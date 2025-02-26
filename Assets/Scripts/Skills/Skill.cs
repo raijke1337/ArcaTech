@@ -3,6 +3,7 @@ using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units;
+using UnityEditor.Build;
 using UnityEngine;
 
 namespace Arcatech.Skills
@@ -21,17 +22,38 @@ namespace Arcatech.Skills
 
         protected SkillUsageStrategy Strategy { get; }
 
-
-        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseEntity owner, BaseEquippableItemComponent item)
+        public string UsableName { get; }
+        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseEntity owner, BaseEquippableItemComponent item, EquipmentType type)
         { 
 
             Owner = owner;
             if (settings == null) return; // placeholder maybe TODO - for items without skills
 
-            UseActionType = settings.UnitActionType;
+            switch (type)
+            {
+                case EquipmentType.None:
+                    break;
+                case EquipmentType.MeleeWeap:
+                    UseActionType = UnitActionType.MeleeSkill;
+                    break;
+                case EquipmentType.RangedWeap:
+                    UseActionType = UnitActionType.RangedSkill;
+                    break;
+                case EquipmentType.Shield:
+                    UseActionType = UnitActionType.ShieldSkill;
+                    break;
+                case EquipmentType.Booster:
+                    UseActionType = UnitActionType.DodgeSkill;
+                    break;
+                    default :
+                    Debug.LogWarning($"Failed to assign action type for {settings.Description.Title} assigned to {item} {type}");
+                    break;
+            }
+
             _cost = settings.Cost;
             Strategy = settings.UseStrategy.ProduceStrategy(Owner, settings, item);
             DrawStrategy = s;
+            UsableName = settings.Description.Text;
         }
 
         public bool TryUseItem(UnitStatsController stats, out BaseUnitAction onUse)
@@ -66,7 +88,7 @@ namespace Arcatech.Skills
 
         public float FillValue => Strategy.FillValue;
 
-        public string Text => Strategy.Text;
+        public string IconValue => Strategy.IconValue;
 
 
         #endregion

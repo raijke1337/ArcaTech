@@ -10,7 +10,7 @@ namespace Arcatech.Triggers
     public class BaseLevelEventTrigger : BaseTrigger, IConditionControlled
     {
         [Header("Base event trigger")]
-        [SerializeField] protected TriggerTargetType targetType;
+        [SerializeField] protected TargetingType targetType;
         [SerializeField] protected bool DestroyOnExit = false;
         [SerializeField] protected bool DestroyOnEnter = false;
         [Space, SerializeField] protected SerializedActionResult[] ActionOnEntry;
@@ -19,7 +19,7 @@ namespace Arcatech.Triggers
 
         private void OnValidate()
         {
-            Assert.IsFalse(targetType == TriggerTargetType.None);
+            Assert.IsFalse(targetType == TargetingType.None);
         }
 
         protected override void OnTriggerEnter(Collider other)
@@ -29,16 +29,16 @@ namespace Arcatech.Triggers
             {
                 switch (targetType)
                 {
-                    case TriggerTargetType.AnyUnit:
+                    case TargetingType.AnyUnit:
                         ApplyResults(p);
                         break;
-                    case TriggerTargetType.OnlyUser:
+                    case TargetingType.OnlyUser:
                         ApplyResults(p);
                         break;
-                    case TriggerTargetType.AnyEnemy:
+                    case TargetingType.AnyEnemy:
                         if (p.Side == Side.EnemySide) ApplyResults(p);
                         break;
-                    case TriggerTargetType.AnyAlly:
+                    case TargetingType.AnyAlly:
                         if (p.Side == Side.PlayerSide) ApplyResults(p);
                         break;
                     default:
@@ -60,16 +60,16 @@ namespace Arcatech.Triggers
             {
                 switch (targetType)
                 {
-                    case TriggerTargetType.AnyUnit:
+                    case TargetingType.AnyUnit:
                         ApplyResults(p);
                         break;
-                    case TriggerTargetType.OnlyUser:
+                    case TargetingType.OnlyUser:
                         ApplyResults(p);
                         break;
-                    case TriggerTargetType.AnyEnemy:
+                    case TargetingType.AnyEnemy:
                         if (p.Side == Side.EnemySide) ApplyResults(p);
                         break;
-                    case TriggerTargetType.AnyAlly:
+                    case TargetingType.AnyAlly:
                         if (p.Side == Side.PlayerSide) ApplyResults(p);
                         break;
                     default:

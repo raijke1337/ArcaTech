@@ -18,7 +18,7 @@ namespace Arcatech.UI
         {
 
             _icon.sprite = content.Icon;
-            _text.text = content.Text;
+            _text.text = content.IconValue;
             _timerFill.fillAmount = content.FillValue;
         }
 

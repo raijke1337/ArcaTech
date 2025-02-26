@@ -7,7 +7,7 @@ namespace Arcatech.UI
     {
         public Sprite Icon { get; }
         public float FillValue { get; }
-        public string Text { get; }
+        public string IconValue { get; }
 
     }
 }

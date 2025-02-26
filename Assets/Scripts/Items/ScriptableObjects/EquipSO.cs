@@ -19,7 +19,7 @@ namespace Arcatech.Items
         {
             base.OnValidate();
             Assert.IsNotNull(ItemPrefab);
-            Assert.IsNotNull(Skill);
+          //  Assert.IsNotNull(Skill);
         }
     }
 

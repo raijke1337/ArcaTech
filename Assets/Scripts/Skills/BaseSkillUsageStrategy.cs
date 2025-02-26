@@ -110,7 +110,7 @@ namespace Arcatech.Skills
             }
         }
 
-        public string Text => _remainingCharges > 0 ? "OK" : "CHARGING";
+        public string IconValue => _remainingCharges > 0 ? "OK" : "CHARGING";
 
         #endregion
 

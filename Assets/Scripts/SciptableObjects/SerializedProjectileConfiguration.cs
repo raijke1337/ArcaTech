@@ -3,6 +3,7 @@ using Arcatech.Triggers;
 using Arcatech.Units;
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Assertions;
 namespace Arcatech.Items
@@ -12,16 +13,19 @@ namespace Arcatech.Items
     {
 
         [SerializeField] ProjectileComponent ProjectilePrefab;
+        [SerializeField] TargetingType AffectedTargets;
+        [Range(1, 10), Tooltip("How many times affected targets will trigger the collision results"), SerializeField] int AffectedTargetsCount;
+        [SerializeField] SerializedActionResult[] UnitCollisionResult;
 
+
+        [Space,Header("Projectile")]
         [SerializeField] float TimeToLive;
         [SerializeField] float ProjectileSpeed;
 
-
         [SerializeField, Tooltip("Placeholder for homing projectiles, range of scanning for tgts")] float HomingRange = 6f;
 
-        [Range(1, 10), Tooltip("How many enemies will be hit by this projectile"),SerializeField] int ProjectilePenetration;
 
-        [SerializeField] SerializedActionResult[] UnitCollisionResult;  
+
         [SerializeField] SerializedActionResult[] ExpirationCollisionResult;
 
 
@@ -30,6 +34,7 @@ namespace Arcatech.Items
         {
             Assert.IsNotNull(ProjectilePrefab);
             Assert.IsNotNull(UnitCollisionResult);
+            Assert.IsFalse(AffectedTargets == TargetingType.None);
         }
         /// <summary>
         /// instantiate the prefab and set it
@@ -52,10 +57,10 @@ namespace Arcatech.Items
             proj.transform.forward = dir;
 
             proj.Lifetime = TimeToLive;
-            proj.RemainingHits = ProjectilePenetration;
+            proj.RemainingHits = AffectedTargetsCount;
             proj.Speed = ProjectileSpeed;
 
-            proj.SetResult(UnitCollisionResult, ExpirationCollisionResult);
+            proj.SetResult(UnitCollisionResult, ExpirationCollisionResult,AffectedTargets);
 
             if (proj is HomingProjectileComponent h)
             {

@@ -16,13 +16,13 @@ namespace Arcatech.Items
 
         public DrawItemsStrategy DrawStrategy;
 
-        public WeaponAnimationsSet WeaponType;
+       // public WeaponAnimationsSet WeaponType;
 
         protected override void OnValidate()
         {
             base.OnValidate();
             Assert.IsNotNull(Cost);
-            Assert.IsFalse(WeaponType == WeaponAnimationsSet.None);
+            //Assert.IsFalse(WeaponType == WeaponAnimationsSet.None);
         }
 
 

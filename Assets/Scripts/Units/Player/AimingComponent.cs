@@ -23,7 +23,7 @@ namespace Arcatech.Units.Inputs
         [SerializeField] float targetingUpdateFreq = 0.1f;
 
         ITargetable currentTgt;
-        Collider[] checkColliders = new Collider[10];
+        Collider[] checkColliders = new Collider[20];
         #endregion
 
         #region public properties
@@ -33,6 +33,8 @@ namespace Arcatech.Units.Inputs
         float _rotationToTarget;
         RaycastHit hit;
         public ITargetable Target => currentTgt;
+
+        CountDownTimer resetTargetTimer;
 
 
         CinemachineBrain _br;
@@ -91,7 +93,9 @@ namespace Arcatech.Units.Inputs
 
 
             targetUpdate = new CountDownTimer(targetingUpdateFreq);
+            resetTargetTimer = new CountDownTimer(1f); //todo
             targetUpdate.Start();
+            resetTargetTimer.Start();
         }
         public void FixedControllerUpdate(float fixedDelta)
         {
@@ -138,6 +142,7 @@ namespace Arcatech.Units.Inputs
 
 
             targetUpdate.Tick(delta);
+            resetTargetTimer.Tick(delta);
             if (targetUpdate.IsReady)
             {
                 CheckTargetables(_target);
@@ -145,16 +150,14 @@ namespace Arcatech.Units.Inputs
                 targetUpdate.Start();
             }
 
-
         }
 
         void CheckTargetables(Vector3 target)
         {
             if (target == null) return; 
+
             if (Physics.OverlapSphereNonAlloc(target, targetingSphereRadius, checkColliders, LayerMask.NameToLayer("Ground")) > 0) // dont check ground layer objects
             {
-                if (currentTgt != null) return;
-
                 for (int i = 0; i < checkColliders.Length; i++)
                 {
                     if (checkColliders[i] == null) break;
@@ -167,7 +170,7 @@ namespace Arcatech.Units.Inputs
             }
             else
             {
-                currentTgt = null;
+                    currentTgt = null;
             }
 
             EventBus<PlayerTargetUpdateEvent>.Raise(new PlayerTargetUpdateEvent(currentTgt));

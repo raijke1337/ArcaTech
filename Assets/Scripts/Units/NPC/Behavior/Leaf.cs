@@ -29,7 +29,7 @@ namespace Arcatech.Units.Behaviour
 
         protected virtual void PrintDebug(NodeStatus st, NPCUnit ac)
         {
-           // _debug.PrintDebug($"{ac.UnitName} Leaf: {NodeName} status {st}");
+            _debug.PrintDebug($"{ac.UnitName} Leaf: {NodeName} status {st}");
         }
     }
 

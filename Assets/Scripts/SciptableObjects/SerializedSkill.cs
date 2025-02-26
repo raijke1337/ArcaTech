@@ -14,20 +14,21 @@ namespace Arcatech.Skills
         [SerializeField] DrawItemsStrategy DrawItemsStrategy;
         [Header("Text"), SerializeField] public ExtendedText Description;
 
-        [Space, Header("Combat"), SerializeField]
-        public UnitActionType UnitActionType;
+        [Space, Header("Combat")]
+        //public UnitActionType UnitActionType;
         [SerializeField] public SerializedStatsEffectConfig Cost;
 
 
-        public Skill CreateSkill(BaseEntity owner, BaseEquippableItemComponent item)
+        public Skill CreateSkill(BaseEntity owner, BaseEquippableItemComponent item,EquipmentType type)
         {
-            return new Skill(DrawItemsStrategy, this,owner,item);
+            return new Skill(DrawItemsStrategy, this,owner,item,type);
         }
         private void OnValidate()
         {
             Assert.IsNotNull(UseStrategy);
             Assert.IsNotNull(Cost);
             Assert.IsNotNull(DrawItemsStrategy);
+            Assert.IsNotNull(Description);
         }
     }
 }

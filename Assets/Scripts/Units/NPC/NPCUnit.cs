@@ -27,6 +27,9 @@ namespace Arcatech.Units
         [SerializeField, Range(1, 10f)] protected float _sphereCastRadius = 3f;
         [SerializeField, Range(1, 999)] protected float _combatTimeout = 5f;
 
+        [Space, Header("General combat settings")]
+        [SerializeField, Range(0,25)] protected float _attackingRange;
+
         [Space,SerializeField] SerializedUnitAction _enterCombatAction;
         [SerializeField] SerializedUnitAction _exitCombatAction;
 
@@ -34,14 +37,29 @@ namespace Arcatech.Units
         {
             if (_showDebugs)
             {
-                Gizmos.color = Color.yellow;
+                // combat state and detection
+                Gizmos.color = Color.green;
+                UnityEditor.Handles.color = Color.green;
                 if (UnitInCombatState)
                 {
-                    Gizmos.color = Color.red;
+                    Gizmos.color = Color.yellow;
+                    UnityEditor.Handles.color = Color.yellow;
                 }
-                Gizmos.DrawWireSphere(_headT.position, _sphereCastRadius);
-                Gizmos.DrawWireSphere(_headT.position + (_headT.forward * _playerDetectionSphereCastRange), _sphereCastRadius);
                 Gizmos.DrawLine(_headT.position, _headT.position + (_headT.forward * _playerDetectionSphereCastRange));
+
+                UnityEditor.Handles.DrawWireDisc(_headT.position, Vector3.up, _sphereCastRadius);
+                UnityEditor.Handles.DrawWireDisc(_headT.position + (_headT.forward * _playerDetectionSphereCastRange), Vector3.up, _sphereCastRadius);
+
+                if (agent != null && agent.destination != null)
+                {
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawWireSphere(agent.destination, 0.3f);
+                    UnityEditor.Handles.color = Color.blue;
+                    UnityEditor.Handles.DrawWireDisc(transform.position,Vector3.up,agent.stoppingDistance);
+                }
+
+                UnityEditor.Handles.color = Color.red;
+                UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, _attackingRange);
             }
         }
 
@@ -131,10 +149,6 @@ namespace Arcatech.Units
         void ExecuteBehaviour()
         {
             if (ActionLock || UnitPaused) return;
-            if (UnitInCombatState) {
-
-                int i = 0;
-            };
             if (tree?.Process(this) == Node.NodeStatus.Fail)
             {
                 Debug.Log($"{UnitName} has an empty behavior tree!");
@@ -162,7 +176,7 @@ namespace Arcatech.Units
                 }
                 else return false;
             }
-            Leaf checkWait = new Leaf(new BehaviourCondition(() => isDoneWaiting()),"is finished idle time");
+            Leaf checkWait = new Leaf(new SimpleBehaviourCondition(() => isDoneWaiting()),"is finished idle time");
             idleWait.AddChild(checkWait);
 
             roamandWait.AddChild(roam);
@@ -181,10 +195,6 @@ namespace Arcatech.Units
             return randomPatrol;
         }
 
-        protected bool CheckDistanceToPlayer(float distance)
-        {
-            return Vector3.Magnitude(transform.position - _player.transform.position) <= distance;
-        }
 
         #endregion
 
@@ -211,7 +221,10 @@ namespace Arcatech.Units
                 OnCombatStateChanged(value);
                 _inCombat = value;
                 tree.Reset();
-                if (_showDebugs) Debug.Log($"{UnitName} combat state: {value}");
+                if (_showDebugs)
+                {
+                    Debug.Log($"{UnitName} combat state: {value}");
+                }
             }
         }
 
@@ -219,7 +232,7 @@ namespace Arcatech.Units
         {
             if (state)
             {
-                if (combatTimeoutTimer == null) combatTimeoutTimer = new CountDownTimer(_combatTimeout);
+                combatTimeoutTimer ??= new CountDownTimer(_combatTimeout);
                 combatTimeoutTimer.Start();
             }
             if (state && _enterCombatAction != null)
@@ -261,6 +274,7 @@ namespace Arcatech.Units
                         {
                             combatTimeoutTimer?.Reset();
                             UnitInCombatState = true;
+                            //if (_showDebugs) Debug.Log($"{UnitName} spotted player!");
                             break;
                         }
                     }
@@ -271,6 +285,23 @@ namespace Arcatech.Units
 
         #endregion
 
+        protected bool CheckDistance (Transform t, Comparer c, float value)
+        {
+            float d = Vector3.Distance(transform.position, t.position);
+            switch (c)
+            {
+                case Comparer.Equal:
+                    return d == value;
+
+                case Comparer.NotEqual:
+                    return d!= value;
+                case Comparer.Greater:
+                    return d > value;
+                case Comparer.Less:
+                    return d < value;   
+            }
+            return false;
+        }
 
         #endregion
     }

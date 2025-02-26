@@ -22,6 +22,7 @@ namespace Arcatech.Items
 
         BaseEntity[] hits;
         int index = 0;
+        TargetingType targetingType;
 
         //public SerializedEffectsCollection VFX;
        // EffectsCollection _fx;
@@ -30,8 +31,9 @@ namespace Arcatech.Items
         IActionResult[] ExpirationCollisionResult; // explode (place aoe projectile) or stop moving
 
 
-        public void SetResult(SerializedActionResult[] cfg, SerializedActionResult[] exp)
+        public void SetResult(SerializedActionResult[] cfg, SerializedActionResult[] exp, TargetingType t)
         {
+            targetingType = t;
             UnitCollisionResult = new ActionResult[cfg.Length];
             for (int i = 0; i < UnitCollisionResult.Length; i++)
             {
@@ -54,26 +56,27 @@ namespace Arcatech.Items
 
         protected virtual void Col_SomethingHitEvent(Collider other)
         {
-         //   Debug.Log($"{this} hit {other}!");
-
             if (other.TryGetComponent<BaseEntity>(out var u))
             {
-                // hit an entioty
-
-                if (u != Owner && u.Side != Owner.Side && !hits.Contains(u) && RemainingHits > 0) // mightr be slow 
+                switch (targetingType)
                 {
-                    hits[index] = u;
-                    index++;
-                    hasHitUnit = true;
-                    RemainingHits--;
-
-                    if (UnitCollisionResult.Length > 0)
-                    {
-                        foreach (var uc in UnitCollisionResult)
+                    case TargetingType.OnlyUser:
+                        if (u == Owner)
                         {
-                            uc.ProduceResult(Owner, u, transform);
+                            OnColliderSuccess(u);
                         }
-                    }
+                        break;
+                    case TargetingType.AnyUnit:
+                        OnColliderSuccess(u);
+                        break;
+                    case TargetingType.AnyEnemy:
+                        if (u.Side != Owner.Side)
+                            OnColliderSuccess(u);
+                        break;
+                    case TargetingType.AnyAlly:
+                        if (u.Side == Owner.Side)
+                            OnColliderSuccess(u);
+                        break;
                 }
             }
             if (isAoe) return;
@@ -87,6 +90,24 @@ namespace Arcatech.Items
             {
                 Expiry();
                 Destroy(gameObject);
+            }
+        }
+        void OnColliderSuccess(BaseEntity u)
+        {
+            if (!hits.Contains(u) && RemainingHits > 0) // mightr be slow 
+            {
+                hits[index] = u;
+                index++;
+                hasHitUnit = true;
+                RemainingHits--;
+
+                if (UnitCollisionResult.Length > 0)
+                {
+                    foreach (var uc in UnitCollisionResult)
+                    {
+                        uc.ProduceResult(Owner, u, transform);
+                    }
+                }
             }
         }
 
@@ -104,8 +125,7 @@ namespace Arcatech.Items
         protected virtual void Expiry()
         {
             if (ExpirationCollisionResult.Length > 0 && !hasHitUnit)
-            {
-                Debug.Log($"{this} expiry!");
+            {               
                 foreach (var exp in ExpirationCollisionResult)
                 {
                     exp.ProduceResult(Owner, null, transform);

@@ -3,6 +3,7 @@ using Arcatech.Stats;
 using Arcatech.Units;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Arcatech.Skills
 {
@@ -40,9 +41,11 @@ namespace Arcatech.Skills
                 if (ok)
                 {
                     inv.DrawItems(_skills[action].DrawStrategy);
+                    if (DebugMessage && Owner.UnitDebug) { Debug.Log($"{Owner} used skill {_skills[action]}"); }
                     return ok;
                 }
             }
+            if (DebugMessage && Owner.UnitDebug) { Debug.Log($"{Owner} failed to use skill {_skills[action]}"); }
             return false;
         }
 

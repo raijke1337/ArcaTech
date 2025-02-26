@@ -72,5 +72,4 @@ namespace Arcatech.Units.Behaviour
 
         public void Reset() => isFollowingCalculatedPath = false;
     }
-
 }

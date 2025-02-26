@@ -1,5 +1,7 @@
-﻿using Arcatech.BlackboardSystem;
+﻿using Arcatech.AI;
+using Arcatech.BlackboardSystem;
 using Arcatech.Units.Behaviour;
+using KevinIglesias;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,40 +11,80 @@ namespace Arcatech.Units
     {
 
         [Header("NPC Behaviour : Crawler")]
-        [SerializeField, Range(0, 1)] float selfDestructHealthPercent = 0.2f;
+        [SerializeField, Range(0, 1)] float healAtPercent = 0.6f;
+        [SerializeField] UnitActionType healAction = UnitActionType.MeleeSkill;
+
+        ITacticsRequest checkLowHPAlly;
+        Transform assistedAlly;
+        bool CheckAllyCondition()
+        {
+            var unit = _group.ProcessTacticsRequest(checkLowHPAlly);
+            if (unit != null) { assistedAlly = unit.transform; agent.SetDestination(assistedAlly.position); return true; }
+            else return false;
+        }
 
         protected override void SetupBehavior()
         {
-            BehaviourPrioritySelector actionsPriority = new BehaviourPrioritySelector("actions list " + UnitName);
+            Leaf resumeAgent = new Leaf(new BehaviourAction(() => agent.isStopped = false), "resume agent in case it was stopped by combat");
+            Leaf stopAgent = new Leaf(new BehaviourAction(() => agent.isStopped = true), "stop agent to perform combat");
 
-            Sequence explode = new Sequence("Explode at low hp", 100);
 
-            Leaf checkHP = new Leaf(new BehaviourCondition(()=> _stats.GetStatValue(BaseStatType.Health).GetPercent < selfDestructHealthPercent), "is hp low for skill");
-            Leaf useSkill = new Leaf(new CheckCombatAction(_skills, _weapons, UnitActionType.MeleeSkill), "explode");
+            Sequence combatSequence = new Sequence("combat actions " + UnitName, 80);
+            Leaf checkCombat = new Leaf(new SimpleBehaviourCondition(() => UnitInCombatState == true), "check combat state", 100);
+            BehaviourPrioritySelector combatPriority = new BehaviourPrioritySelector("select combat action", 0);
+            Leaf combatSequenceDone = new Leaf(new BehaviourAction(() => combatSequence.Reset()), "Reset combat");
 
-            explode.AddChild(checkHP);
-            explode.AddChild(useSkill);
+            combatSequence.AddChild(checkCombat);
+            combatSequence.AddChild(combatPriority);
+            combatSequence.AddChild(combatSequenceDone);
 
-            Sequence inCombat = new Sequence("combat activity",50);
+            checkLowHPAlly = new TacticsRequestLowStatAllyAction(BaseStatType.Health, Comparer.Less, healAtPercent, healAction);
+            Sequence assistAlly = new Sequence("assist damaged ally", 100);
 
-            Leaf checkCombatState = new Leaf(new BehaviourCondition(() => UnitInCombatState == true), "check combat state");
+            Leaf allyAvailable = new Leaf(new SimpleBehaviourCondition(() => CheckAllyCondition()), "tactics request");
+            Leaf checkSkill = new Leaf(new CombatActionReadyBehaviourCondition(_skills, _weapons, healAction), "is skill ready");
+            Leaf arrived = new Leaf(new SimpleBehaviourCondition(() => (agent.remainingDistance <= agent.stoppingDistance)),"has arrived at ally");
+            Leaf useSkill = new Leaf(new BehaviourAction(() => HandleUnitAction(healAction)), "use heal");
+
+            assistAlly.AddChild(allyAvailable);
+            assistAlly.AddChild(checkSkill);
+            assistAlly.AddChild(resumeAgent);
+            assistAlly.AddChild(arrived);
+            assistAlly.AddChild(useSkill);
+            assistAlly.AddChild(combatSequenceDone);
+
+            combatPriority.AddChild(assistAlly);
+
+
+
+            Sequence chaseAndAttackPlayer = new Sequence("Chase player", 80);
             Leaf chase = new Leaf(new MoveToTransformStrategy(agent, _player), "move to player");
-            Leaf attack = new Leaf(new CheckCombatAction(_skills,_weapons, UnitActionType.Melee), "use melee attack");
+            Leaf attackReady = new Leaf(new CombatActionReadyBehaviourCondition(_skills,_weapons, UnitActionType.Melee), "use melee attack check");
+            Leaf useAttack = new Leaf(new BehaviourAction(()=>HandleUnitAction(UnitActionType.Melee)),"Attack in melee");
 
-            Leaf chaseComplete = new Leaf(new BehaviourAction(() => inCombat.Reset()), "reset chase");
+            chaseAndAttackPlayer.AddChild(resumeAgent);
+            chaseAndAttackPlayer.AddChild(chase);
+            chaseAndAttackPlayer.AddChild(attackReady);
+            chaseAndAttackPlayer.AddChild(useAttack);
+            chaseAndAttackPlayer.AddChild(combatSequenceDone);
 
-            inCombat.AddChild(checkCombatState);
-            inCombat.AddChild(chase);
-            inCombat.AddChild(attack);
-            inCombat.AddChild(chaseComplete);
+            combatPriority.AddChild(chaseAndAttackPlayer);
 
-            actionsPriority.AddChild(explode);
-            actionsPriority.AddChild(inCombat);
 
-            if (patrolPointVariants != null && patrolPointVariants.Count > 0) actionsPriority.AddChild(SetupPatrolPoints());
-            actionsPriority.AddChild(SetupIdleRoaming());
+            Sequence idleSequence = new Sequence("idling", 10);
+            BehaviorInverter noCombatState = new BehaviorInverter("no combat state");
+            noCombatState.AddChild(checkCombat);
 
-            tree.AddChild(actionsPriority);
+            idleSequence.AddChild(noCombatState);
+            if (patrolPointVariants != null && patrolPointVariants.Count > 0)
+            {
+                idleSequence.AddChild(SetupPatrolPoints());
+            }
+            idleSequence.AddChild(SetupIdleRoaming());
+
+
+            tree.AddChild(idleSequence);
+            tree.AddChild(combatSequence);
         }
     }
 }

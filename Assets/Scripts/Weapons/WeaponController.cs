@@ -65,6 +65,7 @@ namespace Arcatech.Units
         #region interface
         public bool TryUseAction(UnitActionType action, out BaseUnitAction onUse)
         {
+            onUse = null;
             if (ActionAvailable(action))
             {
                 bool ok = _weapons[action].TryUseItem(_stats, out onUse);
@@ -72,11 +73,11 @@ namespace Arcatech.Units
                 {
                     _currentWeapon = _weapons[action];
                     _inv.DrawItems(_weapons[action].DrawStrategy);
+                    if (DebugMessage && Owner.UnitDebug) { Debug.Log($"{Owner} used weapon {_weapons[action]}"); }
                     return true;
                 }
-                return false;
             }
-            onUse = null;
+            if (DebugMessage && Owner.UnitDebug) { Debug.Log($"{Owner} failed to use weapon {_weapons[action]}"); }
             return false;
         }
 

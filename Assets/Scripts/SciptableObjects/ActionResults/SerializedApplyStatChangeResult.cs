@@ -13,7 +13,7 @@ namespace Arcatech.Actions
     public class SerializedApplyStatChangeResult : SerializedActionResult
     {
 
-        [SerializeField] SerializedDictionary<TriggerTargetType, SerializedStatsEffectConfig[]> StatChanges;
+        [SerializeField] SerializedDictionary<TargetingType, SerializedStatsEffectConfig[]> StatChanges;
         public override IActionResult GetActionResult()
         {
             return new ApplyStatChangeEffectResult(StatChanges);
@@ -35,8 +35,8 @@ namespace Arcatech.Actions
     }
     public class ApplyStatChangeEffectResult : ActionResult
     {
-        Dictionary <TriggerTargetType, SerializedStatsEffectConfig[]> _effs; 
-        public ApplyStatChangeEffectResult(SerializedDictionary<TriggerTargetType, SerializedStatsEffectConfig[]> cfg)
+        Dictionary <TargetingType, SerializedStatsEffectConfig[]> _effs; 
+        public ApplyStatChangeEffectResult(SerializedDictionary<TargetingType, SerializedStatsEffectConfig[]> cfg)
         {
             _effs = cfg;
 
@@ -48,32 +48,32 @@ namespace Arcatech.Actions
             {
                 switch (type)
                 {
-                    case TriggerTargetType.None:
+                    case TargetingType.None:
                         foreach (var e in _effs[type])
                         {
                             Debug.LogWarning($"Target type not set for effect {e}");
                         }
                         break;
-                    case TriggerTargetType.OnlyUser:
+                    case TargetingType.OnlyUser:
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(user, new StatsEffect(e), place));
                         }
                         break;
-                    case TriggerTargetType.AnyUnit:
+                    case TargetingType.AnyUnit:
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
                         }
                         break;
-                    case TriggerTargetType.AnyEnemy:
+                    case TargetingType.AnyEnemy:
                         if (target.Side == user.Side) return;
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
                         }
                         break;
-                    case TriggerTargetType.AnyAlly:
+                    case TargetingType.AnyAlly:
                         if (target.Side != user.Side) return;
                         foreach (var e in _effs[type])
                         {

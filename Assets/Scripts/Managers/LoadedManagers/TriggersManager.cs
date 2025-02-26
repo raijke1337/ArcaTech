@@ -11,9 +11,6 @@ namespace Arcatech.Managers
 {
     public class TriggersManager : MonoBehaviour, IManagedController
     {
-
-
-
         EventBinding<StatsEffectTriggerEvent> _triggersBinding;
 
         private void OnEnable()

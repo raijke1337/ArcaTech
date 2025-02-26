@@ -14,7 +14,10 @@ namespace Arcatech.Items
         {
             DisplayItem = GameObject.Instantiate(cfg.ItemPrefab);
             StatMods = cfg.StatMods;
-            GetSkill = cfg.Skill.CreateSkill(ow, DisplayItem);
+            if (cfg.Skill!= null)
+            {
+                GetSkill = cfg.Skill.CreateSkill(ow, DisplayItem, Type);
+            }
             DisplayItem.gameObject.SetActive(false);
           //  Debug.Log($"setup equipment{this}");
         }               

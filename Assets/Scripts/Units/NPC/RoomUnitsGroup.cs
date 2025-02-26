@@ -43,13 +43,14 @@ namespace Arcatech.AI
                     _units.Add(u);
                     u.OnUnitAttackedEvent += Unit_OnUnitAttackedEvent;
                     u.BaseEntityDeathEvent += RemoveUnitOnDeath;
-                    //ar.RegisterExpert(u);
+                    u.SetUnitsGroup(this);
                     Debug.Log($"{this.gameObject} register unit {u}");
                 }
             }
         }
         private void Unit_OnUnitAttackedEvent(NPCUnit arg)
         {
+            //placeholder
             foreach (var unit in _units) { unit.UnitInCombatState = true; };
         }
 
@@ -64,5 +65,11 @@ namespace Arcatech.AI
                 Debug.Log($"{this.gameObject} deregister unit {unit}");
             }
         }
+
+        public NPCUnit ProcessTacticsRequest(ITacticsRequest r)
+        {
+            return r.Process(_units);
+        }
     }
+
 }

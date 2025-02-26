@@ -24,14 +24,14 @@ namespace Arcatech.Items
         public UnitActionType UseActionType { get; protected set; }
         public IWeaponUseStrategy UseStrategy { get; protected set; }
 
-        public WeaponAnimationsSet AnimationSet { get; protected set; }
+        //public WeaponAnimationsSet AnimationSet { get; protected set; }
 
         public Weapon(WeaponSO cfg, EquippedUnit ow) : base(cfg, ow)
         {
             _weaponGameobject = DisplayItem as BaseWeaponComponent;
 
             _cost = cfg.Cost;
-            AnimationSet = cfg.WeaponType;
+           // AnimationSet = cfg.WeaponType;
             switch (Type)
             {
                 case EquipmentType.MeleeWeap:
@@ -67,7 +67,7 @@ namespace Arcatech.Items
             EventBus<UpdateIconEvent>.Raise(new UpdateIconEvent(this, Owner));
         }
 
-
+        public string UsableName { get => Config.Description.Text; }
 
         #region UI
 
@@ -75,7 +75,7 @@ namespace Arcatech.Items
 
         public float FillValue => UseStrategy.FillValue;
 
-        public string Text => UseStrategy.Text;
+        public string IconValue => UseStrategy.IconValue;
 
 
         #endregion

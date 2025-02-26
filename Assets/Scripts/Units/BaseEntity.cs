@@ -239,7 +239,7 @@ namespace Arcatech.Units
         {
             if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
             {
-               if (_showDebugs) Debug.Log("Boom");
+               //if (_showDebugs) Debug.Log("Boom");
                force?.Kill();
             }
         }

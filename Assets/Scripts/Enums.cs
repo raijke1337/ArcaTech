@@ -26,17 +26,6 @@ public enum EquipmentType
     Other = 255
 }
 
-public enum WeaponAnimationsSet
-{
-    None,
-    MeleeOneHanded,
-    MeleeTwoHanded,
-    MeleeTwoHandedLong,
-    RangedHandGun,
-    RangedRifle,
-    RangedAutoRifle
-}
-
 public enum UnitActionType : byte
 {
     Melee,
@@ -49,7 +38,7 @@ public enum UnitActionType : byte
     None = 255
 }
 
-public enum TriggerTargetType
+public enum TargetingType
 {
     None,
     OnlyUser,
@@ -66,12 +55,6 @@ public enum CursorType
     Explore,
     EnemyTarget,
     Item,
-}
-public enum DisplayValueType : byte
-{
-    Health = 0,
-    Energy = 1,
-    Stamina = 2
 }
 
 public enum FontType
@@ -93,29 +76,6 @@ public enum LevelType
 }
 
 
-public enum EffectMoment
-{
-    OnStart,
-    OnUpdate,
-    OnCollision,
-    OnExpiry
-}
-
-
-#region AI
-public enum ReferenceUnitType : byte
-{
-    Small = 0,
-    Big = 1,
-    Boss = 2,
-    Focus = 252,
-    Self = 253,
-    Any = 254,
-    Player = 255
-}
-
-
-#endregion
 
 public enum FaceExpression : byte
 {

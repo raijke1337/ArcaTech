@@ -35,9 +35,5 @@ namespace Arcatech.Triggers
         public abstract bool CheckCondition(StatValueContainer c);
     }
 
-    public enum ConditionComparer
-    {
-        Greater, Less
-    }
 
 }
