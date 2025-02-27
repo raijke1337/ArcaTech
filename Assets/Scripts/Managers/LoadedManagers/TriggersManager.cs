@@ -65,7 +65,7 @@ namespace Arcatech.Managers
                 else
                 {
                     // target not in list
-                    targetToApply.ApplyEffect(obj.Applied);
+                    targetToApply.ApplyEffect(obj.Applied,null,out _);
                     r.Add(obj.Target);
 
                     if (obj.Applied.OnApply != null)
@@ -77,7 +77,7 @@ namespace Arcatech.Managers
             // effect not in list just do normally
             else
             {
-                targetToApply.ApplyEffect(obj.Applied);
+                targetToApply.ApplyEffect(obj.Applied,null, out _);
                 _applied[obj.Applied] = new List<BaseEntity>() { targetToApply };
 
                 if (obj.Applied.OnApply != null)

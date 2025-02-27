@@ -22,44 +22,50 @@ namespace Arcatech.Stats
         private float _cachedValue;
         private float _maxValue;
         private float _minValue = 0f;
-        private bool _setup = false;
+        private float _initValue = 0f;
+
+       // private bool _setup = false;
 
         public override string ToString()
         {
             return ($"{Mathf.RoundToInt(GetCurrent)} / {Mathf.RoundToInt(GetMax)}");
         }
 
-        public StatValueContainer()
+        public StatValueContainer(IEnumerable<SerializedStatModConfig> initValues)
         {
             _currentEffects = new List<StatsEffect>();
             _currentMods = new();
-        }
-
-        public void Initialize(float startValue)
-        {
-            if (!_setup)
+            foreach (var mod in initValues)
             {
-                _currentValue = Mathf.Clamp(startValue, _minValue, _maxValue);
-                _cachedValue = _currentValue;
-                _setup = true;
+                ApplyStatsMod(mod);
             }
+            _currentValue = _initValue;
+            _cachedValue = _initValue;
+        }
+        public StatValueContainer(SerializedStatModConfig initValue)
+        {
+            _currentEffects = new List<StatsEffect>();
+            _currentMods = new();
+            ApplyStatsMod(initValue);
+            _currentValue = _initValue;
+            _cachedValue = _initValue;
         }
 
         public void UpdateInDelta(float deltaTime)
         {
-            if (!_setup) return;
-            HandleMods(deltaTime);
-            HandleEffects(deltaTime);
+            UpdateMods(deltaTime);
+            UpdateEffects(deltaTime);
         }
 
         #region mods
         private List<SerializedStatModConfig> _currentMods;
         public void ApplyStatsMod(SerializedStatModConfig mod)
         {
-            _maxValue += mod.GetBaseValue;
+            _maxValue += mod.GetMaxValue;
+            _initValue += mod.GetInitValue;
             _currentMods.Add(mod);
         }
-        void HandleMods(float d)
+        void UpdateMods(float d)
         {
             foreach (var mod in _currentMods.ToList())
             {
@@ -68,12 +74,17 @@ namespace Arcatech.Stats
                     _cachedValue = _currentValue;
                     _currentValue = Mathf.Clamp(_currentValue + (mod.GetPerSecValue * d), _minValue, _maxValue);
                 }
+                else
+                {
+                   // Debug.Log($"Condition not met for {mod}");
+                }
             }
+
         }
-        public void RemoveStatsMod(SerializedStatModConfig mod)
-        {
-            if (_currentMods.Contains(mod)) _currentMods.Remove(mod);
-        }
+        //public void RemoveStatsMod(SerializedStatModConfig mod)
+        //{
+        //    if (_currentMods.Contains(mod)) _currentMods.Remove(mod);
+        //}
 
         #endregion
 
@@ -87,7 +98,7 @@ namespace Arcatech.Stats
             _currentEffects.Add(eff);
         }
 
-        void HandleEffects(float d)
+        void UpdateEffects(float d)
         {
             foreach (var eff in _currentEffects.ToList())
             {

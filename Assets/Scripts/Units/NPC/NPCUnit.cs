@@ -72,11 +72,11 @@ namespace Arcatech.Units
             }
         }
         
-        protected override void HandleDamage(float value)
+        protected override void DamageAction()
         {
             OnUnitAttackedEvent?.Invoke(this);
             UnitInCombatState = true;
-            base.HandleDamage(value);
+            base.DamageAction();
         }
 
         protected override void HandleInteractionAction(IInteractible i)

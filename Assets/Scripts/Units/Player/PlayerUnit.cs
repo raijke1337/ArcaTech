@@ -88,30 +88,28 @@ namespace Arcatech.Units
         #endregion
 
         #region stats
-        protected override void UpdateStats()
+        protected override void OnTimedStatsUpdate()
         {
-            base.UpdateStats();
-            foreach (var pair in _stats.GetStatValues)
+            foreach(var k in _stats.GetStatValues.Keys)
             {
-                EventBus<PlayerStatsChangedUIEvent>.Raise(new PlayerStatsChangedUIEvent(pair.Key,pair.Value));
+                EventBus<PlayerStatsChangedUIEvent>.Raise(new PlayerStatsChangedUIEvent(k, _stats.GetStatValue(k)));
             }
-             // used by player UI
+            base.OnTimedStatsUpdate();
         }
 
-        protected override void HandleDamage(float value)
+        protected override void DamageAction()
         {
-            UpdateStats();
             if (_stats.GetStatValue(BaseStatType.Stamina).GetCurrent <= _armorBreakStam && _stats.GetStatValue(BaseStatType.Energy).GetCurrent <= _armorBreakEnergy)
             {
                 if (_showDebugs) Debug.Log($"Armor break!");
                 costumes.OnBreak();
             }
-            base.HandleDamage(value);
+            base.DamageAction();
         }
 
-        protected override void HandleDeath()
+        protected override void DeathAction()
         {
-            base.HandleDeath();
+            base.DeathAction();
             _movement.SetDesiredMoveDirection(Vector3.zero);
         }
 

@@ -25,6 +25,7 @@ namespace Arcatech.Units
 
             combatSequence.AddChild(checkCombat);
             combatSequence.AddChild(combatPriority);
+            combatSequenceDone.AddChild(new Leaf(new BehaviourAction(() => agent.stoppingDistance = initStoppingDistance),"Reset stopping distacne"));
             combatSequence.AddChild(combatSequenceDone);
 
 
@@ -35,6 +36,7 @@ namespace Arcatech.Units
             runAwayFromPlayer.AddChild(checkIfPlayerIsTooClose);
             runAwayFromPlayer.AddChild(resumeAgent);
             runAwayFromPlayer.AddChild(flee);
+
 
             Sequence aimAndShoot = new Sequence("aim at player and use weapon", 50);
 
@@ -52,6 +54,13 @@ namespace Arcatech.Units
 
 
             Sequence chasePlayer = new Sequence("chase player",20);
+            Leaf setStoppingDistance = new Leaf(new BehaviourAction(() => agent.stoppingDistance = _attackingRange),"set stopping distance to attack range");
+            Leaf chase = new Leaf(new MoveToTransformStrategy(agent, _player), "move to player");
+
+            chasePlayer.AddChild(setStoppingDistance);
+            chasePlayer.AddChild(resumeAgent);
+            chasePlayer.AddChild(chase);
+            chasePlayer.AddChild(combatSequenceDone);
 
 
             combatPriority.AddChild(chasePlayer);

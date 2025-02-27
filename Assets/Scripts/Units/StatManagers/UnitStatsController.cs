@@ -16,29 +16,29 @@ namespace Arcatech.Stats
     {
         private Dictionary<BaseStatType, StatValueContainer> _stats;
 
-        public UnitStatsController(SerializedStatModConfig[] startingstats, BaseEntity dummyUnit) : base(dummyUnit)
+        public UnitStatsController(SerializedStatModConfig[] initialStatMods, BaseEntity dummyUnit) : base(dummyUnit)
         {
             _stats = new Dictionary<BaseStatType, StatValueContainer>();
-            //var vals = Enum.GetValues(typeof(BaseStatType));
-            //foreach (var typ in vals)
-            //{
-            //    _stats[(BaseStatType)typ] = new StatValueContainer();
-            //}
-            AddMods(startingstats);
+            AddMods(initialStatMods);
         }
         public UnitStatsController AddMods (SerializedStatModConfig[] mods)
         {
             foreach (var cfg in mods)
             {
-                if (!_stats.ContainsKey(cfg.GetStatType)) _stats[cfg.GetStatType] = new StatValueContainer();
-                _stats[cfg.GetStatType].ApplyStatsMod(cfg);
+                if (!_stats.ContainsKey(cfg.GetStatType))
+                {
+                    _stats[cfg.GetStatType] = new StatValueContainer(cfg);
+                }
+                else
+                {
+                    _stats[cfg.GetStatType].ApplyStatsMod(cfg);
+                }
             }
             return this;
         }
 
-        public bool CanApplyEffect (StatsEffect eff,out float current, IEquippable withShield = null)
+        public bool CanApplyEffect (StatsEffect eff,IEquippable withShield = null)
         {
-            current = 0;
             StatValueContainer c;
             switch (eff.StatType)
             {
@@ -49,9 +49,8 @@ namespace Arcatech.Stats
                         var results = shield.AbsorbStrategy.SplitDamage(eff, _stats[BaseStatType.Energy]);
                         foreach (var result in results)
                         {
-                            CanApplyEffect(result, out _, null);
+                            CanApplyEffect(result, null);
                         }
-                        current = _stats[BaseStatType.Health].GetCurrent;
                         shield.AbsorbStrategy.OnApplicationResult.ProduceResult(Owner, Owner, Owner.transform);
 
                         return true;
@@ -65,7 +64,6 @@ namespace Arcatech.Stats
                             {
                                 eff.OnApply.GetActionResult().ProduceResult(Owner, Owner, Owner.transform);
                             }
-                            current = c.GetCurrent;
                             return true;
                         }
                     }
@@ -74,7 +72,6 @@ namespace Arcatech.Stats
                     if (_stats.TryGetValue(eff.StatType, out c))
                     {
                         c.ApplyStatsEffect(eff);
-                        current = c.GetCurrent;
                         return true;
                     }
                     break;
@@ -84,15 +81,17 @@ namespace Arcatech.Stats
         }
         public bool CanApplyCost (StatsEffect cost)
         {
-            bool OK;
+            bool OK = false;
             if (cost == null)
             {
                 OK = true;
             }
             else
             {
-                var cont = _stats[cost.StatType];
-                OK = cont.GetCurrent >= Mathf.Abs(cost.InitialValue);
+                if (_stats.TryGetValue(cost.StatType, out var c))
+                {
+                    OK = c.GetCurrent >= Mathf.Abs(cost.InitialValue);
+                }
             }
             return OK;
         }
@@ -125,10 +124,7 @@ namespace Arcatech.Stats
 
         public override void StartController()
         {
-            foreach (var stat in _stats.Values)
-            {
-                stat.Initialize(stat.GetMax);
-            }
+
         }
 
 

@@ -51,13 +51,14 @@ namespace Arcatech.UI
                 }
 
             _background.DOColor(flash, 0.1f).SetEase(Ease.InQuint).Play().onComplete += () => _background.DOColor(_baseBgColor, 0.1f).SetEase(Ease.InQuint).Play(); 
+            try
+            {
+                _fill.DOFillAmount(c.GetPercent, fillTime).SetEase(_ease).Play();
+                _text.text = c.ToString();
+            }
 
-            _fill.DOFillAmount(c.GetPercent, fillTime).SetEase(_ease).Play();
-            _text.text = c.ToString();
+            catch { }
         }
-        private void OnDestroy()
-        {
-            
-        }
+
     }
 }

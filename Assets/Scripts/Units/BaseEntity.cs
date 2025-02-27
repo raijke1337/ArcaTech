@@ -26,7 +26,6 @@ namespace Arcatech.Units
         protected UnitStatsController _stats;
         [Space, SerializeField] protected SerializedUnitAction ActionOnDamage;
         [SerializeField] protected SerializedUnitAction ActionOnDeath;
-        [SerializeField] protected SerializedUnitAction ActionOnStun;
         [SerializeField, Tooltip("Place to spawn effects")] protected Transform _headT;
 
         [SerializeField, Self] protected Animator _animator;
@@ -93,6 +92,7 @@ namespace Arcatech.Units
             }
         }
 
+
         #endregion
 
 
@@ -106,12 +106,11 @@ namespace Arcatech.Units
                 statsUpdateTimer?.Tick(delta);
                 if (statsUpdateTimer.IsReady)
                 {
-                    UpdateStats();
+                    OnTimedStatsUpdate();
                     statsUpdateTimer.Reset();
                     statsUpdateTimer.Start();
                 }
             }
-
         }
         public virtual void RunFixedUpdate(float delta)
         {
@@ -125,62 +124,35 @@ namespace Arcatech.Units
         CountDownTimer statsUpdateTimer;
         public event UnityAction<BaseEntity> BaseEntityDeathEvent = delegate { };
 
-        protected virtual void UpdateStats()
+        protected virtual void OnTimedStatsUpdate()
         {
-            var stats = _stats.GetStatValues;
-            foreach (var k in stats.Keys)
-            {
-                switch (k)
-                {
-                    case BaseStatType.Health:
-                        if (stats[k].GetCurrent == 0) HandleDeath();
-                        break;
-                    case BaseStatType.Stamina:
-                        if (stats[k].GetCurrent == 0) HandleStun();
-                        break;
-                    case BaseStatType.Energy:
-                        break;
-                }
-            }
+            var hp = _stats.GetStatValue(BaseStatType.Health).GetCurrent;
+            if (hp <= 0) DeathAction();
         }
 
-        public virtual void ApplyEffect(StatsEffect eff, IEquippable shield = null)
-        {
-            if (_stats.CanApplyEffect(eff, out var curr, shield))
-            {
-                switch (eff.StatType)
-                {
-                    case BaseStatType.Health:
-                        if (eff.InitialValue < 0)
-                        {
-                            EventBus<DrawDamageEvent>.Raise(new DrawDamageEvent(this, Mathf.Abs(eff.InitialValue)));
-                            HandleDamage(Mathf.Abs(eff.InitialValue));
-                        }
-                        if (curr == 0) HandleDeath();
-                        break;
-                    case BaseStatType.Stamina:
-                        if (curr == 0) HandleStun();
-                        break;
-                    case BaseStatType.Energy:
-                        break;
-                }
-            }
-            UpdateStats();
 
+        public virtual void ApplyEffect(StatsEffect eff, IEquippable shield, out float current)
+        {
+            current = 0;
+            if (UnitDead) return;
+
+            if (_stats.CanApplyEffect(eff, shield))
+            {
+                current = _stats.GetStatValue(eff.StatType).GetCurrent;
+            }
+            OnTimedStatsUpdate();
         }
 
-        protected virtual void HandleDamage(float value)
-        {
-            if (_showDebugs) Debug.Log($"{UnitName} took dmg {value}");
+        protected virtual void DamageAction()
+        {            
             if (ActionOnDamage != null)
             {                
                 ForceUnitAction(ActionOnDamage.ProduceAction(this, transform));
             }
         }
 
-        protected virtual void HandleDeath()
+        protected virtual void DeathAction()
         {
-            
             if (ActionOnDeath != null)
             {
                 ForceUnitAction(ActionOnDeath.ProduceAction(this,transform));
@@ -189,18 +161,11 @@ namespace Arcatech.Units
             {
                 c.enabled = false;
             }
-
             UnitDead = true;
             BaseEntityDeathEvent.Invoke(this);
         }
-        protected virtual void HandleStun()
-        {
-            if (_showDebugs) Debug.Log($"{UnitName} got stunned");
-            if (ActionOnStun != null)
-            {
-                ForceUnitAction(ActionOnStun.ProduceAction(this, _headT));
-            }
-        }
+        protected virtual void StunAction() { }
+
         protected virtual void OnUnitPause(bool isPause)
         {
             Debug.Log($"Entity paused: {isPause} and nothing else happened because this is not overwritten");

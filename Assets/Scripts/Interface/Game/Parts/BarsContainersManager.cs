@@ -43,7 +43,9 @@ namespace Arcatech.UI
         
 
         public void UpdateBarValue(BaseStatType barValue, StatValueContainer container)
+            
         {
+            if (container == null) return;
             if (_barsDict == null)
             {
                 _barsDict = new Dictionary<BaseStatType, BarContainerUIScript>();

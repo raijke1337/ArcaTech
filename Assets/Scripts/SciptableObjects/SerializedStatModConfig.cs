@@ -8,23 +8,24 @@ namespace Arcatech.Triggers
     public class SerializedStatModConfig : ScriptableObject
     {
         [SerializeField] BaseStatType _stat;
-        [SerializeField] SerializedStatModCondition _condition;
-        [SerializeField] int _initValue; // value change
-        [SerializeField] int _perSecValue;
+        
 
-        private void OnValidate()
-        {
-            Assert.IsFalse(_initValue == 0);
-        }
+        [SerializeField] int MaxValueChange;
+        [SerializeField] int InitValueChange;
+        [Space, SerializeField] SerializedStatModCondition PerSecondValueChangeCondition;
+        [SerializeField] int PerSecondValueChange;
+
+
         public BaseStatType GetStatType { get => _stat; }
-        public int GetBaseValue { get => _initValue; }
-        public int GetPerSecValue { get => _perSecValue; }
+        public int GetMaxValue { get => MaxValueChange; }
+        public int GetPerSecValue { get => PerSecondValueChange; }
+        public int GetInitValue { get => InitValueChange; }
 
         public bool CheckCondition(StatValueContainer cont)
         {
-            if (_condition != null)
+            if (PerSecondValueChangeCondition != null)
             {
-                return _condition.CheckCondition(cont);
+                return PerSecondValueChangeCondition.CheckCondition(cont);
             }
             else return true;
         }

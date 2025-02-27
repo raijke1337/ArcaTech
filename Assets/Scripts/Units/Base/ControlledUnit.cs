@@ -1,4 +1,5 @@
-﻿using Arcatech.Managers;
+﻿using Arcatech.Items;
+using Arcatech.Managers;
 using Arcatech.Triggers;
 using Arcatech.Units.Stats;
 using KBCore.Refs;
@@ -13,13 +14,7 @@ namespace Arcatech.Units
          [SerializeField] protected MovementStatsConfig movementStats;
         [SerializeField, Self] protected Rigidbody _rb;
         [Self, SerializeField] protected ControlInputsBase _inputs;
-        [SerializeField, Range(0, 300)] protected float stunEndStamina = 30f;
-        [SerializeField, Range(0.01f, 1)] protected float stunEndGetUpTime = 0.5f;
-
-        protected bool _stunned = false;
-        Coroutine stunEndProgress;
-
-
+        #region MANAGED
         public override void StartControllerUnit()
         {
             base.StartControllerUnit();
@@ -41,16 +36,6 @@ namespace Arcatech.Units
             }
            
         }
-
-        protected abstract void HandleInteractionAction(IInteractible i);
-
-        public override void DisableUnit()
-        {
-            base.DisableUnit();
-            _inputs.UnitActionRequestedEvent -= HandleUnitAction;
-            _inputs.StopController();
-        }
-
         public override void RunUpdate(float delta)
         {
             base.RunUpdate(delta);
@@ -72,7 +57,7 @@ namespace Arcatech.Units
                         ActionLock = currentAction.LockMovement;
                         break;
                     case UnitActionState.ExitTime:
-                        ActionLock =false;
+                        ActionLock = false;
                         break;
                     case UnitActionState.Completed:
                         ActionLock = false;
@@ -81,6 +66,36 @@ namespace Arcatech.Units
             }
             _inputs.ControllerUpdate(delta);
         }
+                public override void DisableUnit()
+        {
+            base.DisableUnit();
+            _inputs.UnitActionRequestedEvent -= HandleUnitAction;
+            _inputs.StopController();
+        }
+        #endregion
+
+        [Space,Header("Stuns")]
+
+        [SerializeField] protected SerializedUnitAction ActionOnStun;
+        [SerializeField, Range(0, 300)] protected float stunStartStamina = 0f;
+        [SerializeField, Range(0, 300)] protected float stunEndStamina = 30f;
+        [SerializeField, Range(0.01f, 1)] protected float stunEndGetUpTime = 0.5f;
+
+        Coroutine stunEndProgress;
+
+
+        protected bool _stunned = false;
+        public bool UnitStunned
+        {
+            get => _stunned;
+            protected set
+            {
+                _stunned = value;
+
+                if (_showDebugs) Debug.Log($"Entity stunned: {value}");
+            }
+        }
+
         IEnumerator StunCancelCoroutine()
         {
             yield return new WaitForSeconds(stunEndGetUpTime);
@@ -90,6 +105,24 @@ namespace Arcatech.Units
             stunEndProgress = null;
             yield return null;
         }
+        protected override void StunAction()
+        {
+            if (UnitStunned) return;
+            OnForceAction(ActionOnStun.ProduceAction(this,transform));
+            UnitStunned = true;
+        }
+
+        protected override void OnTimedStatsUpdate()
+        {
+            if (_stats.GetStatValue(BaseStatType.Stamina).GetCurrent <= stunStartStamina)
+            {
+                StunAction();
+            }
+            base.OnTimedStatsUpdate();
+        }
+
+        #region action lock
+
 
         bool _lockAction;
         protected bool ActionLock
@@ -103,19 +136,9 @@ namespace Arcatech.Units
         }
         protected abstract void OnActionLock(bool locking);
 
-        protected override void HandleStun()
-        {
-            base.HandleStun();
-            ActionLock = true;
-            _stunned = true;
-        }
-        protected override void HandleDamage(float value)
-        {
-            if (_stunned) return; // do not play anims 
-            base.HandleDamage(value);
-        }
+#endregion
 
-        #region actions
+        #region base unit actions
 
         protected BaseUnitAction currentAction;
 
@@ -138,24 +161,16 @@ namespace Arcatech.Units
         public bool CanDoAction(UnitActionType action)
         {
             if (!_ground.isOnGround) return false;
-            else switch (action)
-                {
-                    case UnitActionType.Melee:
-                        return _weapons.CanUseAction(action);
-                    case UnitActionType.Ranged:
-                        return _weapons.CanUseAction(action);
-                    case UnitActionType.DodgeSkill:
-                        return _skills.CanUseAction(action);
-                    case UnitActionType.MeleeSkill:
-                        return _skills.CanUseAction(action);
-                    case UnitActionType.RangedSkill:
-                        return _skills.CanUseAction(action);
-                    case UnitActionType.ShieldSkill:
-                        return _skills.CanUseAction(action);
-                    default:
-                        return false;
-                }
-
+            else return action switch
+            {
+                UnitActionType.Melee => _weapons.CanUseAction(action),
+                UnitActionType.Ranged => _weapons.CanUseAction(action),
+                UnitActionType.DodgeSkill => _skills.CanUseAction(action),
+                UnitActionType.MeleeSkill => _skills.CanUseAction(action),
+                UnitActionType.RangedSkill => _skills.CanUseAction(action),
+                UnitActionType.ShieldSkill => _skills.CanUseAction(action),
+                _ => false,
+            };
         }
         protected virtual void HandleUnitAction(UnitActionType obj)
         {
@@ -186,21 +201,21 @@ namespace Arcatech.Units
                 default:
                     Debug.LogWarning($"action type {obj} not supported in {this}");
                     break;
-            }
-            
-            
-            #endregion
+            }    
+        }
 
-        }
-        protected override void HandleDeath()
-        {
-            currentAction?.CompleteAction();
-            base.HandleDeath();
-        }
+        #endregion
+
+        #region interaction
 
         public virtual void ReceiveInteraction(IInteractible interactible)
         {
             if (_showDebugs) Debug.Log($"NYI: {this} receives interaction from {interactible}");
         }
+
+        protected abstract void HandleInteractionAction(IInteractible i);
+
+        #endregion
+
     }
 }

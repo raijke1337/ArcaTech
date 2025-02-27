@@ -13,9 +13,9 @@ namespace Arcatech.Triggers
             switch (Comparison)
             {
                 case Comparer.Greater:
-                    return (c.GetPercent > PercentCutoff);
+                    return (c.GetPercent > PercentCutoff/100);
                 case Comparer.Less:
-                    return (c.GetPercent < PercentCutoff);
+                    return (c.GetPercent < PercentCutoff/100);
             }
             return false;
         }

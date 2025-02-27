@@ -68,16 +68,15 @@ namespace Arcatech.Units
 /// shield check
 /// </summary>
 /// <param name="eff"></param>
-        public override void ApplyEffect(StatsEffect eff, IEquippable shield = null)
+        public override void ApplyEffect(StatsEffect eff, IEquippable shieldModifier, out float current)
         {
             if( _inventory.HasItemType(EquipmentType.Shield, out var s))
             {
-               // if (_showDebugs) Debug.Log($"{GetUnitName} shield absorb check");
-                base.ApplyEffect(eff,s);
+                base.ApplyEffect(eff,s,out current);
             }
             else
             {
-                base.ApplyEffect(eff);
+                base.ApplyEffect(eff,null,out current);
             }
         }
 
