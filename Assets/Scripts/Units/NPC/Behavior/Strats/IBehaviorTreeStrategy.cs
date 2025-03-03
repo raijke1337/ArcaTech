@@ -1,4 +1,5 @@
-﻿using Arcatech.Stats;
+﻿using Arcatech.AI;
+using Arcatech.Stats;
 
 namespace Arcatech.Units.Behaviour
 {
@@ -7,4 +8,27 @@ namespace Arcatech.Units.Behaviour
         Node.NodeStatus Process(ControlledUnit actor);
         void Reset();
     }
+
+
+    //public class ITacticsRequestAction : IBehaviorTreeStrategy
+    //{
+    //    RoomUnitsGroup _g;
+    //    ITacticsRequest _r;
+    //    public ITacticsRequestAction(RoomUnitsGroup group, ITacticsRequest r)
+    //    {
+    //        _g = group;
+    //        _r = r;
+    //    }
+
+    //    public Node.NodeStatus Process(ControlledUnit actor)
+    //    {
+    //        if (_g.ProcessTacticsRequest(_r) == null) return Node.NodeStatus.Fail;
+
+    //    }
+
+    //    public void Reset()
+    //    {
+
+    //    }
+    //}
 }

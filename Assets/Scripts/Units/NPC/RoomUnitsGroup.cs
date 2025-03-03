@@ -9,7 +9,7 @@ namespace Arcatech.AI
 {
     public class RoomUnitsGroup : MonoBehaviour 
     {
-        //public List<NPCUnit> GetAllUnits => _units;
+
         private List<NPCUnit> _units;
 
         Collider box;

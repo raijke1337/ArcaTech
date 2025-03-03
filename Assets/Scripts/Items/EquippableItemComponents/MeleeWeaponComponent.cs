@@ -8,14 +8,12 @@ namespace Arcatech.Items
     public class MeleeWeaponComponent : BaseWeaponComponent
     {
 
-        public WeaponTriggerComponent Trigger { get; protected set; }
-        public MeleeWeaponTrail Trail { get;protected set; }
+        public WeaponTriggerComponent Trigger { get => _trigger; }
+        public MeleeWeaponTrail Trail { get => _trail; }
 
-        private void Awake()
-        {
-            Trigger = GetComponent<WeaponTriggerComponent>();
-            Trail = GetComponent<MeleeWeaponTrail>();
-        }
+        [Child,SerializeField] WeaponTriggerComponent _trigger;
+        [Child,SerializeField] MeleeWeaponTrail _trail;
+
     }
 
 }

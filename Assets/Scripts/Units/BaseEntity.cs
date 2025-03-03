@@ -28,7 +28,7 @@ namespace Arcatech.Units
         [SerializeField] protected SerializedUnitAction ActionOnDeath;
         [SerializeField, Tooltip("Place to spawn effects")] protected Transform _headT;
 
-        [SerializeField, Self] protected Animator _animator;
+        [SerializeField, Self,Child] protected Animator _animator;
 
         protected GroundDetection _ground;
         public bool UnitDebug => _showDebugs;
@@ -40,12 +40,23 @@ namespace Arcatech.Units
         protected override void OnValidate()
         {
             base.OnValidate();
+            if (_headT == null)
+            {
+                foreach (var t in GetComponentsInChildren<Transform>())
+                {
+                    if (t.name.ToLower().Contains("head"))
+                    {
+                        _headT = t;
+                    }
+                }
+            }
+
             Assert.IsFalse(defaultStats==null);
             Assert.IsNotNull(_headT);
         }
         public virtual void StartControllerUnit() // this is run by unit manager
         {
-            if (_showDebugs) Debug.Log($"Starting unit {this}");
+            if (_showDebugs) Debug.Log($"Starting {UnitName}");
             _ground = GetComponent<GroundDetection>();
             _stats = new UnitStatsController(defaultStats.InitialStats, this);
             _stats.StartController();
@@ -55,7 +66,7 @@ namespace Arcatech.Units
 
         public virtual void DisableUnit()
         {
-            if (_showDebugs) Debug.Log($"Stopping unit {this}");
+            if (_showDebugs) Debug.Log($"Stopping {UnitName}");
         }
 
         /// <summary>
@@ -74,7 +85,7 @@ namespace Arcatech.Units
             }
             set
             {
-                if (_showDebugs) Debug.Log($"Entity paused: {value}");
+                if (_showDebugs) Debug.Log($"{UnitName} paused: {value}");
                 OnUnitPause(value);
                 _paused = value;
             }
@@ -86,7 +97,7 @@ namespace Arcatech.Units
             get { return _dead; }
             set
             {
-                if (_showDebugs) Debug.Log($"Entity dead: {value}");
+                if (_showDebugs) Debug.Log($"{UnitName} dead: {value}");
                 UnitPaused = value;
                 _dead = value;
             }
@@ -168,7 +179,7 @@ namespace Arcatech.Units
 
         protected virtual void OnUnitPause(bool isPause)
         {
-            Debug.Log($"Entity paused: {isPause} and nothing else happened because this is not overwritten");
+            Debug.Log($"{UnitName} OnPause NYI");
         }
 
 

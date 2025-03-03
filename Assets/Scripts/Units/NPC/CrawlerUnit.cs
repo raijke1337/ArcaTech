@@ -56,19 +56,39 @@ namespace Arcatech.Units
             combatPriority.AddChild(assistAlly);
 
 
+            Sequence aimAndAttack = new Sequence("aim at player and use weapon", 50);
 
-            Sequence chaseAndAttackPlayer = new Sequence("Chase player", 80);
+            Leaf checkDistance = new Leaf(new SimpleBehaviourCondition(() => CheckDistance(_player.transform, Comparer.Less, _attackingRange)), "check if player is in attack range ");
+            Leaf rotate = new Leaf(new AimAtTransform(agent, _player, 1f), "aim at player");
+            Leaf shoot = new Leaf(new CombatActionReadyBehaviourCondition(_skills, _weapons, UnitActionType.Melee), "Check attack ready");
+            Leaf shoot2 = new Leaf(new BehaviourAction(() => HandleUnitAction(UnitActionType.Melee)), "Melee attack");
+
+            aimAndAttack.AddChild(checkDistance);
+            aimAndAttack.AddChild(stopAgent);
+            aimAndAttack.AddChild(rotate);
+            aimAndAttack.AddChild(shoot);
+            aimAndAttack.AddChild(shoot2);
+            aimAndAttack.AddChild(combatSequenceDone);
+
+            combatPriority.AddChild(aimAndAttack);
+
+
+            Sequence chasePlayer = new Sequence("chase player", 80);
+
+            Leaf setStoppingDistance = new Leaf(new BehaviourAction(() => agent.stoppingDistance = _attackingRange), "set stopping distance to attack range");
+            BehaviorInverter checkNeedsChase = new BehaviorInverter("invert distance check");
+            checkNeedsChase.AddChild(checkDistance);
             Leaf chase = new Leaf(new MoveToTransformStrategy(agent, _player), "move to player");
-            Leaf attackReady = new Leaf(new CombatActionReadyBehaviourCondition(_skills,_weapons, UnitActionType.Melee), "use melee attack check");
-            Leaf useAttack = new Leaf(new BehaviourAction(()=>HandleUnitAction(UnitActionType.Melee)),"Attack in melee");
 
-            chaseAndAttackPlayer.AddChild(resumeAgent);
-            chaseAndAttackPlayer.AddChild(chase);
-            chaseAndAttackPlayer.AddChild(attackReady);
-            chaseAndAttackPlayer.AddChild(useAttack);
-            chaseAndAttackPlayer.AddChild(combatSequenceDone);
+            chasePlayer.AddChild(setStoppingDistance);
+            chasePlayer.AddChild(checkNeedsChase);
+            chasePlayer.AddChild(resumeAgent);
+            chasePlayer.AddChild(chase);
+            chasePlayer.AddChild(combatSequenceDone);
 
-            combatPriority.AddChild(chaseAndAttackPlayer);
+            combatPriority.AddChild(chasePlayer);
+
+
 
 
             Sequence idleSequence = new Sequence("idling", 10);
