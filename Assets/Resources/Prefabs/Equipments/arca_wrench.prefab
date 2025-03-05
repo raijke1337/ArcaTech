@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 5188941293757656330}
   - component: {fileID: 9131835006296536996}
   - component: {fileID: 7849039679999465125}
+  - component: {fileID: -6002948010217824289}
   m_Layer: 0
   m_Name: arca_wrench
   m_TagString: Untagged
@@ -101,8 +102,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawner: {fileID: 2874318480728645224}
-  Trigger: {fileID: 9131835006296536996}
-  Trail: {fileID: 0}
+  animator: {fileID: -6002948010217824289}
+  _trigger: {fileID: 9131835006296536996}
+  _trail: {fileID: 7849039679999465125}
 --- !u!114 &9131835006296536996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,6 +143,27 @@ MonoBehaviour:
   subdivisions: 4
   _base: {fileID: 8992702337223659924}
   _tip: {fileID: 2874318480728645224}
+--- !u!95 &-6002948010217824289
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322378502437355212}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &8215549903793161157
 GameObject:
   m_ObjectHideFlags: 0

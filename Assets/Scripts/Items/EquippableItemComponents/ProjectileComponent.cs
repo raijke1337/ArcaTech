@@ -29,7 +29,7 @@ namespace Arcatech.Items
 
         IActionResult[] UnitCollisionResult; // explode (place aoe projectile) or apply effects
         IActionResult[] ExpirationCollisionResult; // explode (place aoe projectile) or stop moving
-
+        
 
         public void SetResult(SerializedActionResult[] cfg, SerializedActionResult[] exp, TargetingType t)
         {

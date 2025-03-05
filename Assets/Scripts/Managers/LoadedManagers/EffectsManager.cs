@@ -196,7 +196,7 @@ namespace Arcatech.Managers
                 while (done < ev.ShootingConfig.Shots)
                 {
                     done++;
-                    ev.Projectile.ProduceProjectile(ev.Shooter, place,rotation, ev.ShootingConfig.Spread);
+                    ev.Projectile.ProduceProjectile(ev.Shooter, place, rotation, ev.ShootingConfig.Spread);
                     yield return new WaitForSeconds(ev.ShootingConfig.BetweenShotsDelay);
                 }
                 yield return null;
@@ -206,7 +206,7 @@ namespace Arcatech.Managers
                 while (done < ev.ShootingConfig.Shots)
                 {
                     done++;
-                    ev.Projectile.ProduceProjectile(ev.Shooter, ev.Place, ev.ShootingConfig.Spread);
+                    ev.Projectile.ProduceProjectile(ev.Shooter, place,rotation, ev.ShootingConfig.Spread);
                     yield return new WaitForSeconds(ev.ShootingConfig.BetweenShotsDelay);
                 }
                 yield return null;

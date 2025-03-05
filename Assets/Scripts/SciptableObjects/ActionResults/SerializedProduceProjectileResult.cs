@@ -23,7 +23,7 @@ namespace Arcatech.Actions
         }
         public override IActionResult GetActionResult()
         {
-            return new ProduceProjectileResult(Projectile,numberOfProjectiles,spread,intDelay,shotDelay);
+            return new ProduceProjectileResult(Projectile,numberOfProjectiles,spread,intDelay, shotDelay);
         }
 
         public override string ToString()
@@ -36,11 +36,10 @@ namespace Arcatech.Actions
         SerializedProjectileConfiguration _p;
         ShootingConfig _cfg;
         ProjectilePlaceEvent cachedEvent;
-
         public ProduceProjectileResult(SerializedProjectileConfiguration p, int n,float s, float d, float st)
         {
             _p = p;
-            _cfg = new ShootingConfig(n,s,d,st);
+            _cfg = new ShootingConfig(n, s, d, st);
             cachedEvent = new ProjectilePlaceEvent(null, null, _p, _cfg);
         }
 

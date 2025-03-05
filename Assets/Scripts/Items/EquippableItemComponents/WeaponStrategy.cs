@@ -70,7 +70,9 @@ namespace Arcatech.Items
             action = Action;
             if (CanUseUsable())
             {
-                ChargesLogicOnUse(); return true;
+                ChargesLogicOnUse();
+                WeaponComponent.OnUse();
+                return true;
             }
             else return false;
         }

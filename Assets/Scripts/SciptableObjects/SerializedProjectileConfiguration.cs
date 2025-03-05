@@ -21,6 +21,7 @@ namespace Arcatech.Items
         [Space,Header("Projectile")]
         [SerializeField] float TimeToLive;
         [SerializeField] float ProjectileSpeed;
+        [SerializeField] bool attachToUser = false;
 
         [SerializeField, Tooltip("Placeholder for homing projectiles, range of scanning for tgts")] float HomingRange = 6f;
 
@@ -43,12 +44,12 @@ namespace Arcatech.Items
         /// <param name="place"></param>
         /// <param name="spread">in euler degrees</param>
         /// <returns></returns>
-        public virtual ProjectileComponent ProduceProjectile(BaseEntity owner, Transform place,float spread = 0f)
-        {
-            return ProduceProjectile(owner, place.position, place.rotation, spread);
-        }
+        //public virtual ProjectileComponent ProduceProjectile(BaseEntity owner, Transform place ,float spread = 0f)
+        //{
+        //    return ProduceProjectile(owner, place.position, place.rotation, attachToUser, spread);
+        //}
 
-        public virtual ProjectileComponent ProduceProjectile (BaseEntity owner, Vector3 pos, Quaternion rot, float spread = 0f)
+        public virtual ProjectileComponent ProduceProjectile (BaseEntity owner, Vector3 pos, Quaternion rot,  float spread = 0f)
         {
             ProjectileComponent proj = Instantiate(ProjectilePrefab, pos, rot);
             proj.Owner = owner;
@@ -65,6 +66,12 @@ namespace Arcatech.Items
             if (proj is HomingProjectileComponent h)
             {
                 h.WithHoming(HomingRange);
+            }
+
+            if (attachToUser)
+            {
+                proj.Speed = 0;
+                proj.transform.SetParent(owner.transform, true);
             }
             return proj;
         }

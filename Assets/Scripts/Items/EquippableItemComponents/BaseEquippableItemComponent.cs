@@ -10,10 +10,14 @@ namespace Arcatech.Items
         [SerializeField] protected Transform _spawner;
         public Transform Spawner { get => _spawner; }
 
-        private void OnValidate()
+        protected virtual void OnValidate()
         {
             Assert.IsNotNull(_spawner);
             this.ValidateRefs();
+        }
+        public virtual void OnUse()
+        {
+
         }
     }
 }

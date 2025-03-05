@@ -24,11 +24,8 @@ namespace Arcatech.Items
         
         public void SetItemEmpty(Transform pos)
         {
-            ItemShown = true;
-
-            DisplayItem.transform.SetPositionAndRotation(pos.position, pos.rotation);
-            DisplayItem.transform.localScale = Vector3.one;
-            DisplayItem.transform.SetParent(pos.transform);
+            ItemShown = true;            
+            DisplayItem.transform.SetParent(pos.transform,false);
         }
 
 

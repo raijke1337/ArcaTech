@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-using Arcatech.Units.Behaviour;
-using Arcatech.BlackboardSystem;
-using Arcatech.Units.Inputs;
+﻿using Arcatech.Units.Behaviour;
+using UnityEngine;
 namespace Arcatech.Units
 {
     public class MetalGolemUnit : NPCUnit
