@@ -185,10 +185,26 @@ namespace Arcatech.Managers
 
         IEnumerator ShootingCoroutine(ProjectilePlaceEvent ev)
         {
-            Vector3 place = ev.Place.position;
-            Quaternion rotation = ev.Place.rotation; // if this is called on an expiring projectile, place becomes null
 
-            yield return new WaitForSeconds(ev.ShootingConfig.ShotDelay);
+            Vector3 place = ev.Place.position;
+            Quaternion rotation = ev.Place.rotation; // bandaid
+
+            // should make the bandaid unnecessary
+            if (ev.ShootingConfig.ShotDelay >0)
+            {
+                yield return new WaitForSeconds(ev.ShootingConfig.ShotDelay);
+            }
+            if (ev.Place == null) // place projectile was called on destroy, ref null, use cached spot bandaid
+            {
+
+            }
+            else
+            {
+                 place = ev.Place.position;
+                 rotation = ev.Place.rotation;
+                // transform ref is not null
+            }
+
             int done = 0;
 
             if (ev.Place == null)

@@ -36,7 +36,8 @@ Shader "CR/CleanOutline23"
             // Pass
             
             HLSLPROGRAM
-  #if UNITY_VERSION >= 202310             
+  //#if UNITY_VERSION >= 202310
+#if UNITY_VERSION >= 202239
             // Pragmas
             #pragma target 3.0
             #pragma vertex vert

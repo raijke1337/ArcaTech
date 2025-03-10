@@ -129,6 +129,28 @@
         }
 #else
 
+        #if UNITY_VERSION >= 202230
+            float GetClosenessBoostEyeDepth(float3 viewDirWS, float eyeDepth)
+            {
+                float3 cameraForward = -UNITY_MATRIX_V[2].xyz;
+                float cameraDistance = - eyeDepth / dot(viewDirWS, cameraForward);
+                float dis = cameraDistance * 0.01;
+                float disBoost = smoothstep(_BoostFar, _BoostNear, dis) * _ClosenessBoostThickness + 1;
+                return disBoost;
+            }
+
+            float GetDistanceFadeEyeDepth(float3 viewDirWS, float eyeDepth)
+            {
+                // float linearDepth = (1.0 / depth01 - _ZBufferParams.y) / _ZBufferParams.x;
+                // float eyeDepth = LinearEyeDepth(linearDepth, _ZBufferParams);
+                float3 cameraForward = -UNITY_MATRIX_V[2].xyz;
+                float cameraDistance = - eyeDepth / dot(viewDirWS, cameraForward);
+                float dis = cameraDistance * 0.01;
+                float disBoost = smoothstep(_FadeFar, _FadeNear, dis) + 0.0001;
+                return disBoost;            
+            }
+        #endif
+
         float GetClosenessBoost(float3 viewPos, float depth01)
         {
             viewPos = viewPos * depth01;

@@ -12,10 +12,11 @@ namespace Arcatech.Actions
     public class SerializedProduceProjectileResult : SerializedActionResult
     {
         [SerializeField] SerializedProjectileConfiguration Projectile;
-        [SerializeField,Range (1,10)] int numberOfProjectiles;
-        [SerializeField, Tooltip("seconds before shot is done"),Range(0.1f, 1f)] float shotDelay = 0.3f;
+        [SerializeField, Tooltip("seconds before projectile will spawn is done"),Range(0f, 1f)] float shotDelay = 0.3f;
         [SerializeField, Range(0, 10)] float spread;
-        [SerializeField, Range(0.1f, 1f)] float intDelay = 0.1f;
+
+        [Space,Header("Multi shots"),SerializeField, Range(1, 10)] int numberOfProjectiles;
+        [SerializeField, Range(0.1f, 1f)] float BetweenShotsDelay = 0.1f;
 
         private void OnValidate()
         {
@@ -23,7 +24,7 @@ namespace Arcatech.Actions
         }
         public override IActionResult GetActionResult()
         {
-            return new ProduceProjectileResult(Projectile,numberOfProjectiles,spread,intDelay, shotDelay);
+            return new ProduceProjectileResult(Projectile,numberOfProjectiles,spread,BetweenShotsDelay, shotDelay);
         }
 
         public override string ToString()
