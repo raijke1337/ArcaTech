@@ -13,8 +13,8 @@ namespace Arcatech.Triggers
         [SerializeField] protected TargetingType targetType;
         [SerializeField] protected bool DestroyOnExit = false;
         [SerializeField] protected bool DestroyOnEnter = false;
-        [Space, SerializeField] protected SerializedActionResult[] ActionOnEntry;
-        [SerializeField] protected SerializedActionResult[] ActionOnExit;
+        [Space, SerializeField] protected SerializedActionResult[] ResultOnEntry;
+        [SerializeField] protected SerializedActionResult[] ResultOnExit;
 
 
         private void OnValidate()
@@ -86,7 +86,7 @@ namespace Arcatech.Triggers
 
         protected void ApplyResults(BaseEntity p)
         {
-            foreach (var action in ActionOnEntry)
+            foreach (var action in ResultOnEntry)
             {
                 action.BuildActionResult().ProduceResult(null, p, transform);
             }
