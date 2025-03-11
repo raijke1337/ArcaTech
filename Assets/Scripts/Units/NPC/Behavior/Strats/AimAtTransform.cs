@@ -9,11 +9,14 @@ namespace Arcatech.Units.Behaviour
         readonly float angle;
         readonly NavMeshAgent agent;
         readonly Transform aimAt;
-        public AimAtTransform (NavMeshAgent agent, Transform point, float angleTolerance)
+        readonly float rotateSpeed;
+        const float rotateRadiansBase = 0.01f;
+        public AimAtTransform (NavMeshAgent agent, Transform point, float angleTolerance, float rotateSpeedMult)
         {
             this.angle = angleTolerance;
             this.agent = agent;
             this.aimAt = point;
+            rotateSpeed = rotateRadiansBase * rotateSpeedMult;
         }
 
         public NodeStatus Process(ControlledUnit actor)
@@ -30,7 +33,7 @@ namespace Arcatech.Units.Behaviour
             else
             {
                 agent.isStopped = true;
-                actor.transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(actor.transform.forward, desired, 0.1f, 1f));
+                actor.transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(actor.transform.forward, desired, rotateSpeed, 10f));
                 return NodeStatus.Running;
             }
         }

@@ -63,7 +63,7 @@ namespace Arcatech.Units
                 OnStartAction = new IActionResult[onstart.Length]; 
                 for (int i = 0; i < onstart.Length; i++)
                 {
-                    OnStartAction[i] = onstart[i].GetActionResult();
+                    OnStartAction[i] = onstart[i].BuildActionResult();
                 }
             }
             if (onfinish != null && onfinish.Length > 0)
@@ -71,7 +71,7 @@ namespace Arcatech.Units
                 OnCompleteAction = new IActionResult[onfinish.Length];
                 for (int i = 0; i < onfinish.Length; i++)
                 {
-                    OnCompleteAction[i] = onfinish[i].GetActionResult();
+                    OnCompleteAction[i] = onfinish[i].BuildActionResult();
                 }
             }
             if (onExit != null && onExit.Length > 0)
@@ -80,7 +80,7 @@ namespace Arcatech.Units
                 OnExitTime = new IActionResult[onExit.Length];
                 for (int i = 0; i < onExit.Length; i++)
                 {
-                    OnExitTime[i] = onExit[i].GetActionResult();
+                    OnExitTime[i] = onExit[i].BuildActionResult();
                 }
             }
 

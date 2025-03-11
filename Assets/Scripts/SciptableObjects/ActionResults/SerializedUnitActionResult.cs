@@ -8,7 +8,7 @@ namespace Arcatech.Actions
     {
         [SerializeField] SerializedUnitAction _action;
 
-        public override IActionResult GetActionResult()
+        public override IActionResult BuildActionResult()
         {
             return new UnitActionResult(_action);
         }

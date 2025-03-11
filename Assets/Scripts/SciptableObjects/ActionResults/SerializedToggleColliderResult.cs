@@ -9,7 +9,7 @@ namespace Arcatech.Actions
     {
         [SerializeField] bool ResultingColliderState;
         [SerializeField, Range(0, 1f)] float Delay = 0.1f;
-        public override IActionResult GetActionResult()
+        public override IActionResult BuildActionResult()
         {
             return new ToggleColliderResult(ResultingColliderState,Delay);
         }
@@ -36,4 +36,5 @@ namespace Arcatech.Actions
             }
         }
     }
+
 }

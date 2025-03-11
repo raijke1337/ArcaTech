@@ -22,7 +22,7 @@ namespace Arcatech.Actions
         {
             Assert.IsFalse(Distance == 0);
         }
-        public override IActionResult GetActionResult()
+        public override IActionResult BuildActionResult()
         {
             return new ApplyForceResult(Distance, Speed, Target );
         }

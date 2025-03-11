@@ -21,8 +21,9 @@ namespace Arcatech.Actions
         private void OnValidate()
         {
             Assert.IsNotNull(Projectile);
+            Assert.IsFalse(numberOfProjectiles == 0);
         }
-        public override IActionResult GetActionResult()
+        public override IActionResult BuildActionResult()
         {
             return new ProduceProjectileResult(Projectile,numberOfProjectiles,spread,BetweenShotsDelay, shotDelay);
         }

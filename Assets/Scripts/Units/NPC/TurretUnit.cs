@@ -7,7 +7,10 @@ namespace Arcatech.Units
     {
         [Header("Turret settings")] 
         [SerializeField,Range(0,180)] int frontAngle = 90;
-
+        public override void ApplyForceResultToUnit(float speed, float distance)
+        {
+            
+        }
         protected override void SetupBehavior()
         {
 
@@ -24,7 +27,7 @@ namespace Arcatech.Units
             Sequence aimAndShoot = new Sequence("aim at player and use weapon", 80);
 
             Leaf checkDistance = new Leaf(new SimpleBehaviourCondition(() => CheckDistance(_player.transform, Comparer.Less, _attackingRange)), "check if player is in attack range ");
-            Leaf rotate = new Leaf(new AimAtTransform(agent, _player, 1f), "aim at player");
+            Leaf rotate = new Leaf(new AimAtTransform(agent, _player, 1f, movementStats.Stats[Stats.MovementStatType.TurnSpeed]), "aim at player");
             Leaf shoot = new Leaf(new CombatActionReadyBehaviourCondition(_skills, _weapons, UnitActionType.Ranged), "prepare to shoot");
             Leaf shoot2 = new Leaf(new BehaviourAction(() => HandleUnitAction(UnitActionType.Ranged)), "Shoot");
 

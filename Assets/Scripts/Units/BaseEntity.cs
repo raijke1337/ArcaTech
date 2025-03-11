@@ -14,7 +14,6 @@ using UnityEngine.ProBuilder.MeshOperations;
 
 namespace Arcatech.Units
 {
-    [RequireComponent(typeof(GroundDetection))]
     public class BaseEntity : ValidatedMonoBehaviour, IInteractible
     {
         protected const float zeroF = 0f;
@@ -30,7 +29,7 @@ namespace Arcatech.Units
 
         [SerializeField, Self,Child] protected Animator _animator;
 
-        protected GroundDetection _ground;
+        
         public bool UnitDebug => _showDebugs;
         public string UnitName { get => defaultStats.DisplayName; }
         [HideInInspector] public Side Side => _unitSide;
@@ -57,7 +56,7 @@ namespace Arcatech.Units
         public virtual void StartControllerUnit() // this is run by unit manager
         {
             if (_showDebugs) Debug.Log($"Starting {UnitName}");
-            _ground = GetComponent<GroundDetection>();
+            
             _stats = new UnitStatsController(defaultStats.InitialStats, this);
             _stats.StartController();
             statsUpdateTimer = new CountDownTimer(statsUpdateFrequency);
@@ -203,8 +202,6 @@ namespace Arcatech.Units
             {
                 Vector3 end = rb.transform.position + (rb.transform.forward * distance);
                 force = rb.DOMove(end, Mathf.Abs(distance / speed), false);
-                //Debug.Log($"Tried to apply impulse {distance} to {GetName} but it has no movement controller component, using dotween");
-                //rb.AddForce(rb.transform.forward * distance * 5f,ForceMode.Impulse);
             }
             else
             {
@@ -232,9 +229,9 @@ namespace Arcatech.Units
         #endregion
 
         #region iinteractible
-        public void AcceptInteraction(IInteractible actor)
+        public virtual void AcceptInteraction(IInteractible target)
         {
-            Debug.Log($"Tried to interact with {UnitName}");
+            Debug.Log($"{UnitName} tried to interact with {target.UnitName} ");
         }
         public Vector3 Position => transform.position;
         #endregion

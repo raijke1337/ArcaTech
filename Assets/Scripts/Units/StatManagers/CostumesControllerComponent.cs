@@ -29,7 +29,7 @@ namespace Arcatech.Units
                     {
                         foreach (var f in BreakEffects)
                         {
-                            f.GetActionResult().ProduceResult(owner, null, owner.transform);
+                            f.BuildActionResult().ProduceResult(owner, null, owner.transform);
                         }
                     }
                     s.SetActive(false);

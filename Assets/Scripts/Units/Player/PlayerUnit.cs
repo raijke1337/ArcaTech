@@ -31,7 +31,7 @@ namespace Arcatech.Units
             costumes = GetComponent<CostumesControllerComponent>();
             costumes.Init(this);
 
-            _movement.speed = movementStats.Stats[Stats.MovementStatType.Movespeed].Max;
+            _movement.speed = movementStats.Stats[Stats.MovementStatType.Movespeed];
             ToggleCamera(true);
         }
 

@@ -46,7 +46,6 @@ namespace Arcatech.Triggers
                         break;
                 }
             }
-
             if (DestroyOnEnter)
             {
                 gameObject.SetActive(false);
@@ -89,7 +88,7 @@ namespace Arcatech.Triggers
         {
             foreach (var action in ActionOnEntry)
             {
-                action.GetActionResult().ProduceResult(null, p, transform);
+                action.BuildActionResult().ProduceResult(null, p, transform);
             }
 
             if (DestroyOnEnter)

@@ -14,7 +14,7 @@ namespace Arcatech.Actions
     {
 
         [SerializeField] SerializedDictionary<TargetingType, SerializedStatsEffectConfig[]> StatChanges;
-        public override IActionResult GetActionResult()
+        public override IActionResult BuildActionResult()
         {
             return new ApplyStatChangeEffectResult(StatChanges);
         }

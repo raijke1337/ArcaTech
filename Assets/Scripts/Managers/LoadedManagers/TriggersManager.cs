@@ -70,7 +70,7 @@ namespace Arcatech.Managers
 
                     if (obj.Applied.OnApply != null)
                     {
-                        obj.Applied.OnApply.GetActionResult().ProduceResult(null, obj.Target, obj.Place); // play particles or maybe something else if needed
+                        obj.Applied.OnApply.BuildActionResult().ProduceResult(null, obj.Target, obj.Place); // play particles or maybe something else if needed
                     }
                 }
             }
@@ -82,7 +82,7 @@ namespace Arcatech.Managers
 
                 if (obj.Applied.OnApply != null)
                 {
-                    obj.Applied.OnApply.GetActionResult().ProduceResult(null, obj.Target, obj.Place);
+                    obj.Applied.OnApply.BuildActionResult().ProduceResult(null, obj.Target, obj.Place);
                 }
             }
         }

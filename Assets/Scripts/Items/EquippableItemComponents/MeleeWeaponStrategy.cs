@@ -21,7 +21,7 @@ namespace Arcatech.Items
 
             for (int i = 0; i < onHit.Length; i++)
             {
-                OnColliderHit[i] = onHit[i].GetActionResult();
+                OnColliderHit[i] = onHit[i].BuildActionResult();
             }
 
         }

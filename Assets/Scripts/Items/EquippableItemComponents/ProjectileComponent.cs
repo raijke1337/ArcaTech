@@ -37,13 +37,13 @@ namespace Arcatech.Items
             UnitCollisionResult = new ActionResult[cfg.Length];
             for (int i = 0; i < UnitCollisionResult.Length; i++)
             {
-                UnitCollisionResult[i] = cfg[i].GetActionResult();
+                UnitCollisionResult[i] = cfg[i].BuildActionResult();
             }
 
             ExpirationCollisionResult = new ActionResult[exp.Length];
             for (int i = 0; i < ExpirationCollisionResult.Length; i++)
             {
-                ExpirationCollisionResult[i] = exp[i].GetActionResult();
+                ExpirationCollisionResult[i] = exp[i].BuildActionResult();
             }
             hits = new BaseEntity[RemainingHits];
         }
@@ -56,6 +56,7 @@ namespace Arcatech.Items
 
         protected virtual void Col_SomethingHitEvent(Collider other)
         {
+            if (Owner.UnitDebug) { Debug.Log($"{this} hit {other}"); }
             if (other.TryGetComponent<BaseEntity>(out var u))
             {
                 switch (targetingType)
@@ -81,7 +82,7 @@ namespace Arcatech.Items
             }
             if (isAoe) return;
 
-            if (other.CompareTag("SolidItem") || other.gameObject.isStatic)
+            if (other.gameObject.isStatic)
             {
                 RemainingHits = 0;
             }

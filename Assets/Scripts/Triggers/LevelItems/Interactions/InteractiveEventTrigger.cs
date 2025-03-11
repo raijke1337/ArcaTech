@@ -10,7 +10,8 @@ namespace Arcatech.Level
     {
         #region interface
         [Header("Interactive trigger"),Space,SerializeField] protected string _displayName = "Interactive item";
-        [SerializeField] protected SerializedActionResult[] ActionOnInteract;
+        [SerializeField] protected SerializedActionResult[] UserActionOnInteract;
+        [SerializeField] string AnimatorTrigger;
 
         public string UnitName => _displayName;
 
@@ -20,12 +21,12 @@ namespace Arcatech.Level
 
         public virtual void AcceptInteraction(IInteractible actor)
         {
-
-            foreach (var r in ActionOnInteract)
+            foreach (var r in UserActionOnInteract)
             {
-                r.GetActionResult().ProduceResult(actor as BaseEntity, null, transform);
+                r.BuildActionResult().ProduceResult(actor as BaseEntity, null, transform);
             }
             actor.AcceptInteraction(this);
+            // Debug.Log($"{UnitName} tried to interact with {actor.UnitName} ");
         }
         #endregion
     }

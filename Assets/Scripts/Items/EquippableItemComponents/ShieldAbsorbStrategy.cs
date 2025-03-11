@@ -16,7 +16,7 @@ namespace Arcatech.Items
         SerializedActionResult _result;
         float _absorbTime;
 
-        public IActionResult OnApplicationResult { get => _result.GetActionResult(); }
+        public IActionResult OnApplicationResult { get => _result.BuildActionResult(); }
 
         public ShieldAbsorbStrategy(float mult, float coef, float splitTime, SerializedActionResult onApply)
         {

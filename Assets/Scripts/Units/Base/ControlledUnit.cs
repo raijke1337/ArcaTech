@@ -2,23 +2,24 @@
 using Arcatech.Managers;
 using Arcatech.Triggers;
 using Arcatech.Units.Stats;
+using ECM.Components;
 using KBCore.Refs;
 using System.Collections;
 using UnityEngine;
 namespace Arcatech.Units
 {
-    [RequireComponent(typeof(ControlInputsBase), typeof(Rigidbody))]
+    [RequireComponent(typeof(ControlInputsBase), typeof(Rigidbody),typeof(GroundDetection))]
     public abstract class ControlledUnit : ArmedUnit, IInteractible
     {
         [Space, Header("Controlled Unit")]
          [SerializeField] protected MovementStatsConfig movementStats;
         [SerializeField, Self] protected Rigidbody _rb;
         [Self, SerializeField] protected ControlInputsBase _inputs;
+        [Self, SerializeField] protected GroundDetection _ground;
         #region MANAGED
         public override void StartControllerUnit()
         {
             base.StartControllerUnit();
-          
             if (GameManager.Instance.GetCurrentLevelData.LevelType == LevelType.Game)
             {
                 UnitPaused = false;

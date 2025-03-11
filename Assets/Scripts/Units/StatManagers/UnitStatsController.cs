@@ -62,7 +62,7 @@ namespace Arcatech.Stats
                             c.ApplyStatsEffect(eff);
                             if (eff.OnApply!=null)
                             {
-                                eff.OnApply.GetActionResult().ProduceResult(Owner, Owner, Owner.transform);
+                                eff.OnApply.BuildActionResult().ProduceResult(Owner, Owner, Owner.transform);
                             }
                             return true;
                         }

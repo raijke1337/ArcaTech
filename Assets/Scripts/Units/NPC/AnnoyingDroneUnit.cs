@@ -39,7 +39,7 @@ namespace Arcatech.Units
             Sequence aimAndShoot = new Sequence("aim at player and use weapon", 50);
 
             Leaf checkDistance = new Leaf(new SimpleBehaviourCondition(() => CheckDistance(_player.transform,Comparer.Less,_attackingRange)), "check if player is in attack range ");
-            Leaf rotate = new Leaf(new AimAtTransform(agent, _player, 1f), "aim at player");
+            Leaf rotate = new Leaf(new AimAtTransform(agent, _player, 1f, movementStats.Stats[Stats.MovementStatType.TurnSpeed]), "aim at player");
             Leaf shoot = new Leaf(new CombatActionReadyBehaviourCondition(_skills, _weapons, UnitActionType.Ranged), "prepare to shoot");
             Leaf shoot2 = new Leaf(new BehaviourAction(()=>HandleUnitAction(UnitActionType.Ranged)),"Shoot");
 
