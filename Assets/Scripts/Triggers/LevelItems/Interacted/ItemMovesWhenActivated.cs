@@ -1,4 +1,5 @@
 ﻿using AYellowpaper.SerializedCollections;
+using com.cyborgAssets.inspectorButtonPro;
 using DG.Tweening;
 using UnityEngine;
 
@@ -7,7 +8,10 @@ namespace Arcatech.Level
     public class ItemMovesWhenActivated : ConditionControlledItem
     {
         [SerializeField] SerializedDictionary<Rigidbody,Vector3> movingItemsToVector3;
+        [SerializeField] SerializedDictionary<Rigidbody,Vector3> rotateItemsToVector3;
         Vector3[] moveFrom;
+        Vector3[] rotateFrom;
+
         [SerializeField] bool loop = true;  
 
         [SerializeField] float movetime = 1f;
@@ -17,14 +21,6 @@ namespace Arcatech.Level
 
         private void OnValidate()
         {
-            if (movingItemsToVector3 != null)
-            {
-                foreach (var rb in movingItemsToVector3.Keys)
-                {
-                    rb.constraints = RigidbodyConstraints.None;
-                    rb.constraints = RigidbodyConstraints.FreezeRotation;
-                }
-            }
         }
 
         protected override void OnSetState(bool newstate)
@@ -40,6 +36,7 @@ namespace Arcatech.Level
             {
                 int index = 0;
                 moveFrom = new Vector3[movingItemsToVector3.Count];
+                rotateFrom = new Vector3[rotateItemsToVector3.Count];
                 foreach (var item in movingItemsToVector3.Keys)
                 {
                     moveFrom[index] = item.position;
@@ -51,7 +48,20 @@ namespace Arcatech.Level
                     {
                         item.DOMove(moveFrom[index] + movingItemsToVector3[item], movetime).SetEase(ease);
                     }
-                }        
+                } 
+                foreach (var item in rotateItemsToVector3.Keys)
+                {
+                    rotateFrom[index] = item.transform.eulerAngles;
+                    if (loop)
+                    {
+                        item.DORotate(rotateFrom[index] + rotateItemsToVector3[item], movetime).SetLoops(-1, LoopType.Yoyo).SetEase(ease);
+                    }
+                    else
+                    {
+                        item.DORotate(rotateFrom[index] + rotateItemsToVector3[item], movetime).SetEase(ease);
+                    }
+                }
+                
             }
         }
     }

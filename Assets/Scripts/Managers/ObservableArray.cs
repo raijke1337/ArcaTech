@@ -22,7 +22,7 @@ namespace Arcatech
     {
         T2 this[uint index] { get; }
         bool TryGetValue(T key, out T2 value);
-        T TryGetKey(T2 value);
+        T TryGetKeyByValue(T2 value);
         void SetPair(T key, T2 value);
     }
 

@@ -4,7 +4,7 @@ namespace Arcatech.Items
 {
     public interface IEquippable : IHasSkill, IItem
     {
-        public BaseEquippableItemComponent DisplayItem { get; }
+        public BaseItemComponent DisplayItem { get; }
         public SerializedStatModConfig[] StatMods { get; }
     
     }

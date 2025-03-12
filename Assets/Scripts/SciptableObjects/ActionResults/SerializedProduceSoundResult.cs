@@ -33,7 +33,7 @@ namespace Arcatech.Actions
         {
             foreach (var s in sounds)
             {
-                EventBus<SoundClipRequest>.Raise(new SoundClipRequest(s,pitch,user.transform.position));
+                EventBus<SoundClipRequest>.Raise(new SoundClipRequest(s,pitch,place.position));
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 namespace Arcatech
 {
     public class ObservableDictionary<T, T2> : IObservableDictionary<T, T2>
@@ -30,6 +31,7 @@ namespace Arcatech
 
         public T2 this[uint index] => throw new NotImplementedException();
 
+        public bool HasKey (T key) => Pairs.Any(t=>t.Key.Equals(key));
         public void Clear()
         {
             Pairs = new List<KeyValuePair<T, T2>>();
@@ -55,7 +57,7 @@ namespace Arcatech
             return list;
         }
 
-        public T TryGetKey(T2 value)
+        public T TryGetKeyByValue(T2 value)
         {
             return Pairs.FirstOrDefault(t => t.Value.Equals(value)).Key;
         }
@@ -97,21 +99,16 @@ namespace Arcatech
 
         public void SetPair(T key, T2 value)
         {
-            foreach (var record in Pairs)
+            var allKeys = GetAllKeys();
+            if (allKeys != null && allKeys.Contains(key))
             {
-                if ((record.Key).Equals(key))
-                {
-                    int index = Array.IndexOf(Pairs.ToArray(), (
-                        Pairs.First(t => t.Key.Equals(key))));
-                    Pairs[index] = new KeyValuePair<T, T2> (key,value);
-
-                    break;
-                }
-                else
-                {
-                    Pairs.Add(new KeyValuePair<T, T2>(key, value));
-                }
+                Pairs[allKeys.IndexOf(key)] = new KeyValuePair<T, T2>(key,value);
             }
+            else
+            {
+                Pairs.Add(new KeyValuePair<T, T2>(key, value));
+            }
+
             Invoke();
         }
 

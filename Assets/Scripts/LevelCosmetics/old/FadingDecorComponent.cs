@@ -24,7 +24,7 @@ namespace Arcatech.Level
             }
         }
 
-        public void Fade(float speed, float desiredAlpha, Material newMaterial)
+        public void Fade(float speed, Material newMaterial)
         {
             foreach(var r in _original.Keys)
             {

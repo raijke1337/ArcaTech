@@ -136,6 +136,21 @@ namespace Arcatech.Units
         {
             i.AcceptInteraction(this);
         }
+        public override void AcceptInteraction(IInteractible target)
+        {
+            if (target is ItemSOContainerComponent containerComponent)
+            {
+                if (containerComponent.Content is EquipSO equip)
+                {
+                    _inventory.TryEquipItem(equip);
+                }
+                else
+                {
+
+                }
+            }
+            base.AcceptInteraction(target);
+        }
 
     }
 

@@ -18,9 +18,8 @@ namespace Arcatech.UI
         private Dictionary<IIconContent, IconContainerUIScript> _skillIcons = new();
         private Dictionary<IIconContent, IconContainerUIScript> _otherIcons = new();
 
-        public void TrackIcon(IIconContent content)
+        public void IconUpdate(IIconContent content)
         {
-
             if (content is not ISkill && content is not IWeapon)
             {
                 if (_otherIcons.ContainsKey(content))
@@ -34,20 +33,6 @@ namespace Arcatech.UI
                     _otherIcons[content].UpdateIcon(content);
                 }
             }
-            //if (content is IWeapon weapon)
-            //{
-            //    if (_weaponIcons.ContainsKey(weapon))
-            //    {
-            //        _weaponIcons[weapon].UpdateIcon(weapon);
-            //    }
-
-            //    else
-            //    {
-            //        _weaponIcons[weapon] = Instantiate(_iconPrefab, _weaponsP);
-            //        _weaponIcons[weapon].UpdateIcon(weapon);
-            //    }
-            //    return;
-            //}
             else
             {
                 if (_skillIcons.ContainsKey(content))

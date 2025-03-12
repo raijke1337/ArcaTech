@@ -21,12 +21,9 @@ namespace Arcatech.UI
             EventBus<UpdateIconEvent>.Register(bindIcons);
         }
 
-        public void ShowIcons (UnitInventoryController inv)
+        public void OnInventoryUpdate (UnitInventoryController inv)
         {
-            foreach (var weapon in inv.GetWeapons)
-            {
-                _icons.TrackIcon(weapon);
-            }
+
         }
 
 
@@ -34,7 +31,7 @@ namespace Arcatech.UI
         {
             if (obj.User is PlayerUnit)
             {
-                _icons.TrackIcon(obj.Used);
+                _icons.IconUpdate(obj.Used);
             }
         }
 

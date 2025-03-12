@@ -1,6 +1,6 @@
 namespace Arcatech.Items
 {
-    public class BaseBooster : BaseEquippableItemComponent
+    public class BaseBooster : BaseItemComponent
     {
 
     }

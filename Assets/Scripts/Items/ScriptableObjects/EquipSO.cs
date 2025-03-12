@@ -11,7 +11,7 @@ namespace Arcatech.Items
     [Serializable, CreateAssetMenu(fileName = "New Equip Item", menuName = "Items/Equipment")]
     public class EquipSO : ItemSO
     {
-        public BaseEquippableItemComponent ItemPrefab;
+        
         public SerializedStatModConfig[] StatMods;
         public SerializedSkill Skill;
 

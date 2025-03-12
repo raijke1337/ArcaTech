@@ -7,9 +7,9 @@ namespace Arcatech.Triggers
 {
 
 
-    public class BaseLevelEventTrigger : BaseTrigger, IConditionControlled
+    public class TrapTrigger : BaseTrigger, IConditionControlled
     {
-        [Header("Base event trigger")]
+        [Header("Trap trigger")]
         [SerializeField] protected TargetingType targetType;
         [SerializeField] protected bool DestroyOnExit = false;
         [SerializeField] protected bool DestroyOnEnter = false;

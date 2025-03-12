@@ -184,7 +184,7 @@ namespace Arcatech.Items
         }
         #endregion
  
+        public bool TryEquipItem (EquipSO e) => Inventory.EquipItem(e, out _);
+
     }
-
-
 }

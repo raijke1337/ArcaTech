@@ -1,8 +1,10 @@
+using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Units;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Arcatech.Skills
@@ -13,19 +15,54 @@ namespace Arcatech.Skills
         UnitInventoryController inv;
         UnitStatsController stats;
         protected Dictionary<UnitActionType, ISkill> _skills;
+        private EventBinding<InventoryUpdateEvent> bindInv;
 
         public SkillsController (UnitStatsController stats, UnitInventoryController inv, EquippedUnit ow) : base (ow)
         {
             this.inv = inv;
             this.stats = stats;
+            bindInv = new EventBinding<InventoryUpdateEvent>(OnInvUpdate);
 
             _skills = new();
-
             foreach (var skill in inv.GetSkills)
             {
                 _skills[skill.UseActionType] = skill;
             }
+
         }
+
+        private void OnInvUpdate(InventoryUpdateEvent e)
+        {
+            var newSkills = e.Inventory.GetSkills;
+            List<UnitActionType> newTypes = new List<UnitActionType>();
+            foreach (var s in newSkills)
+            {
+                newTypes.Add(s.UseActionType);
+            }
+            foreach (var type in _skills.Keys)
+            {
+                if (!newTypes.Contains(type))
+                {
+                    _skills.Remove(type);
+                }
+            }
+
+            foreach (var skill in newSkills)
+            {
+                if (!_skills.ContainsValue(skill))
+                {
+                    _skills[skill.UseActionType] = skill;
+                }
+                else
+                {
+                    if (!_skills[skill.UseActionType].Equals(skill))
+                    {
+                        _skills[skill.UseActionType] = skill;
+                    }
+                }
+            }
+        }
+
         public bool ActionAvailable(UnitActionType action)
         {
             return _skills.ContainsKey(action);
@@ -62,6 +99,7 @@ namespace Arcatech.Skills
 
         public override void StartController()
         {
+            EventBus<InventoryUpdateEvent>.Register(bindInv);
         }
 
         public override void ControllerUpdate(float delta)
@@ -75,6 +113,7 @@ namespace Arcatech.Skills
 
         public override void StopController()
         {
+            EventBus<InventoryUpdateEvent>.Deregister(bindInv);
         }
 
     }

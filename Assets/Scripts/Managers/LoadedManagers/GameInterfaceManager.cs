@@ -144,7 +144,7 @@ namespace Arcatech.Managers
         {
             if (obj.Unit is PlayerUnit)
             {
-                _playerPan.ShowIcons(obj.Inventory);
+                _playerPan.OnInventoryUpdate(obj.Inventory);
             }
         }
 

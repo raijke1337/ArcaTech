@@ -23,7 +23,7 @@ namespace Arcatech.Skills
         protected SkillUsageStrategy Strategy { get; }
 
         public string UsableName { get; }
-        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseEntity owner, BaseEquippableItemComponent item, EquipmentType type)
+        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseEntity owner, BaseItemComponent item, EquipmentType type)
         { 
 
             Owner = owner;

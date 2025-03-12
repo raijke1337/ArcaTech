@@ -38,7 +38,7 @@ namespace Arcatech.Items
             }
         }
 
-        public BaseEquippableItemComponent DisplayItem { get; protected set; }
+        public BaseItemComponent DisplayItem { get; protected set; }
         public SerializedStatModConfig[] StatMods { get; protected set; }
         public ISkill GetSkill { get; protected set; }
     }

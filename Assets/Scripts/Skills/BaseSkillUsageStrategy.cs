@@ -28,7 +28,7 @@ namespace Arcatech.Skills
 
 
 
-        public SkillUsageStrategy(BaseEquippableItemComponent item, SerializedUnitAction useaction, BaseEntity unit, ExtendedText desc, int charges, float reload)
+        public SkillUsageStrategy(BaseItemComponent item, SerializedUnitAction useaction, BaseEntity unit, ExtendedText desc, int charges, float reload)
         {
 
             Owner = unit;

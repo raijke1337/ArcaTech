@@ -12,26 +12,27 @@ namespace Arcatech.Items
     [Serializable, CreateAssetMenu(fileName = "New Backpack Item", menuName = "Items/Just Item")]
     public class ItemSO : ScriptableObjectID
     {
-        public ExtendedText Description;
-        public int MaxStack = 1;
-
+        public BaseItemComponent ItemPrefab;
+        public ExtendedText Description;        
         public EquipmentType Type;
+
+        [Space] public int MaxStack = 1;
         protected virtual void OnValidate()
         {
             Assert.IsFalse(Type==EquipmentType.None);
         }
 
 
-        [ProButton]
-        protected void CheckAttributes()
-        {
-            var type = this.GetType();
-            var fields = type.GetFields();
+        //[ProButton]
+        //protected void CheckAttributes()
+        //{
+        //    var type = this.GetType();
+        //    var fields = type.GetFields();
 
-            foreach (var field in fields)
-            {
-                Debug.Log($"public field {field.Name} type is {field.FieldType}, base is SO: {field.FieldType.BaseType.IsAssignableFrom(typeof(ScriptableObject))}");
-            }
-        }
+        //    foreach (var field in fields)
+        //    {
+        //        Debug.Log($"public field {field.Name} type is {field.FieldType}, base is SO: {field.FieldType.BaseType.IsAssignableFrom(typeof(ScriptableObject))}");
+        //    }
+        //}
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 
 namespace Arcatech.Items
 {
-    public class BaseEquippableItemComponent : MonoBehaviour
+    public class BaseItemComponent : MonoBehaviour
     {
         [SerializeField] protected Transform _spawner;
         public Transform Spawner { get => _spawner; }

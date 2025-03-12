@@ -26,7 +26,7 @@ namespace Arcatech.Units.Inputs
         Collider[] checkColliders = new Collider[20];
         #endregion
 
-        #region public properties
+        
         Vector3 _target;
         float distanceToTarget;
         float _dotProduct;
@@ -36,8 +36,7 @@ namespace Arcatech.Units.Inputs
 
         CountDownTimer resetTargetTimer;
 
-
-        CinemachineBrain _br;
+        #region public properties
         public float GetDotProduct
         { get { return _dotProduct; } }
 
@@ -74,7 +73,6 @@ namespace Arcatech.Units.Inputs
                 return _target - transform.position;
             }
         }
-        public RaycastHit GetCurrentRaycastHit { get { return hit; } }
         #endregion
 
 
@@ -85,12 +83,8 @@ namespace Arcatech.Units.Inputs
         #region managed
         public void StartController()
         {
-            Debug.Log("start aiming");
             _aimPlane = new Plane(Vector3.down, planeY);
-
             _target = transform.forward;
-            _br = GetComponent<CinemachineBrain>();
-
 
             targetUpdate = new CountDownTimer(targetingUpdateFreq);
             resetTargetTimer = new CountDownTimer(1f); //todo
@@ -149,18 +143,17 @@ namespace Arcatech.Units.Inputs
                 targetUpdate.Reset();
                 targetUpdate.Start();
             }
-
         }
 
         void CheckTargetables(Vector3 target)
         {
             if (target == null) return; 
-
+            
             if (Physics.OverlapSphereNonAlloc(target, targetingSphereRadius, checkColliders, LayerMask.NameToLayer("Ground")) > 0) // dont check ground layer objects
             {
                 for (int i = 0; i < checkColliders.Length; i++)
                 {
-                    if (checkColliders[i] == null) break;
+                    if (checkColliders[i] == null) return;
                     if (checkColliders[i].TryGetComponent<ITargetable>(out var component))
                     {
                         currentTgt = component;
@@ -170,7 +163,7 @@ namespace Arcatech.Units.Inputs
             }
             else
             {
-                    currentTgt = null;
+                currentTgt = null;
             }
 
             EventBus<PlayerTargetUpdateEvent>.Raise(new PlayerTargetUpdateEvent(currentTgt));
@@ -181,15 +174,6 @@ namespace Arcatech.Units.Inputs
 
         }
         #endregion
-
-        private void OnDrawGizmos()
-        {
-            if (_target != null)
-            {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawWireSphere(_target, targetingSphereRadius);
-            }
-        }
 
         public bool CheckInteractive (out IInteractible item)
         {
