@@ -43,8 +43,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3890635576766224058}
-  - component: {fileID: 2119789704025630516}
   - component: {fileID: 4089783640774818182}
+  - component: {fileID: 3687581774560333640}
   m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
@@ -70,27 +70,6 @@ Transform:
   - {fileID: 4065402724305639838}
   m_Father: {fileID: 3532768730723117148}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2119789704025630516
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2543573629902991029}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33517c08897e5b44c88dde33d636332a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movingItemsToVector3:
-    _serializedList:
-    - Key: {fileID: 4089783640774818182}
-      Value: {x: 0, y: 0, z: 0}
-  rotateItemsToVector3:
-    _serializedList: []
-  loop: 0
-  movetime: 3
-  ease: 2
 --- !u!54 &4089783640774818182
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -118,6 +97,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &3687581774560333640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2543573629902991029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f4d8d94a5ead524b96276050be47c94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  strategy: {fileID: 11400000, guid: 32a3db15017226245836d7b37bb8ab45, type: 2}
+  SucceedOnce: 1
 --- !u!1 &2655472235491568481
 GameObject:
   m_ObjectHideFlags: 0
@@ -1630,11 +1623,6 @@ PrefabInstance:
       propertyPath: _list._serializedList.Array.data[0].Value.Array.size
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3143092608743161406, guid: 1840b9c088cc25a46bba2e822f1e8771,
-        type: 3}
-      propertyPath: _list._serializedList.Array.data[0].Value.Array.data[0]
-      value: 
-      objectReference: {fileID: 2119789704025630516}
     - target: {fileID: 5635040846008172326, guid: 1840b9c088cc25a46bba2e822f1e8771,
         type: 3}
       propertyPath: m_Name
@@ -1690,11 +1678,43 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3143092608743161406, guid: 1840b9c088cc25a46bba2e822f1e8771, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5635040846008172326, guid: 1840b9c088cc25a46bba2e822f1e8771,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3787250208290393079}
   m_SourcePrefab: {fileID: 100100000, guid: 1840b9c088cc25a46bba2e822f1e8771, type: 3}
+--- !u!1 &722196999880598707 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5635040846008172326, guid: 1840b9c088cc25a46bba2e822f1e8771,
+    type: 3}
+  m_PrefabInstance: {fileID: 4915236523103640469}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3787250208290393079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722196999880598707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffa2e06f5c72926489bd70a5200d2cef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _displayName: Elevator button
+  UserActionOnInteract:
+  - {fileID: 11400000, guid: 2f43903c167eae14e9e265bf5cdb8004, type: 2}
+  AnimatorTrigger: 
+  _list:
+    _serializedList:
+    - Key: {fileID: 11400000, guid: 669ce7a013941e542815fc463f761f69, type: 2}
+      Value:
+      - {fileID: 3687581774560333640}
 --- !u!4 &4065402724305639838 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8961419638059221515, guid: 1840b9c088cc25a46bba2e822f1e8771,

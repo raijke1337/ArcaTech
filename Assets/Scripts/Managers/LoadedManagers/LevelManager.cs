@@ -1,13 +1,8 @@
-using Arcatech.Puzzles;
-using Arcatech.Triggers;
-using Arcatech.Units;
+using Arcatech.Level;
+using Arcatech.Level.Conditions;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Arcatech.Level;
-using Arcatech.EventBus;
-using Arcatech.Items;
-using Arcatech.Effects;
 
 namespace Arcatech.Managers
 {

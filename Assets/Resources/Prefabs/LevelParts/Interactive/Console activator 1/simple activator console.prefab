@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffa2e06f5c72926489bd70a5200d2cef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _displayName: Elevator console
+  _displayName: Activator console
   UserActionOnInteract:
   - {fileID: 11400000, guid: 2f43903c167eae14e9e265bf5cdb8004, type: 2}
   AnimatorTrigger: 
@@ -116,8 +116,7 @@ MonoBehaviour:
     _serializedList:
     - Key: {fileID: 11400000, guid: 5d2b023156025014e9c959588d1eaf13, type: 2}
       Value:
-      - {fileID: 710869603835362484}
-      - {fileID: 0}
+      - {fileID: 5344818856631218081}
 --- !u!1001 &36890788523760443
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -756,7 +755,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5840357584676949103, guid: 5327444fc84d77246ba0479f91603c8c,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 710869603835362484}
+      addedObject: {fileID: 5344818856631218081}
   m_SourcePrefab: {fileID: 100100000, guid: 5327444fc84d77246ba0479f91603c8c, type: 3}
 --- !u!1 &152016255566837097 stripped
 GameObject:
@@ -764,7 +763,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5985582685161584902}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &710869603835362484
+--- !u!114 &5344818856631218081
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -773,11 +772,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 152016255566837097}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e211cf46cc96d64baaaca088322441c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f4d8d94a5ead524b96276050be47c94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  negColor: {r: 1, g: 0, b: 0, a: 1}
-  posColor: {r: 0, g: 1, b: 0, a: 1}
+  strategy: {fileID: 11400000, guid: 1099659ee7833ba46b7c290289a22b6c, type: 2}
+  SucceedOnce: 1
 --- !u!4 &5971600161132821994 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 130161320672904428, guid: 5327444fc84d77246ba0479f91603c8c,
