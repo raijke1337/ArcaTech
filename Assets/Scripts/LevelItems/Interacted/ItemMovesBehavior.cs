@@ -10,46 +10,28 @@ namespace Arcatech.Level
     [CreateAssetMenu(fileName = "new item moves and rotates behavior", menuName = "Level/Event Condition Behavior/Item translation")]
     public class ItemMovesBehavior : ConditionBehaviorStrategy
     {
-        [SerializeField,Tooltip("if set to true, object will go through all steps and then back")] bool looping;
-        [SerializeField] ItemMovementPackage[] movementSteps;
+        [SerializeField] ItemMovementPackage movement;
         public override IConditionControlledStrat Build(ConditionControlledItemComponent item)
         {
-            return new ItemMovementStrat(item, movementSteps, looping);
+            return new ItemMovementStrat(item, movement);
         }
     }
 
     public class ItemMovementStrat : IConditionControlledStrat
     {
-        readonly bool loop;
-        readonly ItemMovementPackage[] steps; //nyi
-        int index;
-        Rigidbody _rb;
         Transform _transform;
-        bool doRigidTransform = false;
+        readonly ItemMovementPackage data;
 
-        Vector3 moveFrom;
-        Vector3 rotateFrom;
+        Tween movement;
 
 
-        public ItemMovementStrat(ConditionControlledItemComponent comp, ItemMovementPackage[] steps, bool loop)
+        public ItemMovementStrat(ConditionControlledItemComponent comp, ItemMovementPackage data)
         {
-            this.loop = loop;
-            this.steps = steps;
-            index = 0;
-            if (comp.TryGetComponent<Rigidbody>(out var r))
-            {
-                _rb = r;
-                doRigidTransform = true;
-                moveFrom = _rb.transform.position;
-                rotateFrom = _rb.transform.eulerAngles;
-            }
-            else
-            {
-                _transform = comp.transform;
-                moveFrom = _transform.position;
-                rotateFrom = _transform.eulerAngles;
-            }
+            this.data = data;
 
+            _transform = comp.transform;
+            movement = _transform.DOLocalPath(data.path, data.movetime, data.pathType);
+            movement.SetEase(data.ease).SetLoops(data.loops).Pause();
         }
 
         public void SetState(ConditionCheckResult newstate)
@@ -57,40 +39,23 @@ namespace Arcatech.Level
             switch (newstate)
             {
                 case ConditionCheckResult.Success:
-                    if (doRigidTransform)
-                    {
-                        RigidTransform(steps[index].targetMovement, steps[index].targetRotation, steps[index].movetime);
-                    }
+                    movement.Play();
                     break;
-                case ConditionCheckResult.Fail:
-                    if (doRigidTransform)
-                    {
-                        RigidTransform(moveFrom,rotateFrom, steps[index].movetime);
-                    }
+                default:
+                    Debug.Log($"NYI state {newstate} for {this}");
                     break;
             }
         }
 
-
-        void RigidTransform(Vector3 moveTO, Vector3 rotateTo, float time, bool loop = false)
-        {
-            _rb.DOMove(moveTO,time,true);
-            _rb.DORotate(rotateTo,time);
-        }
-        void JustTransform(Vector3 moveTO, Vector3 rotateTo, float time, bool loop = false)
-        {
-            _transform.DOMove(moveTO, time, true);
-            _transform.DORotate(rotateTo, time);    
-        }
     }
 
     [Serializable]
     public struct ItemMovementPackage
     {
-        [SerializeField] public Vector3 targetMovement;
-        [SerializeField] public Vector3 targetRotation;
-        [SerializeField] public bool loop;
+        [SerializeField] public Vector3[] path;
+        [SerializeField,Tooltip("-1 is infinite")] public int loops;
         [SerializeField] public float movetime;
         [SerializeField] public Ease ease;
+        [SerializeField] public PathType pathType;
     }
 }

@@ -41,7 +41,7 @@ namespace Arcatech.Managers
         private void OnEnable()
         {
             Bindings(true);
-
+            DOTween.Init();
             _dataManager = DataManager.Instance;
 
 #if UNITY_EDITOR
