@@ -32,6 +32,21 @@ namespace Arcatech.Managers
             Instance = this;
         }
 
+        public void TryRegisterEntity(BaseEntity entity)
+        {
+            if (entity == null) return;
+            if (entities.Contains(entity)) return;
+            else
+            {
+                entities.Add(entity);
+                SetupUnit(entity,true);
+            }
+        }
+        public void TryDeregisterEntity(BaseEntity entity)
+        {
+
+        }
+
 
         #region managed
         public virtual void StartController()

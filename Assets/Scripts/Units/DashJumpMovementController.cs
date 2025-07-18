@@ -107,8 +107,8 @@ namespace Arcatech.Units
             Vector2 dot;
             if (moveDirection.magnitude > 0f)
             {
-                var x = Vector3.Dot(right, Vector3.Normalize(_rb.velocity));
-                var z = Vector3.Dot(fwd, Vector3.Normalize(_rb.velocity));
+                var x = Vector3.Dot(right, Vector3.Normalize(_rb.linearVelocity));
+                var z = Vector3.Dot(fwd, Vector3.Normalize(_rb.linearVelocity));
 
                 dot.x = x;
                 dot.y = z;
@@ -137,7 +137,7 @@ namespace Arcatech.Units
                     isStandingRotating = false;
                 }
             }
-            animator.SetFloat("VerticalMove", _rb.velocity.y);
+            animator.SetFloat("VerticalMove", _rb.linearVelocity.y);
             animator.SetFloat("Rotation", Vector3.Cross(fwd, desiredLookDirection).y);
 
 

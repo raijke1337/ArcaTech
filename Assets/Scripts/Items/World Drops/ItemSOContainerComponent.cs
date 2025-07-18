@@ -1,5 +1,6 @@
 ﻿using Arcatech.Stats;
 using Arcatech.Triggers;
+using Arcatech.Units;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -7,34 +8,25 @@ using UnityEngine;
 namespace Arcatech.Items
 {
     [RequireComponent(typeof(Rigidbody),typeof(BoxCollider))]
-    public class ItemSOContainerComponent : MonoBehaviour, IInteractible
+    public class ItemSOContainerComponent : BaseEntity, IInteractible
     {
-        ItemSO c;
-        public ItemSO Content
+        [SerializeField] ItemSO c;
+        public ItemSO Content { get => c; }
+        public override void ApplyEffect(StatsEffect eff, IEquippable shield, out float current)
         {
-            get { return c; }
-            set
-            { 
-                c = value;
-                Instantiate(c.ItemPrefab, transform);
-            }
+            // item drops don't get destroyed
+            current = 1;
         }
-        Rigidbody _r;
-        public Vector3 Position => transform.position;
 
-        public string UnitName => Content.Description.Title;
-
-        public IReadOnlyDictionary<BaseStatType, StatValueContainer> GetDisplayValues => null;
-
-        public void AcceptInteraction(IInteractible actor)
+        public override void AcceptInteraction(IInteractible actor)
         {
             actor.AcceptInteraction(this);
             Destroy(gameObject);
         }
-        private void Awake()
+
+        private void OnEnable()
         {
-            _r = GetComponent<Rigidbody>();
-            _r.AddForce(Vector3.up*10,ForceMode.Impulse);
+            Instantiate(c.ItemPrefab,transform);
         }
     }
     

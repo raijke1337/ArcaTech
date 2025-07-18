@@ -234,7 +234,17 @@ namespace Arcatech.Units
             Debug.Log($"{UnitName} tried to interact with {target.UnitName} ");
         }
         public Vector3 Position => transform.position;
+
+        public bool Triggered
+        {
+            get
+            {
+                if (UnitDebug) Debug.Log($"checking if {UnitName} was triggered by something, returning false - NYI");
+                return false;
+            }
+        }
         #endregion
+
     }
 
 

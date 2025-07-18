@@ -9,11 +9,13 @@ namespace Arcatech.Scenes.Cameras
     {
 
         [Header("Fade out Settings")]
-        [SerializeField, Tooltip("vert Offset from player")] float verticalOffset = 10f;        
-        [SerializeField, Tooltip("radius of fade sphere")] float _fadeCastRad = 5f;
+        [SerializeField, Tooltip("cast ray length")] float rayLength = 7f;        
+        [SerializeField, Tooltip("radius of fade sphere")] float fadeCastSphereRadius = 2f;
+        [SerializeField,Tooltip("vertical offset for sphere casted, defaults to 1/2 of radius")] float fadeCastSphereVerticalOffset = 3f;
+       // [SerializeField] bool aimAtCursor = false;
         
         [SerializeField] Material _fadedMaterial;
-        [SerializeField] float _fadeSpeed = 0.5f;
+     //   [SerializeField] float _fadeSpeed = 0.5f;
 
 
         [Header("Fade out info")]
@@ -21,19 +23,30 @@ namespace Arcatech.Scenes.Cameras
         private RaycastHit[] _hitsThisFrame;
 
         AimingComponent comp;
+        IsoCameraController cam;
+
         Ray ray;
+        float _rayL;
+        float _castRad;
+        Vector3 _sphereOffset;
+
         private void OnDrawGizmos()
         {
-            Gizmos.DrawRay(ray);
+            Gizmos.DrawLine(ray.origin, ray.origin + (ray.direction * rayLength));
+            Gizmos.DrawWireSphere(ray.origin + (ray.direction * rayLength), fadeCastSphereRadius);
+            foreach (var fading in _currentlyFadingList)
+            {
+                Gizmos.DrawWireCube(fading.transform.position, Vector3.one);
+            }
         }
 
         
         private void SphereCastForHiding()
         {
-            Vector3 dir = comp.transform.position - transform.position;
+            Vector3 dir = comp.transform.position + _sphereOffset - transform.position;
             ray = new Ray(transform.position,dir);
 
-            int hits = Physics.SphereCastNonAlloc(ray, _fadeCastRad, _hitsThisFrame, verticalOffset-(_fadeCastRad/2));
+            int hits = Physics.SphereCastNonAlloc(ray, _castRad, _hitsThisFrame, _rayL);
             
             //add relevant
             if (hits > 0)
@@ -49,7 +62,7 @@ namespace Arcatech.Scenes.Cameras
                         if (!_currentlyFadingList.Contains(fading))
                         {
                             _currentlyFadingList.Add(fading);
-                            fading.Fade(_fadeSpeed, _fadedMaterial);
+                            fading.Fade(0f, _fadedMaterial);
                         }
                     }
                 }
@@ -99,15 +112,27 @@ namespace Arcatech.Scenes.Cameras
         private void Start()
         {
             comp = FindObjectOfType<AimingComponent>();
-            transform.position = new Vector3(comp.transform.position.x, comp.transform.position.y + verticalOffset, comp.transform.position.z);
-            transform.LookAt(comp.transform.position);
-            transform.SetParent(comp.transform, true);
+            cam = FindObjectOfType<IsoCameraController>();
 
+            _rayL = rayLength;
+            _castRad = fadeCastSphereRadius;
+           // fadeCastSphereVerticalOffset = _castRad / 2;
+            _sphereOffset = new Vector3(0, fadeCastSphereVerticalOffset, 0);
+
+            //transform.localPosition = new Vector3(comp.transform.position.x, comp.transform.position.y + _curOfset, comp.transform.position.z);
+
+
+            transform.SetParent(cam.transform, false);
             _hitsThisFrame = new RaycastHit[50];
         }
         private void Update()
         {
-            if (_hitsThisFrame == null || comp == null) return;
+            if (_hitsThisFrame == null || comp == null || cam == null) return;
+// update serialized settings
+            if (_castRad != fadeCastSphereRadius) { _castRad = fadeCastSphereRadius; }
+            if (_rayL != rayLength) { _rayL = rayLength; }
+            if (_sphereOffset.y != fadeCastSphereVerticalOffset) { _sphereOffset.y = fadeCastSphereVerticalOffset; }
+           // if (aimAtCursor) { transform.LookAt(comp.GetLookTarget); }
             SphereCastForHiding();
         }
 
