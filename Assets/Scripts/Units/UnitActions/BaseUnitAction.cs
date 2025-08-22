@@ -23,7 +23,7 @@ namespace Arcatech.Units
             _crossfadeTime = crossfade;
 
             this.place = place;
-            var a = u.GetComponent<Animator>();
+            var a = u.AnimatorReference;
 
             if (_animationName != null && a.runtimeAnimatorController.animationClips.Any(t=>t.name == _animationName))
             {

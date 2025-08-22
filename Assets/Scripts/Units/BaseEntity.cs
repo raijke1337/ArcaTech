@@ -14,6 +14,7 @@ using UnityEngine.ProBuilder.MeshOperations;
 
 namespace Arcatech.Units
 {
+    [RequireComponent(typeof(Animator))]
     public class BaseEntity : ValidatedMonoBehaviour, IInteractible
     {
         protected const float zeroF = 0f;
@@ -27,8 +28,8 @@ namespace Arcatech.Units
         [SerializeField] protected SerializedUnitAction ActionOnDeath;
         [SerializeField, Tooltip("Place to spawn effects")] protected Transform _headT;
 
-        [SerializeField, Self,Child] protected Animator _animator;
-
+        [SerializeField] protected Animator _animator;
+        public Animator AnimatorReference => _animator;
         
         public bool UnitDebug => _showDebugs;
         public string UnitName { get => defaultStats.DisplayName; }
@@ -36,27 +37,10 @@ namespace Arcatech.Units
 
         #region managed
 
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            if (_headT == null)
-            {
-                foreach (var t in GetComponentsInChildren<Transform>())
-                {
-                    if (t.name.ToLower().Contains("head"))
-                    {
-                        _headT = t;
-                    }
-                }
-            }
-
-            Assert.IsFalse(defaultStats==null);
-            Assert.IsNotNull(_headT);
-        }
         public virtual void StartControllerUnit() // this is run by unit manager
         {
             if (_showDebugs) Debug.Log($"Starting {UnitName}");
-            
+            _animator = GetComponent<Animator>();
             _stats = new UnitStatsController(defaultStats.InitialStats, this);
             _stats.StartController();
             statsUpdateTimer = new CountDownTimer(statsUpdateFrequency);
