@@ -18,6 +18,6 @@ namespace Arcatech.Actions
     // play an animation action
     public abstract class ActionResult : IActionResult
     {
-        public abstract void ProduceResult(BaseEntity user, BaseEntity target,Transform place);
+        public abstract void ProduceResult(BaseEntityOLD user, BaseEntityOLD target,Transform place);
     }
 }

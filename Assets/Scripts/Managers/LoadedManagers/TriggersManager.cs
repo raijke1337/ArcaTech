@@ -30,7 +30,7 @@ namespace Arcatech.Managers
 
             Debug.Log($"starting triggers on {gameObject}");
 
-            _applied = new Dictionary<StatsEffect, List<BaseEntity>>();
+            _applied = new Dictionary<StatsEffect, List<BaseEntityOLD>>();
 
         }
         public virtual void ControllerUpdate(float delta)
@@ -51,10 +51,10 @@ namespace Arcatech.Managers
 
         #region triggers
 
-        private Dictionary<StatsEffect, List<BaseEntity>> _applied;
+        private Dictionary<StatsEffect, List<BaseEntityOLD>> _applied;
         private void HandleTriggerEvent(StatsEffectTriggerEvent obj)
         {
-           // Debug.Log($"Handling trigger event; {obj}");
+            Debug.Log($"Handling trigger event; {obj}");
             var targetToApply = obj.Target;
 
             if (_applied.TryGetValue(obj.Applied, out var r))
@@ -78,7 +78,7 @@ namespace Arcatech.Managers
             else
             {
                 targetToApply.ApplyEffect(obj.Applied,null, out _);
-                _applied[obj.Applied] = new List<BaseEntity>() { targetToApply };
+                _applied[obj.Applied] = new List<BaseEntityOLD>() { targetToApply };
 
                 if (obj.Applied.OnApply != null)
                 {

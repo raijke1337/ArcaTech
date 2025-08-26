@@ -92,18 +92,19 @@ namespace Arcatech.Units
         {
             foreach(var k in _stats.GetStatValues.Keys)
             {
-                EventBus<PlayerStatsChangedUIEvent>.Raise(new PlayerStatsChangedUIEvent(k, _stats.GetStatValue(k)));
+                EventBus<PlayerStatsChangedUIEvent>.Raise(new PlayerStatsChangedUIEvent(k, _stats.GetStatValues[k]));
             }
             base.OnTimedStatsUpdate();
         }
 
         protected override void DamageAction()
         {
-            if (_stats.GetStatValue(BaseStatType.Stamina).GetCurrent <= _armorBreakStam && _stats.GetStatValue(BaseStatType.Energy).GetCurrent <= _armorBreakEnergy)
-            {
-                if (_showDebugs) Debug.Log($"Armor break!");
-                costumes.OnBreak();
-            }
+            if (_showDebugs) Debug.Log($"Armor break NYI");
+            //if (_stats.TryGetStatValu(BaseStatType.Stamina).GetCurrent <= _armorBreakStam && _stats.TryGetStatValu(BaseStatType.Energy).GetCurrent <= _armorBreakEnergy)
+            //{
+            //    if (_showDebugs) Debug.Log($"Armor break!");
+            //    costumes.OnBreak();
+            //}
             base.DamageAction();
         }
 

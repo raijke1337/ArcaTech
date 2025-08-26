@@ -25,7 +25,7 @@ namespace Arcatech.Actions
             delay = d;
         }
 
-        public override void ProduceResult(BaseEntity user, BaseEntity target, Transform place)
+        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
         {
             if (user is ArmedUnit ar && ar.IsArmed(out IWeapon w))
             {

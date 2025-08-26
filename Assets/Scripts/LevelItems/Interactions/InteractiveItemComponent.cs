@@ -43,7 +43,7 @@ namespace Arcatech.Level
             }
             foreach (var r in UserActionOnInteract)
             {
-                r.BuildActionResult().ProduceResult(actor as BaseEntity, null, transform);
+                r.BuildActionResult().ProduceResult(actor as BaseEntityOLD, null, transform);
             }
             actor.AcceptInteraction(this);
         }

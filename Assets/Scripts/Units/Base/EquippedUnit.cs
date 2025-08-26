@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Arcatech.Units
 {
     
-    public class EquippedUnit : BaseEntity
+    public class EquippedUnit : BaseEntityOLD
     {
         [Space,Header("Equipped Unit"), SerializeField] protected UnitItemsSO defaultEquips;
         [SerializeField] protected ItemEmpties itemEmpties;

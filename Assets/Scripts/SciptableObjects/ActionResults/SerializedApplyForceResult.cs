@@ -37,7 +37,7 @@ namespace Arcatech.Actions
         {
             _d = distance; _s = speed; _tgt = t;
         }
-        public override void ProduceResult(BaseEntity user, BaseEntity target, Transform place)
+        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
         {
             switch (_tgt)
             {

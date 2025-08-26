@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Arcatech.Items
 {
     [RequireComponent(typeof(Rigidbody),typeof(BoxCollider))]
-    public class ItemSOContainerComponent : BaseEntity, IInteractible
+    public class ItemSOContainerComponent : BaseEntityOLD, IInteractible
     {
         [SerializeField] ItemSO c;
         public ItemSO Content { get => c; }

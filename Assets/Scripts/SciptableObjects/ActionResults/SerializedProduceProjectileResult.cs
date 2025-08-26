@@ -45,7 +45,7 @@ namespace Arcatech.Actions
             cachedEvent = new ProjectilePlaceEvent(null, null, _p, _cfg);
         }
 
-        public override void ProduceResult(BaseEntity user, BaseEntity target, Transform place)
+        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
         {
             if (cachedEvent.Shooter != user)
             {
@@ -78,12 +78,12 @@ namespace Arcatech.Actions
 
     public struct ProjectilePlaceEvent : IEvent
     {
-        public BaseEntity Shooter;
+        public BaseEntityOLD Shooter;
         public Transform Place;
         public readonly SerializedProjectileConfiguration Projectile;
         public readonly ShootingConfig ShootingConfig;
 
-        public ProjectilePlaceEvent(BaseEntity shooter, Transform place, SerializedProjectileConfiguration projectile, ShootingConfig shootingConfig)
+        public ProjectilePlaceEvent(BaseEntityOLD shooter, Transform place, SerializedProjectileConfiguration projectile, ShootingConfig shootingConfig)
         {
             Shooter = shooter;
             Place = place;

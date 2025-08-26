@@ -1,29 +1,50 @@
-using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units.Stats;
 using DG.Tweening;
-using ECM.Components;
 using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Events;
-using UnityEngine.ProBuilder.MeshOperations;
 
 namespace Arcatech.Units
 {
     [RequireComponent(typeof(Animator))]
-    public class BaseEntity : ValidatedMonoBehaviour, IInteractible
+    public class BaseEntityOLD : ValidatedMonoBehaviour, IInteractible
     {
         protected const float zeroF = 0f;
+        #region depreciated
+
         [Header("Entity")]
-        [SerializeField] protected bool _showDebugs = false;
-        [SerializeField] protected Side _unitSide;
-        [SerializeField] protected BaseStatsConfig defaultStats;
-        [SerializeField] protected float statsUpdateFrequency = 0.1f;
-        protected UnitStatsController _stats;
+        [SerializeField] protected bool _showDebugs = false;//
+        [SerializeField] protected Side entitySide; //
+
+
+        [SerializeField] protected BaseStatsConfig defaultStats; //
+        [SerializeField] protected float statsUpdateFrequency = 0.1f; // 
+
+        protected UnitStatsControllerOLD _stats; // moved to separate component TODO all the stuff
+
+        
+        public bool UnitDebug => _showDebugs; //
+        public string UnitName { get => defaultStats.DisplayName; } //
+        [HideInInspector] public Side Side => entitySide; //
+        public virtual void ApplyEffect(StatsEffect eff, IEquippable shield, out float current)
+        {
+            current = 0;
+            if (UnitDead) return;
+
+            if (_stats.CanApplyEffect(eff, shield))
+            {
+                current = _stats.GetStatValues[eff.StatType].GetCurrent;
+            }
+            OnTimedStatsUpdate();
+        }
+
+
+        #endregion
+
         [Space, SerializeField] protected SerializedUnitAction ActionOnDamage;
         [SerializeField] protected SerializedUnitAction ActionOnDeath;
         [SerializeField, Tooltip("Place to spawn effects")] protected Transform _headT;
@@ -31,9 +52,6 @@ namespace Arcatech.Units
         [SerializeField] protected Animator _animator;
         public Animator AnimatorReference => _animator;
         
-        public bool UnitDebug => _showDebugs;
-        public string UnitName { get => defaultStats.DisplayName; }
-        [HideInInspector] public Side Side => _unitSide;
 
         #region managed
 
@@ -41,7 +59,7 @@ namespace Arcatech.Units
         {
             if (_showDebugs) Debug.Log($"Starting {UnitName}");
             _animator = GetComponent<Animator>();
-            _stats = new UnitStatsController(defaultStats.InitialStats, this);
+            _stats = new UnitStatsControllerOLD(defaultStats.BuildBaseStats, this);
             _stats.StartController();
             statsUpdateTimer = new CountDownTimer(statsUpdateFrequency);
             statsUpdateTimer.Start();
@@ -116,26 +134,18 @@ namespace Arcatech.Units
         #endregion
         #region stats
         CountDownTimer statsUpdateTimer;
-        public event UnityAction<BaseEntity> BaseEntityDeathEvent = delegate { };
+        public event UnityAction<BaseEntityOLD> BaseEntityDeathEvent = delegate { };
 
         protected virtual void OnTimedStatsUpdate()
         {
-            var hp = _stats.GetStatValue(BaseStatType.Health).GetCurrent;
-            if (hp <= 0) DeathAction();
-        }
-
-
-        public virtual void ApplyEffect(StatsEffect eff, IEquippable shield, out float current)
-        {
-            current = 0;
-            if (UnitDead) return;
-
-            if (_stats.CanApplyEffect(eff, shield))
+            if (_stats.TryGetStatValue(BaseStatType.Health,out var hp))
             {
-                current = _stats.GetStatValue(eff.StatType).GetCurrent;
+                if (hp.GetCurrent<=0) DeathAction();
             }
-            OnTimedStatsUpdate();
+            /// ProcessStats(newstats.getSnapshot);
         }
+
+
 
         protected virtual void DamageAction()
         {            

@@ -46,9 +46,9 @@ namespace Arcatech.EventBus
 
     public struct DrawDamageEvent : IEvent
     {
-        public BaseEntity Unit { get; }
+        public BaseEntityOLD Unit { get; }
         public float Damage { get; }
-        public DrawDamageEvent (BaseEntity unit, float damage)
+        public DrawDamageEvent (BaseEntityOLD unit, float damage)
         {
             Unit = unit; this.Damage = damage;
         }
@@ -57,14 +57,14 @@ namespace Arcatech.EventBus
     #endregion
     public struct StatsEffectTriggerEvent : IEvent
     {
-        public StatsEffectTriggerEvent(BaseEntity target, StatsEffect toApply, Transform place)
+        public StatsEffectTriggerEvent(BaseEntityOLD target, StatsEffect toApply, Transform place)
         {
             Target = target;
             Applied = toApply;
             Place = place;
         }
 
-        public BaseEntity Target { get; }
+        public BaseEntityOLD Target { get; }
         public StatsEffect Applied { get; }
         public Transform Place { get; }
         public override string ToString()
@@ -92,13 +92,13 @@ namespace Arcatech.EventBus
 
     public struct UpdateIconEvent : IEvent
     {
-        public UpdateIconEvent(IIconContent used, BaseEntity user)
+        public UpdateIconEvent(IIconContent used, BaseEntityOLD user)
         {
             Used = used;
             User = user;
         }
         public IIconContent Used { get; }
-        public BaseEntity User { get; }
+        public BaseEntityOLD User { get; }
 
 
     }

@@ -16,14 +16,14 @@ namespace Arcatech.Units
     {
 
         protected Dictionary<UnitActionType, IWeapon> _weapons;
-        protected UnitStatsController _stats;
+        protected UnitStatsControllerOLD _stats;
 
         private UnitInventoryController _inv;
         private EventBinding<InventoryUpdateEvent> bindInv;
 
         IWeapon _currentWeapon;
 
-        public WeaponController(UnitStatsController stats, UnitInventoryController inv, EquippedUnit dummyUnit) : base(dummyUnit)
+        public WeaponController(UnitStatsControllerOLD stats, UnitInventoryController inv, EquippedUnit dummyUnit) : base(dummyUnit)
         {
             _stats = stats;
             _inv = inv;

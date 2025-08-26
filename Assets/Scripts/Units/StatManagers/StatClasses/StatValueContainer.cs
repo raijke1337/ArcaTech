@@ -10,7 +10,11 @@ namespace Arcatech.Stats
     [Serializable]
     public class StatValueContainer
     {
-        #region public 
+        #region public
+        /// <summary>
+        /// <see langword="false"/>means the container has no mods and 0 value
+        /// </summary>
+        public bool Initialized { get => _setup; } 
         public float GetCurrent { get => _currentValue; }
         public float GetMax { get => _maxValue; }
         public float GetMin { get => _minValue; }
@@ -23,46 +27,48 @@ namespace Arcatech.Stats
         private float _maxValue;
         private float _minValue = 0f;
         private float _initValue = 0f;
-
-       // private bool _setup = false;
+        private bool _setup = false;
 
         public override string ToString()
         {
             return ($"{Mathf.RoundToInt(GetCurrent)} / {Mathf.RoundToInt(GetMax)}");
         }
-
-        public StatValueContainer(IEnumerable<SerializedStatModConfig> initValues)
+        public StatValueContainer()
         {
-            _currentEffects = new List<StatsEffect>();
-            _currentMods = new();
-            foreach (var mod in initValues)
-            {
-                ApplyStatsMod(mod);
-            }
-            _currentValue = _initValue;
-            _cachedValue = _initValue;
+            _currentEffects = new();
+            _currentMods = new();            
         }
-        public StatValueContainer(SerializedStatModConfig initValue)
-        {
-            _currentEffects = new List<StatsEffect>();
-            _currentMods = new();
-            ApplyStatsMod(initValue);
-            _currentValue = _initValue;
-            _cachedValue = _initValue;
-        }
+        //public StatValueContainer(IEnumerable<StatsMod> initValues)
+        //{
+        //    _currentEffects = new List<StatsEffect>();
+        //    _currentMods = new();
+        //    foreach (var mod in initValues)
+        //    {
+        //        ApplyStatsMod(mod);
+        //    }
+        //    _currentValue = _initValue;
+        //    _cachedValue = _initValue;
+        //}
+        //public StatValueContainer(StatsMod initValue)
+        //{
+        //    _currentEffects = new List<StatsEffect>();
+        //    _currentMods = new();
+        //    ApplyStatsMod(initValue);
+        //    _currentValue = _initValue;
+        //    _cachedValue = _initValue;
+        //}
 
         public void UpdateInDelta(float deltaTime)
         {
             UpdateMods(deltaTime);
             UpdateEffects(deltaTime);
+            if (!_setup) { _setup = true; } // starting mods and effects are applied and the component can now process effects 
         }
 
         #region mods
-        private List<SerializedStatModConfig> _currentMods;
-        public void ApplyStatsMod(SerializedStatModConfig mod)
+        private List<StatsMod> _currentMods;
+        public void ApplyStatsMod(StatsMod mod)
         {
-            _maxValue += mod.GetMaxValue;
-            _initValue += mod.GetInitValue;
             _currentMods.Add(mod);
         }
         void UpdateMods(float d)
@@ -71,15 +77,13 @@ namespace Arcatech.Stats
             {
                 if (mod.CheckCondition(this))
                 {
-                    _cachedValue = _currentValue;
-                    _currentValue = Mathf.Clamp(_currentValue + (mod.GetPerSecValue * d), _minValue, _maxValue);
-                }
-                else
-                {
-                   // Debug.Log($"Condition not met for {mod}");
+                    _initValue += mod.GetInitValue;
+                    var valueDelta = mod.GetMaxValue - _maxValue;
+                    _maxValue += mod.GetMaxValue;
+                    _currentValue += 
+                    
                 }
             }
-
         }
         //public void RemoveStatsMod(SerializedStatModConfig mod)
         //{

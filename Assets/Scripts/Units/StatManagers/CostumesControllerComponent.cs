@@ -9,9 +9,9 @@ namespace Arcatech.Units
     public class CostumesControllerComponent : MonoBehaviour
     {
 
-        public void Init(BaseEntity unit) => owner = unit;
+        public void Init(BaseEntityOLD unit) => owner = unit;
 
-        BaseEntity owner;
+        BaseEntityOLD owner;
 
         [SerializeField] private List<GameObject> _parts;
         [SerializeField] SerializedActionResult[] BreakEffects;

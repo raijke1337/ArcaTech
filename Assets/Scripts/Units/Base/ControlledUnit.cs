@@ -27,9 +27,9 @@ namespace Arcatech.Units
             }
             _inputs.UnitActionRequestedEvent += HandleUnitAction;
             _inputs.RequestInteraction += HandleInteractionAction;
-            if (_stats.GetStatValue(BaseStatType.Stamina) != null)
+            if (_stats.TryGetStatValue(BaseStatType.Stamina, out var stam))
             {
-                stunEndStamina = Mathf.Clamp(stunEndStamina, _stats.GetStatValue(BaseStatType.Stamina).GetMin, _stats.GetStatValue(BaseStatType.Stamina).GetMax);
+                stunEndStamina = Mathf.Clamp(stunEndStamina, stam.GetMin, stam.GetMax);
             }
             else
             {
@@ -42,9 +42,12 @@ namespace Arcatech.Units
             base.RunUpdate(delta);
             if (_stunned)
             {
-                if (_stats.GetStatValue(BaseStatType.Stamina).GetCurrent >= stunEndStamina && stunEndProgress == null)
+                if (_stats.TryGetStatValue(BaseStatType.Stamina, out var s))
                 {
-                    stunEndProgress = StartCoroutine(StunCancelCoroutine());
+                    if (s.GetCurrent >= stunEndStamina && stunEndProgress == null)
+                    {
+                        stunEndProgress = StartCoroutine(StunCancelCoroutine());
+                    }
                 }
                 else return;
             }
@@ -115,9 +118,13 @@ namespace Arcatech.Units
 
         protected override void OnTimedStatsUpdate()
         {
-            if (_stats.GetStatValue(BaseStatType.Stamina).GetCurrent <= stunStartStamina)
+            if (_stats.TryGetStatValue(BaseStatType.Stamina, out var stam))
             {
-                StunAction();
+                if (stam.GetCurrent <= stunStartStamina)
+                {
+                    StunAction();
+                }
+                
             }
             base.OnTimedStatsUpdate();
         }

@@ -7,12 +7,12 @@ namespace Arcatech.Items
 {
     public class HomingProjectileComponent : ProjectileComponent
     {
-        BaseEntity target;
+        BaseEntityOLD target;
 
         float scanTimer = 0;
         float range;
         Collider[] scanResults;
-        List<BaseEntity> hitTarget = new();
+        List<BaseEntityOLD> hitTarget = new();
 
         public HomingProjectileComponent WithHoming (float scanRange)
         {
@@ -33,7 +33,7 @@ namespace Arcatech.Items
                 foreach (Collider col in scanResults)
                 {
                     if (col == null) return;
-                    if (col.TryGetComponent<BaseEntity>(out var e) && e.Side != Owner.Side && !hitTarget.Contains(e))
+                    if (col.TryGetComponent<BaseEntityOLD>(out var e) && e.Side != Owner.Side && !hitTarget.Contains(e))
                     { 
                         target = e;                      
                         break;

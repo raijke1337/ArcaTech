@@ -13,11 +13,11 @@ namespace Arcatech.Skills
     public class SkillsController : ManagedControllerBase, ICombatActions
     {
         UnitInventoryController inv;
-        UnitStatsController stats;
+        UnitStatsControllerOLD stats;
         protected Dictionary<UnitActionType, ISkill> _skills;
         private EventBinding<InventoryUpdateEvent> bindInv;
 
-        public SkillsController (UnitStatsController stats, UnitInventoryController inv, EquippedUnit ow) : base (ow)
+        public SkillsController (UnitStatsControllerOLD stats, UnitInventoryController inv, EquippedUnit ow) : base (ow)
         {
             this.inv = inv;
             this.stats = stats;

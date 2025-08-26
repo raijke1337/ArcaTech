@@ -46,7 +46,7 @@ namespace Arcatech.Items
     [Serializable]
     public struct EntitiesPlacementConfig
     {
-        public BaseEntity entity;
+        public BaseEntityOLD entity;
         public Vector3 offset;
        // public bool randomizePlacement;
     }

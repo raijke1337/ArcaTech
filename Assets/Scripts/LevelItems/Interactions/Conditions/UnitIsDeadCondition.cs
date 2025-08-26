@@ -9,7 +9,7 @@ namespace Arcatech.Level.Conditions
     {//checks target
         public override ConditionCheckResult PerformConditionChecks(IInteractible user, IInteractible target, Transform place)
         {
-            if (target is BaseEntity entity && (entity.UnitDead || !entity.isActiveAndEnabled)) return ConditionCheckResult.Success;
+            if (target is BaseEntityOLD entity && (entity.UnitDead || !entity.isActiveAndEnabled)) return ConditionCheckResult.Success;
             else return ConditionCheckResult.Fail;
         }
     }

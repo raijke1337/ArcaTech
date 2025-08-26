@@ -9,12 +9,12 @@ namespace Arcatech.Units
 {
     public class BaseUnitAction : IUnitAction
     {
-        public static BaseUnitAction BuildAction(BaseEntity u, bool lck, NextActionSettings next, string anim, float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place, float crossfade)
+        public static BaseUnitAction BuildAction(BaseEntityOLD u, bool lck, NextActionSettings next, string anim, float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place, float crossfade)
         {
             return new BaseUnitAction(u, lck, next, anim, exit,onstart, onfinish, onExit,place,crossfade);
         }
 
-        BaseUnitAction(BaseEntity u, bool locks, NextActionSettings next, string anim, float exitTimeMult, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place,float crossfade)
+        BaseUnitAction(BaseEntityOLD u, bool locks, NextActionSettings next, string anim, float exitTimeMult, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place,float crossfade)
         {
             Actor = u;
             LockMovement = locks;
@@ -89,7 +89,7 @@ namespace Arcatech.Units
        
         
         
-        protected BaseEntity Actor;
+        protected BaseEntityOLD Actor;
         public bool LockMovement { get; protected set; }
         protected NextActionSettings Next { get; }
 

@@ -55,7 +55,7 @@ namespace Arcatech.AI
         }
 
 
-        private void RemoveUnitOnDeath(BaseEntity u)
+        private void RemoveUnitOnDeath(BaseEntityOLD u)
         {
             if (u is NPCUnit unit)
             {

@@ -73,13 +73,13 @@ namespace Arcatech.Items
         }
 
 
-        List<BaseEntity> hitsThisSwing = new();
+        List<BaseEntityOLD> hitsThisSwing = new();
         private void HandleColliderHitEvent(Collider target)
         {
             if (target == Owner) return;
             else
             {
-                if (target.TryGetComponent<BaseEntity>(out var e))
+                if (target.TryGetComponent<BaseEntityOLD>(out var e))
                 {
                     if (!hitsThisSwing.Contains(e))
                     {
@@ -89,7 +89,7 @@ namespace Arcatech.Items
                 }
             }
         }
-        protected void PerformOnHit(BaseEntity user, BaseEntity target, Transform place)
+        protected void PerformOnHit(BaseEntityOLD user, BaseEntityOLD target, Transform place)
         {
             foreach (var res in OnColliderHit)
             {

@@ -1,27 +1,35 @@
-using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Arcatech.Stats
 {
     [Serializable]
-    public class UnitStatsController : ManagedControllerBase
+    public class UnitStatsControllerOLD : ManagedControllerBase
     {
+        #region depreciated
+
         private Dictionary<BaseStatType, StatValueContainer> _stats;
 
-        public UnitStatsController(SerializedStatModConfig[] initialStatMods, BaseEntity dummyUnit) : base(dummyUnit)
+
+
+        public override void ControllerUpdate(float delta)
+        {
+            foreach (var stat in _stats)
+            {
+                stat.Value.UpdateInDelta(delta);
+            }
+        }
+
+        public UnitStatsControllerOLD(SerializedStatModConfig[] initialStatMods, BaseEntityOLD dummyUnit) : base(dummyUnit)
         {
             _stats = new Dictionary<BaseStatType, StatValueContainer>();
             AddMods(initialStatMods);
         }
-        public UnitStatsController AddMods (SerializedStatModConfig[] mods)
+        public UnitStatsControllerOLD AddMods(SerializedStatModConfig[] mods)
         {
             foreach (var cfg in mods)
             {
@@ -36,6 +44,7 @@ namespace Arcatech.Stats
             }
             return this;
         }
+        #endregion
 
         public bool CanApplyEffect (StatsEffect eff,IEquippable withShield = null)
         {
@@ -109,16 +118,15 @@ namespace Arcatech.Stats
         }
 
         public IReadOnlyDictionary<BaseStatType, StatValueContainer> GetStatValues => _stats;
-        public StatValueContainer GetStatValue(BaseStatType type)
+        public bool TryGetStatValue(BaseStatType type,out StatValueContainer container)
         {
-            try
+            container = null;
+            if (_stats.ContainsKey(type))
             {
-                return _stats[type];
+                container = _stats[type];
+                return true;
             }
-            catch
-            {
-                return null;
-            }
+            else return false;
         }
         #region managed
 
@@ -128,13 +136,7 @@ namespace Arcatech.Stats
         }
 
 
-        public override void ControllerUpdate(float delta)
-        {
-            foreach (var stat in _stats)
-            {
-                stat.Value.UpdateInDelta(delta);
-            }
-        }
+
 
         public override void StopController()
         {

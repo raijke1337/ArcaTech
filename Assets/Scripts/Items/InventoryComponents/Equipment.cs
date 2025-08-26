@@ -1,5 +1,6 @@
 using Arcatech.Effects;
 using Arcatech.Skills;
+using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System;

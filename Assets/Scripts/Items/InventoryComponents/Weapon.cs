@@ -45,7 +45,7 @@ namespace Arcatech.Items
             UseStrategy = cfg.WeaponUseStrategy.ProduceStrategy(Owner, cfg,_weaponGameobject);
         }
 
-        public bool TryUseItem(UnitStatsController stats, out BaseUnitAction act)
+        public bool TryUseItem(UnitStatsControllerOLD stats, out BaseUnitAction act)
         {
             act = null;
             bool ok = false;
@@ -57,7 +57,7 @@ namespace Arcatech.Items
 
             return ok;
         }
-        public bool CanUseItem(UnitStatsController stats)
+        public bool CanUseItem(UnitStatsControllerOLD stats)
         {
             return stats.CanApplyCost(GetCost) && UseStrategy.CanUseUsable();
         }

@@ -21,7 +21,7 @@ namespace Arcatech.Actions
         {
             act = a;
         }
-        public void ProduceResult(BaseEntity user, BaseEntity target, Transform place)
+        public void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
         {
             user.ForceUnitAction(act.ProduceAction(user, place));
         }

@@ -12,7 +12,7 @@ namespace Arcatech.Items
     [RequireComponent(typeof(WeaponTriggerComponent))]
     public class ProjectileComponent : MonoBehaviour
     {
-        public BaseEntity Owner { get; set; }
+        public BaseEntityOLD Owner { get; set; }
         [HideInInspector] public int RemainingHits;
         [HideInInspector] public float Lifetime;
         [HideInInspector] public float Speed;
@@ -20,7 +20,7 @@ namespace Arcatech.Items
         WeaponTriggerComponent col;
         bool isAoe = false; // bandaid but w/e
 
-        BaseEntity[] hits;
+        BaseEntityOLD[] hits;
         int index = 0;
         TargetingType targetingType;
 
@@ -45,7 +45,7 @@ namespace Arcatech.Items
             {
                 ExpirationCollisionResult[i] = exp[i].BuildActionResult();
             }
-            hits = new BaseEntity[RemainingHits];
+            hits = new BaseEntityOLD[RemainingHits];
         }
         private void Start()
         {
@@ -57,7 +57,7 @@ namespace Arcatech.Items
         protected virtual void Col_SomethingHitEvent(Collider other)
         {
             if (Owner.UnitDebug) { Debug.Log($"{this} hit {other}"); }
-            if (other.TryGetComponent<BaseEntity>(out var u))
+            if (other.TryGetComponent<BaseEntityOLD>(out var u))
             {
                 switch (targetingType)
                 {
@@ -93,7 +93,7 @@ namespace Arcatech.Items
                 Destroy(gameObject);
             }
         }
-        void OnColliderSuccess(BaseEntity u)
+        void OnColliderSuccess(BaseEntityOLD u)
         {
             if (!hits.Contains(u) && RemainingHits > 0) // mightr be slow 
             {

@@ -42,7 +42,7 @@ namespace Arcatech.Actions
 
         }
 
-        public override void ProduceResult(BaseEntity user, BaseEntity target,Transform place)
+        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target,Transform place)
         {
             foreach (var type in _effs.Keys)
             {

@@ -12,7 +12,7 @@ namespace Arcatech.Skills
 {
     public  class SkillUsageStrategy : IUsablesStrategy    , IIconContent
     {
-        public BaseEntity Owner {get;protected set;}
+        public BaseEntityOLD Owner {get;protected set;}
         SerializedUnitAction SkillAction { get; }
 
         protected Transform Spawner;
@@ -28,7 +28,7 @@ namespace Arcatech.Skills
 
 
 
-        public SkillUsageStrategy(BaseItemComponent item, SerializedUnitAction useaction, BaseEntity unit, ExtendedText desc, int charges, float reload)
+        public SkillUsageStrategy(BaseItemComponent item, SerializedUnitAction useaction, BaseEntityOLD unit, ExtendedText desc, int charges, float reload)
         {
 
             Owner = unit;

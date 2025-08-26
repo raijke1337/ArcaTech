@@ -11,7 +11,7 @@ namespace Arcatech.Skills
     public class Skill : ISkill
     {
         #region interface
-        public BaseEntity Owner { get ; set; }
+        public BaseEntityOLD Owner { get ; set; }
        // protected SerializedSkill Config { get; }
         public UnitActionType UseActionType { get;  }
         public StatsEffect GetCost => new(_cost);
@@ -23,7 +23,7 @@ namespace Arcatech.Skills
         protected SkillUsageStrategy Strategy { get; }
 
         public string UsableName { get; }
-        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseEntity owner, BaseItemComponent item, EquipmentType type)
+        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseEntityOLD owner, BaseItemComponent item, EquipmentType type)
         { 
 
             Owner = owner;
@@ -56,7 +56,7 @@ namespace Arcatech.Skills
             UsableName = settings.Description.Text;
         }
 
-        public bool TryUseItem(UnitStatsController stats, out BaseUnitAction onUse)
+        public bool TryUseItem(UnitStatsControllerOLD stats, out BaseUnitAction onUse)
         {
             onUse = null;
             if (stats.CanApplyCost(GetCost) && Strategy.TryUseUsable(out onUse))
@@ -66,7 +66,7 @@ namespace Arcatech.Skills
             }
             else return false;
         }
-        public bool CanUseItem(UnitStatsController stats)
+        public bool CanUseItem(UnitStatsControllerOLD stats)
         {
             return stats.CanApplyCost(GetCost) && Strategy.CanUseUsable();
         }

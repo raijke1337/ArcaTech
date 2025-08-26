@@ -1,7 +1,7 @@
 ﻿
 using Arcatech.Stats;
 using UnityEngine;
-namespace Arcatech.Triggers
+namespace Arcatech.Stats
 {
     [CreateAssetMenu(fileName = "New Serialized Stat Mod Condition", menuName = "Items/Stats/Stat mod condition/Check current value", order = 2)]
     public class CheckCurrentValuePercent : SerializedStatModCondition

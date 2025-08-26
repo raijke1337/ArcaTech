@@ -32,7 +32,7 @@ namespace Arcatech.Managers
             Instance = this;
         }
 
-        public void TryRegisterEntity(BaseEntity entity)
+        public void TryRegisterEntity(BaseEntityOLD entity)
         {
             if (entity == null) return;
             if (entities.Contains(entity)) return;
@@ -42,7 +42,7 @@ namespace Arcatech.Managers
                 SetupUnit(entity,true);
             }
         }
-        public void TryDeregisterEntity(BaseEntity entity)
+        public void TryDeregisterEntity(BaseEntityOLD entity)
         {
 
         }
@@ -52,8 +52,8 @@ namespace Arcatech.Managers
         public virtual void StartController()
         {
 
-            List<BaseEntity> l = new List<BaseEntity>();
-            foreach (BaseEntity u in FindObjectsOfType<BaseEntity>())
+            List<BaseEntityOLD> l = new List<BaseEntityOLD>();
+            foreach (BaseEntityOLD u in FindObjectsOfType<BaseEntityOLD>())
             {
                 SetupUnit(u, true);
                 entities.Add(u);
@@ -100,9 +100,9 @@ namespace Arcatech.Managers
         #region units handling
 
         private PlayerUnit _player;
-        List<BaseEntity> entities = new List<BaseEntity>();
+        List<BaseEntityOLD> entities = new List<BaseEntityOLD>();
 
-        private void SetupUnit(BaseEntity u, bool isEnable)
+        private void SetupUnit(BaseEntityOLD u, bool isEnable)
         {
             if (isEnable)
             {
@@ -117,7 +117,7 @@ namespace Arcatech.Managers
         }
 
 
-        private void HandleUnitDeath(BaseEntity unit)
+        private void HandleUnitDeath(BaseEntityOLD unit)
         {
 
             SetupUnit(unit, false);
