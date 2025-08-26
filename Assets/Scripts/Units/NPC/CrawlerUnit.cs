@@ -18,8 +18,14 @@ namespace Arcatech.Units
         Transform assistedAlly;
         bool CheckAllyCondition()
         {
+            if (_group == null) return false;
             var unit = _group.ProcessTacticsRequest(checkLowHPAlly);
-            if (unit != null) { assistedAlly = unit.transform; agent.SetDestination(assistedAlly.position); return true; }
+            if (unit != null) 
+            {
+                assistedAlly = unit.transform;
+                agent.SetDestination(assistedAlly.position); 
+                return true;
+            }
             else return false;
         }
 

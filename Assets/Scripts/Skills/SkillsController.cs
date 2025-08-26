@@ -39,7 +39,7 @@ namespace Arcatech.Skills
             {
                 newTypes.Add(s.UseActionType);
             }
-            foreach (var type in _skills.Keys)
+            foreach (var type in _skills.Keys.ToList())
             {
                 if (!newTypes.Contains(type))
                 {
