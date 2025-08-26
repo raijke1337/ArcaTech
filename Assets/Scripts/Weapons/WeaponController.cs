@@ -1,6 +1,7 @@
 using Arcatech.Effects;
 using Arcatech.EventBus;
 using Arcatech.Items;
+using Arcatech.Stat;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using KBCore.Refs;
@@ -16,14 +17,14 @@ namespace Arcatech.Units
     {
 
         protected Dictionary<UnitActionType, IWeapon> _weapons;
-        protected UnitStatsControllerOLD _stats;
+        protected EntityStatsComponent _stats;
 
         private UnitInventoryController _inv;
         private EventBinding<InventoryUpdateEvent> bindInv;
 
         IWeapon _currentWeapon;
 
-        public WeaponController(UnitStatsControllerOLD stats, UnitInventoryController inv, EquippedUnit dummyUnit) : base(dummyUnit)
+        public WeaponController(EntityStatsComponent stats, UnitInventoryController inv, EquippedUnit dummyUnit) : base(dummyUnit)
         {
             _stats = stats;
             _inv = inv;

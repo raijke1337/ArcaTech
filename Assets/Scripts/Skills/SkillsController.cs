@@ -1,5 +1,6 @@
 using Arcatech.EventBus;
 using Arcatech.Items;
+using Arcatech.Stat;
 using Arcatech.Stats;
 using Arcatech.Units;
 using System;
@@ -13,11 +14,11 @@ namespace Arcatech.Skills
     public class SkillsController : ManagedControllerBase, ICombatActions
     {
         UnitInventoryController inv;
-        UnitStatsControllerOLD stats;
+        EntityStatsComponent stats;
         protected Dictionary<UnitActionType, ISkill> _skills;
         private EventBinding<InventoryUpdateEvent> bindInv;
 
-        public SkillsController (UnitStatsControllerOLD stats, UnitInventoryController inv, EquippedUnit ow) : base (ow)
+        public SkillsController (EntityStatsComponent stats, UnitInventoryController inv, EquippedUnit ow) : base (ow)
         {
             this.inv = inv;
             this.stats = stats;

@@ -12,7 +12,7 @@ namespace Arcatech.Items
     [RequireComponent(typeof(WeaponTriggerComponent))]
     public class ProjectileComponent : MonoBehaviour
     {
-        public BaseEntityOLD Owner { get; set; }
+        public ActiveGameUnitComponent Owner { get; set; }
         [HideInInspector] public int RemainingHits;
         [HideInInspector] public float Lifetime;
         [HideInInspector] public float Speed;
@@ -20,7 +20,7 @@ namespace Arcatech.Items
         WeaponTriggerComponent col;
         bool isAoe = false; // bandaid but w/e
 
-        BaseEntityOLD[] hits;
+        BaseGameEntityComponent[] hits;
         int index = 0;
         TargetingType targetingType;
 
@@ -45,20 +45,21 @@ namespace Arcatech.Items
             {
                 ExpirationCollisionResult[i] = exp[i].BuildActionResult();
             }
-            hits = new BaseEntityOLD[RemainingHits];
+            hits = new BaseGameEntityComponent[RemainingHits];
         }
         private void Start()
         {
             col = GetComponent<WeaponTriggerComponent>();
             if (GetComponent<AreaOfEffectSphereScalerComponent>()) isAoe = true;
-            col.SomethingHitEvent += Col_SomethingHitEvent;
+            col.SomeColliderWasHitEvent += Col_SomethingHitEvent;
         }
 
         protected virtual void Col_SomethingHitEvent(Collider other)
         {
-            if (Owner.UnitDebug) { Debug.Log($"{this} hit {other}"); }
-            if (other.TryGetComponent<BaseEntityOLD>(out var u))
+
+            if (other.TryGetComponent<BaseGameEntityComponent>(out var u))
             {
+                if (Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{this} hit {u.GetName}"); }
                 switch (targetingType)
                 {
                     case TargetingType.OnlyUser:
@@ -71,11 +72,11 @@ namespace Arcatech.Items
                         OnColliderSuccess(u);
                         break;
                     case TargetingType.AnyEnemy:
-                        if (u.Side != Owner.Side)
+                        if (u.GetEntitySide != Owner.GetMainEntity.GetEntitySide)
                             OnColliderSuccess(u);
                         break;
                     case TargetingType.AnyAlly:
-                        if (u.Side == Owner.Side)
+                        if (u.GetEntitySide == Owner.GetMainEntity.GetEntitySide)
                             OnColliderSuccess(u);
                         break;
                 }
@@ -93,7 +94,7 @@ namespace Arcatech.Items
                 Destroy(gameObject);
             }
         }
-        void OnColliderSuccess(BaseEntityOLD u)
+        void OnColliderSuccess(BaseGameEntityComponent u)
         {
             if (!hits.Contains(u) && RemainingHits > 0) // mightr be slow 
             {
@@ -106,7 +107,7 @@ namespace Arcatech.Items
                 {
                     foreach (var uc in UnitCollisionResult)
                     {
-                        uc.ProduceResult(Owner, u, transform);
+                        uc.ProduceResult(Owner.GetMainEntity, u, transform);
                     }
                 }
             }
@@ -129,7 +130,7 @@ namespace Arcatech.Items
             {               
                 foreach (var exp in ExpirationCollisionResult)
                 {
-                    exp.ProduceResult(Owner, null, transform);
+                    exp.ProduceResult(Owner.GetMainEntity, null, transform);
                 }
             }
         }

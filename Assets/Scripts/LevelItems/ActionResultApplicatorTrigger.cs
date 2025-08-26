@@ -1,17 +1,17 @@
 using Arcatech.Actions;
 using Arcatech.Level;
 using Arcatech.Units;
+using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 namespace Arcatech.Triggers
 {
 
-
+    [RequireComponent(typeof(BaseGameEntityComponent))]
     public class ActionResultApplicatorTrigger : BaseTrigger
     {
         [Header("Action result applicator")]
-        [SerializeField] Side applicatorSide;
         [SerializeField] protected TargetingType targetType;
         [Header("if 0, apply once. if >0, apply the results every f seconds")]
         [SerializeField, Range(0,3)] protected float ReapplyWhileActorInsideTimer = 0;
@@ -22,11 +22,14 @@ namespace Arcatech.Triggers
         [SerializeField] protected bool DestroyOnExit = false;
 
         Timer reapplyTimer;
+        [SerializeField,Self] BaseGameEntityComponent baseComp;
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             Assert.IsFalse(targetType == TargetingType.None || targetType == TargetingType.OnlyUser,$"Incorrect targeting type set for {this}");
         }
+
         private void Update()
         {
             if (reapplyTimer != null && reapplyTimer.IsRunning)
@@ -47,7 +50,7 @@ namespace Arcatech.Triggers
         protected override void OnTriggerEnter(Collider other)
         {
 
-            if (other.gameObject.TryGetComponent(out BaseEntityOLD p))
+            if (other.gameObject.TryGetComponent(out BaseGameEntityComponent p))
             {
 
                 if (reapplyTimer == null)
@@ -62,13 +65,13 @@ namespace Arcatech.Triggers
                         ApplyResultsTo(p);
                         break;
                     case TargetingType.AnyEnemy:
-                        if (p.Side != applicatorSide) ApplyResultsTo(p);
+                        if (p.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(p);
                         break;
                     case TargetingType.AnyAlly:
-                        if (p.Side == applicatorSide) ApplyResultsTo(p);
+                        if (p.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(p);
                         break;
                     default:
-                        Debug.Log($"{p.UnitName} entered {this} and nothing happened because of trigger settings");
+                        Debug.Log($"{p.name} entered {this} and nothing happened because of trigger settings");
                         break;
                 }
             }
@@ -81,7 +84,7 @@ namespace Arcatech.Triggers
 
         protected override void OnTriggerExit(Collider other)
         {
-            if (other.gameObject.TryGetComponent(out BaseEntityOLD p))
+            if (other.gameObject.TryGetComponent(out BaseGameEntityComponent p))
             {
                 switch (targetType)
                 {
@@ -89,13 +92,13 @@ namespace Arcatech.Triggers
                         ApplyResultsTo(p);
                         break;
                     case TargetingType.AnyEnemy:
-                        if (p.Side != applicatorSide) ApplyResultsTo(p);
+                        if (p.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(p);
                         break;
                     case TargetingType.AnyAlly:
-                        if (p.Side == applicatorSide) ApplyResultsTo(p);
+                        if (p.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(p);
                         break;
                     default:
-                        Debug.Log($"{p.UnitName} exited {this} and nothing happened because of trigger settings");
+                        Debug.Log($"{p.GetName} exited {this} and nothing happened because of trigger settings");
                         break;
                 }
             }
@@ -107,7 +110,7 @@ namespace Arcatech.Triggers
         }
 
 
-        protected void ApplyResultsTo(BaseEntityOLD p)
+        protected void ApplyResultsTo(BaseGameEntityComponent p)
         {
             foreach (var action in ResultOnEntry)
             {

@@ -41,7 +41,7 @@ namespace Arcatech.Units
         {
             base.RunUpdate(delta);
 
-            if (ActionLock || _stunned) return;
+            if (ActionLock) return;
             _movement.SetDesiredMoveDirection(_inputs.InputsMovementVector);
             _movement.SetDesiredLookDirection(_inputs.InputsLookVector,_aim.Target!=null);
         }
@@ -90,16 +90,16 @@ namespace Arcatech.Units
         #region stats
         protected override void OnTimedStatsUpdate()
         {
-            foreach(var k in _stats.GetStatValues.Keys)
+            foreach(var k in _stats.GetAllStats.Keys)
             {
-                EventBus<PlayerStatsChangedUIEvent>.Raise(new PlayerStatsChangedUIEvent(k, _stats.GetStatValues[k]));
+                EventBus<PlayerStatsChangedUIEvent>.Raise(new PlayerStatsChangedUIEvent(k, _stats.GetAllStats[k]));
             }
             base.OnTimedStatsUpdate();
         }
 
         protected override void DamageAction()
         {
-            if (_showDebugs) Debug.Log($"Armor break NYI");
+            if (UnitDebug) Debug.Log($"Armor break NYI");
             //if (_stats.TryGetStatValu(BaseStatType.Stamina).GetCurrent <= _armorBreakStam && _stats.TryGetStatValu(BaseStatType.Energy).GetCurrent <= _armorBreakEnergy)
             //{
             //    if (_showDebugs) Debug.Log($"Armor break!");

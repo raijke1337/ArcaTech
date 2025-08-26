@@ -57,19 +57,19 @@ namespace Arcatech.EventBus
     #endregion
     public struct StatsEffectTriggerEvent : IEvent
     {
-        public StatsEffectTriggerEvent(BaseEntityOLD target, StatsEffect toApply, Transform place)
+        public StatsEffectTriggerEvent(BaseGameEntityComponent target, StatsEffect toApply, Transform place)
         {
             Target = target;
             Applied = toApply;
             Place = place;
         }
 
-        public BaseEntityOLD Target { get; }
+        public BaseGameEntityComponent Target { get; }
         public StatsEffect Applied { get; }
         public Transform Place { get; }
         public override string ToString()
         {
-            return string.Concat(Applied," on ", Target?.UnitName, " at ", Place.position);
+            return string.Concat(Applied," on ", Target?.GetName, " at ", Place.position);
         }
     }
     public struct VFXEvent : IEvent

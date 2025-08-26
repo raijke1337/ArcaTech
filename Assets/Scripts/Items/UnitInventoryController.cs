@@ -129,11 +129,11 @@ namespace Arcatech.Items
             return Inventory.HasItem(check);
         }
 
-        public SerializedStatModConfig[] GetCurrentMods
+        public StatsMod[] GetCurrentMods
         {
             get
             {
-                var list = new List<SerializedStatModConfig>();
+                var list = new List<StatsMod>();
                 foreach (var equip in Inventory.Equipments.GetAllValues())
                 {
                     if (equip.StatMods != null)

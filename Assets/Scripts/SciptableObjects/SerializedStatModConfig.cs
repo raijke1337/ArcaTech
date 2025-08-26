@@ -9,6 +9,7 @@ namespace Arcatech.Stats
     {
         [SerializeField] BaseStatType _stat;
 
+        SerializableGuid _guid;
         [Space, SerializeField] SerializedStatModCondition _condition;
 
         [SerializeField] int _changeMax;
@@ -17,27 +18,30 @@ namespace Arcatech.Stats
 
         public StatsMod BuildMod { get
             {
-                return new StatsMod(_stat, _condition, _changeMax, _changeInit, _changePerSec);
+                return new StatsMod(_stat, _condition, _changeMax, _changeInit, _changePerSec, _guid);
             }
         }
         private void OnValidate()
         {
             Assert.IsNotNull(_condition, $"Set some condition for {this}");
+            _guid = SerializableGuid.NewGuid();
         }
     }
 
     public class StatsMod
     {
         internal StatsMod() { }
-        public StatsMod(BaseStatType type, SerializedStatModCondition cond, int max, int init, int persec)
+        public StatsMod(BaseStatType type, SerializedStatModCondition cond, int max, int init, int persec,SerializableGuid id)
         {
-            GetStatType = type; condition = cond; GetMaxValue = max; GetInitValue = init; GetPerSecValue = persec;
+            GetStatType = type; condition = cond; GetMaxValue = max; GetInitValue = init; GetPerSecValue = persec; ID = id;
         }
         SerializedStatModCondition condition;
         public BaseStatType GetStatType { get; }
         public int GetMaxValue { get ; }
         public int GetPerSecValue { get ; }
         public int GetInitValue { get ; }
+
+        public SerializableGuid ID { get; }
 
         public bool CheckCondition(StatValueContainer cont)
         {
@@ -46,6 +50,13 @@ namespace Arcatech.Stats
                 return condition.CheckCondition(cont);
             }
             else return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is StatsMod s)) return false;
+            else if (s.ID.Equals(ID)) return true;
+            return false;
         }
 
     }

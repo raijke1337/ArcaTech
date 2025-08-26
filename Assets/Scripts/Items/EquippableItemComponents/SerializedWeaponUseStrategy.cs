@@ -22,7 +22,7 @@ namespace Arcatech.Items
             Assert.IsFalse(TotalCharges == 0);
             Assert.IsNotNull(Action);
         }
-        public virtual WeaponStrategy ProduceStrategy (EquippedUnit unit, WeaponSO cfg,BaseWeaponComponent comp)
+        public virtual WeaponStrategy ProduceStrategy (ActiveGameUnitComponent unit, WeaponSO cfg,BaseWeaponComponent comp)
         {
             return new WeaponStrategy(Action, unit, cfg,TotalCharges,ChargeRestoreTime, InternalCooldown,comp);   
         }

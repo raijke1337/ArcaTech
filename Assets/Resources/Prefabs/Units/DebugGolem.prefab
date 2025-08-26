@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 6491212273667095636}
   - component: {fileID: 8802708854192566849}
   - component: {fileID: 349653046179133193}
+  - component: {fileID: 2299372504592603577}
+  - component: {fileID: 749276468014651579}
   m_Layer: 0
   m_Name: DebugGolem
   m_TagString: Enemy
@@ -177,10 +179,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8683f71a5cfe53439f51db09350de3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _showDebugs: 0
-  _unitSide: 1
-  defaultStats: {fileID: 11400000, guid: aa050d370950d914684ca237e9e31ff0, type: 2}
-  statsUpdateFrequency: 0.1
+  _stats: {fileID: 2299372504592603577}
+  _gameEntity: {fileID: 749276468014651579}
   ActionOnDamage: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
   ActionOnDeath: {fileID: 11400000, guid: 2237ed11289a6734faab0b08121d8d01, type: 2}
   _headT: {fileID: 8012587124920114488}
@@ -201,10 +201,6 @@ MonoBehaviour:
   _rb: {fileID: 280783704676542858}
   _inputs: {fileID: 6491212273667095636}
   _ground: {fileID: 8802708854192566849}
-  ActionOnStun: {fileID: 11400000, guid: f2f512d0267193c4692ef39181e44f00, type: 2}
-  stunStartStamina: 0
-  stunEndStamina: 30
-  stunEndGetUpTime: 0.5
   _idleWanderRange: 5
   _waitAtIdleSpotTime: 3
   patrolPointVariants: []
@@ -216,6 +212,35 @@ MonoBehaviour:
   _enterCombatAction: {fileID: 11400000, guid: 3e414ef8f3a3f6343be87488e5342590, type: 2}
   _exitCombatAction: {fileID: 11400000, guid: 55a1b7d1aa12aec4b97798559eabf9a3, type: 2}
   agent: {fileID: 122197050836451525}
+--- !u!114 &2299372504592603577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6282177902539391458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4980b1095bba4ba4e9dc04954162be1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingStats: {fileID: 11400000, guid: aa050d370950d914684ca237e9e31ff0, type: 2}
+  statsUpdateFrequency: 0.1
+--- !u!114 &749276468014651579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6282177902539391458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _name: Debug golem
+  entitySide: 1
+  _showDebugs: 0
 --- !u!1001 &2455048497133562149
 PrefabInstance:
   m_ObjectHideFlags: 0

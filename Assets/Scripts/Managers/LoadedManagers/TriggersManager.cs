@@ -1,6 +1,7 @@
 using Arcatech.Effects;
 using Arcatech.EventBus;
 using Arcatech.Items;
+using Arcatech.Stat;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System;
@@ -15,7 +16,7 @@ namespace Arcatech.Managers
 
         private void OnEnable()
         {
-            if (_triggersBinding == null) _triggersBinding = new EventBinding<StatsEffectTriggerEvent>(HandleTriggerEvent);
+            if (_triggersBinding == null) _triggersBinding = new EventBinding<StatsEffectTriggerEvent>(HandleStatsEffectEvent);
             EventBus<StatsEffectTriggerEvent>.Register(_triggersBinding);
         }
         private void OnDisable()
@@ -30,7 +31,7 @@ namespace Arcatech.Managers
 
             Debug.Log($"starting triggers on {gameObject}");
 
-            _applied = new Dictionary<StatsEffect, List<BaseEntityOLD>>();
+            _alreadyAppliedTO = new Dictionary<StatsEffect, List<EntityStatsComponent>>();
 
         }
         public virtual void ControllerUpdate(float delta)
@@ -44,45 +45,47 @@ namespace Arcatech.Managers
 
         public virtual void StopController()
         {
-            _applied.Clear();
+            _alreadyAppliedTO.Clear();
 
         }
         #endregion
 
         #region triggers
 
-        private Dictionary<StatsEffect, List<BaseEntityOLD>> _applied;
-        private void HandleTriggerEvent(StatsEffectTriggerEvent obj)
+        private Dictionary<StatsEffect, List<EntityStatsComponent>> _alreadyAppliedTO;
+        private void HandleStatsEffectEvent(StatsEffectTriggerEvent obj)
         {
-            Debug.Log($"Handling trigger event; {obj}");
-            var targetToApply = obj.Target;
+            Debug.Log($"Handling stats effect trigger event; {obj}");
 
-            if (_applied.TryGetValue(obj.Applied, out var r))
+            if (obj.Target.TryGetComponent<EntityStatsComponent>(out var stats)) // check if the hit entity has some stats that can be changed
             {
-                // effect in list
+                if (_alreadyAppliedTO.TryGetValue(obj.Applied, out var listOfAffectedEntities))
+                {
+                    // effect in list
 
-                if (r.Contains(targetToApply)) return; // target in list
+                    if (listOfAffectedEntities.Contains(stats)) return; // already applied to to target
+                    else
+                    {
+                        // target not in list
+                        stats.ApplyStatsEffect(obj.Applied);
+                        listOfAffectedEntities.Add(stats);
+
+                        if (obj.Applied.OnApply != null)
+                        {
+                            obj.Applied.OnApply.BuildActionResult().ProduceResult(null, obj.Target, obj.Place); // play particles or maybe something else if needed
+                        }
+                    }
+                }
+                // effect not in list just do normally and create a new entry
                 else
                 {
-                    // target not in list
-                    targetToApply.ApplyEffect(obj.Applied,null,out _);
-                    r.Add(obj.Target);
+                    stats.ApplyStatsEffect(obj.Applied);
+                    _alreadyAppliedTO[obj.Applied] = new List<EntityStatsComponent>() { stats };
 
                     if (obj.Applied.OnApply != null)
                     {
-                        obj.Applied.OnApply.BuildActionResult().ProduceResult(null, obj.Target, obj.Place); // play particles or maybe something else if needed
+                        obj.Applied.OnApply.BuildActionResult().ProduceResult(null, obj.Target, obj.Place);
                     }
-                }
-            }
-            // effect not in list just do normally
-            else
-            {
-                targetToApply.ApplyEffect(obj.Applied,null, out _);
-                _applied[obj.Applied] = new List<BaseEntityOLD>() { targetToApply };
-
-                if (obj.Applied.OnApply != null)
-                {
-                    obj.Applied.OnApply.BuildActionResult().ProduceResult(null, obj.Target, obj.Place);
                 }
             }
         }

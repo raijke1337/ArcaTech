@@ -19,7 +19,7 @@ namespace Arcatech.Skills
         [SerializeField] public SerializedStatsEffectConfig Cost;
 
 
-        public Skill CreateSkill(BaseEntityOLD owner, BaseItemComponent item,EquipmentType type)
+        public Skill CreateSkill(ActiveGameUnitComponent owner, BaseItemComponent item,EquipmentType type)
         {
             return new Skill(DrawItemsStrategy, this,owner,item,type);
         }

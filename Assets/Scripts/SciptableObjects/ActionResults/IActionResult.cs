@@ -5,7 +5,7 @@ namespace Arcatech.Actions
 {
     public interface IActionResult
     {
-        void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place);
+        void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place);
     }
 
 }

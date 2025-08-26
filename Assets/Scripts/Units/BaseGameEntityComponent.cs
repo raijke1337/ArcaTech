@@ -1,3 +1,4 @@
+using Arcatech.Triggers;
 using UnityEngine;
 namespace Arcatech
 {/// <summary>
@@ -9,7 +10,12 @@ namespace Arcatech
         [SerializeField] Side entitySide;
         [Space,SerializeField] protected bool _showDebugs = false;
 
-        public string GetUnitName { get => _name; }
+        public string GetName { get => _name; }
         public Side GetEntitySide => entitySide;
+        public bool ShowingDebugs => _showDebugs;
+
+        public bool Paused { get => _paused; }
+        protected bool _paused;
+
     }
 }

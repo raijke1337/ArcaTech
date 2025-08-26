@@ -1,10 +1,7 @@
-using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Triggers;
-using Arcatech.Units.Stats;
 using System.Collections.Generic;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 namespace Arcatech.Stat
 {
     /// <summary>
@@ -13,13 +10,17 @@ namespace Arcatech.Stat
     public class EntityStatsComponent : MonoBehaviour
     {
         [SerializeField] protected BaseStatsConfig startingStats;
-        [SerializeField] protected float statsUpdateFrequency = 0.1f;
+        [SerializeField] protected float statsUpdateFrequency = 0.1f; // call some events to announce update
 
         private Dictionary<BaseStatType, StatValueContainer> _stats;
+        public IReadOnlyDictionary<BaseStatType, StatValueContainer> GetAllStats => _stats;
+        bool _started = false;
+        public bool DidInit => _started;
 
         private void Start()
         {
             _stats = startingStats.BuildBaseStats;
+            _started = true;
         }
         private void Update()
         {
@@ -28,25 +29,62 @@ namespace Arcatech.Stat
                 stat.Value.UpdateInDelta(Time.deltaTime);
             }
         }
+
+
         public void ApplyStatsEffect(StatsEffect eff)
         {
-
+            if (_stats.ContainsKey(eff.StatType))
+            {
+                _stats[eff.StatType].ApplyStatsEffect(eff);
+            }
         }
         public void ApplyStatMod(StatsMod mod)
         {
-
+            _stats[mod.GetStatType].AddStatsMod(mod);
+        }
+        public void ApplyStatsEffects(IEnumerable<StatsEffect> effects)
+        {
+            foreach (var effect in effects)
+            {
+                ApplyStatsEffect(effect);
+            }
+        }
+        public void ApplyStatsMods(IEnumerable<StatsMod> mods)
+        {
+            foreach (var mod in mods) ApplyStatMod(mod);
         }
 
-        // void ApplyStatsEffectOLD(StatsEffect eff, IEquippable shield, out float current)
-        //{
-        //    current = 0;
-        //    if (UnitDead) return;
 
-        //    if (_stats.CanApplyEffect(eff, shield))
-        //    {
-        //        current = _stats.GetStatValues[eff.StatType].GetCurrent;
-        //    }
-        //    OnTimedStatsUpdate();
-        //}
+        public bool CanApplyCost(StatsEffect cost)
+        {
+            bool OK = false;
+            if (cost == null)
+            {
+                OK = true;
+            }
+            else
+            {
+                if (_stats.TryGetValue(cost.StatType, out var c))
+                {
+                    OK = c.GetCurrent >= Mathf.Abs(cost.InitialValue);
+                }
+            }
+            return OK;
+        }
+        public void ApplyCost(StatsEffect cost)
+        {
+            var cont = _stats[cost.StatType];
+            if (cont.GetCurrent >= Mathf.Abs(cost.InitialValue))
+            {
+                cont.ApplyStatsEffect(cost);
+            }
+            else
+            {
+                Debug.LogError($"tried to apply cost {cost} in {gameObject.name} without checking if its possible");
+            }
+        }
+
+
+
     }
 }

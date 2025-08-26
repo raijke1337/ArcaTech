@@ -1,4 +1,5 @@
 using Arcatech.Units;
+using KBCore.Refs;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,7 +7,7 @@ using UnityEngine.Events;
 namespace Arcatech.Triggers
 {
     [RequireComponent(typeof(Collider))]
-    public abstract class BaseTrigger : MonoBehaviour
+    public abstract class BaseTrigger : ValidatedMonoBehaviour
     {
         public Collider Collider { get; protected set; }
 

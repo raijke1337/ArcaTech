@@ -279,6 +279,8 @@ GameObject:
   - component: {fileID: 8911038474986482686}
   - component: {fileID: 1374659358142407288}
   - component: {fileID: 801400512438492360}
+  - component: {fileID: 3872436069235659623}
+  - component: {fileID: 2276535461323191673}
   m_Layer: 8
   m_Name: PlayerTails
   m_TagString: Player
@@ -368,10 +370,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 622e61fc5fe76184b9ab42d6741f8fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _showDebugs: 0
-  _unitSide: 0
-  defaultStats: {fileID: 11400000, guid: 82d9e0125322d9941bed0e073c81adf7, type: 2}
-  statsUpdateFrequency: 0.1
+  _stats: {fileID: 2276535461323191673}
+  _gameEntity: {fileID: 3872436069235659623}
   ActionOnDamage: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
   ActionOnDeath: {fileID: 11400000, guid: 0b8a8ee7cdc62a646a39b231248b013b, type: 2}
   _headT: {fileID: 6430559715144683568}
@@ -400,10 +400,6 @@ MonoBehaviour:
   _rb: {fileID: 3679989756617116995}
   _inputs: {fileID: 1910410889340383960}
   _ground: {fileID: 8911038474986482686}
-  ActionOnStun: {fileID: 11400000, guid: f2f512d0267193c4692ef39181e44f00, type: 2}
-  stunStartStamina: 10
-  stunEndStamina: 25
-  stunEndGetUpTime: 1
   _armorBreakStam: 30
   _armorBreakEnergy: 30
   _faceCam: {fileID: 6195898166004764537}
@@ -605,6 +601,35 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3872436069235659623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4612417970087076613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _name: Tails
+  entitySide: 0
+  _showDebugs: 0
+--- !u!114 &2276535461323191673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4612417970087076613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4980b1095bba4ba4e9dc04954162be1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingStats: {fileID: 11400000, guid: 82d9e0125322d9941bed0e073c81adf7, type: 2}
+  statsUpdateFrequency: 0.1
 --- !u!1 &4898024540398301014
 GameObject:
   m_ObjectHideFlags: 0

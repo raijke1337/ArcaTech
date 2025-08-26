@@ -8,7 +8,7 @@ namespace Arcatech.Triggers
     public class WeaponTriggerComponent : BaseTrigger
     {
 
-        public event UnityAction<Collider> SomethingHitEvent = delegate { };
+        public event UnityAction<Collider> SomeColliderWasHitEvent = delegate { };
         public void ToggleCollider(bool isEnable)
         {
             Collider.enabled = isEnable;
@@ -16,7 +16,7 @@ namespace Arcatech.Triggers
 
         protected override void OnTriggerEnter(Collider other)
         {
-            SomethingHitEvent?.Invoke(other);
+            SomeColliderWasHitEvent?.Invoke(other);
         }
         // weapon signals about trigger hits based on the event
         // all logic moved to strategy

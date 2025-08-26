@@ -11,12 +11,12 @@ namespace Arcatech.Items
 
     public class WeaponStrategy : IWeaponUseStrategy
     {
-        public BaseEntityOLD Owner { get; }
+        public ActiveGameUnitComponent Owner { get; }
         public WeaponSO Config { get; }
         protected BaseWeaponComponent WeaponComponent { get; }
 
 
-        public WeaponStrategy (SerializedUnitAction act,EquippedUnit unit, WeaponSO cfg, int charges, float reload, float intcd,BaseWeaponComponent comp)
+        public WeaponStrategy (SerializedUnitAction act, ActiveGameUnitComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseWeaponComponent comp)
         {
             Owner = unit;
             Config = cfg;
@@ -25,7 +25,7 @@ namespace Arcatech.Items
             MaxCharges = charges;
             WeaponComponent = comp;
 
-            Action = act.ProduceAction(unit,comp.Spawner);
+            Action = act.ProduceAction(unit.GetMainEntity,comp.Spawner);
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);

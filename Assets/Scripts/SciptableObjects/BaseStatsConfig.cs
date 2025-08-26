@@ -20,10 +20,7 @@ namespace Arcatech.Stats
                     {
                         dict[built.GetStatType] = new StatValueContainer();
                     }
-                    else
-                    {
-                        dict[built.GetStatType].ApplyStatsMod(built);
-                    }
+                    dict[built.GetStatType].AddStatsMod(built);
                 }
                 return dict;
             }

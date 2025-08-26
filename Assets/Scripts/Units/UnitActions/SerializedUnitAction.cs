@@ -15,7 +15,7 @@ namespace Arcatech.Units
         [SerializeField] SerializedActionResult[] _onStart;
         [SerializeField] SerializedActionResult[] _onExit;
         [SerializeField] SerializedActionResult[] _onFinish;
-        public BaseUnitAction ProduceAction(BaseEntityOLD unit, Transform place)
+        public BaseUnitAction ProduceAction(ActiveGameUnitComponent unit, Transform place)
         {
             return BaseUnitAction.BuildAction(unit,_locksMovement,_nextAct,_animationName,_exitTime,_onStart,_onFinish,_onExit, place,_crossFadeTime);
         }

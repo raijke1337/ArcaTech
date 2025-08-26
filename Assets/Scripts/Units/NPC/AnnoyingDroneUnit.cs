@@ -84,7 +84,7 @@ namespace Arcatech.Units
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
-            if (!_showDebugs) return;
+            if (!UnitDebug) return;
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(agent.transform.position, agent.transform.position + agent.transform.forward);
 

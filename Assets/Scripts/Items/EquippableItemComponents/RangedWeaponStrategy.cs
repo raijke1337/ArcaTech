@@ -7,7 +7,7 @@ namespace Arcatech.Items
 {
     public class RangedWeaponStrategy : WeaponStrategy
     {
-        public RangedWeaponStrategy(SerializedUnitAction act,EquippedUnit unit, WeaponSO cfg, int charges, float reload, float intcd, BaseWeaponComponent comp) : base(act, unit, cfg, charges, reload, intcd, comp)
+        public RangedWeaponStrategy(SerializedUnitAction act,ActiveGameUnitComponent unit, WeaponSO cfg, int charges, float reload, float intcd, BaseWeaponComponent comp) : base(act, unit, cfg, charges, reload, intcd, comp)
         {
         }
 

@@ -27,30 +27,30 @@ namespace Arcatech.Units
             }
             _inputs.UnitActionRequestedEvent += HandleUnitAction;
             _inputs.RequestInteraction += HandleInteractionAction;
-            if (_stats.TryGetStatValue(BaseStatType.Stamina, out var stam))
-            {
-                stunEndStamina = Mathf.Clamp(stunEndStamina, stam.GetMin, stam.GetMax);
-            }
-            else
-            {
-                stunEndStamina = 0;
-            }
+            //if (_stats.TryGetStatValue(BaseStatType.Stamina, out var stam))
+            //{
+            //    stunEndStamina = Mathf.Clamp(stunEndStamina, stam.GetMin, stam.GetMax);
+            //}
+            //else
+            //{
+            //    stunEndStamina = 0;
+            //}
            
         }
         public override void RunUpdate(float delta)
         {
             base.RunUpdate(delta);
-            if (_stunned)
-            {
-                if (_stats.TryGetStatValue(BaseStatType.Stamina, out var s))
-                {
-                    if (s.GetCurrent >= stunEndStamina && stunEndProgress == null)
-                    {
-                        stunEndProgress = StartCoroutine(StunCancelCoroutine());
-                    }
-                }
-                else return;
-            }
+            //if (_stunned)
+            //{
+            //    if (_stats.TryGetStatValue(BaseStatType.Stamina, out var s))
+            //    {
+            //        if (s.GetCurrent >= stunEndStamina && stunEndProgress == null)
+            //        {
+            //            stunEndProgress = StartCoroutine(StunCancelCoroutine());
+            //        }
+            //    }
+            //    else return;
+            //}
             if (currentAction != null)
             {
                 switch (currentAction?.UpdateAction(delta))
@@ -78,56 +78,60 @@ namespace Arcatech.Units
         }
         #endregion
 
-        [Space,Header("Stuns")]
+        /// <summary>
+        /// Stuns will be implemented differently through the stats component check
+        /// </summary>
+        /// 
+        //[Space,Header("Stuns")]
 
-        [SerializeField] protected SerializedUnitAction ActionOnStun;
-        [SerializeField, Range(0, 300)] protected float stunStartStamina = 0f;
-        [SerializeField, Range(0, 300)] protected float stunEndStamina = 30f;
-        [SerializeField, Range(0.01f, 1)] protected float stunEndGetUpTime = 0.5f;
+        //[SerializeField] protected SerializedUnitAction ActionOnStun;
+        //[SerializeField, Range(0, 300)] protected float stunStartStamina = 0f;
+        //[SerializeField, Range(0, 300)] protected float stunEndStamina = 30f;
+        //[SerializeField, Range(0.01f, 1)] protected float stunEndGetUpTime = 0.5f;
 
-        Coroutine stunEndProgress;
+        //Coroutine stunEndProgress;
 
 
-        protected bool _stunned = false;
-        public bool UnitStunned
-        {
-            get => _stunned;
-            protected set
-            {
-                _stunned = value;
+        //protected bool _stunned = false;
+        //public bool UnitStunned
+        //{
+        //    get => _stunned;
+        //    protected set
+        //    {
+        //        _stunned = value;
 
-                if (_showDebugs) Debug.Log($"Entity stunned: {value}");
-            }
-        }
+        //        if (_showDebugs) Debug.Log($"Entity stunned: {value}");
+        //    }
+        //}
 
-        IEnumerator StunCancelCoroutine()
-        {
-            yield return new WaitForSeconds(stunEndGetUpTime);
-            _stunned = false;
-            _animator.SetTrigger("StunEnd");
-            ActionLock = false;
-            stunEndProgress = null;
-            yield return null;
-        }
-        protected override void StunAction()
-        {
-            if (UnitStunned) return;
-            OnForceAction(ActionOnStun.ProduceAction(this,transform));
-            UnitStunned = true;
-        }
+        //IEnumerator StunCancelCoroutine()
+        //{
+        //    yield return new WaitForSeconds(stunEndGetUpTime);
+        //    _stunned = false;
+        //    _animator.SetTrigger("StunEnd");
+        //    ActionLock = false;
+        //    stunEndProgress = null;
+        //    yield return null;
+        //}
+        //protected override void StunAction()
+        //{
+        //    if (UnitStunned) return;
+        //    OnForceAction(ActionOnStun.ProduceAction(this,transform));
+        //    UnitStunned = true;
+        //}
 
-        protected override void OnTimedStatsUpdate()
-        {
-            if (_stats.TryGetStatValue(BaseStatType.Stamina, out var stam))
-            {
-                if (stam.GetCurrent <= stunStartStamina)
-                {
-                    StunAction();
-                }
+        //protected override void OnTimedStatsUpdate()
+        //{
+        //    if (_stats.TryGetStatValue(BaseStatType.Stamina, out var stam))
+        //    {
+        //        if (stam.GetCurrent <= stunStartStamina)
+        //        {
+        //            StunAction();
+        //        }
                 
-            }
-            base.OnTimedStatsUpdate();
-        }
+        //    }
+        //    base.OnTimedStatsUpdate();
+        //}
 
         #region action lock
 
@@ -218,7 +222,7 @@ namespace Arcatech.Units
 
         public virtual void ReceiveInteraction(IInteractible interactible)
         {
-            if (_showDebugs) Debug.Log($"NYI: {this} receives interaction from {interactible}");
+            if (UnitDebug) Debug.Log($"NYI: {this} receives interaction from {interactible}");
         }
 
         protected abstract void HandleInteractionAction(IInteractible i);

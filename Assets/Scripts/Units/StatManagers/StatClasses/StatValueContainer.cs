@@ -4,6 +4,7 @@ using Arcatech.Units.Stats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 namespace Arcatech.Stats
 {
@@ -36,59 +37,54 @@ namespace Arcatech.Stats
         public StatValueContainer()
         {
             _currentEffects = new();
-            _currentMods = new();            
+            _inactiveMods = new();
+            _activeMods = new();
         }
-        //public StatValueContainer(IEnumerable<StatsMod> initValues)
-        //{
-        //    _currentEffects = new List<StatsEffect>();
-        //    _currentMods = new();
-        //    foreach (var mod in initValues)
-        //    {
-        //        ApplyStatsMod(mod);
-        //    }
-        //    _currentValue = _initValue;
-        //    _cachedValue = _initValue;
-        //}
-        //public StatValueContainer(StatsMod initValue)
-        //{
-        //    _currentEffects = new List<StatsEffect>();
-        //    _currentMods = new();
-        //    ApplyStatsMod(initValue);
-        //    _currentValue = _initValue;
-        //    _cachedValue = _initValue;
-        //}
 
         public void UpdateInDelta(float deltaTime)
         {
             UpdateMods(deltaTime);
             UpdateEffects(deltaTime);
-            if (!_setup) { _setup = true; } // starting mods and effects are applied and the component can now process effects 
+            if (!_setup) 
+            {
+                _currentValue = _initValue;
+                _cachedValue = _currentValue;
+                _setup = true; 
+            } // starting mods and effects are applied and the component can now process effects 
         }
 
         #region mods
-        private List<StatsMod> _currentMods;
-        public void ApplyStatsMod(StatsMod mod)
-        {
-            _currentMods.Add(mod);
-        }
+        private List<StatsMod> _inactiveMods;
+        private List<StatsMod> _activeMods;
+        public void AddStatsMod(StatsMod mod) => _inactiveMods.Add(mod);
+
         void UpdateMods(float d)
         {
-            foreach (var mod in _currentMods.ToList())
+            foreach (var mod in _inactiveMods.ToList())
             {
                 if (mod.CheckCondition(this))
                 {
+                    _activeMods.Add(mod);
+                    _inactiveMods.Remove(mod);
                     _initValue += mod.GetInitValue;
-                    var valueDelta = mod.GetMaxValue - _maxValue;
-                    _maxValue += mod.GetMaxValue;
-                    _currentValue += 
-                    
+                    _maxValue += mod.GetMaxValue;                 
                 }
             }
+            foreach (var mod in _activeMods.ToList())
+            {
+                if (!mod.CheckCondition(this))
+                {
+                    _activeMods.Remove(mod);
+                    _inactiveMods.Add(mod);
+                    _initValue -= mod.GetInitValue;
+                    _maxValue -= mod.GetMaxValue;
+                }
+            }
+            foreach (var mod in _activeMods)
+            {
+                _currentValue = Math.Clamp(_currentValue+ d/mod.GetPerSecValue, _minValue, _maxValue);
+            }
         }
-        //public void RemoveStatsMod(SerializedStatModConfig mod)
-        //{
-        //    if (_currentMods.Contains(mod)) _currentMods.Remove(mod);
-        //}
 
         #endregion
 

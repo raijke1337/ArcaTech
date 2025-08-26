@@ -14,6 +14,10 @@ namespace Arcatech.Units
 
         protected UnitInventoryController _inventory;
 
+        /// <summary>
+        /// TODO: Move equipment to a separate component
+        /// </summary>
+
         public override void StartControllerUnit()
         {
 
@@ -24,7 +28,7 @@ namespace Arcatech.Units
             _inventory.DrawItems(defaultItemsDrawStrat)
                 .StartController();
 
-            _stats.AddMods(_inventory.GetCurrentMods);
+            _stats.ApplyStatsMods(_inventory.GetCurrentMods);
 
 
         }
@@ -34,8 +38,7 @@ namespace Arcatech.Units
             base.DisableUnit();
             UnitPaused = true;
             _inventory.StopController();
-            _stats.StopController();
-
+            //_stats.StopController();
         }
 
 

@@ -35,7 +35,7 @@ namespace Arcatech.Units
 
         protected virtual void OnDrawGizmos()
         {
-            if (_showDebugs)
+            if (UnitDebug)
             {
                 // combat state and detection
                 Gizmos.color = Color.green;
@@ -72,31 +72,26 @@ namespace Arcatech.Units
             }
         }
         
-        protected override void DamageAction()
-        {
-            OnUnitAttackedEvent?.Invoke(this);
-            UnitInCombatState = true;
-            base.DamageAction();
-        }
+        //protected override void DamageAction()
+        //{
+        //    OnUnitAttackedEvent?.Invoke(this);
+        //    UnitInCombatState = true;
+        //    base.DamageAction();
+        //}
 
-        protected override void HandleInteractionAction(IInteractible i)
-        {
-            if (_showDebugs) Debug.Log($"{UnitName} wants to interact with {i}");
-            i.AcceptInteraction(this);
-        }
         protected override void OnActionLock(bool locking)
         {
             agent.isStopped = locking;
-            if (locking) _animator.SetBool("isMoving", false);
+           // if (locking)  _animator.SetBool("isMoving", false);
         }
-        protected override void OnUnitPause(bool isPause)
-        {
-            if (agent != null)
-            {
-                agent.isStopped = isPause;
-            } // wtf....
-            if (_animator != null) _animator.SetBool("isMoving", !isPause);
-        }
+        //protected override void OnUnitPause(bool isPause)
+        //{
+        //    if (agent != null)
+        //    {
+        //        agent.isStopped = isPause;
+        //    } // wtf....
+        //    if (_animator != null) _animator.SetBool("isMoving", !isPause);
+        //}
 
         public override void StartControllerUnit()
         {
@@ -114,7 +109,7 @@ namespace Arcatech.Units
             base.RunUpdate(delta);
             _ground.DetectGround();
             InternalCombatStateUpdate(delta);
-            _animator.SetBool("isMoving", agent.velocity.magnitude > 0 && !agent.isStopped);
+            //_animator.SetBool("isMoving", agent.velocity.magnitude > 0 && !agent.isStopped);
             ExecuteBehaviour();
         }
 
@@ -221,7 +216,7 @@ namespace Arcatech.Units
                 OnCombatStateChanged(value);
                 _inCombat = value;
                 tree.Reset();
-                if (_showDebugs)
+                if (UnitDebug)
                 {
                     Debug.Log($"{UnitName} combat state: {value}");
                 }
@@ -235,14 +230,14 @@ namespace Arcatech.Units
                 combatTimeoutTimer ??= new CountDownTimer(_combatTimeout);
                 combatTimeoutTimer.Start();
             }
-            if (state && _enterCombatAction != null)
-            {
-                ForceUnitAction(_enterCombatAction.ProduceAction(this, _headT));
-            }
-            if (!state && _exitCombatAction != null)
-            {
-                ForceUnitAction(_exitCombatAction.ProduceAction(this, _headT));
-            }
+            //if (state && _enterCombatAction != null)
+            //{
+            //    ForceUnitAction(_enterCombatAction.ProduceAction(this, _headT));
+            //}
+            //if (!state && _exitCombatAction != null)
+            //{
+            //    ForceUnitAction(_exitCombatAction.ProduceAction(this, _headT));
+            //}
         }
 
         void InternalCombatStateUpdate(float d)

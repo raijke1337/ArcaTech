@@ -49,7 +49,7 @@ namespace Arcatech.Items
         //    return ProduceProjectile(owner, place.position, place.rotation, attachToUser, spread);
         //}
 
-        public virtual ProjectileComponent ProduceProjectile (BaseEntityOLD owner, Vector3 pos, Quaternion rot,  float spread = 0f)
+        public virtual ProjectileComponent ProduceProjectile (ActiveGameUnitComponent owner, Vector3 pos, Quaternion rot,  float spread = 0f)
         {
             ProjectileComponent proj = Instantiate(ProjectilePrefab, pos, rot);
             proj.Owner = owner;
