@@ -12,7 +12,7 @@ namespace Arcatech.Items
     public class Equipment : Item, IEquippable
     {
 
-        public Equipment (EquipSO cfg, ActiveGameUnitComponent ow) : base (cfg,ow)
+        public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
         {
             DisplayItem = GameObject.Instantiate(cfg.ItemPrefab);
             foreach (var m in cfg.StatMods)

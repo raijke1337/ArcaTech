@@ -10,7 +10,7 @@
 
         }
 
-        public override NodeStatus Process(NPCUnit actor)
+        public override NodeStatus Process(NPCUnitComponent actor)
         {
             switch (Children[currentChildIndex].Process(actor))
             {

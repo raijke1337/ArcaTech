@@ -22,7 +22,7 @@ namespace Arcatech.Units.Behaviour
             isPathCalculated = false;
             this.agent = agent;
         }
-        public NodeStatus Process(ControlledUnit actor)
+        public NodeStatus Process(NPCUnitComponent actor)
         {
             if (!unset && isPathCalculated && agent.remainingDistance <= agent.stoppingDistance)
             {

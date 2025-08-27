@@ -14,7 +14,7 @@ namespace Arcatech.Units.Behaviour
             this.predicate = predicate;
         }
 
-        public Node.NodeStatus Process(ControlledUnit actor)
+        public Node.NodeStatus Process(NPCUnitComponent actor)
         {
             if (predicate()) return Node.NodeStatus.Success;
             else return Node.NodeStatus.Fail;

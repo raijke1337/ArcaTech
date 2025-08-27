@@ -22,7 +22,7 @@ namespace Arcatech.Units.Behaviour
             this.angle = angle;
         }
 
-        public NodeStatus Process(ControlledUnit actor)
+        public NodeStatus Process(NPCUnitComponent actor)
         {
             Vector3 tgt = target.position;
             if (isFollowingCalculatedPath && nma.remainingDistance < nma.stoppingDistance)

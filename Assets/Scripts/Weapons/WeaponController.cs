@@ -19,12 +19,12 @@ namespace Arcatech.Units
         protected Dictionary<UnitActionType, IWeapon> _weapons;
         protected EntityStatsComponent _stats;
 
-        private UnitInventoryController _inv;
+        private UnitInventoryControllerOLD _inv;
         private EventBinding<InventoryUpdateEvent> bindInv;
 
         IWeapon _currentWeapon;
 
-        public WeaponController(EntityStatsComponent stats, UnitInventoryController inv, EquippedUnit dummyUnit) : base(dummyUnit)
+        public WeaponController(EntityStatsComponent stats, UnitInventoryControllerOLD inv, ActiveGameUnitComponent dummyUnit) : base(dummyUnit)
         {
             _stats = stats;
             _inv = inv;
@@ -37,7 +37,7 @@ namespace Arcatech.Units
             UpdateWeapons(_inv);
         }
 
-        void UpdateWeapons(UnitInventoryController i)
+        void UpdateWeapons(UnitInventoryControllerOLD i)
         {
             _weapons = new();
             foreach (var weapon in i.GetWeapons)
@@ -74,11 +74,11 @@ namespace Arcatech.Units
                 {
                     _currentWeapon = _weapons[action];
                     _inv.DrawItems(_weapons[action].DrawStrategy);
-                    if (DebugMessage && Owner.UnitDebug) { Debug.Log($"{Owner} used weapon {_weapons[action]}"); }
+                    if (DebugMessage && Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{Owner} used weapon {_weapons[action]}"); }
                     return true;
                 }
             }
-            if (DebugMessage && Owner.UnitDebug) { Debug.Log($"{Owner} failed to use weapon {_weapons[action]}"); }
+            if (DebugMessage && Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{Owner} failed to use weapon {_weapons[action]}"); }
             return false;
         }
 

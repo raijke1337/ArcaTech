@@ -8,7 +8,7 @@
     {
         public Sequence(string n,int p = 0) : base (n,p) { }
 
-        public override NodeStatus Process(NPCUnit actor)
+        public override NodeStatus Process(NPCUnitComponent actor)
         {
             if (currentChildIndex < Children.Count)
             {

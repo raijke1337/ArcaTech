@@ -112,7 +112,7 @@ namespace Arcatech.UI
 
         #region item operations
 
-        public event UnityAction InventoryChanged = delegate { };
+        public event UnityAction ViewChangedInventory = delegate { };
 
         [SerializeField] private TextMeshProUGUI _swapItemsButton;
         private Item _selectedItem;
@@ -122,7 +122,7 @@ namespace Arcatech.UI
             _skillTooltipPanel.gameObject.SetActive(false);
             _swapItemsButton.gameObject.SetActive(false);
 
-            InventoryChanged.Invoke();
+            ViewChangedInventory.Invoke();
         }
 
         private IconTileComp _hldTile;

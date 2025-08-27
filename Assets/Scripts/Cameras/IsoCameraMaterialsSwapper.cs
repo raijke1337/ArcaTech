@@ -22,7 +22,7 @@ namespace Arcatech.Scenes.Cameras
         [SerializeField] private List<FadingDecorComponent> _currentlyFadingList = new List<FadingDecorComponent>();
         private RaycastHit[] _hitsThisFrame;
 
-        AimingComponent comp;
+        PlayerAimingComponent comp;
         IsoCameraController cam;
 
         Ray ray;
@@ -111,7 +111,7 @@ namespace Arcatech.Scenes.Cameras
         }
         private void Start()
         {
-            comp = FindObjectOfType<AimingComponent>();
+            comp = FindObjectOfType<PlayerAimingComponent>();
             cam = FindObjectOfType<IsoCameraController>();
 
             _rayL = rayLength;

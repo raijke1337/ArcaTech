@@ -5,13 +5,13 @@ namespace Arcatech.Items
 {
     public struct InventoryUpdateEvent : IEvent
     {
-        public InventoryUpdateEvent(EquippedUnit unit, UnitInventoryController inventory)
+        public InventoryUpdateEvent(EquippedUnitOLD unit, UnitInventoryControllerOLD inventory)
         {
             Unit = unit;
             Inventory = inventory;
         }
 
-        public EquippedUnit Unit { get; }
-        public UnitInventoryController Inventory { get; }
+        public EquippedUnitOLD Unit { get; }
+        public UnitInventoryControllerOLD Inventory { get; }
     }
 }

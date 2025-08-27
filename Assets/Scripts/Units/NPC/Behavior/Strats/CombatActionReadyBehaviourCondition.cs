@@ -15,7 +15,7 @@ namespace Arcatech.Units.Behaviour
             _weapon = weapon;
            // _stats = stats;
         }
-        public Node.NodeStatus Process(ControlledUnit actor)
+        public Node.NodeStatus Process(NPCUnitComponent actor)
         {
             switch (_action)
             {

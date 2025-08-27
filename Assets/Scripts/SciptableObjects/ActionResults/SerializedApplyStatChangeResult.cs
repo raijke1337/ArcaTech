@@ -67,14 +67,14 @@ namespace Arcatech.Actions
                         }
                         break;
                     case TargetingType.AnyEnemy:
-                        if (target.Side == user.Side) return;
+                        if (target.GetEntitySide== user.GetEntitySide) return;
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
                         }
                         break;
                     case TargetingType.AnyAlly:
-                        if (target.Side != user.Side) return;
+                        if (target.GetEntitySide != user.GetEntitySide) return;
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));

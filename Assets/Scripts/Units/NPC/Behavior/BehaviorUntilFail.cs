@@ -4,7 +4,7 @@
     {
         public BehaviorUntilFail(string n, int p = 0) : base(n, p) { }
 
-        public override NodeStatus Process(NPCUnit actor)
+        public override NodeStatus Process(NPCUnitComponent actor)
         {
             if (Children[currentChildIndex].Process(actor) == NodeStatus.Fail)
             {
@@ -18,7 +18,7 @@
     public class BehaviorUntilSuccess : Node
     {
         public BehaviorUntilSuccess(string n, int p = 0) : base(n, p) { }
-        public override NodeStatus Process(NPCUnit actor)
+        public override NodeStatus Process(NPCUnitComponent actor)
         {
             if (Children[currentChildIndex].Process(actor) == NodeStatus.Success)
             {

@@ -1,3 +1,4 @@
+using Arcatech;
 using Arcatech.Items;
 using Arcatech.Units;
 using KBCore.Refs;
@@ -7,12 +8,12 @@ using UnityEngine;
 public abstract class ManagedControllerBase : IManagedController
 {
     [SerializeField] public bool DebugMessage = false;
-    public ManagedControllerBase(BaseEntityOLD dummyUnit)
+    public ManagedControllerBase(ActiveGameUnitComponent dummyUnit)
     {
         Owner = dummyUnit;
     }
 
-    public BaseEntityOLD Owner { get; }
+    public ActiveGameUnitComponent Owner { get; }
     public abstract void StartController();
     public abstract void ControllerUpdate(float delta);
     public abstract void FixedControllerUpdate(float fixedDelta);

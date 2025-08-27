@@ -98,6 +98,11 @@ namespace Arcatech.Units
             }
         }
 
+        void OnUnitPause(bool pause)
+        {
+            Debug.Log($"Pause currently NYI, refactoring");
+        }
+
         private bool _dead = false;
         public bool UnitDead
         {

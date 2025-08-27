@@ -14,7 +14,7 @@ namespace Arcatech.Units.Behaviour
             waitTimer = new CountDownTimer(waitTime);
         }
 
-        public NodeStatus Process(ControlledUnit actor)
+        public NodeStatus Process(NPCUnitComponent actor)
         {
             if (waitTimer.IsReady)
             {

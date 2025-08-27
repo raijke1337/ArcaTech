@@ -14,7 +14,7 @@ namespace Arcatech.Units.Behaviour
         {
 
         }
-        public override NodeStatus Process(NPCUnit actor)
+        public override NodeStatus Process(NPCUnitComponent actor)
         {
             if (Children.Count == 0)
             {

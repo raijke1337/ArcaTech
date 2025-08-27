@@ -3,12 +3,12 @@ namespace Arcatech.Units
 {
     public class UnitActivityHandler
     {
-        private List<NPCUnit> _units;
+        private List<NPCUnitComponent> _units;
         private PlayerUnit _player;
 
-        public UnitActivityHandler(IEnumerable<NPCUnit> units, PlayerUnit player)
+        public UnitActivityHandler(IEnumerable<NPCUnitComponent> units, PlayerUnit player)
         {
-            _units = new List<NPCUnit>(); _player = player;
+            _units = new List<NPCUnitComponent>(); _player = player;
             _units.AddRange(units);
         }
 

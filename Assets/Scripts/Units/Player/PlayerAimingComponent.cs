@@ -14,7 +14,7 @@ using UnityEngine.Scripting.APIUpdating;
 
 namespace Arcatech.Units.Inputs
 {
-    public class AimingComponent : MonoBehaviour, IManagedController
+    public class PlayerAimingComponent : MonoBehaviour
     {
         #region setup
         private Plane _aimPlane;
@@ -81,8 +81,11 @@ namespace Arcatech.Units.Inputs
         CountDownTimer targetUpdate;
 
         #region managed
-        public void StartController()
+
+        bool init = false;
+        private void OnEnable()
         {
+            
             _aimPlane = new Plane(Vector3.down, planeY);
             _target = transform.forward;
 
@@ -90,14 +93,12 @@ namespace Arcatech.Units.Inputs
             resetTargetTimer = new CountDownTimer(1f); //todo
             targetUpdate.Start();
             resetTargetTimer.Start();
-        }
-        public void FixedControllerUpdate(float fixedDelta)
-        {
-
+            init = true;
         }
 
-        public void ControllerUpdate(float delta)
+        void Update()
         {
+            if (!init) return;
             // update aim plane position
             if (transform.position.y != prevY)
             {
@@ -135,68 +136,64 @@ namespace Arcatech.Units.Inputs
             //}
 
 
-            targetUpdate.Tick(delta);
-            resetTargetTimer.Tick(delta);
+            targetUpdate.Tick(Time.deltaTime);
+            resetTargetTimer.Tick(Time.deltaTime);
             if (targetUpdate.IsReady)
             {
-                CheckTargetables(_target);
+                //CheckTargetables(_target);
                 targetUpdate.Reset();
                 targetUpdate.Start();
             }
         }
 
-        void CheckTargetables(Vector3 target)
-        {
-            if (target == null) return; 
+        //void CheckTargetables(Vector3 target)
+        //{
+        //    if (target == null) return; 
             
-            if (Physics.OverlapSphereNonAlloc(target, targetingSphereRadius, checkColliders, LayerMask.NameToLayer("Ground")) > 0) // dont check ground layer objects
-            {
-                for (int i = 0; i < checkColliders.Length; i++)
-                {
-                    if (checkColliders[i] == null) return;
-                    if (checkColliders[i].TryGetComponent<ITargetable>(out var component))
-                    {
-                        currentTgt = component;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                currentTgt = null;
-            }
+        //    if (Physics.OverlapSphereNonAlloc(target, targetingSphereRadius, checkColliders, LayerMask.NameToLayer("Ground")) > 0) // dont check ground layer objects
+        //    {
+        //        for (int i = 0; i < checkColliders.Length; i++)
+        //        {
+        //            if (checkColliders[i] == null) return;
+        //            if (checkColliders[i].TryGetComponent<ITargetable>(out var component))
+        //            {
+        //                currentTgt = component;
+        //                break;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        currentTgt = null;
+        //    }
 
-            EventBus<PlayerTargetUpdateEvent>.Raise(new PlayerTargetUpdateEvent(currentTgt));
-        }
+        //    EventBus<PlayerTargetUpdateEvent>.Raise(new PlayerTargetUpdateEvent(currentTgt));
+        //}
 
-        public void StopController()
-        {
-
-        }
         #endregion
 
-        public bool CheckInteractive (out IInteractible item)
-        {
-            item = null;
+        //public bool CheckInteractive (out IInteractible item)
+        //{
+        //    item = null;
 
-            var hits = Physics.OverlapSphere(_target, targetingSphereRadius);
-            if (hits.Length > 0)
-            {
-                for (int i = 0; i < hits.Length; i++)
-                {
-                    if (checkColliders[i] == null) break;
-                    if (checkColliders[i].gameObject.layer.Equals(LayerMask.NameToLayer("Ground")) ) break;
+        //    var hits = Physics.OverlapSphere(_target, targetingSphereRadius);
+        //    if (hits.Length > 0)
+        //    {
+        //        for (int i = 0; i < hits.Length; i++)
+        //        {
+        //            if (checkColliders[i] == null) break;
+        //            if (checkColliders[i].gameObject.layer.Equals(LayerMask.NameToLayer("Ground")) ) break;
 
-                    if (checkColliders[i].TryGetComponent<IInteractible>(out var component))
-                    {
-                        item = component;
-                        return true;
-                    }
-                }
-                return false;
-            }
-           return false;
-        }
+        //            if (checkColliders[i].TryGetComponent<IInteractible>(out var component))
+        //            {
+        //                item = component;
+        //                return true;
+        //            }
+        //        }
+        //        return false;
+        //    }
+        //   return false;
+        //}
 
     }
 }

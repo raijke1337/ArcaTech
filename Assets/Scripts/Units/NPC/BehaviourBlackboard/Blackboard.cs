@@ -122,8 +122,8 @@ namespace Arcatech.BlackboardSystem
         }
         #endregion
 
-        public NPCUnit gatherAround { get; private set; }
-        public void SetGatherPointUnit (NPCUnit g)
+        public NPCUnitComponent gatherAround { get; private set; }
+        public void SetGatherPointUnit (NPCUnitComponent g)
         {
             if (g == null)
             gatherAround = g;

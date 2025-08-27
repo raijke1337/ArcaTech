@@ -5,13 +5,13 @@ using UnityEngine;
 namespace Arcatech.Units
 {
 
-    public abstract class ControlInputsBase : MonoBehaviour, IManagedController
+    public abstract class ControlInputsBaseOLD : MonoBehaviour, IManagedController
     {
         public Vector3 InputsMovementVector { get; protected set; }
         public Vector3 InputsLookVector { get; protected set; }
 
 
-        protected abstract ControlInputsBase ControllerBindings(bool start);
+        protected abstract ControlInputsBaseOLD ControllerBindings(bool start);
         public event Action<UnitActionType> UnitActionRequestedEvent = delegate { };
         public event Action InputsPause = delegate { };
         public event Action<IInteractible> RequestInteraction = delegate { };

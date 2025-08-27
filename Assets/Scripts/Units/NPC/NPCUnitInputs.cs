@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace Arcatech.Units.Inputs
 {
-    public class NPCUnitInputs : ControlInputsBase
+    public class NPCUnitInputs : ControlInputsBaseOLD
     {
         protected void SetLookVector(Vector3 v) => InputsLookVector = v;
         protected void SetMoveVector(Vector3 v) => InputsMovementVector = v;
-        protected override ControlInputsBase ControllerBindings(bool start)
+        protected override ControlInputsBaseOLD ControllerBindings(bool start)
         {
             return this;
         }

@@ -41,7 +41,7 @@ namespace Arcatech.Actions
             parent = p;
         }
 
-        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
+        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
             if (parent)
             {

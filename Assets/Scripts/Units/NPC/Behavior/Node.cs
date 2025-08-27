@@ -27,7 +27,7 @@ namespace Arcatech.Units.Behaviour
         }
 
         public void AddChild (Node c) => Children.Add(c);
-        public virtual NodeStatus Process(NPCUnit actor)
+        public virtual NodeStatus Process(NPCUnitComponent actor)
         {
             return Children[currentChildIndex].Process(actor);
         }

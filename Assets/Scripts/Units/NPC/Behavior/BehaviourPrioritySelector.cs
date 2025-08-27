@@ -22,7 +22,7 @@ namespace Arcatech.Units.Behaviour
             sortedChildren = null;
         }
 
-        public override NodeStatus Process(NPCUnit actor)
+        public override NodeStatus Process(NPCUnitComponent actor)
         {
             foreach (var c in SortedChildren)
             {

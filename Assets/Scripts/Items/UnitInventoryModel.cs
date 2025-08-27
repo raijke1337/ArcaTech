@@ -8,7 +8,7 @@ namespace Arcatech.Items
 {
     public class UnitInventoryModel
     {
-        public EquippedUnit Owner {get;}
+        public BaseGameEntityComponent Owner {get;}
         public ObservableArray<Item> Inventory { get; protected set; }
         public ObservableDictionary<EquipmentType, Equipment> Equipments { get; protected set; }
 
@@ -25,9 +25,9 @@ namespace Arcatech.Items
         }
 
 
-        public UnitInventoryModel(UnitInventoryItemConfigsContainer cfgs, EquippedUnit owner)
+        public UnitInventoryModel(UnitInventoryItemConfigsContainer cfgs)
         {
-            Owner = owner;  
+          //  Owner = owner;  
             Inventory = new ObservableArray<Item>();
             List<KeyValuePair<EquipmentType, Equipment>> list = new();
             Equipments = new ObservableDictionary<EquipmentType, Equipment>(list.ToArray());

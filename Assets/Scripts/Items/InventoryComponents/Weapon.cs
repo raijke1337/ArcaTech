@@ -27,7 +27,7 @@ namespace Arcatech.Items
 
         //public WeaponAnimationsSet AnimationSet { get; protected set; }
 
-        public Weapon(WeaponSO cfg, ActiveGameUnitComponent ow) : base(cfg, ow)
+        public Weapon(WeaponSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
         {
             _weaponGameobject = DisplayItem as BaseWeaponComponent;
 
@@ -65,7 +65,7 @@ namespace Arcatech.Items
         public void DoUpdate(float delta)
         {
             UseStrategy.UpdateUsable(delta);
-            EventBus<UpdateIconEvent>.Raise(new UpdateIconEvent(this, Owner));
+           // EventBus<UpdateIconEvent>.Raise(new UpdateIconEvent(this, Owner));
         }
 
         public string UsableName { get => Config.Description.Text; }

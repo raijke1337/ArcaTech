@@ -13,12 +13,12 @@ namespace Arcatech.Skills
     [Serializable]
     public class SkillsController : ManagedControllerBase, ICombatActions
     {
-        UnitInventoryController inv;
+        UnitInventoryControllerOLD inv;
         EntityStatsComponent stats;
         protected Dictionary<UnitActionType, ISkill> _skills;
         private EventBinding<InventoryUpdateEvent> bindInv;
 
-        public SkillsController (EntityStatsComponent stats, UnitInventoryController inv, EquippedUnit ow) : base (ow)
+        public SkillsController (EntityStatsComponent stats, UnitInventoryControllerOLD inv, ActiveGameUnitComponent ow) : base (ow)
         {
             this.inv = inv;
             this.stats = stats;
@@ -79,11 +79,11 @@ namespace Arcatech.Skills
                 if (ok)
                 {
                     inv.DrawItems(_skills[action].DrawStrategy);
-                    if (DebugMessage && Owner.UnitDebug) { Debug.Log($"{Owner} used skill {_skills[action]}"); }
+                    if (DebugMessage && Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{Owner} used skill {_skills[action]}"); }
                     return ok;
                 }
             }
-            if (DebugMessage && Owner.UnitDebug) { Debug.Log($"{Owner} failed to use skill {_skills[action]}"); }
+            if (DebugMessage && Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{Owner} failed to use skill {_skills[action]}"); }
             return false;
         }
 

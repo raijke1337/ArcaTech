@@ -4,17 +4,18 @@ using Arcatech.Triggers;
 using Arcatech.Units.Stats;
 using ECM.Components;
 using KBCore.Refs;
+using System;
 using System.Collections;
 using UnityEngine;
 namespace Arcatech.Units
 {
-    [RequireComponent(typeof(ControlInputsBase), typeof(Rigidbody),typeof(GroundDetection))]
-    public abstract class ControlledUnit : ArmedUnit, IInteractible
+    [RequireComponent(typeof(ControlInputsBaseOLD), typeof(Rigidbody),typeof(GroundDetection))]
+    public abstract class ControlledUnitOLD : ArmedUnit, IInteractible
     {
         [Space, Header("Controlled Unit")]
          [SerializeField] protected MovementStatsConfig movementStats;
         [SerializeField, Self] protected Rigidbody _rb;
-        [Self, SerializeField] protected ControlInputsBase _inputs;
+        [Self, SerializeField] protected ControlInputsBaseOLD _inputs;
         [Self, SerializeField] protected GroundDetection _ground;
         #region MANAGED
         public override void StartControllerUnit()
@@ -37,6 +38,12 @@ namespace Arcatech.Units
             //}
            
         }
+
+        private void HandleUnitAction(UnitActionType type)
+        {
+            Debug.Log($"PLACEHOLDER: handle unit actions not operational - refactoring");
+        }
+
         public override void RunUpdate(float delta)
         {
             base.RunUpdate(delta);
@@ -51,23 +58,7 @@ namespace Arcatech.Units
             //    }
             //    else return;
             //}
-            if (currentAction != null)
-            {
-                switch (currentAction?.UpdateAction(delta))
-                {
-                    case UnitActionState.None:
-                        break;
-                    case UnitActionState.Started:
-                        ActionLock = currentAction.LockMovement;
-                        break;
-                    case UnitActionState.ExitTime:
-                        ActionLock = false;
-                        break;
-                    case UnitActionState.Completed:
-                        ActionLock = false;
-                        break;
-                }
-            }
+
             _inputs.ControllerUpdate(delta);
         }
                 public override void DisableUnit()
@@ -133,90 +124,9 @@ namespace Arcatech.Units
         //    base.OnTimedStatsUpdate();
         //}
 
-        #region action lock
 
 
-        bool _lockAction;
-        protected bool ActionLock
-        {
-            get => _lockAction;
-            set
-            {
-                OnActionLock(value);
-                _lockAction = value;
-            }
-        }
-        protected abstract void OnActionLock(bool locking);
 
-#endregion
-
-        #region base unit actions
-
-        protected BaseUnitAction currentAction;
-
-        protected override void OnForceAction(BaseUnitAction act)
-        {
-            base.OnForceAction(act);
-            DoActionLogic(act);
-        }
-
-        protected void DoActionLogic(BaseUnitAction act)
-        {
-            if (currentAction!= null && currentAction != act && currentAction.GetActionState != UnitActionState.Completed)
-            {
-                currentAction.CompleteAction();
-            }
-            currentAction = act;
-            ActionLock = currentAction.LockMovement;
-            currentAction.StartAction();
-        }
-        public bool CanDoAction(UnitActionType action)
-        {
-            if (!_ground.isOnGround) return false;
-            else return action switch
-            {
-                UnitActionType.Melee => _weapons.CanUseAction(action),
-                UnitActionType.Ranged => _weapons.CanUseAction(action),
-                UnitActionType.DodgeSkill => _skills.CanUseAction(action),
-                UnitActionType.MeleeSkill => _skills.CanUseAction(action),
-                UnitActionType.RangedSkill => _skills.CanUseAction(action),
-                UnitActionType.ShieldSkill => _skills.CanUseAction(action),
-                _ => false,
-            };
-        }
-        protected virtual void HandleUnitAction(UnitActionType obj)
-        {
-            // this execution is blocked by ActionLock bool
-            BaseUnitAction a;
-
-            if (!_ground.isOnGround) return;
-            switch (obj)
-            {
-                case UnitActionType.Melee:
-                    if (_weapons.TryUseAction(obj, out a)) DoActionLogic(a);
-                    break;
-                case UnitActionType.Ranged:
-                    if (_weapons.TryUseAction(obj, out a)) DoActionLogic(a);
-                    break;
-                case UnitActionType.DodgeSkill:
-                    if (_skills.TryUseAction(obj, out a)) DoActionLogic(a);
-                    break;
-                case UnitActionType.MeleeSkill:
-                    if (_skills.TryUseAction(obj, out a)) DoActionLogic(a);
-                    break;
-                case UnitActionType.RangedSkill:
-                    if (_skills.TryUseAction(obj, out a)) DoActionLogic(a);
-                    break;
-                case UnitActionType.ShieldSkill:
-                    if (_skills.TryUseAction(obj, out a)) DoActionLogic(a);
-                    break;
-                default:
-                    Debug.LogWarning($"action type {obj} not supported in {this}");
-                    break;
-            }    
-        }
-
-        #endregion
 
         #region interaction
 

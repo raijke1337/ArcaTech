@@ -10,7 +10,7 @@ using UnityEngine.Events;
 namespace Arcatech.Units
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    public class NPCUnit : ControlledUnit, IRoomUnitTacticsMember
+    public class NPCUnitComponent : ActiveGameUnitComponent
     {
 
         [Space, Header("Idling settings")]
@@ -35,7 +35,7 @@ namespace Arcatech.Units
 
         protected virtual void OnDrawGizmos()
         {
-            if (UnitDebug)
+            if (GetMainEntity.ShowingDebugs)
             {
                 // combat state and detection
                 Gizmos.color = Color.green;
@@ -66,9 +66,9 @@ namespace Arcatech.Units
         protected override void OnValidate()
         {
             base.OnValidate();
-            if (this.Side == Side.EnemySide && !CompareTag("Enemy"))
+            if (GetMainEntity.GetEntitySide== Side.EnemySide && !CompareTag("Enemy"))
             {
-                Debug.LogError($"Set enemy tag for {UnitName}");
+                Debug.LogError($"Set enemy tag for {GetMainEntity.GetName}");
             }
         }
         
@@ -93,25 +93,25 @@ namespace Arcatech.Units
         //    if (_animator != null) _animator.SetBool("isMoving", !isPause);
         //}
 
-        public override void StartControllerUnit()
-        {
-            base.StartControllerUnit();
-            agent.speed = movementStats.Stats[Stats.MovementStatType.Movespeed];
-            agent.updateRotation = true; // todo check what this adoes
+        //public override void StartControllerUnit()
+        //{
+        //    base.StartControllerUnit();
+        //    agent.speed = movementStats.Stats[Stats.MovementStatType.Movespeed];
+        //    agent.updateRotation = true; // todo check what this adoes
 
-            _player = FindObjectOfType<PlayerUnit>().transform;
-            BaseBehaviourSetup();
-            SetupBehavior();
-        }
+        //    _player = FindObjectOfType<PlayerUnit>().transform;
+        //    BaseBehaviourSetup();
+        //    SetupBehavior();
+        //}
 
-        public override void RunUpdate(float delta)
-        {
-            base.RunUpdate(delta);
-            _ground.DetectGround();
-            InternalCombatStateUpdate(delta);
-            //_animator.SetBool("isMoving", agent.velocity.magnitude > 0 && !agent.isStopped);
-            ExecuteBehaviour();
-        }
+        //public override void RunUpdate(float delta)
+        //{
+        //    base.RunUpdate(delta);
+        //    _ground.DetectGround();
+        //    InternalCombatStateUpdate(delta);
+        //    //_animator.SetBool("isMoving", agent.velocity.magnitude > 0 && !agent.isStopped);
+        //    ExecuteBehaviour();
+        //}
 
         #region behavior
 
@@ -124,7 +124,7 @@ namespace Arcatech.Units
 
         void BaseBehaviourSetup()
         {
-            tree = new BehaviourTree(UnitName + " undefined behavior tree");
+            tree = new BehaviourTree(name + " undefined behavior tree");
 
             initStoppingDistance = agent.stoppingDistance;
         }
@@ -139,14 +139,14 @@ namespace Arcatech.Units
 
             tree.AddChild(dummyUnitBehavior);
 
-            Debug.Log($"{UnitName} is using dummy behavior!");
+            Debug.Log($"{GetMainEntity.GetName} is using dummy behavior!");
         }
         void ExecuteBehaviour()
         {
-            if (ActionLock || UnitPaused) return;
+            if (ActionLock || GetMainEntity.Paused) return;
             if (tree?.Process(this) == Node.NodeStatus.Fail)
             {
-                Debug.Log($"{UnitName} has an empty behavior tree!");
+                Debug.Log($"{GetMainEntity.GetName} has an empty behavior tree!");
             }
         }
         /// <summary>
@@ -199,7 +199,7 @@ namespace Arcatech.Units
         public void SetUnitsGroup(RoomUnitsGroup g) => _group = g;  
 
         #region combat state
-        public event UnityAction<NPCUnit> OnUnitAttackedEvent = delegate { };
+        public event UnityAction<NPCUnitComponent> OnUnitAttackedEvent = delegate { };
         protected CountDownTimer combatTimeoutTimer;
         bool _inCombat = false;
         string _debugString;
@@ -216,9 +216,9 @@ namespace Arcatech.Units
                 OnCombatStateChanged(value);
                 _inCombat = value;
                 tree.Reset();
-                if (UnitDebug)
+                if (GetMainEntity.ShowingDebugs)
                 {
-                    Debug.Log($"{UnitName} combat state: {value}");
+                    Debug.Log($"{GetMainEntity.Ge   } combat state: {value}");
                 }
             }
         }
@@ -248,7 +248,7 @@ namespace Arcatech.Units
             {
                 if (combatTimeoutTimer.IsReady)
                 {
-                    combatTimeoutTimer.Reset(); UnitInCombatState = false; Debug.Log($"combat timeout {UnitName}");
+                    combatTimeoutTimer.Reset(); UnitInCombatState = false; Debug.Log($"combat timeout {GetMainEntity.GetName}");
                 };
             }
         }

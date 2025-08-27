@@ -12,14 +12,14 @@ namespace Arcatech.Units.Behaviour
             this.strat = strat;            
         }
 
-        public override NodeStatus Process(NPCUnit actor)
+        public override NodeStatus Process(NPCUnitComponent actor)
         {
             var st = strat.Process(actor);
-            if (actor.UnitDebug)
-            {
-                if (_debug == null) _debug = new BehaviorTreeDebugger();
-                PrintDebug(st,actor);
-            }
+            //if (actor.UnitDebug)
+            //{
+            //    if (_debug == null) _debug = new BehaviorTreeDebugger();
+            //    PrintDebug(st,actor);
+            //}
             return st;
         }
         public override void Reset()
@@ -27,10 +27,6 @@ namespace Arcatech.Units.Behaviour
             strat.Reset();
         }
 
-        protected virtual void PrintDebug(NodeStatus st, NPCUnit ac)
-        {
-            _debug.PrintDebug($"{ac.UnitName} Leaf: {NodeName} status {st}");
-        }
     }
 
 

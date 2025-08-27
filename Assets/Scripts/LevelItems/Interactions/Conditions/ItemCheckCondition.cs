@@ -11,13 +11,15 @@ namespace Arcatech.Level.Conditions
         [SerializeField] ItemSO _checked;
         public override ConditionCheckResult PerformConditionChecks(IInteractible user, IInteractible target, Transform place)
         {
-            if (user is EquippedUnit eq)
-            {
-                var ok = eq.HasItem(_checked);
-                Debug.Log(ok);
-                return ConditionCheckResult.Success;
-            }
-            else return ConditionCheckResult.Fail;
+            Debug.Log("CONDITION TODO:" + this);
+            //if (user is EquippedUnitOLD eq)
+            //{
+            //    var ok = eq.HasItem(_checked);
+            //    Debug.Log(ok);
+            //    return ConditionCheckResult.Success;
+            //}
+            //else 
+                return ConditionCheckResult.Fail;
         }
     }
 }

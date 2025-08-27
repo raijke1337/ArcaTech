@@ -25,7 +25,7 @@ namespace Arcatech.Units.Behaviour
             currentIndex = 0;
         }
 
-        public NodeStatus Process(ControlledUnit actor)
+        public NodeStatus Process(NPCUnitComponent actor)
         {
             if (idleTimer.IsRunning) // currentlly idling
             {

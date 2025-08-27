@@ -16,12 +16,12 @@ namespace Arcatech.Managers
         EventBinding<PauseToggleEvent> _pauseBind;
         private void OnPawsToggle(PauseToggleEvent isPausing)
         {
-            _player.UnitPaused = !_player.UnitPaused;
-            Debug.Log($"Paws the game: {_player.UnitPaused}");
-            foreach(var e in entities)
-            {
-                e.UnitPaused = _player.UnitPaused;
-            }
+            //_player.UnitPaused = !_player.UnitPaused;
+            Debug.Log($"Paws the game: {isPausing}");
+            //foreach(var e in entities)
+            //{
+            //    e.UnitPaused = _player.UnitPaused;
+            //}
         }
         #endregion
 
@@ -52,48 +52,48 @@ namespace Arcatech.Managers
         public virtual void StartController()
         {
 
-            List<BaseEntityOLD> l = new List<BaseEntityOLD>();
-            foreach (BaseEntityOLD u in FindObjectsOfType<BaseEntityOLD>())
-            {
-                SetupUnit(u, true);
-                entities.Add(u);
-                if (u is PlayerUnit p)
-                {
-                    _player = p;
-                }
-            }
+            //List<BaseEntityOLD> l = new List<BaseEntityOLD>();
+            //foreach (BaseEntityOLD u in FindObjectsOfType<BaseEntityOLD>())
+            //{
+            //    SetupUnit(u, true);
+            //    entities.Add(u);
+            //    if (u is PlayerUnit p)
+            //    {
+            //        _player = p;
+            //    }
+            //}
            // SetupBlackboard();
         }
         public virtual void ControllerUpdate(float delta)
         {
-            if (_player.UnitPaused) return;
+            //if (_player.UnitPaused) return;
 
-            for (int i = entities.Count - 1; i >= 0; i--)
-            {
-                entities[i].RunUpdate(delta);
-            }
+            //for (int i = entities.Count - 1; i >= 0; i--)
+            //{
+            //    entities[i].RunUpdate(delta);
+            //}
             //UpdateBlackboardController();
         }
 
         public virtual void FixedControllerUpdate(float fixedDelta)
         {
-            if (_player.UnitPaused) return;
+        //    if (_player.UnitPaused) return;
 
-            for (int i = entities.Count - 1; i >= 0; i--)
-            {
-                entities[i].RunFixedUpdate(fixedDelta);
-            }
+        //    for (int i = entities.Count - 1; i >= 0; i--)
+        //    {
+        //        entities[i].RunFixedUpdate(fixedDelta);
+        //    }
 
         }
 
         public virtual void StopController()
         {
-            foreach (var e in entities)
-            {
-                e.DisableUnit();
-                SetupUnit(e, false);
-            }
-            entities.Clear();
+            //foreach (var e in entities)
+            //{
+            //    e.DisableUnit();
+            //    SetupUnit(e, false);
+            //}
+            //entities.Clear();
         }
         #endregion
 

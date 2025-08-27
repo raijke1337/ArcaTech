@@ -12,7 +12,7 @@ namespace Arcatech.Skills
     public class Skill : ISkill
     {
         #region interface
-        public ActiveGameUnitComponent Owner { get ; set; }
+        public BaseGameEntityComponent Owner { get ; set; }
        // protected SerializedSkill Config { get; }
         public UnitActionType UseActionType { get;  }
         public StatsEffect GetCost => new(_cost);
@@ -24,7 +24,7 @@ namespace Arcatech.Skills
         protected SkillUsageStrategy Strategy { get; }
 
         public string UsableName { get; }
-        public Skill(IDrawItemStrategy s, SerializedSkill settings, ActiveGameUnitComponent owner, BaseItemComponent item, EquipmentType type)
+        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseGameEntityComponent owner, BaseItemComponent item, EquipmentType type)
         { 
 
             Owner = owner;

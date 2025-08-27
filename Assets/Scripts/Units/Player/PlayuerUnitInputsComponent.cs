@@ -7,45 +7,21 @@ using UnityEngine;
 
 namespace Arcatech.Units.Inputs
 {
-    [RequireComponent(typeof(AimingComponent))]
-    public class InputsPlayer : ControlInputsBase
+    public class PlayerUnitInputsComponen : ActiveUnitsInputComponent
     {
         [Space,Header("Player inputs")]
         [SerializeField, Anywhere] PlayerInputReaderObject _playerInputReader;
-        [SerializeField,Self] private AimingComponent _aim;
+        [SerializeField,Self] private PlayerAimingComponent _aim;
         [SerializeField] float _interactRange = 3f;
-        public AimingComponent Aiming => _aim;
+        public PlayerAimingComponent Aiming => _aim;
         private IsoCamAdjust _adj;
 
-        #region managedctrl
 
-        public override void StartController()
+        protected override void ControllerStartBindings(bool enabling)
         {
-            base.StartController();
-
             _adj ??= new IsoCamAdjust();
             _playerInputReader.EnablePlayerInputs();
-            _aim = GetComponent<AimingComponent>();
-            _aim?.StartController();
-        }
-        public override void StopController()
-        {
-            base.StopController();
-            _aim?.StopController();
-        }
-        public override void ControllerUpdate(float delta)
-        {
-            base.ControllerUpdate(delta);
-            _aim?.ControllerUpdate(delta);
-        }
-        #endregion
-
-
-        #region inputs section
-
-        protected override ControlInputsBase ControllerBindings(bool start)
-        {
-            if (start)
+            if (enabling)
 
             {
                 _playerInputReader.Aim += OnAimAction;
@@ -81,31 +57,20 @@ namespace Arcatech.Units.Inputs
                 _playerInputReader.PausePressed -= OnPauseButton;
                 _playerInputReader.MountAction -= OnMountButton;
             }
-
-            return this;
         }
-        #endregion
 
-        #region controls handling
+        #region inputs section
+
+
 
 
         private void OnMountButton()
         {
-            if (Aiming.CheckInteractive(out var inter))
-            {
-                if (Vector3.Distance(transform.position,inter.Position)<= _interactRange)
-                {
-                    CallBackInteraction(inter);
-                }
-                else
-                {
-                    Debug.Log($"Too far to interact with {inter}");
-                }
-            }
+            // interact button pressed
         }
         private void OnPauseButton()
         {
-            CallBackPause();
+            EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent());
         }
 
         private void OnShieldSkill()

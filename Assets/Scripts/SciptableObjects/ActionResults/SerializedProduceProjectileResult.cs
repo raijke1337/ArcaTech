@@ -45,11 +45,13 @@ namespace Arcatech.Actions
             cachedEvent = new ProjectilePlaceEvent(null, null, _p, _cfg);
         }
 
-        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
+        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
-            if (cachedEvent.Shooter != user)
+
+            var actor = user.GetComponent<ActiveGameUnitComponent>(); // placeholder TODO
+            if (cachedEvent.Shooter != actor)
             {
-                cachedEvent.Shooter = user;
+                cachedEvent.Shooter = actor;
             }
             if (cachedEvent.Place != place)
             {
@@ -78,12 +80,12 @@ namespace Arcatech.Actions
 
     public struct ProjectilePlaceEvent : IEvent
     {
-        public BaseEntityOLD Shooter;
+        public ActiveGameUnitComponent Shooter;
         public Transform Place;
         public readonly SerializedProjectileConfiguration Projectile;
         public readonly ShootingConfig ShootingConfig;
 
-        public ProjectilePlaceEvent(BaseEntityOLD shooter, Transform place, SerializedProjectileConfiguration projectile, ShootingConfig shootingConfig)
+        public ProjectilePlaceEvent(ActiveGameUnitComponent shooter, Transform place, SerializedProjectileConfiguration projectile, ShootingConfig shootingConfig)
         {
             Shooter = shooter;
             Place = place;

@@ -21,7 +21,7 @@ namespace Arcatech.UI
             EventBus<UpdateIconEvent>.Register(bindIcons);
         }
 
-        public void OnInventoryUpdate (UnitInventoryController inv)
+        public void OnInventoryUpdate (UnitInventoryControllerOLD inv)
         {
 
         }

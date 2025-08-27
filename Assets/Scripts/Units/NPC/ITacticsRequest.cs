@@ -14,7 +14,7 @@ namespace Arcatech.AI
 {
     public interface ITacticsRequest
     {
-        public NPCUnit Process(List<NPCUnit> units);
+        public NPCUnitComponent Process(List<NPCUnitComponent> units);
     }
 
     public class TacticsRequestLowStatAllyAction : ITacticsRequest
@@ -31,30 +31,30 @@ namespace Arcatech.AI
             _comparer = c;
         }
 
-        public NPCUnit Process(List<NPCUnit> units)
+        public NPCUnitComponent Process(List<NPCUnitComponent> units)
         {
-            foreach (NPCUnit unit in units)
-            {
-                if (unit.GetDisplayValues.TryGetValue(_stat, out var cont))
-                {
-                    switch (_comparer)
-                    {
-                        case Comparer.Equal:
-                            if (cont.GetPercent == _valuePercent) return unit;
-                            break;
-                        case Comparer.NotEqual:
-                            if (cont.GetPercent != _valuePercent) return unit;
-                            break;
-                        case Comparer.Greater:
-                            if (cont.GetPercent > _valuePercent) return unit;
-                            break;
-                        case Comparer.Less:
-                            if (cont.GetPercent < _valuePercent) return unit;
-                            break;
-                    }
-                }
+            //foreach (NPCUnit unit in units)
+            //{
+            //    if (unit.GetDisplayValues.TryGetValue(_stat, out var cont))
+            //    {
+            //        switch (_comparer)
+            //        {
+            //            case Comparer.Equal:
+            //                if (cont.GetPercent == _valuePercent) return unit;
+            //                break;
+            //            case Comparer.NotEqual:
+            //                if (cont.GetPercent != _valuePercent) return unit;
+            //                break;
+            //            case Comparer.Greater:
+            //                if (cont.GetPercent > _valuePercent) return unit;
+            //                break;
+            //            case Comparer.Less:
+            //                if (cont.GetPercent < _valuePercent) return unit;
+            //                break;
+            //        }
+            //    }
 
-            }
+            //}
             return null;
         }
 

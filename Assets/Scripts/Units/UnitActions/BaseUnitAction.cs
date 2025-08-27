@@ -46,7 +46,7 @@ namespace Arcatech.Units
 
                             _totalActionTime = clipLength / animSpeedMult;
                             _exitActionTime = _totalActionTime * exitTimeMult;
-                           if (u.UnitDebug) Debug.Log($"Action {this} exit at {_exitActionTime} complete at {_totalActionTime}");
+                           if (u.GetMainEntity.ShowingDebugs) Debug.Log($"Action {this} exit at {_exitActionTime} complete at {_totalActionTime}");
                             break;
                         }
                     }
@@ -187,7 +187,7 @@ namespace Arcatech.Units
                 }
             }
             _actionState = UnitActionState.ExitTime;
-            if (Actor.UnitDebug) { Debug.Log($"{this}, result {ex}"); }
+            if (Actor.GetMainEntity.ShowingDebugs) { Debug.Log($"{this}, result {ex}"); }
 
         }
         public void CompleteAction()
@@ -216,7 +216,7 @@ namespace Arcatech.Units
             _actionState = UnitActionState.Completed;
             _actionTimer.Stop();
 
-            if (Actor.UnitDebug) { 
+            if (Actor.GetMainEntity.ShowingDebugs) { 
                 //Debug.Log($"{this}, result {fin}");
                                    }
 

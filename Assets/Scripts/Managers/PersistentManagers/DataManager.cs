@@ -163,7 +163,7 @@ namespace Arcatech.Managers
 
         public class Itemfactory
         {
-            public IItem ProduceItem (ItemSO cfg, ActiveGameUnitComponent owner)
+            public IItem ProduceItem (ItemSO cfg, BaseGameEntityComponent owner)
             {
                 return cfg.Type switch
                 {

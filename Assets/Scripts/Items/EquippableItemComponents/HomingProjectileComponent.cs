@@ -33,7 +33,7 @@ namespace Arcatech.Items
                 foreach (Collider col in scanResults)
                 {
                     if (col == null) return;
-                    if (col.TryGetComponent<BaseEntityOLD>(out var e) && e.Side != Owner.Side && !hitTarget.Contains(e))
+                    if (col.TryGetComponent<BaseEntityOLD>(out var e) && e.Side != Owner.GetMainEntity.GetEntitySide&& !hitTarget.Contains(e))
                     { 
                         target = e;                      
                         break;

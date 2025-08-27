@@ -29,7 +29,7 @@ namespace Arcatech.Actions
             this.pitch = pitch;
         }
 
-        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
+        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
             foreach (var s in sounds)
             {

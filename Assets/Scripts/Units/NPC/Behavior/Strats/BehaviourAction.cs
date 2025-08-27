@@ -15,7 +15,7 @@ namespace Arcatech.Units.Behaviour
 
         readonly Action act;
 
-        public Node.NodeStatus Process(ControlledUnit actor)
+        public Node.NodeStatus Process(NPCUnitComponent actor)
         {
             act();
             return Node.NodeStatus.Success;

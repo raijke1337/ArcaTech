@@ -25,7 +25,7 @@ namespace Arcatech.Items
             MaxCharges = charges;
             WeaponComponent = comp;
 
-            Action = act.ProduceAction(unit.GetMainEntity,comp.Spawner);
+            Action = act.ProduceAction(unit,comp.Spawner);
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);

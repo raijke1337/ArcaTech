@@ -19,7 +19,7 @@ namespace Arcatech.Units.Behaviour
             rotateSpeed = rotateRadiansBase * rotateSpeedMult;
         }
 
-        public NodeStatus Process(ControlledUnit actor)
+        public NodeStatus Process(NPCUnitComponent actor)
         {
             Vector3 desired = (aimAt.position - actor.transform.position).normalized;
             desired.y = 0f;

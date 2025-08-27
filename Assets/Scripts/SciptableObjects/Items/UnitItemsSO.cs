@@ -23,5 +23,10 @@ namespace Arcatech.Items
                 Assert.IsNotNull(item);
             }
         }
+
+        public UnitInventoryItemConfigsContainer BuildContainer()
+        {
+            return new UnitInventoryItemConfigsContainer(this);
+        }
     }
 }
