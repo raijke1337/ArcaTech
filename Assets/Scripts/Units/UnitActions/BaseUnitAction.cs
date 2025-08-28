@@ -141,7 +141,7 @@ namespace Arcatech.Units
         public void StartAction()
         {
             string start = "";
-            var a = Actor.GetComponent<Animator>();
+            var a = Actor.GetAnimatorReference;
             if (_animationName!= null)
             {
                 a.CrossFade(Animator.StringToHash(_animationName), _crossfadeTime);
@@ -156,7 +156,7 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor, null, place);
+                        r.ProduceResult(Actor.GetMainEntity, null, place);
                         start += (r.ToString() + ' ');
                     }
                 }
@@ -181,7 +181,7 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor, null, place);
+                        r.ProduceResult(Actor.GetMainEntity, null, place);
                         ex += (r.ToString() + ' ');
                     }
                 }
@@ -208,7 +208,7 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor, null, place);
+                        r.ProduceResult(Actor.GetMainEntity, null, place);
                         fin += (r.ToString() + ' ');
                     }
                 }

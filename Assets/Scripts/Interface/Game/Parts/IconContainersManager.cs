@@ -10,45 +10,23 @@ namespace Arcatech.UI
     {
 
         [SerializeField] private IconContainerUIScript _iconPrefab;
-        [SerializeField, Space] private Transform _weaponsP;
-        [SerializeField, Space] private Transform _skillsP;
-        [SerializeField, Space] private Transform _othersP;
+        [SerializeField, Space] private Transform _usablesP;
 
-        private Dictionary<IIconContent, IconContainerUIScript> _weaponIcons = new();
-        private Dictionary<IIconContent, IconContainerUIScript> _skillIcons = new();
-        private Dictionary<IIconContent, IconContainerUIScript> _otherIcons = new();
+        private Dictionary<IIconContent, IconContainerUIScript> _usablesD = new();
 
         public void IconUpdate(IIconContent content)
         {
-            if (content is not ISkill && content is not IWeapon)
+            if (_usablesD.ContainsKey(content))
             {
-                if (_otherIcons.ContainsKey(content))
-                {
-                    _otherIcons[content].UpdateIcon(content);
-                }
-
-                else
-                {
-                    _otherIcons[content] = Instantiate(_iconPrefab, _othersP);
-                    _otherIcons[content].UpdateIcon(content);
-                }
+                _usablesD[content].UpdateIcon(content);
             }
+
             else
             {
-                if (_skillIcons.ContainsKey(content))
-                {
-                    _skillIcons[content].UpdateIcon(content);
-                }
-
-                else
-                {
-                    _skillIcons[content] = Instantiate(_iconPrefab, _skillsP);
-                    _skillIcons[content].UpdateIcon(content);
-                }
-                return;
+                _usablesD[content] = Instantiate(_iconPrefab, _usablesP);
+                _usablesD[content].UpdateIcon(content);
             }
 
         }
-
     }
 }

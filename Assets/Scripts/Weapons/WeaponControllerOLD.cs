@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Arcatech.Units
 {
     [Serializable]
-    public class WeaponController : ManagedControllerBase, ICombatActions
+    public class WeaponControllerOLD : ManagedControllerBase, ICombatActions
     {
 
         protected Dictionary<UnitActionType, IWeapon> _weapons;
@@ -24,7 +24,7 @@ namespace Arcatech.Units
 
         IWeapon _currentWeapon;
 
-        public WeaponController(EntityStatsComponent stats, UnitInventoryControllerOLD inv, ActiveGameUnitComponent dummyUnit) : base(dummyUnit)
+        public WeaponControllerOLD(EntityStatsComponent stats, UnitInventoryControllerOLD inv, ActiveGameUnitComponent dummyUnit) : base(dummyUnit)
         {
             _stats = stats;
             _inv = inv;
@@ -40,10 +40,10 @@ namespace Arcatech.Units
         void UpdateWeapons(UnitInventoryControllerOLD i)
         {
             _weapons = new();
-            foreach (var weapon in i.GetWeapons)
-            {
-                _weapons[weapon.UseActionType] = weapon;
-            }
+            //foreach (var weapon in i.GetWeapons)
+            //{
+            //    _weapons[weapon.UseActionType] = weapon;
+            //}
         }
         public bool CheckUnitArmed (out IWeapon w)
         {
@@ -73,7 +73,7 @@ namespace Arcatech.Units
                 if (ok)
                 {
                     _currentWeapon = _weapons[action];
-                    _inv.DrawItems(_weapons[action].DrawStrategy);
+                    //_inv.DrawItems(_weapons[action].DrawStrategy);
                     if (DebugMessage && Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{Owner} used weapon {_weapons[action]}"); }
                     return true;
                 }
@@ -81,6 +81,8 @@ namespace Arcatech.Units
             if (DebugMessage && Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{Owner} failed to use weapon {_weapons[action]}"); }
             return false;
         }
+
+
 
         public bool ActionAvailable(UnitActionType action)
         {

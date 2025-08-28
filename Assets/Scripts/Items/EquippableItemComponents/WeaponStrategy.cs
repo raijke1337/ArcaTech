@@ -16,16 +16,16 @@ namespace Arcatech.Items
         protected BaseWeaponComponent WeaponComponent { get; }
 
 
-        public WeaponStrategy (SerializedUnitAction act, ActiveGameUnitComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseWeaponComponent comp)
+        public WeaponStrategy (SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseWeaponComponent comp)
         {
-            Owner = unit;
+            Owner = unit.GetComponent<ActiveGameUnitComponent>();
             Config = cfg;
             ChargeReload = reload;
             InternalDelay = intcd;
             MaxCharges = charges;
             WeaponComponent = comp;
 
-            Action = act.ProduceAction(unit,comp.Spawner);
+            Action = act.ProduceAction(Owner, comp.Spawner);
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);

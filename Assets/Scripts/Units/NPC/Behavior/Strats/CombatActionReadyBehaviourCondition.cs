@@ -4,11 +4,11 @@ namespace Arcatech.Units.Behaviour
 {
     public class CombatActionReadyBehaviourCondition : IBehaviorTreeStrategy
     {
-        SkillsController _skills;
-        WeaponController _weapon;
+        SkillsControllerOLD _skills;
+        WeaponControllerOLD _weapon;
        // UnitStatsController _stats;
         UnitActionType _action;
-        public CombatActionReadyBehaviourCondition (SkillsController skills, WeaponController weapon,UnitActionType actionType)
+        public CombatActionReadyBehaviourCondition (SkillsControllerOLD skills, WeaponControllerOLD weapon,UnitActionType actionType)
         {
             _action = actionType;
             _skills = skills;

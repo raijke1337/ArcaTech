@@ -1,6 +1,7 @@
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 namespace Arcatech.Stat
 {
@@ -12,6 +13,21 @@ namespace Arcatech.Stat
         [SerializeField] protected BaseStatsConfig startingStats;
         [SerializeField] protected float statsUpdateFrequency = 0.1f; // call some events to announce update
 
+        #region serialize
+        [SerializeField] StatValueContainer[] displayContainers;
+
+        void EditorUpdate()
+        {
+            displayContainers = new StatValueContainer[_stats.Count-1];
+            for (int i = 0; i < displayContainers.Length; i++)
+            {
+                displayContainers[i] = _stats.ElementAt(i).Value;
+            }
+        }
+
+        #endregion
+
+
         private Dictionary<BaseStatType, StatValueContainer> _stats;
         public IReadOnlyDictionary<BaseStatType, StatValueContainer> GetAllStats => _stats;
         bool _started = false;
@@ -21,6 +37,7 @@ namespace Arcatech.Stat
         {
             _stats = startingStats.BuildBaseStats;
             _started = true;
+            EditorUpdate();
         }
         private void Update()
         {

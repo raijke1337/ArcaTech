@@ -54,13 +54,9 @@ namespace Arcatech.Managers
 
         private void OnEnable()
         {
-            _statChangedBind = new EventBinding<PlayerStatsChangedUIEvent>(UpdatePlayerBars);
-            _inventoryChangedBind = new EventBinding<InventoryUpdateEvent>(UpdateIcons);
             _pauseToggleBind = new EventBinding<PauseToggleEvent>(ShowPauseMenu);
             _targetUpdateBinding = new EventBinding<PlayerTargetUpdateEvent>(OnTargetUpdate);
 
-            EventBus<PlayerStatsChangedUIEvent>.Register(_statChangedBind);
-            EventBus<InventoryUpdateEvent>.Register(_inventoryChangedBind);
             EventBus<PauseToggleEvent>.Register(_pauseToggleBind);
             EventBus<PlayerTargetUpdateEvent>.Register(_targetUpdateBinding);
         }
@@ -88,8 +84,6 @@ namespace Arcatech.Managers
         }
         private void OnDisable()
         {
-            EventBus<PlayerStatsChangedUIEvent>.Deregister(_statChangedBind);
-            EventBus<InventoryUpdateEvent>.Deregister(_inventoryChangedBind);
             EventBus<PauseToggleEvent>.Deregister(_pauseToggleBind);
             EventBus<PlayerTargetUpdateEvent>.Deregister(_targetUpdateBinding);
         }
@@ -135,26 +129,14 @@ namespace Arcatech.Managers
  
         #region UI events from event bus
 
-        private void UpdatePlayerBars(PlayerStatsChangedUIEvent @event)
-        {
-            _playerPan.ShowBar(@event.StatType, @event.Container);
-        }
-
-        private void UpdateIcons(InventoryUpdateEvent obj)
-        {
-            if (obj.Unit is PlayerUnit)
-            {
-                _playerPan.OnInventoryUpdate(obj.Inventory);
-            }
-        }
 
         void OnTargetUpdate(PlayerTargetUpdateEvent e)
         {
            // Debug.Log($"{e}");
             if (e.Target is PlayerUnit) return; //dont show playuer
 
-            _tgtPan.UpdateTargeted(e.Target);
-            _tgtPan.gameObject.SetActive(e.Target != null);
+            //_tgtPan.UpdateTargeted(e.Target);
+            //_tgtPan.gameObject.SetActive(e.Target != null);
 
 
         }

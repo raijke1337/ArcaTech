@@ -27,6 +27,15 @@ namespace Arcatech.Items
 
         //public WeaponAnimationsSet AnimationSet { get; protected set; }
 
+        protected override void CollectUsables(EquipSO cfg)
+        {
+            cahcedUsables = new List<IUsable>();
+            if (cfg.Skill != null)
+            {
+                GetUsables.Add(cfg.Skill.CreateSkill(Owner, DisplayItem, Type));
+            }
+            cahcedUsables.Add(this);
+        }
         public Weapon(WeaponSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
         {
             _weaponGameobject = DisplayItem as BaseWeaponComponent;

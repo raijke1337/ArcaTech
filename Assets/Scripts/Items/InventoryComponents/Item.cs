@@ -9,10 +9,10 @@ namespace Arcatech.Items
     [Serializable]
     public class Item : IItem
     {
-        public ActiveGameUnitComponent Owner { get; }
+        public BaseGameEntityComponent Owner { get; }
         public SerializableGuid ID;
         public ItemSO Config;
-        public Item(ItemSO cfg, ActiveGameUnitComponent ow)
+        public Item(ItemSO cfg, BaseGameEntityComponent ow)
         {
             ID = cfg.ID;
             Owner = ow;

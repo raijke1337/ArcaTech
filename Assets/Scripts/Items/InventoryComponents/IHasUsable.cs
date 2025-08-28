@@ -1,13 +1,14 @@
 ﻿using Arcatech.Skills;
+using System.Collections.Generic;
 
 namespace Arcatech.Items
 {
     /// <summary>
     /// for inventory components
     /// </summary>
-    public interface IHasSkill
+    public interface IHasUsable
     {
-        public ISkill GetSkill { get; }
+        public List<IUsable> GetUsables { get; }
     }
 
    

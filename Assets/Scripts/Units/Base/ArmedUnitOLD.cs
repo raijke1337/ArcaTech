@@ -5,22 +5,22 @@ using UnityEngine;
 
 namespace Arcatech.Units
 {
-    public abstract class ArmedUnit : EquippedUnitOLD
+    public abstract class ArmedUnitOLD : EquippedUnitOLD
     {
 
         [Space,Header ("Armed Unit")]
-        [SerializeField] protected WeaponController _weapons;
-        [SerializeField] protected SkillsController _skills;
-
+        [SerializeField] protected WeaponControllerOLD _weapons;
+        [SerializeField] protected SkillsControllerOLD _skills;
+        // this was moved to active unit component
         public override void StartControllerUnit()
         {
             base.StartControllerUnit();
 
-            _weapons = new WeaponController(_stats,_inventory, this);
-            _weapons.StartController();
+            //_weapons = new WeaponController(_stats,_inventory, this);
+            //_weapons.StartController();
 
-            _skills = new SkillsController(_stats, _inventory, this);
-            _skills.StartController();
+            //_skills = new SkillsController(_stats, _inventory, this);
+            //_skills.StartController();
 
         }
 

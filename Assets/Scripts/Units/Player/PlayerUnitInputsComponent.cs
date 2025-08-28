@@ -1,21 +1,27 @@
 using Arcatech.EventBus;
-using Arcatech.Managers;
 using Arcatech.Scenes.Cameras;
-using Arcatech.Triggers;
 using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Units.Inputs
 {
-    public class PlayerUnitInputsComponen : ActiveUnitsInputComponent
+    [RequireComponent(typeof(PlayerAimingComponent), typeof(DashJumpMovementController),typeof(PlayerUnit))]
+    public class PlayerUnitInputsComponent : ActiveUnitsInputComponent
     {
         [Space,Header("Player inputs")]
         [SerializeField, Anywhere] PlayerInputReaderObject _playerInputReader;
-        [SerializeField,Self] private PlayerAimingComponent _aim;
+        [SerializeField, Self] PlayerAimingComponent _aim;
+        [SerializeField, Self] DashJumpMovementController _movement;
+        [SerializeField, Self] PlayerUnit _player;
+        [SerializeField] SerializedUnitAction _jump;
+
+
         [SerializeField] float _interactRange = 3f;
         public PlayerAimingComponent Aiming => _aim;
         private IsoCamAdjust _adj;
 
+        Vector3 _movementVector;
+        Vector3 _lookVector;
 
         protected override void ControllerStartBindings(bool enabling)
         {
@@ -61,7 +67,18 @@ namespace Arcatech.Units.Inputs
 
         #region inputs section
 
-
+        private void Update()
+        {
+            if (_player.ActionLock)
+            {
+                _movement.SetDesiredMoveDirection(Vector3.zero);
+            }
+            else
+            {
+                _movement.SetDesiredMoveDirection(_movementVector);
+                _movement.SetDesiredLookDirection(_lookVector);
+            }                
+        }
 
 
         private void OnMountButton()
@@ -89,7 +106,10 @@ namespace Arcatech.Units.Inputs
 
         private void OnJumpAction()
         {
-            RequestCombatAction(UnitActionType.Jump);
+            
+            transform.parent = null;
+            _movement.DoJump();
+            _player.ForceUnitAction(_jump.ProduceAction(_player, transform));
         }
 
         private void OnDodgeSkill()
@@ -103,12 +123,12 @@ namespace Arcatech.Units.Inputs
             Vector3 AD = _adj.Isoright * _playerInputReader.InputDirection.x;
             Vector3 WS = _adj.Isoforward * _playerInputReader.InputDirection.z;
 
-            InputsMovementVector = AD + WS;
+            _movementVector = AD + WS;
         }
 
         private void OnAimAction(Vector2 point)
         {
-            InputsLookVector = _aim.GetDirectionToTarget;
+            _lookVector = _aim.GetDirectionToTarget;
         }
 
         private void OnRangedAction()

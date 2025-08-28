@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 namespace Arcatech.Stats
 {
+
     [Serializable]
     public class StatValueContainer
     {
@@ -23,10 +24,10 @@ namespace Arcatech.Stats
         public float CachedValue { get => _cachedValue; } // to store changes between updates
         #endregion
 
-        private float _currentValue;
+        [SerializeField] private float _currentValue;
         private float _cachedValue;
-        private float _maxValue;
-        private float _minValue = 0f;
+        [SerializeField] private float _maxValue;
+        [SerializeField] private float _minValue = 0f;
         private float _initValue = 0f;
         private bool _setup = false;
 
@@ -82,7 +83,8 @@ namespace Arcatech.Stats
             }
             foreach (var mod in _activeMods)
             {
-                _currentValue = Math.Clamp(_currentValue+ d/mod.GetPerSecValue, _minValue, _maxValue);
+                float deltaChange =  mod.GetPerSecValue * d;
+                _currentValue = Math.Clamp(_currentValue+ deltaChange, _minValue, _maxValue);
             }
         }
 

@@ -3,25 +3,31 @@ using Arcatech.Skills;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 namespace Arcatech.Items
 {
-
-    public class Equipment : Item, IEquippable
+    /// <summary>
+    /// todo maybe create a separate class for USABLE equipment (we can have qeuips that give no skill, cosmetci items )
+    /// </summary>
+    public class Equipment : Item, IEquippable, IHasUsable
     {
-
+        protected virtual void CollectUsables(EquipSO cfg)
+        {
+            cahcedUsables = new List<IUsable>();
+            if (cfg.Skill != null)
+            {
+                GetUsables.Add(cfg.Skill.CreateSkill(Owner, DisplayItem, Type));
+            }
+        }
         public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
         {
             DisplayItem = GameObject.Instantiate(cfg.ItemPrefab);
             foreach (var m in cfg.StatMods)
             {
                 StatMods.Add(m.BuildMod);
-            }
-            if (cfg.Skill!= null)
-            {
-                GetSkill = cfg.Skill.CreateSkill(ow, DisplayItem, Type);
             }
             DisplayItem.gameObject.SetActive(false);
           //  Debug.Log($"setup equipment{this}");
@@ -45,6 +51,15 @@ namespace Arcatech.Items
 
         public BaseItemComponent DisplayItem { get; protected set; }
         public List<StatsMod> StatMods { get; protected set; }
-        public ISkill GetSkill { get; protected set; }
+
+        protected List<IUsable> cahcedUsables;
+        public List<IUsable> GetUsables
+        {
+            get
+            {
+                if (cahcedUsables == null) CollectUsables(Config as EquipSO);
+                return cahcedUsables;
+            }
+        }
     }
 }

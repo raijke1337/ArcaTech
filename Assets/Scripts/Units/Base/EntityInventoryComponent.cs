@@ -3,7 +3,9 @@ using Arcatech.Items;
 using Arcatech.Skills;
 using Arcatech.Stats;
 using KBCore.Refs;
+using System;
 using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 using static UnityEngine.UI.GridLayoutGroup;
 
@@ -12,38 +14,53 @@ namespace Arcatech.Units
 
 
     /// <summary>
-    /// new class to handle all items associated with an entity. CONTROLLER
+    /// new class to handle all items associated with an entity. holds the built model.
+    /// model is deserialized from saves or loaded from a preset SO.
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class EntityInventoryComponent : MonoBehaviour
+    public class EntityInventoryComponent : ValidatedMonoBehaviour
     {
         [Self, SerializeField] BaseGameEntityComponent baseGameEntity;
         [Space, Header("Items list"), SerializeField] protected UnitItemsSO defaultEquips;
 
 
-        private List<IUnitInventoryView> InventoryViews;
-        private UnitInventoryModel InventoryModel;
+        private List<IUnitInventoryView> _views;
+        [SerializeField] private UnitInventoryModel _model;
 
-        //protected UnitInventoryControllerOLD _inventory;
 
         private void OnEnable()
         {
-            InventoryViews = new();
-            InventoryModel = new UnitInventoryModel(defaultEquips.BuildContainer());
+            _views = new();
+            _model = new UnitInventoryModel(defaultEquips.BuildContainer(),baseGameEntity);
 
-            InventoryModel.OnInventoryChange += OnInventoryModelUpdated;
-            InventoryModel.OnEquipsChange += OnInventoryModelUpdated;
+            _model.OnInventoryChange += OnInventoryModelUpdated;
+            _model.OnEquipsChange += OnInventoryModelUpdated;            
         }
 
         private void OnDisable()
         {
-            InventoryModel.OnInventoryChange -= OnInventoryModelUpdated;
-            InventoryModel.OnEquipsChange -= OnInventoryModelUpdated;
-            foreach (var view in InventoryViews)
+            _model.OnInventoryChange -= OnInventoryModelUpdated;
+            _model.OnEquipsChange -= OnInventoryModelUpdated;
+            foreach (var view in _views)
             {
                 view.ViewChangedInventory-= OnInvenoryChangedUI;
             }
         }
+
+        private void Update()
+        {
+            _model?.UpdateModel(Time.deltaTime);
+            _model.DrawStrategyChangedEvent += RefreshViews;
+        }
+
+        private void RefreshViews()
+        {
+            foreach (var view in _views)
+            {
+                view.RefreshView(_model);
+            }
+        }
+
 
         //user uses view to control model
         // model display in view
@@ -56,80 +73,32 @@ namespace Arcatech.Units
         {
             if (view != null)
             {
-                if (!InventoryViews.Contains(view))
+                if (!_views.Contains(view))
                 {
-                    InventoryViews.Add(view);
-                    view.RefreshView(InventoryModel);
+                    _views.Add(view);
+                    view.RefreshView(_model);
                     view.ViewChangedInventory += OnInvenoryChangedUI;
                 }
             }
         }
-        private void OnInvenoryChangedUI()
+        private void OnInvenoryChangedUI(UnitInventoryViewReference reference)
         {
-            // moveto inventory, move to equipped go here)
-            // events from the view component
             Debug.Log($"Something happened in inventory view");
         }
         private void OnInventoryModelUpdated(IEnumerable<IItem> obj)
         {
-            foreach(var view in InventoryViews)
-            {
-                view.RefreshView(InventoryModel);
-            }
-            //EventBus<InventoryUpdateEvent>.Raise(new InventoryUpdateEvent(BaseGameEntityComponent, this));
+            RefreshViews();
         }
-
-        //public UnitInventoryItemConfigsContainer PackPlayerData()
-        //{
-        //    List<Item> inv = new List<Item>(InventoryModel.Inventory.items);
-        //    List<Item> eq = new List<Item>(InventoryModel.Equipments.GetAllValues());
-
-        //    return new UnitInventoryItemConfigsContainer(eq, inv);
-        //}
-
 
         #endregion
 
-
-
-
         #region used by other components
 
+        public IUnitActionsHandler GetUnitActionsHandler => _model.Handler;
 
-        public ISkill[] GetSkills
-        {
-            get
-            {
-                List<ISkill> foundSkills = new();
-                foreach (var e in InventoryModel.Equipments.GetAllValues())
-                {
-                    if (e.GetSkill != null)
-                    {
-                        foundSkills.Add(e.GetSkill);
-                    }
-                }
-                return foundSkills.ToArray();
-            }
-        }
-
-        public IWeapon[] GetWeapons
-        {
-            get
-            {
-                List<IWeapon> weaps = new();
-                foreach (var e in InventoryModel.Equipments.GetAllValues())
-                {
-                    if (e is IWeapon ww)
-                    {
-                        weaps.Add(ww);
-                    }
-                }
-                return weaps.ToArray();
-            }
-        }
         public bool HasItemType(EquipmentType type, out IEquippable equipment)
         {
-            if (InventoryModel.Equipments.TryGetValue(type, out var e))
+            if (_model.Equipments.TryGetValue(type, out var e))
             {
                 equipment = e;
                 return true;
@@ -142,7 +111,7 @@ namespace Arcatech.Units
         }
         public bool HasItem(ItemSO check)
         {
-            return InventoryModel.HasItem(check);
+            return _model.HasItem(check);
         }
 
         public StatsMod[] GetCurrentMods
@@ -150,7 +119,7 @@ namespace Arcatech.Units
             get
             {
                 var list = new List<StatsMod>();
-                foreach (var equip in InventoryModel.Equipments.GetAllValues())
+                foreach (var equip in _model.Equipments.GetAllValues())
                 {
                     if (equip.StatMods != null)
                     {
@@ -161,12 +130,12 @@ namespace Arcatech.Units
             }
         }
 
+        public bool TryEquipItem(EquipSO e) => _model.EquipItem(e, out _);
 
 
         #endregion
 
 
-        public bool TryEquipItem(EquipSO e) => InventoryModel.EquipItem(e, out _);
     }
 
 }

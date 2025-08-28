@@ -11,57 +11,57 @@ using UnityEngine;
 namespace Arcatech.Skills
 {
     [Serializable]
-    public class SkillsController : ManagedControllerBase, ICombatActions
+    public class SkillsControllerOLD : ManagedControllerBase, ICombatActions
     {
         UnitInventoryControllerOLD inv;
         EntityStatsComponent stats;
-        protected Dictionary<UnitActionType, ISkill> _skills;
+        protected Dictionary<UnitActionType, IUsable> _skills;
         private EventBinding<InventoryUpdateEvent> bindInv;
 
-        public SkillsController (EntityStatsComponent stats, UnitInventoryControllerOLD inv, ActiveGameUnitComponent ow) : base (ow)
+        public SkillsControllerOLD (EntityStatsComponent stats, UnitInventoryControllerOLD inv, ActiveGameUnitComponent ow) : base (ow)
         {
             this.inv = inv;
             this.stats = stats;
             bindInv = new EventBinding<InventoryUpdateEvent>(OnInvUpdate);
 
             _skills = new();
-            foreach (var skill in inv.GetSkills)
-            {
-                _skills[skill.UseActionType] = skill;
-            }
+            //foreach (var skill in inv.GetSkills)
+            //{
+            //    _skills[skill.UseActionType] = skill;
+            //}
 
         }
 
         private void OnInvUpdate(InventoryUpdateEvent e)
         {
-            var newSkills = e.Inventory.GetSkills;
-            List<UnitActionType> newTypes = new List<UnitActionType>();
-            foreach (var s in newSkills)
-            {
-                newTypes.Add(s.UseActionType);
-            }
-            foreach (var type in _skills.Keys.ToList())
-            {
-                if (!newTypes.Contains(type))
-                {
-                    _skills.Remove(type);
-                }
-            }
+           //// var newSkills = e.Inventory.GetSkills;
+           // List<UnitActionType> newTypes = new List<UnitActionType>();
+           // foreach (var s in newSkills)
+           // {
+           //     newTypes.Add(s.UseActionType);
+           // }
+           // foreach (var type in _skills.Keys.ToList())
+           // {
+           //     if (!newTypes.Contains(type))
+           //     {
+           //         _skills.Remove(type);
+           //     }
+           // }
 
-            foreach (var skill in newSkills)
-            {
-                if (!_skills.ContainsValue(skill))
-                {
-                    _skills[skill.UseActionType] = skill;
-                }
-                else
-                {
-                    if (!_skills[skill.UseActionType].Equals(skill))
-                    {
-                        _skills[skill.UseActionType] = skill;
-                    }
-                }
-            }
+           // foreach (var skill in newSkills)
+           // {
+           //     if (!_skills.ContainsValue(skill))
+           //     {
+           //         _skills[skill.UseActionType] = skill;
+           //     }
+           //     else
+           //     {
+           //         if (!_skills[skill.UseActionType].Equals(skill))
+           //         {
+           //             _skills[skill.UseActionType] = skill;
+           //         }
+           //     }
+           // }
         }
 
         public bool ActionAvailable(UnitActionType action)
@@ -78,7 +78,7 @@ namespace Arcatech.Skills
                 bool ok = _skills[action].TryUseItem(stats, out onUse);
                 if (ok)
                 {
-                    inv.DrawItems(_skills[action].DrawStrategy);
+                   // inv.DrawItems(_skills[action].DrawStrategy);
                     if (DebugMessage && Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{Owner} used skill {_skills[action]}"); }
                     return ok;
                 }

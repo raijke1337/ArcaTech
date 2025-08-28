@@ -12,7 +12,7 @@ namespace ECM.Controllers
     /// It handles keyboard input, and allows for a variable height jump, however this default behaviour
     /// can easily be modified or completely replaced overriding this related methods in a derived class.
     /// </summary>
-
+    [RequireComponent(typeof(CharacterMovement))]
     public class BaseCharacterController : MonoBehaviour
     {
         #region EDITOR EXPOSED FIELDS

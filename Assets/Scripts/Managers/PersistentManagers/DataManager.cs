@@ -10,18 +10,17 @@ using UnityEngine;
 
 namespace Arcatech.Managers
 {
-    public class DataManager : MonoBehaviour
+    public partial class DataManager : MonoBehaviour
     {
-        public Itemfactory ItemsFactory;
-        public static DataManager Instance;
+        static DataManager _instance;
+        public static DataManager Instance => _instance;
 
 
         private void Awake()
         {
-            if (Instance == null)
+            if (_instance == null)
             {
-                Instance = this;
-                ItemsFactory = new Itemfactory();
+                _instance = this;
                 _bindInv = new EventBinding<InventoryUpdateEvent>(OnInventoryUpdate);
                 _bindLvls = new EventBinding<LevelCompletedEvent>(OnLevelComplete);
 
@@ -147,10 +146,10 @@ namespace Arcatech.Managers
                 return;
             }
             // for debug use
-            if (arg.Unit is PlayerUnit)
-            {
-                _loadedSave.UpdateInventory(arg.Inventory.PackPlayerData());
-            }
+            //if (arg.Unit is PlayerUnit)
+            //{
+            //    _loadedSave.UpdateInventory(arg.Inventory.PackPlayerData());
+            //}
         }
 
         #endregion
@@ -158,22 +157,6 @@ namespace Arcatech.Managers
         private void OnApplicationQuit()
         {
             SaveGame();
-        }
-
-
-        public class Itemfactory
-        {
-            public IItem ProduceItem (ItemSO cfg, BaseGameEntityComponent owner)
-            {
-                return cfg.Type switch
-                {
-                    EquipmentType.MeleeWeap => new Weapon(cfg as WeaponSO, owner),
-                    EquipmentType.RangedWeap => new Weapon(cfg as WeaponSO, owner),
-                    EquipmentType.Shield => new Shield(cfg as ShieldSO, owner),
-                    EquipmentType.Booster => new Equipment(cfg as EquipSO, owner),
-                    _ => new Item(cfg, owner),
-                };
-            }
         }
     }
 }

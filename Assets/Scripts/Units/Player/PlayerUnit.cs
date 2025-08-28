@@ -9,55 +9,29 @@ using UnityEngine;
 
 namespace Arcatech.Units
 {
-    [RequireComponent(typeof(PlayerAimingComponent),typeof(DashJumpMovementController))]
+
     public class PlayerUnit : ActiveGameUnitComponent
     {
         [Space, Header("Player Unit")]
-        [SerializeField] int _armorBreakStam = 30;
-        [SerializeField] int _armorBreakEnergy = 30;
+        //[SerializeField] int _armorBreakStam = 30;
+        //[SerializeField] int _armorBreakEnergy = 30;
 
         [SerializeField, Child] protected Camera _faceCam;
-        [SerializeField, Self] PlayerAimingComponent _aim;
-        [SerializeField, Self] protected DashJumpMovementController _movement;
-
         CostumesControllerComponent costumes;
 
         protected void ToggleCamera(bool value) { _faceCam.enabled = value; }
 
         
-        private void Start()
+        protected override void Start()
         {
             ToggleCamera(true);
+            base.Start();
         }
 
-        protected void Update()
-        {
-            //if (ActionLock) return;
-            //_movement.SetDesiredMoveDirection(_inputs.InputsMovementVector);
-            //_movement.SetDesiredLookDirection(_inputs.InputsLookVector, _aim.Target != null);
-        }
-
-        protected override void OnActionLock(bool locking)
-        {
-            // stop moving
-            _movement.SetDesiredMoveDirection(Vector3.zero);
-        }
-        public override void Command(UnitActionType obj)
-        {
-            if (GetMainEntity.Paused || ActionLock || !_movement.isGrounded) return; //add grounded check
-            if (obj == UnitActionType.Jump)
-            {
-                transform.parent = null;
-                _animator.SetTrigger("TalkTrigger");
-                _movement.DoJump();
-                //DoActionLogic(movementStats.JumpAction.ProduceAction(this, transform));
-            }
-            else base.Command(obj);
-        }
         public override void ApplyForceResultToUnit(float speed, float distance)
         {
             base.ApplyForceResultToUnit(speed, distance);
-            _movement.DisableGroundingOnUnitImpulse(speed, distance);
+            //_movement.DisableGroundingOnUnitImpulse(speed, distance);
         }
 
 

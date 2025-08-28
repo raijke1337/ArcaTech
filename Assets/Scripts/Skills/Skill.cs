@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace Arcatech.Skills
 {
-    public class Skill : ISkill
+    public class Skill : IUsable,IAffectsItemDisplay
     {
         #region interface
-        public BaseGameEntityComponent Owner { get ; set; }
+        public ActiveGameUnitComponent Owner { get ; set; }
        // protected SerializedSkill Config { get; }
         public UnitActionType UseActionType { get;  }
         public StatsEffect GetCost => new(_cost);
@@ -27,7 +27,7 @@ namespace Arcatech.Skills
         public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseGameEntityComponent owner, BaseItemComponent item, EquipmentType type)
         { 
 
-            Owner = owner;
+            Owner = owner.GetComponent<ActiveGameUnitComponent>();
             if (settings == null) return; // placeholder maybe TODO - for items without skills
 
             switch (type)

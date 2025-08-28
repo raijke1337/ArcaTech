@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Arcatech.Items
 {
-    public interface IEquippable : IHasSkill, IItem
+    public interface IEquippable : IItem
     {
         public BaseItemComponent DisplayItem { get; }
         public List<StatsMod> StatMods { get; }

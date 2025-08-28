@@ -112,7 +112,7 @@ namespace Arcatech.UI
 
         #region item operations
 
-        public event UnityAction ViewChangedInventory = delegate { };
+        public event UnityAction<UnitInventoryViewReference> ViewChangedInventory = delegate { };
 
         [SerializeField] private TextMeshProUGUI _swapItemsButton;
         private Item _selectedItem;
@@ -122,7 +122,9 @@ namespace Arcatech.UI
             _skillTooltipPanel.gameObject.SetActive(false);
             _swapItemsButton.gameObject.SetActive(false);
 
-            ViewChangedInventory.Invoke();
+            Debug.LogError("View event NYI");
+
+            //ViewChangedInventory.Invoke(new UnitInventoryViewReference(x,x));
         }
 
         private IconTileComp _hldTile;
@@ -191,8 +193,6 @@ namespace Arcatech.UI
 
 
         #endregion
-
-
 
 
 

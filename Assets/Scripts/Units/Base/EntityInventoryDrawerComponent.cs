@@ -9,7 +9,7 @@ namespace Arcatech.Units
     ///  new class to VIEW the data
     /// </summary>
     [RequireComponent(typeof(EntityInventoryComponent))]
-    public class EntityInventoryDrawerComponent : MonoBehaviour, IUnitInventoryView
+    public class EntityInventoryDrawerComponent : ValidatedMonoBehaviour, IUnitInventoryView
     {
         [Self,SerializeField] EntityInventoryComponent inventoryComponent;
         [SerializeField] protected ItemEmpties itemEmpties;
@@ -18,12 +18,14 @@ namespace Arcatech.Units
         UnitInventoryModel inventoryModel;
         IDrawItemStrategy currentDrawStrategy;
 
-        public event UnityAction ViewChangedInventory;
+        public event UnityAction<UnitInventoryViewReference> ViewChangedInventory = delegate { };
+
+
 
         public void RefreshView(UnitInventoryModel model)
         {
             inventoryModel = model;
-            DrawItems(currentDrawStrategy);
+            DrawItems(model.CurrentDrawStrategy);
         }
 
         private void Start()

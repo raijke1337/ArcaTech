@@ -35,32 +35,32 @@ namespace Arcatech.Units
 
         protected virtual void OnDrawGizmos()
         {
-            if (GetMainEntity.ShowingDebugs)
-            {
-                // combat state and detection
-                Gizmos.color = Color.green;
-                UnityEditor.Handles.color = Color.green;
-                if (UnitInCombatState)
-                {
-                    Gizmos.color = Color.yellow;
-                    UnityEditor.Handles.color = Color.yellow;
-                }
-                Gizmos.DrawLine(_headT.position, _headT.position + (_headT.forward * _playerDetectionSphereCastRange));
+            //if (GetMainEntity.ShowingDebugs)
+            //{
+            //    // combat state and detection
+            //    Gizmos.color = Color.green;
+            //    UnityEditor.Handles.color = Color.green;
+            //    if (UnitInCombatState)
+            //    {
+            //        Gizmos.color = Color.yellow;
+            //        UnityEditor.Handles.color = Color.yellow;
+            //    }
+            //    Gizmos.DrawLine(_headT.position, _headT.position + (_headT.forward * _playerDetectionSphereCastRange));
 
-                UnityEditor.Handles.DrawWireDisc(_headT.position, Vector3.up, _sphereCastRadius);
-                UnityEditor.Handles.DrawWireDisc(_headT.position + (_headT.forward * _playerDetectionSphereCastRange), Vector3.up, _sphereCastRadius);
+            //    UnityEditor.Handles.DrawWireDisc(_headT.position, Vector3.up, _sphereCastRadius);
+            //    UnityEditor.Handles.DrawWireDisc(_headT.position + (_headT.forward * _playerDetectionSphereCastRange), Vector3.up, _sphereCastRadius);
 
-                if (agent != null && agent.destination != null)
-                {
-                    Gizmos.color = Color.blue;
-                    Gizmos.DrawWireSphere(agent.destination, 0.3f);
-                    UnityEditor.Handles.color = Color.blue;
-                    UnityEditor.Handles.DrawWireDisc(transform.position,Vector3.up,agent.stoppingDistance);
-                }
+            //    if (agent != null && agent.destination != null)
+            //    {
+            //        Gizmos.color = Color.blue;
+            //        Gizmos.DrawWireSphere(agent.destination, 0.3f);
+            //        UnityEditor.Handles.color = Color.blue;
+            //        UnityEditor.Handles.DrawWireDisc(transform.position,Vector3.up,agent.stoppingDistance);
+            //    }
 
-                UnityEditor.Handles.color = Color.red;
-                UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, _attackingRange);
-            }
+            //    UnityEditor.Handles.color = Color.red;
+            //    UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, _attackingRange);
+            //}
         }
 
         protected override void OnValidate()
@@ -218,7 +218,7 @@ namespace Arcatech.Units
                 tree.Reset();
                 if (GetMainEntity.ShowingDebugs)
                 {
-                    Debug.Log($"{GetMainEntity.Ge   } combat state: {value}");
+                    Debug.Log($"{GetMainEntity} combat state: {value}");
                 }
             }
         }
@@ -257,24 +257,24 @@ namespace Arcatech.Units
         float _castDelay = 0f;
         void SeekPlayer(float delta)
         {
-            _castDelay += delta;
-            if (_castDelay >= _sphereCastDelay)
-            {
-                _castDelay = 0f;
-                if (Physics.SphereCastNonAlloc(_headT.position, _sphereCastRadius, transform.forward, hits, _playerDetectionSphereCastRange) > 0)
-                {
-                    foreach (RaycastHit hit in hits)
-                    {
-                        if (hit.collider != null && hit.collider.CompareTag("Player"))
-                        {
-                            combatTimeoutTimer?.Reset();
-                            UnitInCombatState = true;
-                            //if (_showDebugs) Debug.Log($"{UnitName} spotted player!");
-                            break;
-                        }
-                    }
-                }
-            }
+            //_castDelay += delta;
+            //if (_castDelay >= _sphereCastDelay)
+            //{
+            //    _castDelay = 0f;
+            //    if (Physics.SphereCastNonAlloc(_headT.position, _sphereCastRadius, transform.forward, hits, _playerDetectionSphereCastRange) > 0)
+            //    {
+            //        foreach (RaycastHit hit in hits)
+            //        {
+            //            if (hit.collider != null && hit.collider.CompareTag("Player"))
+            //            {
+            //                combatTimeoutTimer?.Reset();
+            //                UnitInCombatState = true;
+            //                //if (_showDebugs) Debug.Log($"{UnitName} spotted player!");
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
         }
 
 

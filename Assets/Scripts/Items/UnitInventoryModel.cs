@@ -3,15 +3,31 @@ using Arcatech.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcatech.Items
 {
+    [Serializable]
     public class UnitInventoryModel
     {
+        UnitInventoryModel()
+        {
+            status = "not init";
+        }
+
+        #region serialize
+        [SerializeField][ReadOnlyText] string status;
+        #endregion
+
         public BaseGameEntityComponent Owner {get;}
+        public UsablesHandler Handler { get; protected set; }
         public ObservableArray<Item> Inventory { get; protected set; }
         public ObservableDictionary<EquipmentType, Equipment> Equipments { get; protected set; }
 
+        public event UnityAction DrawStrategyChangedEvent;
+        public IDrawItemStrategy CurrentDrawStrategy { get; private set; }
 
         public event Action<IEnumerable<Item>> OnInventoryChange
         {
@@ -25,9 +41,16 @@ namespace Arcatech.Items
         }
 
 
-        public UnitInventoryModel(UnitInventoryItemConfigsContainer cfgs)
+        public void UpdateModel(float delta)
         {
-          //  Owner = owner;  
+            Handler?.Update(delta);
+            status = $"updating OK {Owner.GetName}";
+        }
+
+
+        public UnitInventoryModel(UnitInventoryItemConfigsContainer cfgs,BaseGameEntityComponent o)
+        {
+            Owner = o;  
             Inventory = new ObservableArray<Item>();
             List<KeyValuePair<EquipmentType, Equipment>> list = new();
             Equipments = new ObservableDictionary<EquipmentType, Equipment>(list.ToArray());
@@ -45,12 +68,23 @@ namespace Arcatech.Items
                     PickUpItem(un.Config);
                 }
             }
+            Handler = new UsablesHandler(Equipments);
+            Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
+
+            status = $"init for {Owner.GetName}";
         }
-        public bool PickUpItem (ItemSO item) => Inventory.TryAdd(DataManager.Instance.ItemsFactory.ProduceItem(item, Owner) as Item);
+
+        private void OnDrawStrategyUpdate(IDrawItemStrategy t)
+        {
+            CurrentDrawStrategy = t;
+            DrawStrategyChangedEvent?.Invoke();
+        }
+
+        public bool PickUpItem (ItemSO item) => Inventory.TryAdd(Itemfactory.Instance.ProduceItem(item, Owner) as Item);
         public bool EquipItem (EquipSO item, out Equipment unequipped)
         {
             unequipped = null;
-            var eq = DataManager.Instance.ItemsFactory.ProduceItem(item, Owner) as Equipment;
+            var eq = Itemfactory.Instance.ProduceItem(item, Owner) as Equipment;
             if (Equipments.TryGetValue(eq.Type, out unequipped))
             {
                 PickUpItem(unequipped.Config);
@@ -67,6 +101,9 @@ namespace Arcatech.Items
                 return Inventory.items.Any(t => t.ID == check.ID) || Equipments.GetAllValues().Any(t => t.ID == check.ID); 
             }
         }
+
+
+
     }
 
 
