@@ -1,6 +1,4 @@
 using Arcatech.AI;
-using Arcatech.Triggers;
-using Arcatech.Units.Behaviour;
 using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,35 +31,9 @@ namespace Arcatech.Units
         [Space,SerializeField] SerializedUnitAction _enterCombatAction;
         [SerializeField] SerializedUnitAction _exitCombatAction;
 
-        protected virtual void OnDrawGizmos()
-        {
-            //if (GetMainEntity.ShowingDebugs)
-            //{
-            //    // combat state and detection
-            //    Gizmos.color = Color.green;
-            //    UnityEditor.Handles.color = Color.green;
-            //    if (UnitInCombatState)
-            //    {
-            //        Gizmos.color = Color.yellow;
-            //        UnityEditor.Handles.color = Color.yellow;
-            //    }
-            //    Gizmos.DrawLine(_headT.position, _headT.position + (_headT.forward * _playerDetectionSphereCastRange));
+        [SerializeField,Self]protected NavMeshAgent agent;
 
-            //    UnityEditor.Handles.DrawWireDisc(_headT.position, Vector3.up, _sphereCastRadius);
-            //    UnityEditor.Handles.DrawWireDisc(_headT.position + (_headT.forward * _playerDetectionSphereCastRange), Vector3.up, _sphereCastRadius);
 
-            //    if (agent != null && agent.destination != null)
-            //    {
-            //        Gizmos.color = Color.blue;
-            //        Gizmos.DrawWireSphere(agent.destination, 0.3f);
-            //        UnityEditor.Handles.color = Color.blue;
-            //        UnityEditor.Handles.DrawWireDisc(transform.position,Vector3.up,agent.stoppingDistance);
-            //    }
-
-            //    UnityEditor.Handles.color = Color.red;
-            //    UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, _attackingRange);
-            //}
-        }
 
         protected override void OnValidate()
         {
@@ -81,9 +53,12 @@ namespace Arcatech.Units
 
         protected override void OnActionLock(bool locking)
         {
-            agent.isStopped = locking;
-           // if (locking)  _animator.SetBool("isMoving", false);
+           agent.isStopped = locking;
+
+           _animator.SetBool("isMoving", false);
         }
+
+
         //protected override void OnUnitPause(bool isPause)
         //{
         //    if (agent != null)
@@ -114,82 +89,9 @@ namespace Arcatech.Units
         //}
 
         #region behavior
-
-
-        protected BehaviourTree tree;
-        [Space, SerializeField, Self] protected NavMeshAgent agent;
-
-
-        protected float initStoppingDistance;
-
-        void BaseBehaviourSetup()
-        {
-            tree = new BehaviourTree(name + " undefined behavior tree");
-
-            initStoppingDistance = agent.stoppingDistance;
-        }
-        protected virtual void SetupBehavior()
-        {
-            BehaviourPrioritySelector dummyUnitBehavior = new BehaviourPrioritySelector("npc idles");
-            if (patrolPointVariants != null && patrolPointVariants.Count > 0)
-            {
-                dummyUnitBehavior.AddChild(SetupPatrolPoints());
-            }
-            dummyUnitBehavior.AddChild(SetupIdleRoaming());
-
-            tree.AddChild(dummyUnitBehavior);
-
-            Debug.Log($"{GetMainEntity.GetName} is using dummy behavior!");
-        }
-        void ExecuteBehaviour()
-        {
-            if (ActionLock || GetMainEntity.Paused) return;
-            if (tree?.Process(this) == Node.NodeStatus.Fail)
-            {
-                Debug.Log($"{GetMainEntity.GetName} has an empty behavior tree!");
-            }
-        }
         /// <summary>
-        /// priority 0
+        /// all behavior to be moved into unity behavior syustem
         /// </summary>
-        /// <returns>0 priority idling sequence</returns>
-        protected Sequence SetupIdleRoaming()
-        {
-            Sequence roamandWait = new Sequence("walk around and wait",0);
-            Leaf roam = new Leaf(new RoamAroundPoint(_idleWanderRange, transform.position,agent), $"roam in range {_idleWanderRange}");
-
-            Sequence idleWait = new("idle for time");
-            Leaf wait = new(new IdleAtPointStrategy(_waitAtIdleSpotTime), $"Wait {_waitAtIdleSpotTime} sec");
-            idleWait.AddChild(wait);
-
-            bool isDoneWaiting()
-            {
-                if (wait.Process(this) == Node.NodeStatus.Success)
-                {
-                    roamandWait.Reset();
-                    return true;
-                }
-                else return false;
-            }
-            Leaf checkWait = new Leaf(new SimpleBehaviourCondition(() => isDoneWaiting()),"is finished idle time");
-            idleWait.AddChild(checkWait);
-
-            roamandWait.AddChild(roam);
-            roamandWait.AddChild(idleWait);
-
-            return roamandWait;
-        }
-
-        protected Sequence SetupPatrolPoints()
-        {
-            Sequence randomPatrol = new Sequence("patrol points", 20);
-            List<Transform> points = patrolPointVariants[0].InternalList; // todo pick random
-
-            randomPatrol.AddChild(new Leaf(new PatrolPointsStrategy(transform, agent, points, _waitAtIdleSpotTime), "patrol points", 30));
-
-            return randomPatrol;
-        }
-
 
         #endregion
 
@@ -215,7 +117,6 @@ namespace Arcatech.Units
                 if (_inCombat == value) return;
                 OnCombatStateChanged(value);
                 _inCombat = value;
-                tree.Reset();
                 if (GetMainEntity.ShowingDebugs)
                 {
                     Debug.Log($"{GetMainEntity} combat state: {value}");

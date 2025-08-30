@@ -1,10 +1,7 @@
-using Arcatech.BlackboardSystem;
 using Arcatech.EventBus;
 using Arcatech.Units;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 namespace Arcatech.Managers
 {
@@ -32,20 +29,20 @@ namespace Arcatech.Managers
             Instance = this;
         }
 
-        public void TryRegisterEntity(BaseEntityOLD entity)
-        {
-            if (entity == null) return;
-            if (entities.Contains(entity)) return;
-            else
-            {
-                entities.Add(entity);
-                SetupUnit(entity,true);
-            }
-        }
-        public void TryDeregisterEntity(BaseEntityOLD entity)
-        {
+        //public void TryRegisterEntity(BaseEntityOLD entity)
+        //{
+        //    if (entity == null) return;
+        //    if (entities.Contains(entity)) return;
+        //    else
+        //    {
+        //        entities.Add(entity);
+        //        SetupUnit(entity,true);
+        //    }
+        //}
+        //public void TryDeregisterEntity(BaseEntityOLD entity)
+        //{
 
-        }
+        //}
 
 
         #region managed
@@ -100,49 +97,33 @@ namespace Arcatech.Managers
         #region units handling
 
         private PlayerUnit _player;
-        List<BaseEntityOLD> entities = new List<BaseEntityOLD>();
+        List<BaseGameEntityComponent> entities = new List<BaseGameEntityComponent>();
 
-        private void SetupUnit(BaseEntityOLD u, bool isEnable)
+        private void SetupUnit(BaseGameEntityComponent u, bool isEnable)
         {
-            if (isEnable)
-            {
-                u.BaseEntityDeathEvent += (t) => HandleUnitDeath(t);
-                u.StartControllerUnit();
-            }
-            else
-            {
-                u.BaseEntityDeathEvent -= (t) => HandleUnitDeath(t);
-                u.DisableUnit();
-            }
+            //if (isEnable)
+            //{
+            //    u.BaseEntityDeathEvent += (t) => HandleUnitDeath(t);
+            //    u.StartControllerUnit();
+            //}
+            //else
+            //{
+            //    u.BaseEntityDeathEvent -= (t) => HandleUnitDeath(t);
+            //    u.DisableUnit();
+            //}
         }
 
 
-        private void HandleUnitDeath(BaseEntityOLD unit)
-        {
-
-            SetupUnit(unit, false);
-            entities.Remove(unit);
-            
-            if (unit is PlayerUnit)
-            {
-                GameInterfaceManager.Instance.GameOver();
-            }
-            else
-            {
-                Destroy(unit.gameObject, 2f);
-            }
-
-        }
         #endregion
 
         private void OnEnable()
         {
             _pauseBind = new EventBinding<PauseToggleEvent>(OnPawsToggle);
-            EventBus<PauseToggleEvent>.Register(_pauseBind);
+            //EventBus<PauseToggleEvent>.Register(_pauseBind);
         }
         private void OnDisable()
         {
-            EventBus<PauseToggleEvent>.Deregister(_pauseBind);
+            //EventBus<PauseToggleEvent>.Deregister(_pauseBind);
         }
 
     }

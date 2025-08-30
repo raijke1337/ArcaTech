@@ -55,7 +55,6 @@ namespace Arcatech.Managers
         private Dictionary<StatsEffect, List<EntityStatsComponent>> _alreadyAppliedTO;
         private void HandleStatsEffectEvent(StatsEffectTriggerEvent obj)
         {
-            Debug.Log($"Handling stats effect trigger event; {obj}");
 
             if (obj.Target.TryGetComponent<EntityStatsComponent>(out var stats)) // check if the hit entity has some stats that can be changed
             {

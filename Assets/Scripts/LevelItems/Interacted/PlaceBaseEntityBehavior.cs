@@ -39,14 +39,14 @@ namespace Arcatech.Items
             foreach(var e in _dict[newstate])
             {
                 var item = GameObject.Instantiate(e.entity, place.position + e.offset, place.rotation);
-                UnitsManager.Instance.TryRegisterEntity(item);
+                //UnitsManager.Instance.TryRegisterEntity(item);
             }
         }
     }
     [Serializable]
     public struct EntitiesPlacementConfig
     {
-        public BaseEntityOLD entity;
+        public BaseGameEntityComponent entity;
         public Vector3 offset;
        // public bool randomizePlacement;
     }

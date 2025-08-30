@@ -1,3 +1,4 @@
+using Arcatech.EventBus;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using System.Collections.Generic;
@@ -41,6 +42,7 @@ namespace Arcatech.Stat
         }
         private void Update()
         {
+            if (_paused) return;
             foreach (var stat in _stats)
             {
                 stat.Value.UpdateInDelta(Time.deltaTime);
@@ -102,6 +104,25 @@ namespace Arcatech.Stat
         }
 
 
+
+        EventBinding<PauseToggleEvent> _pauseBind;
+        bool _paused;
+
+        private void OnEnable()
+        {
+            _pauseBind = new EventBinding<PauseToggleEvent>(HandlePauseEvent);
+            EventBus<PauseToggleEvent>.Register(_pauseBind);
+        }
+
+        void HandlePauseEvent(PauseToggleEvent e)
+        {
+            _paused = e.Value;
+        }
+
+        private void OnDisable()
+        {
+            EventBus<PauseToggleEvent>.Deregister(_pauseBind);
+        }
 
     }
 }

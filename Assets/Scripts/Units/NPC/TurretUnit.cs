@@ -1,5 +1,4 @@
-﻿using Arcatech.Units.Behaviour;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Arcatech.Units
 {

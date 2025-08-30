@@ -1,6 +1,4 @@
-﻿using Arcatech.Units.Behaviour;
-using AYellowpaper.SerializedCollections.KeysGenerators;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Arcatech.Units
 {
@@ -81,14 +79,7 @@ namespace Arcatech.Units
         //    tree.AddChild(combatSequence);
 
         //}
-        protected override void OnDrawGizmos()
-        {
-            //base.OnDrawGizmos();
-            //if (!UnitDebug) return;
-            //Gizmos.color = Color.blue;
-            //Gizmos.DrawLine(agent.transform.position, agent.transform.position + agent.transform.forward);
 
-        }
     }
 
 }

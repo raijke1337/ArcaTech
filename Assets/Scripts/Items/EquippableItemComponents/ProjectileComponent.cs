@@ -56,6 +56,7 @@ namespace Arcatech.Items
 
         protected virtual void Col_SomethingHitEvent(Collider other)
         {
+            Debug.Log(other);
 
             if (other.TryGetComponent<BaseGameEntityComponent>(out var u))
             {

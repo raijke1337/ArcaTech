@@ -46,9 +46,9 @@ namespace Arcatech.EventBus
 
     public struct DrawDamageEvent : IEvent
     {
-        public BaseEntityOLD Unit { get; }
+        public BaseGameEntityComponent Unit { get; }
         public float Damage { get; }
-        public DrawDamageEvent (BaseEntityOLD unit, float damage)
+        public DrawDamageEvent (BaseGameEntityComponent unit, float damage)
         {
             Unit = unit; this.Damage = damage;
         }
@@ -88,19 +88,6 @@ namespace Arcatech.EventBus
     {
         public bool Value { get; }
         public PauseToggleEvent (bool value) => Value = value;
-    }
-
-    public struct UpdateIconEvent : IEvent
-    {
-        public UpdateIconEvent(IIconContent used, BaseEntityOLD user)
-        {
-            Used = used;
-            User = user;
-        }
-        public IIconContent Used { get; }
-        public BaseEntityOLD User { get; }
-
-
     }
 
 

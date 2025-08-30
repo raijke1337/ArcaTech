@@ -1,5 +1,4 @@
-﻿using Arcatech.Units.Behaviour;
-using UnityEngine;
+﻿using UnityEngine;
 namespace Arcatech.Units
 {
     public class MetalGolemUnit : NPCUnitComponent
@@ -8,12 +7,7 @@ namespace Arcatech.Units
         [SerializeField,Range(1,180)] float _playerInFrontAngle = 15f;
         [SerializeField,Range(1,20)] float _chargeRange = 5f;
 
-        protected override void OnDrawGizmos()
-        {
-            base.OnDrawGizmos();
-            UnityEditor.Handles.color = Color.gray;
-            UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, _chargeRange);
-        }
+
 
         //protected override void SetupBehavior()
         //{

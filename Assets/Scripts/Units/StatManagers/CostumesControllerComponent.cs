@@ -1,41 +1,41 @@
 using Arcatech.Actions;
 using Arcatech.EventBus;
 using CartoonFX;
+using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech.Units
 {
-    public class CostumesControllerComponent : MonoBehaviour
+    [RequireComponent(typeof(EntityInventoryComponent))]
+    public class CostumesControllerComponent : ValidatedMonoBehaviour
     {
 
-        public void Init(BaseEntityOLD unit) => owner = unit;
-
-        BaseEntityOLD owner;
-
+        [SerializeField, Self]
+        EntityInventoryComponent inventory;
         [SerializeField] private List<GameObject> _parts;
         [SerializeField] SerializedActionResult[] BreakEffects;
         public void OnBreak()
         {
-            //if (_parts != null)
-            //{
-            //    if (_parts.Count > 0)
-            //    {
-            //        var ind = Random.Range(0, _parts.Count - 1);
-            //        var s = _parts[ind];
+            if (_parts != null)
+            {
+                if (_parts.Count > 0)
+                {
+                    var ind = Random.Range(0, _parts.Count - 1);
+                    var s = _parts[ind];
 
 
-            //        if (BreakEffects != null && BreakEffects.Length > 0)
-            //        {
-            //            foreach (var f in BreakEffects)
-            //            {
-            //                f.BuildActionResult().ProduceResult(owner, null, owner.transform);
-            //            }
-            //        }
-            //        s.SetActive(false);
-            //        _parts.RemoveAt(ind);
-            //    }
-            //}
+                    if (BreakEffects != null && BreakEffects.Length > 0)
+                    {
+                        foreach (var f in BreakEffects)
+                        {
+                           // f.BuildActionResult().ProduceResult(owner, null, owner.transform);
+                        }
+                    }
+                    s.SetActive(false);
+                    _parts.RemoveAt(ind);
+                }
+            }
         }
 
     }

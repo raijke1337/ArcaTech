@@ -13,13 +13,13 @@ namespace Arcatech
     /// new component to define a unit that has stats (can be attacked) and does actions
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent), typeof(Animator), typeof(EntityStatsComponent))]
-    [RequireComponent(typeof(GroundDetection))]
+
     public class ActiveGameUnitComponent : ValidatedMonoBehaviour
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Self] protected Animator _animator;
         [SerializeField, Self] protected EntityStatsComponent _stats;
-        [SerializeField, Self] protected GroundDetection _ground;
+        
 
         [Space, SerializeField] protected SerializedUnitAction ActionOnDamage;
         [SerializeField] protected SerializedUnitAction ActionOnDeath;
@@ -51,10 +51,7 @@ namespace Arcatech
                 _lockAction = value;
             }
         }
-        protected virtual void OnActionLock(bool locking)
-        {
-            Debug.Log($"locked actions {this} {locking}");
-        }
+        protected virtual void OnActionLock(bool locking) { } // do something if needed
         #endregion
 
         private void Update()
@@ -98,7 +95,7 @@ namespace Arcatech
 
         public virtual void Command(UnitActionType obj)
         {
-            if (_lockAction || (!_ground.isOnGround && !_ground.isValidGround) || GetMainEntity.Paused) return;
+            if (_lockAction ||  GetMainEntity.Paused || !CanAct()) return;
 
             foreach (var h in _actionsHandlers)
             {
@@ -108,6 +105,13 @@ namespace Arcatech
                     DidActionAnnounceEvent?.Invoke(obj);
                 }
             }
+        }
+
+
+        protected virtual bool CanAct()
+        {
+            /// extra checks in npc and player
+            return true;
         }
 
         public void ForceUnitAction(BaseUnitAction act)

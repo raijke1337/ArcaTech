@@ -21,14 +21,12 @@ namespace Arcatech.Managers
             if (_instance == null)
             {
                 _instance = this;
-                _bindInv = new EventBinding<InventoryUpdateEvent>(OnInventoryUpdate);
                 _bindLvls = new EventBinding<LevelCompletedEvent>(OnLevelComplete);
 
 
                 SaveService = new SavesHandler(new JsonSerializer());
                 ReloadSave();
 
-                EventBus<InventoryUpdateEvent>.Register(_bindInv);
                 EventBus<LevelCompletedEvent>.Register(_bindLvls);
               //  Debug.Log($"register event binds in {this} at {Time.time}");
             }
@@ -38,7 +36,6 @@ namespace Arcatech.Managers
 
         private void OnDisable()
         {
-            EventBus<InventoryUpdateEvent>.Deregister(_bindInv);
             EventBus<LevelCompletedEvent>.Deregister(_bindLvls);
            // Debug.Log($"deregister event binds in {this} at {Time.time}");
         }
@@ -113,7 +110,6 @@ namespace Arcatech.Managers
         private GameSaveData _loadedSave;
 
         private ISavesService SaveService;
-        EventBinding<InventoryUpdateEvent> _bindInv;
         EventBinding<LevelCompletedEvent> _bindLvls;
         public void OnNewGame()
         {
@@ -139,18 +135,6 @@ namespace Arcatech.Managers
             _loadedSave.OpenedLevelsID.Add(lvl.CompletedLevel.ID.ToString());
         }
 
-        private void OnInventoryUpdate(InventoryUpdateEvent arg)
-        {
-            if (_loadedSave == null)
-            {
-                return;
-            }
-            // for debug use
-            //if (arg.Unit is PlayerUnit)
-            //{
-            //    _loadedSave.UpdateInventory(arg.Inventory.PackPlayerData());
-            //}
-        }
 
         #endregion
 

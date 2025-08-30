@@ -1,3 +1,4 @@
+using Arcatech.EventBus;
 using Arcatech.Triggers;
 using UnityEngine;
 namespace Arcatech
@@ -17,5 +18,22 @@ namespace Arcatech
         public bool Paused { get => _paused; }
         protected bool _paused;
 
+
+        EventBinding<PauseToggleEvent> _pauseBind;
+        private void OnEnable()
+        {
+            _pauseBind = new EventBinding<PauseToggleEvent>(HandlePauseEvent);
+            EventBus<PauseToggleEvent>.Register(_pauseBind);
+        }
+
+        void HandlePauseEvent(PauseToggleEvent e)
+        {
+            _paused = e.Value;
+        }
+
+        private void OnDisable()
+        {
+            EventBus<PauseToggleEvent>.Deregister(_pauseBind);
+        }
     }
 }

@@ -1,8 +1,4 @@
 ﻿using Arcatech.AI;
-using Arcatech.BlackboardSystem;
-using Arcatech.Units.Behaviour;
-using KevinIglesias;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech.Units

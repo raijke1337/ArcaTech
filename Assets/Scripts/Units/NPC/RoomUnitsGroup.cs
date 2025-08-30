@@ -1,4 +1,3 @@
-using Arcatech.BlackboardSystem;
 using Arcatech.Units;
 using com.cyborgAssets.inspectorButtonPro;
 using System.Collections.Generic;
@@ -55,7 +54,7 @@ namespace Arcatech.AI
         }
 
 
-        private void RemoveUnitOnDeath(BaseEntityOLD u)
+        private void RemoveUnitOnDeath(BaseGameEntityComponent u)
         {
             //if (u is NPCUnit unit)
             //{

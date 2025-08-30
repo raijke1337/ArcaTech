@@ -29,6 +29,8 @@ namespace Arcatech.Items
         protected MeleeWeaponTrail Trail;
         protected IActionResult[] OnColliderHit { get; }
         protected BaseUnitAction currentAction;
+
+
         public async void SwitchCollider(bool state, float delay)
         {
             Trail.Emit = state;

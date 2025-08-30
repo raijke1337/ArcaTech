@@ -31,7 +31,7 @@ namespace Arcatech.Managers
         [SerializeField] private GameObject _pause;
 
         EventBinding<PlayerStatsChangedUIEvent> _statChangedBind;
-        EventBinding<InventoryUpdateEvent> _inventoryChangedBind;
+        
         EventBinding<PauseToggleEvent> _pauseToggleBind;
         EventBinding<PlayerTargetUpdateEvent> _targetUpdateBinding;
         

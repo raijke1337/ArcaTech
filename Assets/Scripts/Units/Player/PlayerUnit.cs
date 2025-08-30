@@ -3,13 +3,14 @@ using Arcatech.Items;
 using Arcatech.Managers;
 using Arcatech.Triggers;
 using Arcatech.Units.Inputs;
+using ECM.Components;
 using KBCore.Refs;
 using UnityEngine;
 
 
 namespace Arcatech.Units
 {
-
+    [RequireComponent(typeof(GroundDetection))]
     public class PlayerUnit : ActiveGameUnitComponent
     {
         [Space, Header("Player Unit")]
@@ -17,6 +18,7 @@ namespace Arcatech.Units
         //[SerializeField] int _armorBreakEnergy = 30;
 
         [SerializeField, Child] protected Camera _faceCam;
+        [SerializeField, Self] protected GroundDetection _ground;
         CostumesControllerComponent costumes;
 
         protected void ToggleCamera(bool value) { _faceCam.enabled = value; }
@@ -33,7 +35,10 @@ namespace Arcatech.Units
             base.ApplyForceResultToUnit(speed, distance);
             //_movement.DisableGroundingOnUnitImpulse(speed, distance);
         }
-
+        protected override bool CanAct()
+        {
+            return _ground.isOnGround && _ground.isValidGround;
+        }
 
         #region inventory
 

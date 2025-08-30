@@ -49,6 +49,9 @@ namespace Arcatech.Units
 
         private void Update()
         {
+
+            if (baseGameEntity.Paused) return;
+
             _model?.UpdateModel(Time.deltaTime);
             _model.DrawStrategyChangedEvent += RefreshViews;
         }
