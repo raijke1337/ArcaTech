@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 6655731621570367998}
   - component: {fileID: 3003212133603909935}
   - component: {fileID: -1713724320455612394}
+  - component: {fileID: 1293404516765955585}
   m_Layer: 0
   m_Name: arca_hammer
   m_TagString: Untagged
@@ -95,6 +96,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -153,6 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53cc5452177305e4287558b216bd3933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameEntity: {fileID: 1293404516765955585}
 --- !u!114 &6655731621570367998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,7 +202,7 @@ MonoBehaviour:
   _trail: {fileID: 6655731621570367998}
 --- !u!95 &-1713724320455612394
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -211,8 +216,24 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1293404516765955585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322378502437355212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _name: Hammer
+  entitySide: 0
+  _showDebugs: 0

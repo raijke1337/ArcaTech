@@ -3,8 +3,9 @@ using Arcatech.Triggers;
 using UnityEngine;
 namespace Arcatech
 {/// <summary>
-/// new component that defines any game enitity that does something
-/// </summary>
+ /// new component that defines any game enitity that does something
+ /// </summary>
+    [RequireComponent(typeof(Collider))]
     public class BaseGameEntityComponent : MonoBehaviour
     {
         [SerializeField] string _name;

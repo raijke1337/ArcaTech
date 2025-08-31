@@ -1,9 +1,5 @@
 using Arcatech.Actions;
-using Arcatech.Triggers;
-using Arcatech.Units;
 using System;
-using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Assertions;
 namespace Arcatech.Items
@@ -23,6 +19,7 @@ namespace Arcatech.Items
         [SerializeField] float ProjectileSpeed;
         [SerializeField] bool attachToUser = false;
 
+        [Header("TODO: repalce with homing settings so")]
         [SerializeField, Tooltip("Placeholder for homing projectiles, range of scanning for tgts")] float HomingRange = 6f;
 
 

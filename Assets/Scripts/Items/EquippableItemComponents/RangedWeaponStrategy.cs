@@ -11,7 +11,6 @@ namespace Arcatech.Items
         {
         }
 
-
         //// shooting done via extended serialized produce projectiles now
     }
 }

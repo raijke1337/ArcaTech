@@ -27,14 +27,8 @@ namespace Arcatech.Actions
 
         public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
-            //if (user is ArmedUnit ar && ar.IsArmed(out IWeapon w))
-            //{
-            //    if (w.UseStrategy is MeleeWeaponStrategy m)
-            //    {
-            //        m.SwitchCollider(state,delay);
-            //    }
-            //}
-            Debug.LogWarning($"Toggle collider currenty non operational - maybe refactor??");
+
+            /// moving this to strategy (on use, on end use)
         }
     }
 
