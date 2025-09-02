@@ -58,7 +58,7 @@ namespace Arcatech.Actions
                     }
                     else
                     {
-                        Debug.LogError($"Tried to force movement on {target.GetName} which has no active actor component");
+                        Debug.LogWarning($"Tried to force movement on {target.GetName} which has no active actor component");
                     }
                     break;
             }

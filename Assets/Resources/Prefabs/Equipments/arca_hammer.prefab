@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 3003212133603909935}
   - component: {fileID: -1713724320455612394}
   - component: {fileID: 1293404516765955585}
+  - component: {fileID: 4936519804115430375}
   m_Layer: 0
   m_Name: arca_hammer
   m_TagString: Untagged
@@ -157,7 +158,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53cc5452177305e4287558b216bd3933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameEntity: {fileID: 1293404516765955585}
 --- !u!114 &6655731621570367998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,3 +237,32 @@ MonoBehaviour:
   _name: Hammer
   entitySide: 0
   _showDebugs: 0
+  _rigidbody: {fileID: 4936519804115430375}
+  gravity: 0
+--- !u!54 &4936519804115430375
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322378502437355212}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

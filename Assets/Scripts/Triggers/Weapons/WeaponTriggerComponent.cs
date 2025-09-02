@@ -21,13 +21,15 @@ namespace Arcatech.Triggers
 
         protected override void OnTriggerEnter(Collider other)
         {
+
             if (other.TryGetComponent<BaseGameEntityComponent>(out var o))
             {
-                Debug.Log($"{this} hit entity {o.GetName}");
+                Debug.Log($"{this} hit entity trigger {o.GetName}");
                 SomeColliderWasHitEvent?.Invoke(other);
             }
 
         }
+
         // weapon signals about trigger hits based on the event
         // all logic moved to strategy
     }

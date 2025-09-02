@@ -45,6 +45,7 @@ namespace Arcatech.Units
             {
                 view.ViewChangedInventory-= OnInvenoryChangedUI;
             }
+            _views.Clear();
         }
 
         private void Update()

@@ -2,38 +2,40 @@ using Arcatech.Stat;
 using Arcatech.Stats;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
-using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
+
 
 namespace Arcatech.UI
 {
-    public class BarsContainersManager : MonoBehaviour
+
+    public class BarsContainersManager : MonoBehaviour, IStatUpdatesHandler
     {
-
-
-
         [SerializeField] StatBarContainerUIScript _barPrefab;
         [Space,SerializeField] SerializedDictionary<BaseStatType,ColorSet> _statColors;
         [SerializeField] Ease _barsEaseMethod;
         [SerializeField] float _barsEaseTime = 0.3f;
+        [SerializeField, Range(0, 1), Tooltip("Delta change for visual effects")] float _barFlashTreschold = 0.2f;
 
         Dictionary<BaseStatType, StatBarContainerUIScript> _barsDict;
 
+        bool init = false;
 
-        public void LinkStats(EntityStatsComponent stats)
+        public void HanldeEntityStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
         {
-            _barsDict ??= new();
-            foreach (var stat in stats.GetAllStats)
+            if (!init)
             {
-                _barsDict[stat.Key] = Instantiate(_barPrefab, this.transform).
-                LinkContainer(stat.Value).
-                SetColors(_statColors[stat.Key]).
-                SetEaseMethod(_barsEaseMethod).
-                SetFillTime(_barsEaseTime);
+                _barsDict ??= new();
+                foreach (var stat in stats)
+                {
+                    _barsDict[stat.Key] = Instantiate(_barPrefab, this.transform).
+                    LinkContainer(stat.Value).
+                    SetColors(_statColors[stat.Key]).
+                    SetEaseMethod(_barsEaseMethod).
+                    SetFillTime(_barsEaseTime);
+                }
+                init = true;
             }
         }
-   
     }
 }

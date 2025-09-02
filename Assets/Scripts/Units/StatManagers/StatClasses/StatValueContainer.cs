@@ -21,7 +21,9 @@ namespace Arcatech.Stats
         public float GetMax { get => _maxValue; }
         public float GetMin { get => _minValue; }
         public float GetPercent { get => _currentValue / _maxValue; }
-        public float CachedValue { get => _cachedValue; } // to store changes between updates
+        //public float CachedValue { get => _cachedValue; } // to store changes between updates
+        public float GetFrameDeltaValue { get => _currentValue - _cachedValue; }
+        public float GetFrameDeltaPercentAbs { get => Mathf.Abs((_currentValue - _cachedValue)/_maxValue); }
         #endregion
 
         [SerializeField] private float _currentValue;
@@ -44,14 +46,22 @@ namespace Arcatech.Stats
 
         public void UpdateInDelta(float deltaTime)
         {
-            UpdateMods(deltaTime);
-            UpdateEffects(deltaTime);
-            if (!_setup) 
+            if (_setup)
             {
-                _currentValue = _initValue;
                 _cachedValue = _currentValue;
-                _setup = true; 
-            } // starting mods and effects are applied and the component can now process effects 
+                UpdateMods(deltaTime);
+                UpdateEffects(deltaTime);
+            }
+            else
+            {
+                UpdateMods(deltaTime);
+                if (_activeMods.Count > 0) 
+                { 
+                    _currentValue = _initValue;
+                    _cachedValue = _initValue;
+                    _setup = true; 
+                }
+            } // starting mods  are applied and the component can now process effects 
         }
 
         #region mods
@@ -93,24 +103,25 @@ namespace Arcatech.Stats
         #region temporary effects
         private List<StatsEffect> _currentEffects;
 
-        public void ApplyStatsEffect(StatsEffect eff)
-        {
-            _cachedValue = _currentValue;
-            _currentValue = Mathf.Clamp(_currentValue + eff.InitialValue, _minValue, _maxValue);
-            _currentEffects.Add(eff);
-        }
+        public void ApplyStatsEffect(StatsEffect eff) =>_currentEffects.Add(eff);
+        
 
         void UpdateEffects(float d)
         {
             foreach (var eff in _currentEffects.ToList())
             {
+                if (!eff.InitDone)
+                {
+                    _currentValue = Mathf.Clamp(_currentValue + eff.InitialValue, _minValue, _maxValue);
+                    eff.InitDone = true;
+                }
+
                 if (!eff.CheckCondition(d))
                 {
                     _currentEffects.Remove(eff); // has no duration or is expired
                 }
                 else
                 {
-                    _cachedValue = _currentValue;
                     _currentValue = Mathf.Clamp(_currentValue + eff.FrameDelta, _minValue, _maxValue);
                 }
             }

@@ -45,6 +45,10 @@ public class PlayerInputReaderObject : ScriptableObject, IGameActions
             _controls.Game.SetCallbacks(this);
         }
     }
+    private void OnDisable()
+    {
+        _controls.Disable();
+    }
 
     public void EnablePlayerInputs()
     {

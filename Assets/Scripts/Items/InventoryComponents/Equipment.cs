@@ -16,7 +16,7 @@ namespace Arcatech.Items
     {
         protected virtual void CollectUsables(EquipSO cfg)
         {
-            cahcedUsables = new List<IUsable>();
+            cachedUsables = new List<IUsable>();
             if (cfg.Skill != null)
             {
                 GetUsables.Add(cfg.Skill.CreateSkill(Owner, DisplayItem, Type));
@@ -24,11 +24,18 @@ namespace Arcatech.Items
         }
         public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
         {
+            StatMods = new();
             DisplayItem = GameObject.Instantiate(cfg.ItemPrefab);
-            foreach (var m in cfg.StatMods)
+            if (cfg.StatMods != null)
             {
-                StatMods.Add(m.BuildMod);
+                foreach (var m in cfg.StatMods)
+                {
+                    if (m != null)
+                        StatMods.Add(m.BuildMod);
+                }
+
             }
+
             DisplayItem.gameObject.SetActive(false);
           //  Debug.Log($"setup equipment{this}");
         }               
@@ -52,13 +59,13 @@ namespace Arcatech.Items
         public BaseItemComponent DisplayItem { get; protected set; }
         public List<StatsMod> StatMods { get; protected set; }
 
-        protected List<IUsable> cahcedUsables;
+        protected List<IUsable> cachedUsables;
         public List<IUsable> GetUsables
         {
             get
             {
-                if (cahcedUsables == null) CollectUsables(Config as EquipSO);
-                return cahcedUsables;
+                if (cachedUsables == null) CollectUsables(Config as EquipSO);
+                return cachedUsables;
             }
         }
     }

@@ -8,6 +8,8 @@ namespace Arcatech.Triggers
     public class StatsEffect
     {
 
+        public bool InitDone { get; set; } = false;
+
         public float InitialValue { get => _initial; }
         public float OverTimeValue { get => _totalDelta; }
         public float OverTimeDuration { get => _totalTime; }

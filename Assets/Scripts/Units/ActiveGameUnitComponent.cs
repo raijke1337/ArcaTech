@@ -1,5 +1,6 @@
 using Arcatech.Items;
 using Arcatech.Stat;
+using Arcatech.Stats;
 using Arcatech.Units;
 using DG.Tweening;
 using ECM.Components;
@@ -10,11 +11,11 @@ using UnityEngine.Events;
 namespace Arcatech
 {
     /// <summary>
-    /// new component to define a unit that has stats (can be attacked) and does actions
+    /// new component to define a unit that has stats (can be damaged and killed)
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent), typeof(Animator), typeof(EntityStatsComponent))]
 
-    public class ActiveGameUnitComponent : ValidatedMonoBehaviour
+    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IStatUpdatesHandler
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Self] protected Animator _animator;
@@ -38,21 +39,8 @@ namespace Arcatech
             {
                 Debug.LogWarning($"{GetMainEntity.GetName} has no actions handler assigned at startup because it has no inventory");
             }
+            _stats.RegisterStatChangesHandler(this);
         }
-
-        #region locks
-        bool _lockAction;
-        public bool ActionLock
-        {
-            get => _lockAction;
-            protected set
-            {
-                OnActionLock(value);
-                _lockAction = value;
-            }
-        }
-        protected virtual void OnActionLock(bool locking) { } // do something if needed
-        #endregion
 
         private void Update()
         {
@@ -76,6 +64,20 @@ namespace Arcatech
             }
         }
 
+
+        #region locks
+        bool _lockAction;
+        public bool ActionLock
+        {
+            get => _lockAction;
+            protected set
+            {
+                OnActionLock(value);
+                _lockAction = value;
+            }
+        }
+        protected virtual void OnActionLock(bool locking) { } // do something if needed
+        #endregion
         #region actions
 
         List<IUnitActionsHandler> _actionsHandlers;
@@ -158,6 +160,16 @@ namespace Arcatech
                 force?.Kill();
             }
         }
+
+
+        #endregion
+
+        #region on stat change
+        public void HanldeEntityStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
+        {
+            //todo
+        }
+
         #endregion
     }
 }

@@ -17,6 +17,7 @@ namespace Arcatech.Stat
         #region serialize
         [SerializeField] StatValueContainer[] displayContainers;
 
+
         void EditorUpdate()
         {
             displayContainers = new StatValueContainer[_stats.Count-1];
@@ -29,8 +30,20 @@ namespace Arcatech.Stat
         #endregion
 
 
+        List<IStatUpdatesHandler> _handlers = new();
+        public void RegisterStatChangesHandler(IStatUpdatesHandler handler)
+        {
+            if (handler != null && !_handlers.Contains(handler))
+            {
+                _handlers.Add(handler);
+                if (_started)
+                handler.HanldeEntityStatsUpdate(_stats);
+            }
+        }
+
+
+
         private Dictionary<BaseStatType, StatValueContainer> _stats;
-        public IReadOnlyDictionary<BaseStatType, StatValueContainer> GetAllStats => _stats;
         bool _started = false;
         public bool DidInit => _started;
 
@@ -39,6 +52,8 @@ namespace Arcatech.Stat
             _stats = startingStats.BuildBaseStats;
             _started = true;
             EditorUpdate();
+            UpdateHandlers();
+
         }
         private void Update()
         {
@@ -47,9 +62,16 @@ namespace Arcatech.Stat
             {
                 stat.Value.UpdateInDelta(Time.deltaTime);
             }
+            UpdateHandlers();
         }
 
-
+        void UpdateHandlers()
+        {
+            foreach (var h in _handlers)
+            {
+                h.HanldeEntityStatsUpdate(_stats);
+            }
+        }
         public void ApplyStatsEffect(StatsEffect eff)
         {
             if (_stats.ContainsKey(eff.StatType))
@@ -61,18 +83,6 @@ namespace Arcatech.Stat
         {
             _stats[mod.GetStatType].AddStatsMod(mod);
         }
-        public void ApplyStatsEffects(IEnumerable<StatsEffect> effects)
-        {
-            foreach (var effect in effects)
-            {
-                ApplyStatsEffect(effect);
-            }
-        }
-        public void ApplyStatsMods(IEnumerable<StatsMod> mods)
-        {
-            foreach (var mod in mods) ApplyStatMod(mod);
-        }
-
 
         public bool CanApplyCost(StatsEffect cost)
         {
@@ -104,6 +114,8 @@ namespace Arcatech.Stat
         }
 
 
+        #region pause
+
 
         EventBinding<PauseToggleEvent> _pauseBind;
         bool _paused;
@@ -122,7 +134,8 @@ namespace Arcatech.Stat
         private void OnDisable()
         {
             EventBus<PauseToggleEvent>.Deregister(_pauseBind);
+            _handlers.Clear();
         }
-
+        #endregion
     }
 }

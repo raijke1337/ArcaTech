@@ -29,12 +29,12 @@ namespace Arcatech.Items
 
         protected override void CollectUsables(EquipSO cfg)
         {
-            cahcedUsables = new List<IUsable>();
+            cachedUsables = new List<IUsable>();
             if (cfg.Skill != null)
             {
                 GetUsables.Add(cfg.Skill.CreateSkill(Owner, DisplayItem, Type));
             }
-            cahcedUsables.Add(this);
+            cachedUsables.Add(this);
         }
         public Weapon(WeaponSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
         {
