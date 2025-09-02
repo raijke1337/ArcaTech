@@ -8,12 +8,13 @@ using KBCore.Refs;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Arcatech.UI
 {
     public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitActionsHandler, IUnitInventoryView
     {
-        [SerializeField,Child] protected IconContainersManager _icons;
+        [SerializeField,Child] protected PlayerBarIconsContainerManager _icons;
         [SerializeField, Child] protected BarsContainersManager _bars;
 
         public event UnityAction<UnitInventoryViewReference> ViewChangedInventory;
@@ -38,13 +39,16 @@ namespace Arcatech.UI
 
         private void Start()
         {
-            _bars.LinkStats(_player.GetComponent<EntityStatsComponent>());
+            if (_player != null)
+            {
+                _bars.LinkStats(_player.GetComponent<EntityStatsComponent>());
+            }
         }
 
         public bool TryHandleAction(UnitActionType type, EntityStatsComponent stats, out BaseUnitAction action)
         {
             action = null;
-            Debug.Log($"handle action {type} in UI {this} - NYI");
+            _icons.HandlePlayerAction(type);
 
             return true;
         }
