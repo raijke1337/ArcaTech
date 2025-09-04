@@ -3,4 +3,7 @@
     public interface IStrategy
     {
     }
+
+
+
 }

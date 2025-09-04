@@ -1,6 +1,4 @@
-using Arcatech.Stats;
 using KBCore.Refs;
-using System.Collections.Generic;
 using UnityEngine;
 namespace Arcatech.UI
 {

@@ -1,10 +1,7 @@
 ﻿using Arcatech.Actions;
-using Arcatech.EventBus;
 using Arcatech.Stats;
 using Arcatech.Triggers;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 namespace Arcatech.Items

@@ -1,9 +1,6 @@
-﻿using Arcatech.Managers;
-using Arcatech.Units;
+﻿using Arcatech.Stats;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,36 +9,38 @@ namespace Arcatech.Items
     [Serializable]
     public class UnitInventoryModel
     {
-        UnitInventoryModel()
-        {
-            status = "not init";
-        }
 
         #region serialize
-        [SerializeField][ReadOnlyText] string status;
+        [SerializeField][ReadOnlyText] string status = "not init";
         #endregion
 
         public BaseGameEntityComponent Owner {get;}
         public UsablesHandler Handler { get; protected set; }
-        public ObservableArray<Item> Inventory { get; protected set; }
+        public List<Item> Inventory { get; protected set; }
         public ObservableDictionary<EquipmentType, Equipment> Equipments { get; protected set; }
 
         public event UnityAction DrawStrategyChangedEvent;
         public IDrawItemStrategy CurrentDrawStrategy { get; private set; }
 
-        public event Action<IEnumerable<Item>> OnInventoryChange
-        {
-            add => Inventory.AnyRecordChanged += value;
-            remove => Inventory.AnyRecordChanged -= value;
-        }
-        public event Action<IEnumerable<Equipment>> OnEquipsChange
-        {
-            add => Equipments.AnyValueChanged += value;
-            remove => Equipments.AnyValueChanged -= value;
-        }
+        public event UnityAction<Item> ItemAddedToInventoryEvent = delegate { };
+        public event UnityAction<Item> ItemRemovedFromInventoryEvent = delegate { };
+        public event UnityAction<Equipment> ItemEquippedEvent = delegate { };
+        public event UnityAction<Equipment> ItemUnequippedEvent = delegate { };
 
 
-        public void UpdateModel(float delta)
+        //public event Action<IEnumerable<Item>> OnInventoryChange
+        //{
+        //    add => Inventory.AnyRecordChanged += value;
+        //    remove => Inventory.AnyRecordChanged -= value;
+        //}
+        //public event Action<IEnumerable<Equipment>> OnEquipsChange
+        //{
+        //    add => Equipments.AnyValueChanged += value;
+        //    remove => Equipments.AnyValueChanged -= value;
+        //}
+
+
+        public void UpdateDeltaModel(float delta)
         {
             Handler?.Update(delta);
             status = $"updating OK {Owner.GetName}";
@@ -50,23 +49,23 @@ namespace Arcatech.Items
 
         public UnitInventoryModel(UnitInventoryItemConfigsContainer cfgs,BaseGameEntityComponent o)
         {
-            Owner = o;  
-            Inventory = new ObservableArray<Item>();
+            Owner = o;
+            //Inventory = new ObservableArray<Item>();
+            // Equipments = new ObservableDictionary<EquipmentType, Equipment>(list.ToArray());
+
             List<KeyValuePair<EquipmentType, Equipment>> list = new();
+            Inventory = new();
             Equipments = new ObservableDictionary<EquipmentType, Equipment>(list.ToArray());
 
 
             foreach (ItemSO item in cfgs.Inventory)
             {
-                PickUpItem(item);
+                ItemAddedToInventoryEvent?.Invoke(PickUpItem(item));
             }
             foreach (EquipSO e in cfgs.Equipment)
             {
-                EquipItem(e, out var un);
-                if (un != null)
-                {
-                    PickUpItem(un.Config);
-                }
+                ItemEquippedEvent.Invoke(EquipItem(e, out var un));
+                if (un != null) { ItemUnequippedEvent.Invoke(un); }
             }
             Handler = new UsablesHandler(Equipments);
             Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
@@ -80,8 +79,13 @@ namespace Arcatech.Items
             DrawStrategyChangedEvent?.Invoke();
         }
 
-        public bool PickUpItem (ItemSO item) => Inventory.TryAdd(Itemfactory.Instance.ProduceItem(item, Owner) as Item);
-        public bool EquipItem (EquipSO item, out Equipment unequipped)
+        Item PickUpItem (ItemSO item)
+        {
+            var i = (Itemfactory.Instance.ProduceItem(item, Owner) as Item);
+            Inventory.Add(i);
+            return i;
+        }
+        Equipment EquipItem (EquipSO item, out Equipment unequipped)
         {
             unequipped = null;
             var eq = Itemfactory.Instance.ProduceItem(item, Owner) as Equipment;
@@ -91,17 +95,25 @@ namespace Arcatech.Items
             }
             Equipments.SetPair(eq.Type, eq);
             //Add(new KeyValuePair<EquipmentType, Equipment>(eq.Type, eq as Equipment));
-            return true;
-        }
-        public bool HasItem(ItemSO check)
-        {
-            if (check == null) return false;
-            else
-            {
-                return Inventory.items.Any(t => t.ID == check.ID) || Equipments.GetAllValues().Any(t => t.ID == check.ID); 
-            }
+            return eq;
         }
 
+
+        public StatsMod[] GetCurrentMods
+        {
+            get
+            {
+                var list = new List<StatsMod>();
+                foreach (var equip in Equipments.GetAllValues())
+                {
+                    if (equip.StatMods != null)
+                    {
+                        list.AddRange(equip.StatMods);
+                    }
+                }
+                return list.ToArray();
+            }
+        }
 
 
     }

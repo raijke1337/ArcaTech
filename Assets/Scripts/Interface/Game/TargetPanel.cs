@@ -1,10 +1,3 @@
-using Arcatech.EventBus;
-using Arcatech.Units.Inputs;
-using KBCore.Refs;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
-
 namespace Arcatech.UI
 {
     public class TargetPanel : PanelWithBarGeneric

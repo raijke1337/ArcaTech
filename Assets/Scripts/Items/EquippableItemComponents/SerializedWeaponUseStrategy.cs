@@ -1,9 +1,6 @@
-﻿using Arcatech.Actions;
-using Arcatech.Triggers;
-using Arcatech.Units;
+﻿using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Events;
 
 namespace Arcatech.Items
 {

@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Arcatech.Items;
-using Arcatech.Units;
-using UnityEngine.UI;
 using UnityEngine.Assertions;
 using AYellowpaper.SerializedCollections;
 using System.Linq;
@@ -74,7 +71,7 @@ namespace Arcatech.UI
                 _equipsTiles[equip.Type].Item = equip;
                 _equipsTiles[equip.Type].IconClickedEvent += IconTileClicked;
             }
-            var inve = model.Inventory.items;
+            var inve = model.Inventory;
 
             int placedTiles = _inventoryTiles.Count;
 

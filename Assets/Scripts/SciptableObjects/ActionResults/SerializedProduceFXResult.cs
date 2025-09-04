@@ -1,5 +1,4 @@
-﻿using Arcatech.Units;
-using CartoonFX;
+﻿using CartoonFX;
 using UnityEngine;
 using UnityEngine.Assertions;
 

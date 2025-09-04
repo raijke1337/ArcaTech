@@ -1,4 +1,3 @@
-using Arcatech.Stat;
 using Arcatech.Stats;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
@@ -21,7 +20,7 @@ namespace Arcatech.UI
 
         bool init = false;
 
-        public void HanldeEntityStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
+        public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
         {
             if (!init)
             {

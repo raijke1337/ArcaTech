@@ -1,8 +1,3 @@
-using Arcatech.Items;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-
 namespace Arcatech.UI
 {
     public class ItemTileComponent : IconTileComp

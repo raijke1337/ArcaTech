@@ -1,9 +1,7 @@
 
 using Arcatech.Effects;
 using Arcatech.EventBus;
-using Arcatech.Scenes;
 using Arcatech.Scenes.Cameras;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -42,11 +40,11 @@ namespace Arcatech.Managers
                 case LevelType.Scene:
                     break;
                 case LevelType.Game:
-                    _ctrls.Add(GetComponent<LevelManager>());
-                    _ctrls.Add(GetComponent<UnitsManager>());
+                    //_ctrls.Add(GetComponent<LevelManager>());
+                    //_ctrls.Add(GetComponent<PauseManager>());
                     _ctrls.Add(GetComponent<TriggersManager>());                    
                     _ctrls.Add(Instantiate(_gameUIprefab));
-                    var cam = FindObjectOfType<IsoCameraController>();
+                    var cam = FindFirstObjectByType<IsoCameraController>();
                     if (cam == null)
                     {
                         _ctrls.Add(Instantiate(_camPrefab));

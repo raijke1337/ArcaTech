@@ -1,13 +1,7 @@
-﻿using Arcatech.EventBus;
-using Arcatech.Items;
-using Arcatech.Skills;
-using Arcatech.Stats;
+﻿using Arcatech.Items;
 using KBCore.Refs;
-using System;
 using System.Collections.Generic;
-using TMPro.EditorUtilities;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace Arcatech.Units
 {
@@ -33,14 +27,22 @@ namespace Arcatech.Units
             _views = new();
             _model = new UnitInventoryModel(defaultEquips.BuildContainer(),baseGameEntity);
 
-            _model.OnInventoryChange += OnInventoryModelUpdated;
-            _model.OnEquipsChange += OnInventoryModelUpdated;            
+            _model.ItemAddedToInventoryEvent += ModelInventoryChanges;
+            _model.ItemRemovedFromInventoryEvent += ModelInventoryChanges;
+            _model.ItemEquippedEvent += ModelInventoryChanges;
+            _model.ItemUnequippedEvent += ModelInventoryChanges;
+        }
+        private void ModelInventoryChanges(Item arg0)
+        {
+            RefreshViews();
         }
 
         private void OnDisable()
         {
-            _model.OnInventoryChange -= OnInventoryModelUpdated;
-            _model.OnEquipsChange -= OnInventoryModelUpdated;
+            _model.ItemAddedToInventoryEvent -= ModelInventoryChanges;
+            _model.ItemRemovedFromInventoryEvent -= ModelInventoryChanges;
+            _model.ItemEquippedEvent -= ModelInventoryChanges;
+            _model.ItemUnequippedEvent -= ModelInventoryChanges;
             foreach (var view in _views)
             {
                 view.ViewChangedInventory-= OnInvenoryChangedUI;
@@ -50,10 +52,8 @@ namespace Arcatech.Units
 
         private void Update()
         {
-
             if (baseGameEntity.Paused) return;
-
-            _model?.UpdateModel(Time.deltaTime);
+            _model?.UpdateDeltaModel(Time.deltaTime);
             _model.DrawStrategyChangedEvent += RefreshViews;
         }
 
@@ -89,10 +89,6 @@ namespace Arcatech.Units
         {
             Debug.Log($"Something happened in inventory view");
         }
-        private void OnInventoryModelUpdated(IEnumerable<IItem> obj)
-        {
-            RefreshViews();
-        }
 
         #endregion
 
@@ -100,42 +96,23 @@ namespace Arcatech.Units
 
         public IUnitActionsHandler GetUnitActionsHandler => _model.Handler;
 
-        public bool HasItemType(EquipmentType type, out IEquippable equipment)
-        {
-            if (_model.Equipments.TryGetValue(type, out var e))
-            {
-                equipment = e;
-                return true;
-            }
-            else
-            {
-                equipment = null;
-                return false;
-            }
-        }
-        public bool HasItem(ItemSO check)
-        {
-            return _model.HasItem(check);
-        }
+        //public bool HasItemType(EquipmentType type, out IEquippable equipment)
+        //{
+        //    if (_model.Equipments.TryGetValue(type, out var e))
+        //    {
+        //        equipment = e;
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        equipment = null;
+        //        return false;
+        //    }
+        //}
 
-        public StatsMod[] GetCurrentMods
-        {
-            get
-            {
-                var list = new List<StatsMod>();
-                foreach (var equip in _model.Equipments.GetAllValues())
-                {
-                    if (equip.StatMods != null)
-                    {
-                        list.AddRange(equip.StatMods);
-                    }
-                }
-                return list.ToArray();
-            }
-        }
 
-        public bool TryEquipItem(EquipSO e) => _model.EquipItem(e, out _);
 
+        //public bool TryEquipItem(EquipSO e) => _model.EquipItem(e, out _);
 
         #endregion
 

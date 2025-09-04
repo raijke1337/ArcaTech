@@ -1,5 +1,4 @@
-﻿using Arcatech.Effects;
-using Arcatech.Items;
+﻿using Arcatech.Items;
 using Arcatech.Texts;
 using Arcatech.Triggers;
 using Arcatech.Units;

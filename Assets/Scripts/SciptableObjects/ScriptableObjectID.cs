@@ -1,4 +1,3 @@
-using Arcatech;
 using System;
 using UnityEngine;
 namespace Arcatech

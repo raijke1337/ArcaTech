@@ -1,6 +1,4 @@
-﻿using static Arcatech.Managers.DataManager;
-
-namespace Arcatech.Managers.Save
+﻿namespace Arcatech.Managers.Save
 {
     public interface ISavesService
     {

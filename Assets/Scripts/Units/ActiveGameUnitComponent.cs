@@ -1,9 +1,9 @@
+using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Stat;
 using Arcatech.Stats;
 using Arcatech.Units;
 using DG.Tweening;
-using ECM.Components;
 using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,10 +20,20 @@ namespace Arcatech
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Self] protected Animator _animator;
         [SerializeField, Self] protected EntityStatsComponent _stats;
-        
+
 
         [Space, SerializeField] protected SerializedUnitAction ActionOnDamage;
         [SerializeField] protected SerializedUnitAction ActionOnDeath;
+
+        BaseUnitAction _damageAction;
+        BaseUnitAction _deathAction;
+
+        /// <summary>
+        /// TODO maybe in future
+        /// </summary>
+       // [Header("Stat change handling")]
+       // [SerializeField] List<IStatUpdateHandlingStrategy> strategies = new List<IStatUpdateHandlingStrategy>();
+
         public BaseGameEntityComponent GetMainEntity { get => gameEntity; }
         public Animator GetAnimatorReference => _animator;
         
@@ -34,12 +44,16 @@ namespace Arcatech
             if (TryGetComponent<EntityInventoryComponent>(out var inv))
             {
                 AssignActionsHandler(inv.GetUnitActionsHandler);
+                inv.SetModelView(_stats);
             }
             else
             {
                 Debug.LogWarning($"{GetMainEntity.GetName} has no actions handler assigned at startup because it has no inventory");
             }
             _stats.RegisterStatChangesHandler(this);
+
+            _damageAction = ActionOnDamage.ProduceAction(this,transform);
+            _deathAction = ActionOnDeath.ProduceAction(this, transform);
         }
 
         private void Update()
@@ -165,10 +179,32 @@ namespace Arcatech
         #endregion
 
         #region on stat change
-        public void HanldeEntityStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
+        public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
         {
-            //todo
+            //foreach (var s in strategies)
+            //{
+            //    s.HandleUpdate(stats, GetMainEntity, this);
+            //}
+            var hp = stats[BaseStatType.Health];
+            if (hp != null && hp.Initialized)
+            {
+                if (Mathf.Abs(hp.GetFrameDeltaValue)>20) //todo)
+                {
+                    EventBus<DrawDamageEvent>.Raise(new DrawDamageEvent(GetMainEntity, hp.GetFrameDeltaValue));
+                    ForceUnitAction(_damageAction);
+                }
+                if (hp.GetCurrent <= 0)
+                {
+                    OnUnitDeath();
+                    ForceUnitAction(_deathAction);
+                    ActionLock = true;
+
+                    GetMainEntity.KillEntity();
+                }
+            }
+
         }
+        protected virtual void OnUnitDeath() { Debug.Log($"{GetMainEntity.GetName} died"); }
 
         #endregion
     }

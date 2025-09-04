@@ -1,7 +1,4 @@
-using Arcatech.Texts;
-using Arcatech.Units;
 using System;
-using UnityEngine;
 
 namespace Arcatech.Items
 {

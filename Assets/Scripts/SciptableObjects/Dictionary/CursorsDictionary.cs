@@ -1,5 +1,4 @@
 using AYellowpaper.SerializedCollections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech

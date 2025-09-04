@@ -1,7 +1,5 @@
 using Arcatech.Actions;
-using Arcatech.Effects;
-using System;
-using UnityEngine;
+
 namespace Arcatech.Triggers
 {
 

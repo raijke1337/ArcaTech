@@ -1,7 +1,4 @@
-﻿
-using Arcatech.Stats;
-using Arcatech.Triggers;
-using AYellowpaper.SerializedCollections;
+﻿using AYellowpaper.SerializedCollections;
 using System;
 using UnityEngine;
 

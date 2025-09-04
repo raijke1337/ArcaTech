@@ -71,7 +71,7 @@ namespace Arcatech.UI
         }
 
         
-        public void HanldeEntityStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
+        public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
         {
             var hp = stats[BaseStatType.Health];
             if (hp.GetFrameDeltaValue < 0 )

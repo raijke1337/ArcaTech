@@ -1,7 +1,6 @@
-﻿
-using Arcatech.Stats;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Assertions;
+
 namespace Arcatech.Stats
 {
     [CreateAssetMenu(fileName = "New Serialized Stat Mod", menuName = "Items/Stats/Stat mod", order = 1)]
@@ -25,6 +24,7 @@ namespace Arcatech.Stats
         {
             Assert.IsNotNull(_condition, $"Set some condition for {this}");
             _guid = SerializableGuid.NewGuid();
+            Debug.Log($"assign {_guid.ToString()} to mod config {this}");
         }
     }
 
@@ -57,6 +57,17 @@ namespace Arcatech.Stats
             if (!(obj is StatsMod s)) return false;
             else if (s.ID.Equals(ID)) return true;
             return false;
+        }
+        // Overload the == operator
+        public static bool operator == (StatsMod left, StatsMod right)
+        {
+            if (ReferenceEquals(left, right)) return true;   // same reference or both null
+            if (left is null || right is null) return false; // one null, one not
+            return left.ID == right.ID;
+        }
+        public static bool operator != (StatsMod left, StatsMod right)
+        {
+            return !(left == right);
         }
 
     }

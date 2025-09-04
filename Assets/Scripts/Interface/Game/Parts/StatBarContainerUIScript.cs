@@ -1,7 +1,6 @@
 using Arcatech.Stats;
 using DG.Tweening;
 using KBCore.Refs;
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

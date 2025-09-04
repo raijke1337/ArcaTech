@@ -30,7 +30,7 @@ namespace KevinIglesias
         //Needed for avoiding multiple throwns
         private bool actionDone;
 
-        override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+        public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
 
             //Get the script of the assigned action
@@ -110,7 +110,7 @@ namespace KevinIglesias
             }
         }
 
-        override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+        public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
             //Do the action if it wasn't done yet at the assigned point
             if (!actionDone)

@@ -1,5 +1,4 @@
 ﻿using KBCore.Refs;
-using System;
 using UnityEngine;
 namespace Arcatech
 {
@@ -11,15 +10,14 @@ namespace Arcatech
     {
         [SerializeField,Self] ActiveGameUnitComponent gameUnitComponent;
         protected virtual void RequestCombatAction(UnitActionType type) => gameUnitComponent.Command(type);
-        //protected virtual void RequestCombatAction(UnitActionType type) => UnitActionRequestedEvent.Invoke(type);
-        // public event Action<UnitActionType> UnitActionRequestedEvent = delegate { };
         private void OnEnable()
         {
             ControllerStartBindings(true);  
         }
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             ControllerStartBindings(false);
+            Debug.Log($"Disable called {this}");
         }
 
         protected abstract void ControllerStartBindings(bool enabling);

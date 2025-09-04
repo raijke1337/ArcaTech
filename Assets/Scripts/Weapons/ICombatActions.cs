@@ -1,5 +1,4 @@
 ﻿using Arcatech.Units;
-using System.Collections.Generic;
 
 namespace Arcatech
 {

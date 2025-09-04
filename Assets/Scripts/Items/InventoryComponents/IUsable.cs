@@ -1,6 +1,5 @@
 ﻿using Arcatech.Items;
 using Arcatech.Stat;
-using Arcatech.Stats;
 using Arcatech.UI;
 using Arcatech.Units;
 

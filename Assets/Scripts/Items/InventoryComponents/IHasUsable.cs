@@ -1,5 +1,4 @@
-﻿using Arcatech.Skills;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Arcatech.Items
 {

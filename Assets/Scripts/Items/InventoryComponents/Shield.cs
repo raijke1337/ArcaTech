@@ -1,5 +1,4 @@
-﻿using Arcatech.Units;
-namespace Arcatech.Items
+﻿namespace Arcatech.Items
 {
     public class Shield : Equipment
     {

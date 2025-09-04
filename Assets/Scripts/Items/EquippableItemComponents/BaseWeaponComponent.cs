@@ -1,7 +1,4 @@
-using Arcatech.Triggers;
 using KBCore.Refs;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech.Items

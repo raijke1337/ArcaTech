@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
+
 namespace Arcatech
 {
     public class ObservableDictionary<T, T2> : IObservableDictionary<T, T2>

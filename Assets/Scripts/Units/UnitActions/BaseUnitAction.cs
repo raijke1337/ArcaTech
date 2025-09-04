@@ -102,10 +102,18 @@ namespace Arcatech.Units
         readonly string _animationName;
         readonly float _crossfadeTime;
 
-
+        public event UnityAction<UnitActionState> ActionStateChangedEvent = delegate { };
 
         UnitActionState _actionState = UnitActionState.None;
-        public UnitActionState GetActionState { get { return _actionState; } }
+        public UnitActionState GetActionState 
+        { get 
+            { return _actionState; }
+            set
+            {
+                _actionState = value;
+                ActionStateChangedEvent.Invoke(_actionState);
+            }
+        }
 
         readonly IActionResult[] OnCompleteAction;
         readonly IActionResult[] OnStartAction;

@@ -1,10 +1,16 @@
 using Arcatech.Actions;
-using Arcatech.Level;
-using Arcatech.Units;
 using KBCore.Refs;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+
+namespace Arcatech.Triggers
+{ 
+
+
+}
+
+
+
 namespace Arcatech.Triggers
 {
 
@@ -50,7 +56,7 @@ namespace Arcatech.Triggers
         protected override void OnTriggerEnter(Collider other)
         {
 
-            if (other.gameObject.TryGetComponent(out BaseGameEntityComponent p))
+            if (other.gameObject.TryGetComponent(out ActiveGameUnitComponent p))
             {
 
                 if (reapplyTimer == null)
@@ -62,13 +68,13 @@ namespace Arcatech.Triggers
                 switch (targetType)
                 {
                     case TargetingType.AnyUnit:
-                        ApplyResultsTo(p);
+                        ApplyResultsTo(p.GetMainEntity,ResultOnEntry);
                         break;
                     case TargetingType.AnyEnemy:
-                        if (p.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(p);
+                        if (p.GetMainEntity.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(p.GetMainEntity, ResultOnEntry);
                         break;
                     case TargetingType.AnyAlly:
-                        if (p.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(p);
+                        if (p.GetMainEntity.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(p.GetMainEntity, ResultOnEntry);
                         break;
                     default:
                         Debug.Log($"{p.name} entered {this} and nothing happened because of trigger settings");
@@ -84,21 +90,21 @@ namespace Arcatech.Triggers
 
         protected override void OnTriggerExit(Collider other)
         {
-            if (other.gameObject.TryGetComponent(out BaseGameEntityComponent p))
+            if (other.gameObject.TryGetComponent(out ActiveGameUnitComponent p))
             {
                 switch (targetType)
                 {
                     case TargetingType.AnyUnit:
-                        ApplyResultsTo(p);
+                        ApplyResultsTo(p.GetMainEntity, ResultOnExit);
                         break;
                     case TargetingType.AnyEnemy:
-                        if (p.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(p);
+                        if (p.GetMainEntity.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(p.GetMainEntity,ResultOnExit);
                         break;
                     case TargetingType.AnyAlly:
-                        if (p.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(p);
+                        if (p.GetMainEntity.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(p.GetMainEntity, ResultOnExit);
                         break;
                     default:
-                        Debug.Log($"{p.GetName} exited {this} and nothing happened because of trigger settings");
+                        Debug.Log($"{p.GetMainEntity.GetName} exited {this} and nothing happened because of trigger settings");
                         break;
                 }
             }
@@ -110,9 +116,9 @@ namespace Arcatech.Triggers
         }
 
 
-        protected void ApplyResultsTo(BaseGameEntityComponent p)
+        protected void ApplyResultsTo(BaseGameEntityComponent p, SerializedActionResult[] results)
         {
-            foreach (var action in ResultOnEntry)
+            foreach (var action in results)
             {
                 action.BuildActionResult().ProduceResult(null, p, transform);
             }

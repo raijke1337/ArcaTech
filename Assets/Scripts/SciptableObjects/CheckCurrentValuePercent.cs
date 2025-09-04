@@ -1,6 +1,4 @@
-﻿
-using Arcatech.Stats;
-using UnityEngine;
+﻿using UnityEngine;
 namespace Arcatech.Stats
 {
     [CreateAssetMenu(fileName = "New Serialized Stat Mod Condition", menuName = "Items/Stats/Stat mod condition/Check current value", order = 2)]

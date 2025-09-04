@@ -2,7 +2,6 @@
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Arcatech.Items
@@ -31,16 +30,16 @@ namespace Arcatech.Items
         protected BaseUnitAction currentAction;
 
 
-        public async void SwitchCollider(bool state, float delay)
+         void SwitchCollider(bool state, float delay)
         {
             Trail.Emit = state;
-            await Task.Delay((int)delay*1000);
             Trigger.ToggleCollider(state);
             if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"collider on {WeaponComponent} {(state == true ? "on" : "off")} ");
         }
 
         public override bool TryUseUsable(out BaseUnitAction action)
         {
+
             // TODO needs debug
             // add checks to prevent additional triggering
 
@@ -53,16 +52,17 @@ namespace Arcatech.Items
             }
             hitsThisSwing.Clear();
 
-            /// case advancing
+            // case advancing
            if (currentAction != null && currentAction.CanAdvance(out var next))
             {
                 action = next.ProduceAction(Owner,WeaponComponent.Spawner);
                 ChargesLogicOnUse();
+                currentAction.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
                 currentAction = action;
                 if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Advancing weapon combo {next}");
                 return true;
             }
-            //// case first attack OR previous attack is completed
+            // case first attack OR previous attack is completed
             
            else
             {
@@ -70,10 +70,28 @@ namespace Arcatech.Items
                 action = Action;
                 currentAction = action;
                 if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {action}");
+                action.ActionStateChangedEvent += Action_ActionStateChangedEvent;
                 return true;
             }
         }
 
+        private void Action_ActionStateChangedEvent(UnitActionState state)
+        {
+            switch (state)
+            {
+                case UnitActionState.None:
+                    break;
+                case UnitActionState.Started:
+                    SwitchCollider(true, 0);
+                    break;
+                case UnitActionState.ExitTime:
+                    break;
+                case UnitActionState.Completed:
+                    SwitchCollider(false, 0);
+                    currentAction.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
+                    break;
+            }
+        }
 
         List<BaseGameEntityComponent> hitsThisSwing = new();
         private void HandleColliderHitEvent(Collider target)

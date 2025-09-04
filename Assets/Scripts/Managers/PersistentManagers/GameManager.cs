@@ -1,5 +1,5 @@
 //using Newtonsoft.Json;
-using Arcatech.Effects;
+
 using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Scenes;
@@ -7,8 +7,6 @@ using Arcatech.Scenes.Cameras;
 using Arcatech.UI;
 using Arcatech.Units;
 using DG.Tweening;
-using KBCore.Refs;
-using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;

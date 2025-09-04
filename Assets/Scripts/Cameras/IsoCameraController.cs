@@ -1,8 +1,4 @@
-using Arcatech.Level;
-using Arcatech.Managers;
 using Arcatech.Units.Inputs;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 namespace Arcatech.Scenes.Cameras
 {

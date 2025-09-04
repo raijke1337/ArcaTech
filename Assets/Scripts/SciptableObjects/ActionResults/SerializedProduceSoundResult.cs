@@ -1,7 +1,5 @@
 ﻿using Arcatech.Effects;
 using Arcatech.EventBus;
-using Arcatech.Managers;
-using Arcatech.Units;
 using UnityEngine;
 
 namespace Arcatech.Actions

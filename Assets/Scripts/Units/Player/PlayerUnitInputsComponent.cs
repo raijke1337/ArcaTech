@@ -1,4 +1,5 @@
 using Arcatech.EventBus;
+using Arcatech.Interactions;
 using Arcatech.Scenes.Cameras;
 using KBCore.Refs;
 using UnityEngine;
@@ -6,17 +7,18 @@ using UnityEngine;
 namespace Arcatech.Units.Inputs
 {
     [RequireComponent(typeof(PlayerAimingComponent), typeof(DashJumpMovementController),typeof(PlayerUnit))]
+    [RequireComponent(typeof(InteractionComponent))]
     public class PlayerUnitInputsComponent : ActiveUnitsInputComponent
     {
-        [Space,Header("Player inputs")]
+        [Space,Header("Required components")]
         [SerializeField, Anywhere] PlayerInputReaderObject _playerInputReader;
         [SerializeField, Self] PlayerAimingComponent _aim;
         [SerializeField, Self] DashJumpMovementController _movement;
         [SerializeField, Self] PlayerUnit _player;
-        [SerializeField] SerializedUnitAction _jump;
+        [SerializeField, Self] protected InteractionComponent _interaction;
+        
+        [Space,Header("Jump!"),SerializeField] SerializedUnitAction _jump;
 
-
-        [SerializeField] float _interactRange = 3f;
         public PlayerAimingComponent Aiming => _aim;
         private IsoCamAdjust _adj;
 
@@ -79,11 +81,19 @@ namespace Arcatech.Units.Inputs
                 _movement.SetDesiredLookDirection(_lookVector);
             }                
         }
+        /// <summary>
+        /// called on unit death
+        /// </summary>
+        protected override void OnDisable()
+        {
+            _movement.SetDesiredMoveDirection(Vector3.zero);
+            base.OnDisable();
+        }
 
 
         private void OnMountButton()
         {
-            // interact button pressed
+            _interaction.DoInteraction((InteractionContext.Create(_player,transform)));
         }
         private void OnPauseButton()
         {
@@ -140,6 +150,7 @@ namespace Arcatech.Units.Inputs
         {
             RequestCombatAction(UnitActionType.Melee);
         }
+
 
         #endregion
 

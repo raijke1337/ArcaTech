@@ -1,5 +1,4 @@
 ﻿using Arcatech.Stats;
-using Arcatech.Triggers;
 using System.Collections.Generic;
 
 namespace Arcatech.Items

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using UnityEngine;
+
 namespace Arcatech.EventBus
 {
     public static class EventBus<T> where T : IEvent

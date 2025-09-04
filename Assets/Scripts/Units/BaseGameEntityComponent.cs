@@ -1,5 +1,4 @@
 using Arcatech.EventBus;
-using Arcatech.Triggers;
 using KBCore.Refs;
 using UnityEngine;
 namespace Arcatech
@@ -17,7 +16,7 @@ namespace Arcatech
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
 
-        public bool Paused { get => _paused; }
+        public bool Paused { get => _paused;  }
         protected bool _paused;
         [Space,Header("Rigidbody override"),SerializeField,Self] Rigidbody _rigidbody;
         [SerializeField] bool gravity = false;
@@ -40,6 +39,13 @@ namespace Arcatech
         private void OnDisable()
         {
             EventBus<PauseToggleEvent>.Deregister(_pauseBind);
+        }
+
+        public void KillEntity()
+        {
+            gameObject.SendMessage("OnDisable");        
+            
+           // Destroy(gameObject,5f);
         }
     }
 }

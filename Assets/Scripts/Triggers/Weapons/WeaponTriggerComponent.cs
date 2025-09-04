@@ -1,6 +1,3 @@
-using Arcatech.EventBus;
-using Arcatech.Units;
-using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Events;
 

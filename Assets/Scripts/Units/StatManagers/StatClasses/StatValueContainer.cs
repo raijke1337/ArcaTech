@@ -1,10 +1,8 @@
 
 using Arcatech.Triggers;
-using Arcatech.Units.Stats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 namespace Arcatech.Stats
 {
@@ -68,6 +66,21 @@ namespace Arcatech.Stats
         private List<StatsMod> _inactiveMods;
         private List<StatsMod> _activeMods;
         public void AddStatsMod(StatsMod mod) => _inactiveMods.Add(mod);
+
+        public void RemoveStatMod(StatsMod mod)
+        {
+            if (_activeMods.Contains(mod))
+            {
+                _activeMods.Remove(mod);
+                Debug.Log($"Removed mod {mod.ID}");
+            }
+            if (_inactiveMods.Contains(mod))
+            {
+                _inactiveMods.Remove(mod);
+                Debug.Log($"Removed mod {mod.ID}");
+            }
+
+        }
 
         void UpdateMods(float d)
         {

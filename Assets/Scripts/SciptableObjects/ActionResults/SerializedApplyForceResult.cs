@@ -1,6 +1,4 @@
-﻿using Arcatech.Units;
-using ECM.Components;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Assertions;
 using static Arcatech.Actions.SerializedApplyForceResult;
 
@@ -42,6 +40,7 @@ namespace Arcatech.Actions
             switch (_tgt)
             {
                 case ForceTarget.User:
+                    if (user == null) break;
                     if (user.TryGetComponent<ActiveGameUnitComponent>(out var actor))
                     {
                         actor.ApplyForceResultToUnit(_s, _d);
@@ -52,6 +51,7 @@ namespace Arcatech.Actions
                     }                    
                     break;
                 case ForceTarget.Target:
+                    if (target == null) break;
                     if (target.TryGetComponent<ActiveGameUnitComponent>(out actor))
                     {
                         actor.ApplyForceResultToUnit(_s, _d);

@@ -27,7 +27,10 @@ namespace Arcatech.UI
         public void HandlePlayerAction(UnitActionType action)
         { 
             var k = _usablesD.FirstOrDefault(t=>t.Key.UseActionType == action);
-            k.Value.OnUse();
+            if (k.Value != null)
+            {
+                k.Value.OnUse();
+            }
         }
     }
 }

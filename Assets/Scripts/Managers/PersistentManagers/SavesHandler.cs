@@ -1,13 +1,5 @@
-﻿using Arcatech.Items;
-using Arcatech.Scenes;
-using Arcatech.Units;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
-using UnityEditor;
+﻿using System.IO;
 using UnityEngine;
-using static Arcatech.Managers.DataManager;
 
 namespace Arcatech.Managers.Save
 {

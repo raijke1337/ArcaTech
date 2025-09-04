@@ -1,45 +1,78 @@
 using Arcatech.EventBus;
+using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 namespace Arcatech.Stat
 {
     /// <summary>
     /// new component to handle the current stats and their changes on any game entity
     /// </summary>
-    public class EntityStatsComponent : MonoBehaviour
+    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView
     {
         [SerializeField] protected BaseStatsConfig startingStats;
         [SerializeField] protected float statsUpdateFrequency = 0.1f; // call some events to announce update
 
-        #region serialize
-        [SerializeField] StatValueContainer[] displayContainers;
 
+        /// <summary>
+        /// used to load equipment mods
+        /// </summary>
 
-        void EditorUpdate()
+        UnitInventoryModel model = null;
+        bool firstLoad = true;
+
+        public void RefreshView(UnitInventoryModel m)
         {
-            displayContainers = new StatValueContainer[_stats.Count-1];
-            for (int i = 0; i < displayContainers.Length; i++)
+            if (firstLoad)
             {
-                displayContainers[i] = _stats.ElementAt(i).Value;
+                model = m;
+                firstLoad = false;
+                ///first load
+                ApplyStatMods(m.GetCurrentMods);
+                model.ItemEquippedEvent += Model_ItemEquippedEvent;
+                model.ItemUnequippedEvent += Model_ItemUnequippedEvent;
+            }
+            else if (m != model)
+            {
+                /// for some reason the inv model is changed, should bnot happen but...
+                Debug.LogError($"Changing unit inventory model for some reason, unhandled!");
             }
         }
 
-        #endregion
-
-
-        List<IStatUpdatesHandler> _handlers = new();
-        public void RegisterStatChangesHandler(IStatUpdatesHandler handler)
+        private void Model_ItemUnequippedEvent(Equipment arg0)
         {
-            if (handler != null && !_handlers.Contains(handler))
-            {
-                _handlers.Add(handler);
-                if (_started)
-                handler.HanldeEntityStatsUpdate(_stats);
-            }
+            RemoveStatMods(arg0.StatMods);
         }
+
+        private void Model_ItemEquippedEvent(Equipment arg0)
+        {
+            ApplyStatMods(arg0.StatMods);
+        }
+
+        void ApplyStatMod(StatsMod mod)
+        {
+            if (!_stats.ContainsKey(mod.GetStatType))
+            {
+                _stats[mod.GetStatType] = new StatValueContainer();
+            }
+            _stats[mod.GetStatType].AddStatsMod(mod);
+        }
+        void ApplyStatMods(IEnumerable<StatsMod> mods)
+        {
+            foreach (StatsMod mod in mods) { ApplyStatMod(mod); } 
+        }
+        void RemoveStatMod(StatsMod mod)
+        {
+            _stats[mod.GetStatType].RemoveStatMod(mod);
+        }
+        void RemoveStatMods(IEnumerable<StatsMod> mods)
+        {
+            foreach (StatsMod mod in mods) { RemoveStatMod(mod); }
+        }
+
 
 
 
@@ -51,7 +84,6 @@ namespace Arcatech.Stat
         {
             _stats = startingStats.BuildBaseStats;
             _started = true;
-            EditorUpdate();
             UpdateHandlers();
 
         }
@@ -65,11 +97,24 @@ namespace Arcatech.Stat
             UpdateHandlers();
         }
 
+
+
+        List<IStatUpdatesHandler> _handlers = new();
+        public void RegisterStatChangesHandler(IStatUpdatesHandler handler)
+        {
+            if (handler != null && !_handlers.Contains(handler))
+            {
+                _handlers.Add(handler);
+                if (_started)
+                    handler.HandleStatsUpdate(_stats);
+            }
+        }
+
         void UpdateHandlers()
         {
-            foreach (var h in _handlers)
+            foreach (var h in _handlers.ToList())
             {
-                h.HanldeEntityStatsUpdate(_stats);
+                h.HandleStatsUpdate(_stats);
             }
         }
         public void ApplyStatsEffect(StatsEffect eff)
@@ -78,10 +123,6 @@ namespace Arcatech.Stat
             {
                 _stats[eff.StatType].ApplyStatsEffect(eff);
             }
-        }
-        public void ApplyStatMod(StatsMod mod)
-        {
-            _stats[mod.GetStatType].AddStatsMod(mod);
         }
 
         public bool CanApplyCost(StatsEffect cost)
@@ -120,6 +161,8 @@ namespace Arcatech.Stat
         EventBinding<PauseToggleEvent> _pauseBind;
         bool _paused;
 
+        public event UnityAction<UnitInventoryViewReference> ViewChangedInventory;
+
         private void OnEnable()
         {
             _pauseBind = new EventBinding<PauseToggleEvent>(HandlePauseEvent);
@@ -135,7 +178,15 @@ namespace Arcatech.Stat
         {
             EventBus<PauseToggleEvent>.Deregister(_pauseBind);
             _handlers.Clear();
+
+            if (model != null)
+            {
+                model.ItemEquippedEvent -= Model_ItemEquippedEvent;
+                model.ItemUnequippedEvent -= Model_ItemUnequippedEvent;
+            }
+            firstLoad = true;
         }
+
         #endregion
     }
 }

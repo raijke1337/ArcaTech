@@ -1,6 +1,4 @@
-﻿using Arcatech.Units;
-using Cinemachine.Utility;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech.Items

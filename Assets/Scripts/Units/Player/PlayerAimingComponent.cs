@@ -1,16 +1,5 @@
-using Arcatech.EventBus;
-using Arcatech.Managers;
-using Arcatech.Triggers;
-using Arcatech.UI;
-using Cinemachine;
 using Cinemachine.Utility;
-using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Scripting.APIUpdating;
 
 namespace Arcatech.Units.Inputs
 {
@@ -22,35 +11,24 @@ namespace Arcatech.Units.Inputs
         [SerializeField, Range(0.1f, 3f)] float targetingSphereRadius = 1f;
         [SerializeField] float targetingUpdateFreq = 0.1f;
 
-        ITargetable currentTgt;
         Collider[] checkColliders = new Collider[20];
         #endregion
 
-        
-        Vector3 _target;
-        float distanceToTarget;
+
         float _dotProduct;
         float _rotationToTarget;
         RaycastHit hit;
-        public ITargetable Target => currentTgt;
+        public ITargetable Target { get; }
 
-        CountDownTimer resetTargetTimer;
+        private CountDownTimer resetTargetTimer;
 
         #region public properties
-        public float GetDotProduct
-        { get { return _dotProduct; } }
+        public float GetDotProduct => _dotProduct;
 
-        public Vector3 GetLookTarget
-        {
-            get { return _target; }
-        }
-        public float GetDistanceToTarget
-        {
-            get
-            {
-                return distanceToTarget;
-            }
-        }
+        public Vector3 GetLookTarget { get; private set; }
+
+        public float GetDistanceToTarget { get; private set; }
+
         /// <summary>
         /// positive = clockwise, negatve = CCW
         /// </summary>
@@ -62,7 +40,7 @@ namespace Arcatech.Units.Inputs
         {
             get
             {
-                var heading = (_target - transform.position).normalized;
+                var heading = (GetLookTarget - transform.position).normalized;
                 return heading;
             }
         }
@@ -70,7 +48,7 @@ namespace Arcatech.Units.Inputs
         {
             get
             {
-                return _target - transform.position;
+                return GetLookTarget - transform.position;
             }
         }
         #endregion
@@ -87,7 +65,7 @@ namespace Arcatech.Units.Inputs
         {
             
             _aimPlane = new Plane(Vector3.down, planeY);
-            _target = transform.forward;
+            GetLookTarget = transform.forward;
 
             targetUpdate = new CountDownTimer(targetingUpdateFreq);
             resetTargetTimer = new CountDownTimer(1f); //todo
@@ -112,12 +90,12 @@ namespace Arcatech.Units.Inputs
            // Ray r = _br.OutputCamera.ScreenPointToRay(Input.mousePosition);
             
             _aimPlane.Raycast(r, out float rayDist);
-            _target = r.GetPoint(rayDist);
-            var vectorToTarget = _target - transform.position;
+            GetLookTarget = r.GetPoint(rayDist);
+            var vectorToTarget = GetLookTarget - transform.position;
             // new
             vectorToTarget.ProjectOntoPlane(_aimPlane.normal);
 
-            distanceToTarget = vectorToTarget.magnitude;
+            GetDistanceToTarget = vectorToTarget.magnitude;
             _dotProduct = Vector3.Dot(transform.forward, GetNormalizedDirectionToTaget);
             _rotationToTarget = Vector3.Cross(transform.forward, GetNormalizedDirectionToTaget).y;
 
@@ -145,11 +123,14 @@ namespace Arcatech.Units.Inputs
                 targetUpdate.Start();
             }
         }
-
+        private void OnDisable()
+        {
+            init = false;
+        }
         //void CheckTargetables(Vector3 target)
         //{
         //    if (target == null) return; 
-            
+
         //    if (Physics.OverlapSphereNonAlloc(target, targetingSphereRadius, checkColliders, LayerMask.NameToLayer("Ground")) > 0) // dont check ground layer objects
         //    {
         //        for (int i = 0; i < checkColliders.Length; i++)
@@ -172,28 +153,9 @@ namespace Arcatech.Units.Inputs
 
         #endregion
 
-        //public bool CheckInteractive (out IInteractible item)
-        //{
-        //    item = null;
+        // this is now done through event system  
+        
 
-        //    var hits = Physics.OverlapSphere(_target, targetingSphereRadius);
-        //    if (hits.Length > 0)
-        //    {
-        //        for (int i = 0; i < hits.Length; i++)
-        //        {
-        //            if (checkColliders[i] == null) break;
-        //            if (checkColliders[i].gameObject.layer.Equals(LayerMask.NameToLayer("Ground")) ) break;
-
-        //            if (checkColliders[i].TryGetComponent<IInteractible>(out var component))
-        //            {
-        //                item = component;
-        //                return true;
-        //            }
-        //        }
-        //        return false;
-        //    }
-        //   return false;
-        //}
 
     }
 }
