@@ -1,14 +1,10 @@
-using Arcatech.Level;
-using Arcatech.Managers;
 using Arcatech.Units.Inputs;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 namespace Arcatech.Scenes.Cameras
 {
     public class IsoCameraController : MonoBehaviour, IManagedController
     {
-        private AimingComponent _playerAimingComponent;
+        private PlayerAimingComponent _playerAimingComponent;
         private Vector3 _cameraTargetPoint;
 
         [SerializeField] bool DebugMessage = false;
@@ -32,7 +28,7 @@ namespace Arcatech.Scenes.Cameras
         {
             if (_playerAimingComponent == null)
             {
-                _playerAimingComponent = FindObjectOfType<AimingComponent>();
+                _playerAimingComponent = FindObjectOfType<PlayerAimingComponent>();
                 transform.position = _playerAimingComponent.transform.position + _desiredOffsetFromPlayer;
             }
             else

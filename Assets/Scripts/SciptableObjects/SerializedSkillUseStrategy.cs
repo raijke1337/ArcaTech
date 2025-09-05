@@ -1,6 +1,4 @@
-﻿using Arcatech.Actions;
-using Arcatech.Items;
-using Arcatech.Triggers;
+﻿using Arcatech.Items;
 using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -16,7 +14,7 @@ namespace Arcatech.Skills
         [Space,Header("Usage")]
         [SerializeField] SerializedUnitAction SkillAction;
 
-        public virtual SkillUsageStrategy ProduceStrategy(BaseEntityOLD owner,SerializedSkill cfg, BaseItemComponent item)
+        public virtual SkillUsageStrategy ProduceStrategy(ActiveGameUnitComponent owner,SerializedSkill cfg, BaseItemComponent item)
         {
             return new SkillUsageStrategy(item, SkillAction,owner,cfg.Description,Charges,ChargeReload);
         }

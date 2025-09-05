@@ -1,6 +1,4 @@
-﻿using Arcatech.Items;
-using Arcatech.Units;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Arcatech.Actions
 {
@@ -18,6 +16,6 @@ namespace Arcatech.Actions
     // play an animation action
     public abstract class ActionResult : IActionResult
     {
-        public abstract void ProduceResult(BaseEntityOLD user, BaseEntityOLD target,Transform place);
+        public abstract void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place);
     }
 }

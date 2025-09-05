@@ -1,10 +1,5 @@
-﻿using Arcatech.Items;
-using Arcatech.Skills;
-using Arcatech.Stats;
+﻿using Arcatech.Stats;
 using Arcatech.Triggers;
-using Arcatech.UI;
-using Arcatech.Units;
-using Arcatech.Units.Inputs;
 using CartoonFX;
 using UnityEngine;
 
@@ -46,9 +41,9 @@ namespace Arcatech.EventBus
 
     public struct DrawDamageEvent : IEvent
     {
-        public BaseEntityOLD Unit { get; }
+        public BaseGameEntityComponent Unit { get; }
         public float Damage { get; }
-        public DrawDamageEvent (BaseEntityOLD unit, float damage)
+        public DrawDamageEvent (BaseGameEntityComponent unit, float damage)
         {
             Unit = unit; this.Damage = damage;
         }
@@ -57,19 +52,19 @@ namespace Arcatech.EventBus
     #endregion
     public struct StatsEffectTriggerEvent : IEvent
     {
-        public StatsEffectTriggerEvent(BaseEntityOLD target, StatsEffect toApply, Transform place)
+        public StatsEffectTriggerEvent(BaseGameEntityComponent target, StatsEffect toApply, Transform place)
         {
             Target = target;
             Applied = toApply;
             Place = place;
         }
 
-        public BaseEntityOLD Target { get; }
+        public BaseGameEntityComponent Target { get; }
         public StatsEffect Applied { get; }
         public Transform Place { get; }
         public override string ToString()
         {
-            return string.Concat(Applied," on ", Target?.UnitName, " at ", Place.position);
+            return string.Concat(Applied," on ", Target?.GetName, " at ", Place.position);
         }
     }
     public struct VFXEvent : IEvent
@@ -88,19 +83,6 @@ namespace Arcatech.EventBus
     {
         public bool Value { get; }
         public PauseToggleEvent (bool value) => Value = value;
-    }
-
-    public struct UpdateIconEvent : IEvent
-    {
-        public UpdateIconEvent(IIconContent used, BaseEntityOLD user)
-        {
-            Used = used;
-            User = user;
-        }
-        public IIconContent Used { get; }
-        public BaseEntityOLD User { get; }
-
-
     }
 
 

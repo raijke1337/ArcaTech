@@ -1,6 +1,4 @@
-﻿using Arcatech.Units;
-using ECM.Components;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Assertions;
 using static Arcatech.Actions.SerializedApplyForceResult;
 
@@ -37,19 +35,40 @@ namespace Arcatech.Actions
         {
             _d = distance; _s = speed; _tgt = t;
         }
-        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
+        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
             switch (_tgt)
             {
                 case ForceTarget.User:
-                    user.ApplyForceResultToUnit(_s, _d);
+                    if (user == null) break;
+                    if (user.TryGetComponent<ActiveGameUnitComponent>(out var actor))
+                    {
+                        actor.ApplyForceResultToUnit(_s, _d);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Tried to force movement on {user.GetName} which has no active actor component");
+                    }                    
                     break;
                 case ForceTarget.Target:
-                    target.ApplyForceResultToUnit(_s, _d);
+                    if (target == null) break;
+                    if (target.TryGetComponent<ActiveGameUnitComponent>(out actor))
+                    {
+                        actor.ApplyForceResultToUnit(_s, _d);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Tried to force movement on {target.GetName} which has no active actor component");
+                    }
                     break;
             }
+
+
+
+
         }
-    }
+
+        }
 
 
 }

@@ -1,60 +1,40 @@
 using Arcatech.Stats;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
-using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
+
 
 namespace Arcatech.UI
 {
-    public class BarsContainersManager : MonoBehaviour
+
+    public class BarsContainersManager : MonoBehaviour, IStatUpdatesHandler
     {
-        Dictionary <BaseStatType, BarContainerUIScript> _barsDict;
-        [SerializeField] BarContainerUIScript _barPrefab;
+        [SerializeField] StatBarContainerUIScript _barPrefab;
         [Space,SerializeField] SerializedDictionary<BaseStatType,ColorSet> _statColors;
         [SerializeField] Ease _barsEaseMethod;
         [SerializeField] float _barsEaseTime = 0.3f;
+        [SerializeField, Range(0, 1), Tooltip("Delta change for visual effects")] float _barFlashTreschold = 0.2f;
 
-        public void RemoveBar(BaseStatType type)
-        {
-            Destroy(_barsDict[type].gameObject);
-            _barsDict.Remove(type);
-        }
-        public void ClearAllBars()
-        {
-            if (_barsDict == null) return;
+        Dictionary<BaseStatType, StatBarContainerUIScript> _barsDict;
 
-            foreach (var bar in _barsDict.Values)
+        bool init = false;
+
+        public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
+        {
+            if (!init)
             {
-                Destroy(bar.gameObject);
+                _barsDict ??= new();
+                foreach (var stat in stats)
+                {
+                    _barsDict[stat.Key] = Instantiate(_barPrefab, this.transform).
+                    LinkContainer(stat.Value).
+                    SetColors(_statColors[stat.Key]).
+                    SetEaseMethod(_barsEaseMethod).
+                    SetFillTime(_barsEaseTime);
+                }
+                init = true;
             }
-            _barsDict.Clear();
-        }
-
-        private void AddBar (BaseStatType barValue)
-        {
-            _barsDict[barValue] = Instantiate(_barPrefab, this.transform).
-                SetColors(_statColors[barValue]).
-                SetEaseMethod(_barsEaseMethod).
-                SetFillTime(_barsEaseTime);
-        }
-
-        
-
-        public void UpdateBarValue(BaseStatType barValue, StatValueContainer container)
-            
-        {
-            if (container == null) return;
-            if (_barsDict == null)
-            {
-                _barsDict = new Dictionary<BaseStatType, BarContainerUIScript>();
-            }
-            if (!_barsDict.TryGetValue(barValue, out _))
-            {
-                AddBar (barValue);
-            }
-            _barsDict[barValue].UpdateValue(container);
         }
     }
 }

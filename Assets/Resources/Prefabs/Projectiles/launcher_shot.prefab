@@ -59,6 +59,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -97,6 +100,7 @@ GameObject:
   - component: {fileID: 1768388297220557908}
   - component: {fileID: 2419425542732593975}
   - component: {fileID: -3960255233351670369}
+  - component: {fileID: 982750414569049632}
   m_Layer: 0
   m_Name: launcher_shot
   m_TagString: Untagged
@@ -157,16 +161,16 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.3, y: 0.3, z: 1}
+  m_Size: {x: 2, y: 2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!82 &-3960255233351670369
 AudioSource:
@@ -180,6 +184,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8968678076387812642, guid: 925e4551c014b634ab183825acd53920,
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 4ea26fdb86b277e4e85c3f4a51d119c1, type: 3}
+  m_Resource: {fileID: 8300000, guid: 4ea26fdb86b277e4e85c3f4a51d119c1, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.3
   m_Pitch: 2.61
@@ -265,6 +270,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &982750414569049632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8140027727141375558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _name: Rocket
+  entitySide: 0
+  _showDebugs: 0
 --- !u!1001 &1291331822568932107
 PrefabInstance:
   m_ObjectHideFlags: 0

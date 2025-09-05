@@ -1,7 +1,4 @@
-﻿using Arcatech.Triggers;
-using Arcatech.Units;
-using UnityEngine;
-using UnityEngine.Assertions;
+﻿using UnityEngine;
 
 namespace Arcatech.Items
 {
@@ -10,7 +7,7 @@ namespace Arcatech.Items
     {
        // [SerializeField] protected SerializedProjectileConfiguration Projectile;
        // projectiles are now spawned as "action result"
-        public override WeaponStrategy ProduceStrategy(EquippedUnit unit, WeaponSO cfg, BaseWeaponComponent comp)
+        public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, BaseWeaponComponent comp)
         {
             return new RangedWeaponStrategy(Action,  unit, cfg, TotalCharges, ChargeRestoreTime, InternalCooldown, comp);
         }

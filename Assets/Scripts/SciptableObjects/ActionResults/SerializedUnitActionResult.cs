@@ -21,9 +21,13 @@ namespace Arcatech.Actions
         {
             act = a;
         }
-        public void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
+        public void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
-            user.ForceUnitAction(act.ProduceAction(user, place));
+            if (user.TryGetComponent<ActiveGameUnitComponent>(out var actor))
+            {
+
+                actor.ForceUnitAction(act.ProduceAction(actor, place));
+            }
         }
     }
 

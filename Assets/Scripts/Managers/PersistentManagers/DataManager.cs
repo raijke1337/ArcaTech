@@ -2,34 +2,29 @@ using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Managers.Save;
 using Arcatech.Scenes;
-using Arcatech.Units;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Arcatech.Managers
 {
-    public class DataManager : MonoBehaviour
+    public partial class DataManager : MonoBehaviour
     {
-        public Itemfactory ItemsFactory;
-        public static DataManager Instance;
+        static DataManager _instance;
+        public static DataManager Instance => _instance;
 
 
         private void Awake()
         {
-            if (Instance == null)
+            if (_instance == null)
             {
-                Instance = this;
-                ItemsFactory = new Itemfactory();
-                _bindInv = new EventBinding<InventoryUpdateEvent>(OnInventoryUpdate);
+                _instance = this;
                 _bindLvls = new EventBinding<LevelCompletedEvent>(OnLevelComplete);
 
 
                 SaveService = new SavesHandler(new JsonSerializer());
                 ReloadSave();
 
-                EventBus<InventoryUpdateEvent>.Register(_bindInv);
                 EventBus<LevelCompletedEvent>.Register(_bindLvls);
               //  Debug.Log($"register event binds in {this} at {Time.time}");
             }
@@ -39,7 +34,6 @@ namespace Arcatech.Managers
 
         private void OnDisable()
         {
-            EventBus<InventoryUpdateEvent>.Deregister(_bindInv);
             EventBus<LevelCompletedEvent>.Deregister(_bindLvls);
            // Debug.Log($"deregister event binds in {this} at {Time.time}");
         }
@@ -114,7 +108,6 @@ namespace Arcatech.Managers
         private GameSaveData _loadedSave;
 
         private ISavesService SaveService;
-        EventBinding<InventoryUpdateEvent> _bindInv;
         EventBinding<LevelCompletedEvent> _bindLvls;
         public void OnNewGame()
         {
@@ -140,40 +133,12 @@ namespace Arcatech.Managers
             _loadedSave.OpenedLevelsID.Add(lvl.CompletedLevel.ID.ToString());
         }
 
-        private void OnInventoryUpdate(InventoryUpdateEvent arg)
-        {
-            if (_loadedSave == null)
-            {
-                return;
-            }
-            // for debug use
-            if (arg.Unit is PlayerUnit)
-            {
-                _loadedSave.UpdateInventory(arg.Inventory.PackPlayerData());
-            }
-        }
 
         #endregion
 
         private void OnApplicationQuit()
         {
             SaveGame();
-        }
-
-
-        public class Itemfactory
-        {
-            public IItem ProduceItem (ItemSO cfg, EquippedUnit owner)
-            {
-                return cfg.Type switch
-                {
-                    EquipmentType.MeleeWeap => new Weapon(cfg as WeaponSO, owner),
-                    EquipmentType.RangedWeap => new Weapon(cfg as WeaponSO, owner),
-                    EquipmentType.Shield => new Shield(cfg as ShieldSO, owner),
-                    EquipmentType.Booster => new Equipment(cfg as EquipSO, owner),
-                    _ => new Item(cfg, owner),
-                };
-            }
         }
     }
 }

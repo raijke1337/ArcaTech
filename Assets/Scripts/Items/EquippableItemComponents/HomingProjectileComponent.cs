@@ -1,18 +1,16 @@
-﻿using Arcatech.Units;
-using Cinemachine.Utility;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech.Items
 {
     public class HomingProjectileComponent : ProjectileComponent
     {
-        BaseEntityOLD target;
+        BaseGameEntityComponent target;
 
         float scanTimer = 0;
         float range;
         Collider[] scanResults;
-        List<BaseEntityOLD> hitTarget = new();
+        List<BaseGameEntityComponent> hitTarget = new();
 
         public HomingProjectileComponent WithHoming (float scanRange)
         {
@@ -33,7 +31,7 @@ namespace Arcatech.Items
                 foreach (Collider col in scanResults)
                 {
                     if (col == null) return;
-                    if (col.TryGetComponent<BaseEntityOLD>(out var e) && e.Side != Owner.Side && !hitTarget.Contains(e))
+                    if (col.TryGetComponent<BaseGameEntityComponent>(out var e) && e.GetEntitySide!= Owner.GetMainEntity.GetEntitySide&& !hitTarget.Contains(e))
                     { 
                         target = e;                      
                         break;

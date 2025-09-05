@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -44,6 +42,10 @@ public class PlayerInputReaderObject : ScriptableObject, IGameActions
             _controls = new PlayerControls();
             _controls.Game.SetCallbacks(this);
         }
+    }
+    private void OnDisable()
+    {
+        _controls.Disable();
     }
 
     public void EnablePlayerInputs()

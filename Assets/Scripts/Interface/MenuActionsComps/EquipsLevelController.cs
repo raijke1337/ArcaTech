@@ -1,4 +1,3 @@
-using Arcatech.Items;
 using Arcatech.UI;
 using Arcatech.Units;
 using UnityEngine;
@@ -11,16 +10,16 @@ namespace Arcatech.Managers
         #region UI buttons
         public void OnDone()
         {
-            if (_player.IsArmed(out var _))
-            {
-                GameManager.Instance.OnFinishedEquips();
-            }
-            else
-            {
-                Debug.LogError("Can't start level without weapons equipped, TODO");
+            //if (_player.IsArmed(out var _))
+            //{
+            //    GameManager.Instance.OnFinishedEquips();
+            //}
+            //else
+            //{
+            //    Debug.LogError("Can't start level without weapons equipped, TODO");
 
-                //_weaponsMessage.SetActive(true);
-            }
+            //    //_weaponsMessage.SetActive(true);
+            //}
 
         }
         public void OnMain()
@@ -51,7 +50,7 @@ namespace Arcatech.Managers
             {
                 Debug.LogError($"Player unit not found!");
             }
-            _player.StartControllerUnit();
+           // _player.StartControllerUnit();
             //_menuContainer.InitialInventoryDisplay(_player.GetInventoryComponent);
 
         }

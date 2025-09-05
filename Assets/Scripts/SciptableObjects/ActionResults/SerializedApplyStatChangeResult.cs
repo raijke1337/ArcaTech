@@ -1,5 +1,4 @@
 ﻿using Arcatech.Triggers;
-using Arcatech.Units;
 using UnityEngine;
 using Arcatech.EventBus;
 using AYellowpaper.SerializedCollections;
@@ -42,7 +41,7 @@ namespace Arcatech.Actions
 
         }
 
-        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target,Transform place)
+        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place)
         {
             foreach (var type in _effs.Keys)
             {
@@ -67,14 +66,14 @@ namespace Arcatech.Actions
                         }
                         break;
                     case TargetingType.AnyEnemy:
-                        if (target.Side == user.Side) return;
+                        if (target.GetEntitySide== user.GetEntitySide) return;
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
                         }
                         break;
                     case TargetingType.AnyAlly:
-                        if (target.Side != user.Side) return;
+                        if (target.GetEntitySide != user.GetEntitySide) return;
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));

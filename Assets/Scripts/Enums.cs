@@ -6,7 +6,11 @@ public enum Side
     PlayerSide,
     EnemySide
 }
-
+public enum Comparer
+{
+    Greater,
+    Less
+}
 public enum BaseStatType : byte
 {
     Health,

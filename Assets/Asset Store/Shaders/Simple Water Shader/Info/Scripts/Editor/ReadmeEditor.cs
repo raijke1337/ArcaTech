@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-using System;
 using System.IO;
 using System.Reflection;
 
@@ -21,17 +18,17 @@ public class ReadmeEditor : Editor {
 	
 	static void SelectReadmeAutomatically()
 	{
-		if (!SessionState.GetBool(kShowedReadmeSessionStateName, false ))
-		{
-			var readme = SelectReadme();
-			SessionState.SetBool(kShowedReadmeSessionStateName, true);
+		//if (!SessionState.GetBool(kShowedReadmeSessionStateName, false ))
+		//{
+		//	var readme = SelectReadme();
+		//	SessionState.SetBool(kShowedReadmeSessionStateName, true);
 			
-			if (readme && !readme.loadedLayout)
-			{
-				LoadLayout();
-				readme.loadedLayout = true;
-			}
-		} 
+		//	if (readme && !readme.loadedLayout)
+		//	{
+		//		LoadLayout();
+		//		readme.loadedLayout = true;
+		//	}
+		//} 
 	}
 	
 	static void LoadLayout()

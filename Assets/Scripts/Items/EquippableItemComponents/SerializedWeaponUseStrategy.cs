@@ -1,9 +1,6 @@
-﻿using Arcatech.Actions;
-using Arcatech.Triggers;
-using Arcatech.Units;
+﻿using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Events;
 
 namespace Arcatech.Items
 {
@@ -22,7 +19,7 @@ namespace Arcatech.Items
             Assert.IsFalse(TotalCharges == 0);
             Assert.IsNotNull(Action);
         }
-        public virtual WeaponStrategy ProduceStrategy (EquippedUnit unit, WeaponSO cfg,BaseWeaponComponent comp)
+        public virtual WeaponStrategy ProduceStrategy (BaseGameEntityComponent unit, WeaponSO cfg,BaseWeaponComponent comp)
         {
             return new WeaponStrategy(Action, unit, cfg,TotalCharges,ChargeRestoreTime, InternalCooldown,comp);   
         }

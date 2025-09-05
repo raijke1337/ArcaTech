@@ -1,7 +1,4 @@
-﻿using Arcatech.Actions;
-using Arcatech.AI;
-using Arcatech.UI;
-using Arcatech.Units;
+﻿using Arcatech.Units;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,21 +8,21 @@ namespace Arcatech.Items
 
     public class WeaponStrategy : IWeaponUseStrategy
     {
-        public BaseEntityOLD Owner { get; }
+        public ActiveGameUnitComponent Owner { get; }
         public WeaponSO Config { get; }
         protected BaseWeaponComponent WeaponComponent { get; }
 
 
-        public WeaponStrategy (SerializedUnitAction act,EquippedUnit unit, WeaponSO cfg, int charges, float reload, float intcd,BaseWeaponComponent comp)
+        public WeaponStrategy (SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseWeaponComponent comp)
         {
-            Owner = unit;
+            Owner = unit.GetComponent<ActiveGameUnitComponent>();
             Config = cfg;
             ChargeReload = reload;
             InternalDelay = intcd;
             MaxCharges = charges;
             WeaponComponent = comp;
 
-            Action = act.ProduceAction(unit,comp.Spawner);
+            Action = act.ProduceAction(Owner, comp.Spawner);
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);

@@ -1,24 +1,35 @@
-using Arcatech.Effects;
-using Arcatech.Skills;
 using Arcatech.Stats;
-using Arcatech.Triggers;
-using Arcatech.Units;
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 namespace Arcatech.Items
 {
-
-    public class Equipment : Item, IEquippable
+    /// <summary>
+    /// todo maybe create a separate class for USABLE equipment (we can have qeuips that give no skill, cosmetci items )
+    /// </summary>
+    public class Equipment : Item, IEquippable, IHasUsable
     {
-
-        public Equipment (EquipSO cfg, EquippedUnit ow) : base (cfg,ow)
+        protected virtual void CollectUsables(EquipSO cfg)
         {
-            DisplayItem = GameObject.Instantiate(cfg.ItemPrefab);
-            StatMods = cfg.StatMods;
-            if (cfg.Skill!= null)
+            cachedUsables = new List<IUsable>();
+            if (cfg.Skill != null)
             {
-                GetSkill = cfg.Skill.CreateSkill(ow, DisplayItem, Type);
+                GetUsables.Add(cfg.Skill.CreateSkill(Owner, DisplayItem, Type));
             }
+        }
+        public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
+        {
+            StatMods = new();
+            DisplayItem = GameObject.Instantiate(cfg.ItemPrefab);
+            if (cfg.StatMods != null)
+            {
+                foreach (var m in cfg.StatMods)
+                {
+                    if (m != null)
+                        StatMods.Add(m.BuildMod);
+                }
+
+            }
+
             DisplayItem.gameObject.SetActive(false);
           //  Debug.Log($"setup equipment{this}");
         }               
@@ -40,7 +51,16 @@ namespace Arcatech.Items
         }
 
         public BaseItemComponent DisplayItem { get; protected set; }
-        public SerializedStatModConfig[] StatMods { get; protected set; }
-        public ISkill GetSkill { get; protected set; }
+        public List<StatsMod> StatMods { get; protected set; }
+
+        protected List<IUsable> cachedUsables;
+        public List<IUsable> GetUsables
+        {
+            get
+            {
+                if (cachedUsables == null) CollectUsables(Config as EquipSO);
+                return cachedUsables;
+            }
+        }
     }
 }

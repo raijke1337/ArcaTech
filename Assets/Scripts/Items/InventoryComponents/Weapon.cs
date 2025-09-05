@@ -1,5 +1,4 @@
-﻿using Arcatech.EventBus;
-using Arcatech.Stats;
+﻿using Arcatech.Stat;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System.Collections.Generic;
@@ -26,7 +25,16 @@ namespace Arcatech.Items
 
         //public WeaponAnimationsSet AnimationSet { get; protected set; }
 
-        public Weapon(WeaponSO cfg, EquippedUnit ow) : base(cfg, ow)
+        protected override void CollectUsables(EquipSO cfg)
+        {
+            cachedUsables = new List<IUsable>();
+            if (cfg.Skill != null)
+            {
+                GetUsables.Add(cfg.Skill.CreateSkill(Owner, DisplayItem, Type));
+            }
+            cachedUsables.Add(this);
+        }
+        public Weapon(WeaponSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
         {
             _weaponGameobject = DisplayItem as BaseWeaponComponent;
 
@@ -45,7 +53,7 @@ namespace Arcatech.Items
             UseStrategy = cfg.WeaponUseStrategy.ProduceStrategy(Owner, cfg,_weaponGameobject);
         }
 
-        public bool TryUseItem(UnitStatsControllerOLD stats, out BaseUnitAction act)
+        public bool TryUseItem(EntityStatsComponent stats, out BaseUnitAction act)
         {
             act = null;
             bool ok = false;
@@ -57,14 +65,14 @@ namespace Arcatech.Items
 
             return ok;
         }
-        public bool CanUseItem(UnitStatsControllerOLD stats)
+        public bool CanUseItem(EntityStatsComponent stats)
         {
             return stats.CanApplyCost(GetCost) && UseStrategy.CanUseUsable();
         }
         public void DoUpdate(float delta)
         {
             UseStrategy.UpdateUsable(delta);
-            EventBus<UpdateIconEvent>.Raise(new UpdateIconEvent(this, Owner));
+           // EventBus<UpdateIconEvent>.Raise(new UpdateIconEvent(this, Owner));
         }
 
         public string UsableName { get => Config.Description.Text; }

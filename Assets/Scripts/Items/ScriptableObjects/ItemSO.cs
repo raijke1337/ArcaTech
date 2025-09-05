@@ -1,11 +1,7 @@
 using Arcatech.Texts;
-using com.cyborgAssets.inspectorButtonPro;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
-using System.Reflection;
-using UnityEditor.Compilation;
-using Unity.Properties;
 
 namespace Arcatech.Items
 {

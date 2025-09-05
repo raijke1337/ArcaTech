@@ -9,12 +9,12 @@ namespace Arcatech.Units
 {
     public class BaseUnitAction : IUnitAction
     {
-        public static BaseUnitAction BuildAction(BaseEntityOLD u, bool lck, NextActionSettings next, string anim, float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place, float crossfade)
+        public static BaseUnitAction BuildAction(ActiveGameUnitComponent u, bool lck, NextActionSettings next, string anim, float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place, float crossfade)
         {
             return new BaseUnitAction(u, lck, next, anim, exit,onstart, onfinish, onExit,place,crossfade);
         }
 
-        BaseUnitAction(BaseEntityOLD u, bool locks, NextActionSettings next, string anim, float exitTimeMult, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place,float crossfade)
+        BaseUnitAction(ActiveGameUnitComponent u, bool locks, NextActionSettings next, string anim, float exitTimeMult, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place,float crossfade)
         {
             Actor = u;
             LockMovement = locks;
@@ -23,7 +23,7 @@ namespace Arcatech.Units
             _crossfadeTime = crossfade;
 
             this.place = place;
-            var a = u.AnimatorReference;
+            var a = u.GetAnimatorReference;
 
             if (_animationName != null && a.runtimeAnimatorController.animationClips.Any(t=>t.name == _animationName))
             {
@@ -46,7 +46,7 @@ namespace Arcatech.Units
 
                             _totalActionTime = clipLength / animSpeedMult;
                             _exitActionTime = _totalActionTime * exitTimeMult;
-                           if (u.UnitDebug) Debug.Log($"Action {this} exit at {_exitActionTime} complete at {_totalActionTime}");
+                           if (u.GetMainEntity.ShowingDebugs) Debug.Log($"Action {this} exit at {_exitActionTime} complete at {_totalActionTime}");
                             break;
                         }
                     }
@@ -89,7 +89,7 @@ namespace Arcatech.Units
        
         
         
-        protected BaseEntityOLD Actor;
+        protected ActiveGameUnitComponent Actor;
         public bool LockMovement { get; protected set; }
         protected NextActionSettings Next { get; }
 
@@ -102,10 +102,18 @@ namespace Arcatech.Units
         readonly string _animationName;
         readonly float _crossfadeTime;
 
-
+        public event UnityAction<UnitActionState> ActionStateChangedEvent = delegate { };
 
         UnitActionState _actionState = UnitActionState.None;
-        public UnitActionState GetActionState { get { return _actionState; } }
+        public UnitActionState GetActionState 
+        { get 
+            { return _actionState; }
+            set
+            {
+                _actionState = value;
+                ActionStateChangedEvent.Invoke(_actionState);
+            }
+        }
 
         readonly IActionResult[] OnCompleteAction;
         readonly IActionResult[] OnStartAction;
@@ -141,7 +149,7 @@ namespace Arcatech.Units
         public void StartAction()
         {
             string start = "";
-            var a = Actor.GetComponent<Animator>();
+            var a = Actor.GetAnimatorReference;
             if (_animationName!= null)
             {
                 a.CrossFade(Animator.StringToHash(_animationName), _crossfadeTime);
@@ -156,7 +164,7 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor, null, place);
+                        r.ProduceResult(Actor.GetMainEntity, null, place);
                         start += (r.ToString() + ' ');
                     }
                 }
@@ -181,13 +189,13 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor, null, place);
+                        r.ProduceResult(Actor.GetMainEntity, null, place);
                         ex += (r.ToString() + ' ');
                     }
                 }
             }
             _actionState = UnitActionState.ExitTime;
-            if (Actor.UnitDebug) { Debug.Log($"{this}, result {ex}"); }
+            if (Actor.GetMainEntity.ShowingDebugs) { Debug.Log($"{this}, result {ex}"); }
 
         }
         public void CompleteAction()
@@ -208,7 +216,7 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor, null, place);
+                        r.ProduceResult(Actor.GetMainEntity, null, place);
                         fin += (r.ToString() + ' ');
                     }
                 }
@@ -216,7 +224,7 @@ namespace Arcatech.Units
             _actionState = UnitActionState.Completed;
             _actionTimer.Stop();
 
-            if (Actor.UnitDebug) { 
+            if (Actor.GetMainEntity.ShowingDebugs) { 
                 //Debug.Log($"{this}, result {fin}");
                                    }
 

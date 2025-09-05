@@ -1,6 +1,4 @@
-﻿using Arcatech.Items;
-using Arcatech.Units;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Arcatech.Actions
 {
@@ -25,15 +23,10 @@ namespace Arcatech.Actions
             delay = d;
         }
 
-        public override void ProduceResult(BaseEntityOLD user, BaseEntityOLD target, Transform place)
+        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
-            if (user is ArmedUnit ar && ar.IsArmed(out IWeapon w))
-            {
-                if (w.UseStrategy is MeleeWeaponStrategy m)
-                {
-                    m.SwitchCollider(state,delay);
-                }
-            }
+
+            /// moving this to strategy (on use, on end use)
         }
     }
 

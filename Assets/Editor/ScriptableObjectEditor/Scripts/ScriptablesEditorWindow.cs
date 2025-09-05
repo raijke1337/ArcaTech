@@ -1,7 +1,6 @@
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 using Agent.Assembly;
 
 namespace Agent.SOE

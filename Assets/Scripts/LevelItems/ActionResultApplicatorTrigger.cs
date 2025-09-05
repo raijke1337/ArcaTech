@@ -1,17 +1,23 @@
 using Arcatech.Actions;
-using Arcatech.Level;
-using Arcatech.Units;
-using System.Collections.Generic;
+using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Assertions;
+
+namespace Arcatech.Triggers
+{ 
+
+
+}
+
+
+
 namespace Arcatech.Triggers
 {
 
-
+    [RequireComponent(typeof(BaseGameEntityComponent))]
     public class ActionResultApplicatorTrigger : BaseTrigger
     {
         [Header("Action result applicator")]
-        [SerializeField] Side applicatorSide;
         [SerializeField] protected TargetingType targetType;
         [Header("if 0, apply once. if >0, apply the results every f seconds")]
         [SerializeField, Range(0,3)] protected float ReapplyWhileActorInsideTimer = 0;
@@ -22,11 +28,14 @@ namespace Arcatech.Triggers
         [SerializeField] protected bool DestroyOnExit = false;
 
         Timer reapplyTimer;
+        [SerializeField,Self] BaseGameEntityComponent baseComp;
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             Assert.IsFalse(targetType == TargetingType.None || targetType == TargetingType.OnlyUser,$"Incorrect targeting type set for {this}");
         }
+
         private void Update()
         {
             if (reapplyTimer != null && reapplyTimer.IsRunning)
@@ -47,7 +56,7 @@ namespace Arcatech.Triggers
         protected override void OnTriggerEnter(Collider other)
         {
 
-            if (other.gameObject.TryGetComponent(out BaseEntityOLD p))
+            if (other.gameObject.TryGetComponent(out ActiveGameUnitComponent p))
             {
 
                 if (reapplyTimer == null)
@@ -59,16 +68,16 @@ namespace Arcatech.Triggers
                 switch (targetType)
                 {
                     case TargetingType.AnyUnit:
-                        ApplyResultsTo(p);
+                        ApplyResultsTo(p.GetMainEntity,ResultOnEntry);
                         break;
                     case TargetingType.AnyEnemy:
-                        if (p.Side != applicatorSide) ApplyResultsTo(p);
+                        if (p.GetMainEntity.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(p.GetMainEntity, ResultOnEntry);
                         break;
                     case TargetingType.AnyAlly:
-                        if (p.Side == applicatorSide) ApplyResultsTo(p);
+                        if (p.GetMainEntity.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(p.GetMainEntity, ResultOnEntry);
                         break;
                     default:
-                        Debug.Log($"{p.UnitName} entered {this} and nothing happened because of trigger settings");
+                        Debug.Log($"{p.name} entered {this} and nothing happened because of trigger settings");
                         break;
                 }
             }
@@ -81,21 +90,21 @@ namespace Arcatech.Triggers
 
         protected override void OnTriggerExit(Collider other)
         {
-            if (other.gameObject.TryGetComponent(out BaseEntityOLD p))
+            if (other.gameObject.TryGetComponent(out ActiveGameUnitComponent p))
             {
                 switch (targetType)
                 {
                     case TargetingType.AnyUnit:
-                        ApplyResultsTo(p);
+                        ApplyResultsTo(p.GetMainEntity, ResultOnExit);
                         break;
                     case TargetingType.AnyEnemy:
-                        if (p.Side != applicatorSide) ApplyResultsTo(p);
+                        if (p.GetMainEntity.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(p.GetMainEntity,ResultOnExit);
                         break;
                     case TargetingType.AnyAlly:
-                        if (p.Side == applicatorSide) ApplyResultsTo(p);
+                        if (p.GetMainEntity.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(p.GetMainEntity, ResultOnExit);
                         break;
                     default:
-                        Debug.Log($"{p.UnitName} exited {this} and nothing happened because of trigger settings");
+                        Debug.Log($"{p.GetMainEntity.GetName} exited {this} and nothing happened because of trigger settings");
                         break;
                 }
             }
@@ -107,9 +116,9 @@ namespace Arcatech.Triggers
         }
 
 
-        protected void ApplyResultsTo(BaseEntityOLD p)
+        protected void ApplyResultsTo(BaseGameEntityComponent p, SerializedActionResult[] results)
         {
-            foreach (var action in ResultOnEntry)
+            foreach (var action in results)
             {
                 action.BuildActionResult().ProduceResult(null, p, transform);
             }

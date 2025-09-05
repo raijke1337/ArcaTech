@@ -1,12 +1,12 @@
 
 using Arcatech.Triggers;
-using Arcatech.Units.Stats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 namespace Arcatech.Stats
 {
+
     [Serializable]
     public class StatValueContainer
     {
@@ -19,13 +19,15 @@ namespace Arcatech.Stats
         public float GetMax { get => _maxValue; }
         public float GetMin { get => _minValue; }
         public float GetPercent { get => _currentValue / _maxValue; }
-        public float CachedValue { get => _cachedValue; } // to store changes between updates
+        //public float CachedValue { get => _cachedValue; } // to store changes between updates
+        public float GetFrameDeltaValue { get => _currentValue - _cachedValue; }
+        public float GetFrameDeltaPercentAbs { get => Mathf.Abs((_currentValue - _cachedValue)/_maxValue); }
         #endregion
 
-        private float _currentValue;
+        [SerializeField] private float _currentValue;
         private float _cachedValue;
-        private float _maxValue;
-        private float _minValue = 0f;
+        [SerializeField] private float _maxValue;
+        [SerializeField] private float _minValue = 0f;
         private float _initValue = 0f;
         private bool _setup = false;
 
@@ -36,83 +38,103 @@ namespace Arcatech.Stats
         public StatValueContainer()
         {
             _currentEffects = new();
-            _currentMods = new();            
+            _inactiveMods = new();
+            _activeMods = new();
         }
-        //public StatValueContainer(IEnumerable<StatsMod> initValues)
-        //{
-        //    _currentEffects = new List<StatsEffect>();
-        //    _currentMods = new();
-        //    foreach (var mod in initValues)
-        //    {
-        //        ApplyStatsMod(mod);
-        //    }
-        //    _currentValue = _initValue;
-        //    _cachedValue = _initValue;
-        //}
-        //public StatValueContainer(StatsMod initValue)
-        //{
-        //    _currentEffects = new List<StatsEffect>();
-        //    _currentMods = new();
-        //    ApplyStatsMod(initValue);
-        //    _currentValue = _initValue;
-        //    _cachedValue = _initValue;
-        //}
 
         public void UpdateInDelta(float deltaTime)
         {
-            UpdateMods(deltaTime);
-            UpdateEffects(deltaTime);
-            if (!_setup) { _setup = true; } // starting mods and effects are applied and the component can now process effects 
+            if (_setup)
+            {
+                _cachedValue = _currentValue;
+                UpdateMods(deltaTime);
+                UpdateEffects(deltaTime);
+            }
+            else
+            {
+                UpdateMods(deltaTime);
+                if (_activeMods.Count > 0) 
+                { 
+                    _currentValue = _initValue;
+                    _cachedValue = _initValue;
+                    _setup = true; 
+                }
+            } // starting mods  are applied and the component can now process effects 
         }
 
         #region mods
-        private List<StatsMod> _currentMods;
-        public void ApplyStatsMod(StatsMod mod)
+        private List<StatsMod> _inactiveMods;
+        private List<StatsMod> _activeMods;
+        public void AddStatsMod(StatsMod mod) => _inactiveMods.Add(mod);
+
+        public void RemoveStatMod(StatsMod mod)
         {
-            _currentMods.Add(mod);
+            if (_activeMods.Contains(mod))
+            {
+                _activeMods.Remove(mod);
+                Debug.Log($"Removed mod {mod.ID}");
+            }
+            if (_inactiveMods.Contains(mod))
+            {
+                _inactiveMods.Remove(mod);
+                Debug.Log($"Removed mod {mod.ID}");
+            }
+
         }
+
         void UpdateMods(float d)
         {
-            foreach (var mod in _currentMods.ToList())
+            foreach (var mod in _inactiveMods.ToList())
             {
                 if (mod.CheckCondition(this))
                 {
+                    _activeMods.Add(mod);
+                    _inactiveMods.Remove(mod);
                     _initValue += mod.GetInitValue;
-                    var valueDelta = mod.GetMaxValue - _maxValue;
-                    _maxValue += mod.GetMaxValue;
-                    _currentValue += 
-                    
+                    _maxValue += mod.GetMaxValue;                 
                 }
             }
+            foreach (var mod in _activeMods.ToList())
+            {
+                if (!mod.CheckCondition(this))
+                {
+                    _activeMods.Remove(mod);
+                    _inactiveMods.Add(mod);
+                    _initValue -= mod.GetInitValue;
+                    _maxValue -= mod.GetMaxValue;
+                }
+            }
+            foreach (var mod in _activeMods)
+            {
+                float deltaChange =  mod.GetPerSecValue * d;
+                _currentValue = Math.Clamp(_currentValue+ deltaChange, _minValue, _maxValue);
+            }
         }
-        //public void RemoveStatsMod(SerializedStatModConfig mod)
-        //{
-        //    if (_currentMods.Contains(mod)) _currentMods.Remove(mod);
-        //}
 
         #endregion
 
         #region temporary effects
         private List<StatsEffect> _currentEffects;
 
-        public void ApplyStatsEffect(StatsEffect eff)
-        {
-            _cachedValue = _currentValue;
-            _currentValue = Mathf.Clamp(_currentValue + eff.InitialValue, _minValue, _maxValue);
-            _currentEffects.Add(eff);
-        }
+        public void ApplyStatsEffect(StatsEffect eff) =>_currentEffects.Add(eff);
+        
 
         void UpdateEffects(float d)
         {
             foreach (var eff in _currentEffects.ToList())
             {
+                if (!eff.InitDone)
+                {
+                    _currentValue = Mathf.Clamp(_currentValue + eff.InitialValue, _minValue, _maxValue);
+                    eff.InitDone = true;
+                }
+
                 if (!eff.CheckCondition(d))
                 {
                     _currentEffects.Remove(eff); // has no duration or is expired
                 }
                 else
                 {
-                    _cachedValue = _currentValue;
                     _currentValue = Mathf.Clamp(_currentValue + eff.FrameDelta, _minValue, _maxValue);
                 }
             }

@@ -1,6 +1,5 @@
 ﻿using Arcatech.Triggers;
 using Arcatech.Units;
-using com.cyborgAssets.inspectorButtonPro;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;

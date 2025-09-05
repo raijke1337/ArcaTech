@@ -1,5 +1,6 @@
-using Arcatech.Items;
 using Arcatech.Texts;
+using com.cyborgAssets.inspectorButtonPro;
+
 //using com.cyborgAssets.inspectorButtonPro;
 using TMPro;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace Arcatech.UI
         [SerializeField] private Image _icon;
 
         [Space, SerializeField] private ExtendedText _debugDesc;
-      //  [ProButton]
+        [ProButton]
         private void LoadDebugItem()
         {
             Texts = _debugDesc;

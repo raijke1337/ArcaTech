@@ -1,72 +1,123 @@
-﻿using Arcatech.Managers;
-using Arcatech.Units;
+﻿using Arcatech.Stats;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcatech.Items
 {
+    [Serializable]
     public class UnitInventoryModel
     {
-        public EquippedUnit Owner {get;}
-        public ObservableArray<Item> Inventory { get; protected set; }
-        public ObservableDictionary<EquipmentType, Equipment> Equipments { get; protected set; }
+
+        #region serialize
+        [SerializeField][ReadOnlyText] string status = "not init";
+        #endregion
+
+        public BaseGameEntityComponent Owner {get;}
+        public UsablesHandler Handler { get; protected set; }
+        List<Item> Inventory { get; set; }
+        ObservableDictionary<EquipmentType, Equipment> Equipments { get;  set; }
+
+        public event UnityAction DrawStrategyChangedEvent;
+        public IDrawItemStrategy CurrentDrawStrategy { get; private set; }
+
+        public event UnityAction<Item> ItemAddedToInventoryEvent = delegate { };
+        public event UnityAction<Item> ItemRemovedFromInventoryEvent = delegate { };
+        public event UnityAction<Equipment> ItemEquippedEvent = delegate { };
+        public event UnityAction<Equipment> ItemUnequippedEvent = delegate { };
 
 
-        public event Action<IEnumerable<Item>> OnInventoryChange
+        //public event Action<IEnumerable<Item>> OnInventoryChange
+        //{
+        //    add => Inventory.AnyRecordChanged += value;
+        //    remove => Inventory.AnyRecordChanged -= value;
+        //}
+        //public event Action<IEnumerable<Equipment>> OnEquipsChange
+        //{
+        //    add => Equipments.AnyValueChanged += value;
+        //    remove => Equipments.AnyValueChanged -= value;
+        //}
+
+
+        public void UpdateDeltaModel(float delta)
         {
-            add => Inventory.AnyRecordChanged += value;
-            remove => Inventory.AnyRecordChanged -= value;
+            Handler?.Update(delta);
+            status = $"updating OK {Owner.GetName}";
         }
-        public event Action<IEnumerable<Equipment>> OnEquipsChange
-        {
-            add => Equipments.AnyValueChanged += value;
-            remove => Equipments.AnyValueChanged -= value;
-        }
 
 
-        public UnitInventoryModel(UnitInventoryItemConfigsContainer cfgs, EquippedUnit owner)
+        public UnitInventoryModel(UnitInventoryItemConfigsContainer cfgs,BaseGameEntityComponent o)
         {
-            Owner = owner;  
-            Inventory = new ObservableArray<Item>();
+            Owner = o;
+            //Inventory = new ObservableArray<Item>();
+            // Equipments = new ObservableDictionary<EquipmentType, Equipment>(list.ToArray());
+
             List<KeyValuePair<EquipmentType, Equipment>> list = new();
+            Inventory = new();
             Equipments = new ObservableDictionary<EquipmentType, Equipment>(list.ToArray());
 
 
             foreach (ItemSO item in cfgs.Inventory)
             {
-                PickUpItem(item);
+                ItemAddedToInventoryEvent?.Invoke(PickUpItem(item));
             }
             foreach (EquipSO e in cfgs.Equipment)
             {
-                EquipItem(e, out var un);
-                if (un != null)
-                {
-                    PickUpItem(un.Config);
-                }
+                ItemEquippedEvent.Invoke(EquipItem(e, out var un));
+                if (un != null) { ItemUnequippedEvent.Invoke(un); }
             }
+            Handler = new UsablesHandler(Equipments);
+            Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
+
+            status = $"init for {Owner.GetName}";
         }
-        public bool PickUpItem (ItemSO item) => Inventory.TryAdd(DataManager.Instance.ItemsFactory.ProduceItem(item, Owner) as Item);
-        public bool EquipItem (EquipSO item, out Equipment unequipped)
+
+        private void OnDrawStrategyUpdate(IDrawItemStrategy t)
+        {
+            CurrentDrawStrategy = t;
+            DrawStrategyChangedEvent?.Invoke();
+        }
+
+        public Item PickUpItem (ItemSO item, int amount = 1)
+        {
+            var i = (Itemfactory.Instance.ProduceItem(item, Owner) as Item);
+            Debug.Log($"added item {i} to inventory");
+            Inventory.Add(i);
+            return i;
+        }
+        Equipment EquipItem (EquipSO item, out Equipment unequipped)
         {
             unequipped = null;
-            var eq = DataManager.Instance.ItemsFactory.ProduceItem(item, Owner) as Equipment;
+            var eq = Itemfactory.Instance.ProduceItem(item, Owner) as Equipment;
             if (Equipments.TryGetValue(eq.Type, out unequipped))
             {
                 PickUpItem(unequipped.Config);
             }
             Equipments.SetPair(eq.Type, eq);
             //Add(new KeyValuePair<EquipmentType, Equipment>(eq.Type, eq as Equipment));
-            return true;
+            return eq;
         }
-        public bool HasItem(ItemSO check)
+
+
+        public StatsMod[] GetCurrentMods
         {
-            if (check == null) return false;
-            else
+            get
             {
-                return Inventory.items.Any(t => t.ID == check.ID) || Equipments.GetAllValues().Any(t => t.ID == check.ID); 
+                var list = new List<StatsMod>();
+                foreach (var equip in Equipments.GetAllValues())
+                {
+                    if (equip.StatMods != null)
+                    {
+                        list.AddRange(equip.StatMods);
+                    }
+                }
+                return list.ToArray();
             }
         }
+        public IReadOnlyList<Equipment> ListEquipped => Equipments.GetAllValues();
+        public IReadOnlyList<Item> ListInventory => Inventory.AsReadOnly();
+
     }
 
 

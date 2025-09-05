@@ -14,7 +14,7 @@ namespace KevinIglesias
 
         public bool isLand = false;
 
-        override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+        public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
             if (jS == null)
             {

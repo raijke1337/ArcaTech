@@ -1,6 +1,4 @@
-﻿using Arcatech.Actions;
-using Arcatech.Items;
-using Arcatech.Stats;
+﻿using Arcatech.Items;
 using Arcatech.Texts;
 using Arcatech.UI;
 using Arcatech.Units;
@@ -12,7 +10,7 @@ namespace Arcatech.Skills
 {
     public  class SkillUsageStrategy : IUsablesStrategy    , IIconContent
     {
-        public BaseEntityOLD Owner {get;protected set;}
+        public ActiveGameUnitComponent Owner {get;protected set;}
         SerializedUnitAction SkillAction { get; }
 
         protected Transform Spawner;
@@ -28,7 +26,7 @@ namespace Arcatech.Skills
 
 
 
-        public SkillUsageStrategy(BaseItemComponent item, SerializedUnitAction useaction, BaseEntityOLD unit, ExtendedText desc, int charges, float reload)
+        public SkillUsageStrategy(BaseItemComponent item, SerializedUnitAction useaction, ActiveGameUnitComponent unit, ExtendedText desc, int charges, float reload)
         {
 
             Owner = unit;

@@ -1,8 +1,6 @@
 ﻿using Arcatech.Effects;
 using Arcatech.Texts;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Arcatech.Scenes
 {

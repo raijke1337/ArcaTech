@@ -2,17 +2,16 @@
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Arcatech.Items
 {
     public class MeleeWeaponStrategy : WeaponStrategy
     {
-        public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitAction act, EquippedUnit unit, WeaponSO cfg, int charges, float reload, BaseWeaponComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
+        public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, BaseWeaponComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
         {
             Trigger = (comp as MeleeWeaponComponent).Trigger;
-            Trigger.SomethingHitEvent += HandleColliderHitEvent;
+            Trigger.SomeColliderWasHitEvent += HandleColliderHitEvent;
             Trigger.ToggleCollider(false);
 
             Trail = (comp as MeleeWeaponComponent).Trail;
@@ -29,16 +28,18 @@ namespace Arcatech.Items
         protected MeleeWeaponTrail Trail;
         protected IActionResult[] OnColliderHit { get; }
         protected BaseUnitAction currentAction;
-        public async void SwitchCollider(bool state, float delay)
+
+
+         void SwitchCollider(bool state, float delay)
         {
             Trail.Emit = state;
-            await Task.Delay((int)delay*1000);
             Trigger.ToggleCollider(state);
-            if (Owner.UnitDebug) Debug.Log($"collider on {WeaponComponent} {(state == true ? "on" : "off")} ");
+            if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"collider on {WeaponComponent} {(state == true ? "on" : "off")} ");
         }
 
         public override bool TryUseUsable(out BaseUnitAction action)
         {
+
             // TODO needs debug
             // add checks to prevent additional triggering
 
@@ -46,40 +47,59 @@ namespace Arcatech.Items
             action = null;
             if (!ok)
             {
-                if (Owner.UnitDebug) Debug.Log($"Can't use weapon because CD");
+                if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Can't use weapon because CD");
                 return false;
             }
             hitsThisSwing.Clear();
 
-            /// case advancing
+            // case advancing
            if (currentAction != null && currentAction.CanAdvance(out var next))
             {
                 action = next.ProduceAction(Owner,WeaponComponent.Spawner);
                 ChargesLogicOnUse();
+                currentAction.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
                 currentAction = action;
-                if (Owner.UnitDebug) Debug.Log($"Advancing weapon combo {next}");
+                if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Advancing weapon combo {next}");
                 return true;
             }
-            //// case first attack OR previous attack is completed
+            // case first attack OR previous attack is completed
             
            else
             {
                 ChargesLogicOnUse();
                 action = Action;
                 currentAction = action;
-                if (Owner.UnitDebug) Debug.Log($"Starting weapon combo {action}");
+                if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {action}");
+                action.ActionStateChangedEvent += Action_ActionStateChangedEvent;
                 return true;
             }
         }
 
+        private void Action_ActionStateChangedEvent(UnitActionState state)
+        {
+            switch (state)
+            {
+                case UnitActionState.None:
+                    break;
+                case UnitActionState.Started:
+                    SwitchCollider(true, 0);
+                    break;
+                case UnitActionState.ExitTime:
+                    break;
+                case UnitActionState.Completed:
+                    SwitchCollider(false, 0);
+                    currentAction.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
+                    break;
+            }
+        }
 
-        List<BaseEntityOLD> hitsThisSwing = new();
+        List<BaseGameEntityComponent> hitsThisSwing = new();
         private void HandleColliderHitEvent(Collider target)
         {
             if (target == Owner) return;
             else
             {
-                if (target.TryGetComponent<BaseEntityOLD>(out var e))
+                if (target.TryGetComponent<BaseGameEntityComponent>(out var e))
                 {
                     if (!hitsThisSwing.Contains(e))
                     {
@@ -89,11 +109,11 @@ namespace Arcatech.Items
                 }
             }
         }
-        protected void PerformOnHit(BaseEntityOLD user, BaseEntityOLD target, Transform place)
+        protected void PerformOnHit(ActiveGameUnitComponent user, BaseGameEntityComponent target, Transform place)
         {
             foreach (var res in OnColliderHit)
             {
-                res.ProduceResult(user, target, place);
+                res.ProduceResult(user.GetMainEntity, target, place);
             }
         }
     }

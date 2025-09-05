@@ -1,18 +1,16 @@
 using Arcatech.Actions;
-using Arcatech.EventBus;
-using CartoonFX;
+using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech.Units
 {
-    public class CostumesControllerComponent : MonoBehaviour
+    [RequireComponent(typeof(EntityInventoryComponent))]
+    public class CostumesControllerComponent : ValidatedMonoBehaviour
     {
 
-        public void Init(BaseEntityOLD unit) => owner = unit;
-
-        BaseEntityOLD owner;
-
+        [SerializeField, Self]
+        EntityInventoryComponent inventory;
         [SerializeField] private List<GameObject> _parts;
         [SerializeField] SerializedActionResult[] BreakEffects;
         public void OnBreak()
@@ -29,7 +27,7 @@ namespace Arcatech.Units
                     {
                         foreach (var f in BreakEffects)
                         {
-                            f.BuildActionResult().ProduceResult(owner, null, owner.transform);
+                           // f.BuildActionResult().ProduceResult(owner, null, owner.transform);
                         }
                     }
                     s.SetActive(false);

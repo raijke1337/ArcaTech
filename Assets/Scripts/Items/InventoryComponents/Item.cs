@@ -1,7 +1,4 @@
-using Arcatech.Texts;
-using Arcatech.Units;
 using System;
-using UnityEngine;
 
 namespace Arcatech.Items
 {
@@ -9,10 +6,10 @@ namespace Arcatech.Items
     [Serializable]
     public class Item : IItem
     {
-        public EquippedUnit Owner { get; }
+        public BaseGameEntityComponent Owner { get; }
         public SerializableGuid ID;
         public ItemSO Config;
-        public Item(ItemSO cfg, EquippedUnit ow)
+        public Item(ItemSO cfg, BaseGameEntityComponent ow)
         {
             ID = cfg.ID;
             Owner = ow;

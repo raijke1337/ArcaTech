@@ -1,4 +1,3 @@
-using Arcatech.Items;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +21,11 @@ namespace Arcatech.Items
             {
                 Assert.IsNotNull(item);
             }
+        }
+
+        public UnitInventoryItemConfigsContainer BuildContainer()
+        {
+            return new UnitInventoryItemConfigsContainer(this);
         }
     }
 }

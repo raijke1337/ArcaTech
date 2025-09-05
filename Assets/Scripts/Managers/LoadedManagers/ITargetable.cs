@@ -1,6 +1,5 @@
 ﻿using Arcatech.Stats;
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
 
 public interface ITargetable //: IPointerEnterHandler, IPointerExitHandler 
 {

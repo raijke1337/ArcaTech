@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 namespace Arcatech.Level
 {
@@ -9,13 +7,8 @@ namespace Arcatech.Level
         void Start()
         {
             var mesh = gameObject.GetComponent<MeshFilter>();
-            mesh.gameObject.SetActive(false);
+            Destroy(mesh);
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
     }
 }
