@@ -90,7 +90,10 @@ namespace Arcatech
         {
             return HashCode.Combine(Part1, Part2, Part3, Part4);
         }
-
+        public override string ToString()
+        {
+            return string.Concat(Part1 + ":" + Part2 + ":" + Part3 + ":" + Part4);
+        }
         public static bool operator ==(SerializableGuid left, SerializableGuid right) => left.Equals(right);
         public static bool operator !=(SerializableGuid left, SerializableGuid right) => !(left == right);
     }

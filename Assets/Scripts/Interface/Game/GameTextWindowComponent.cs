@@ -1,12 +1,17 @@
+using Arcatech.Items;
 using Arcatech.Texts;
+using KBCore.Refs;
+
 //using com.cyborgAssets.inspectorButtonPro;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
-namespace Arcatech
+namespace Arcatech.UI
 {
-    public class GameTextComp : MonoBehaviour
+
+    public class GameTextWindowComponent : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _speakerTitle;
         //[SerializeField] private Image _speakerPicture;
@@ -19,6 +24,8 @@ namespace Arcatech
  
 
         public event SimpleEventsHandler DialogueCompleteEvent;
+        public event UnityAction<UnitInventoryViewReference> ViewChangedInventory;
+
         private DialoguePart _currentDialogue;
 
         private List<DialogueDecisionButtonComp> _buttons;
@@ -80,17 +87,6 @@ namespace Arcatech
         {
             _speakerTitle.font = GameUIManager.Instance.GetFont(FontType.Title);
             _mainText.font = GameUIManager.Instance.GetFont(FontType.Text);
-        }
-
-
-        [SerializeField] DialoguePart DebugDialogue;
-       // [ProButton]
-        public void DebugLoadDialogue()
-        {
-            if (DebugDialogue!=null)
-            {
-                CurrentDialogue = DebugDialogue;
-            }
         }
 
 

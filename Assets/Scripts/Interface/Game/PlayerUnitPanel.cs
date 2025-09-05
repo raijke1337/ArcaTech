@@ -11,7 +11,6 @@ using UnityEngine.UI;
 
 namespace Arcatech.UI
 {
-
     public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitActionsHandler, IUnitInventoryView, IStatUpdatesHandler
     {
         [SerializeField,Child] protected PlayerBarIconsContainerManager _icons;

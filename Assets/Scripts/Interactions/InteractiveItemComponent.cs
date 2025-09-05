@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using KBCore.Refs;
+using Arcatech.Triggers;
 
 namespace Arcatech.Interactions
 {
-    [RequireComponent(typeof(BaseGameEntityComponent))]
+    [RequireComponent(typeof(BaseGameEntityComponent),typeof(BaseTrigger))]
     public class InteractiveItemComponent : ValidatedMonoBehaviour, IInteractive
     {
 

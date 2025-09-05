@@ -16,8 +16,8 @@ namespace Arcatech.Items
 
         public BaseGameEntityComponent Owner {get;}
         public UsablesHandler Handler { get; protected set; }
-        public List<Item> Inventory { get; protected set; }
-        public ObservableDictionary<EquipmentType, Equipment> Equipments { get; protected set; }
+        List<Item> Inventory { get; set; }
+        ObservableDictionary<EquipmentType, Equipment> Equipments { get;  set; }
 
         public event UnityAction DrawStrategyChangedEvent;
         public IDrawItemStrategy CurrentDrawStrategy { get; private set; }
@@ -79,9 +79,10 @@ namespace Arcatech.Items
             DrawStrategyChangedEvent?.Invoke();
         }
 
-        Item PickUpItem (ItemSO item)
+        public Item PickUpItem (ItemSO item, int amount = 1)
         {
             var i = (Itemfactory.Instance.ProduceItem(item, Owner) as Item);
+            Debug.Log($"added item {i} to inventory");
             Inventory.Add(i);
             return i;
         }
@@ -114,7 +115,8 @@ namespace Arcatech.Items
                 return list.ToArray();
             }
         }
-
+        public IReadOnlyList<Equipment> ListEquipped => Equipments.GetAllValues();
+        public IReadOnlyList<Item> ListInventory => Inventory.AsReadOnly();
 
     }
 

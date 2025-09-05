@@ -66,12 +66,12 @@ namespace Arcatech.UI
             }
 
             //draw
-            foreach (Equipment equip in model.Equipments.GetAllValues())
+            foreach (Equipment equip in model.ListEquipped)
             {
                 _equipsTiles[equip.Type].Item = equip;
                 _equipsTiles[equip.Type].IconClickedEvent += IconTileClicked;
             }
-            var inve = model.Inventory;
+            var inve = model.ListInventory;
 
             int placedTiles = _inventoryTiles.Count;
 
@@ -173,19 +173,19 @@ namespace Arcatech.UI
 
         private void ShowButton(Item item)
         {
-            _swapItemsButton.gameObject.SetActive(false);
-            if (item is Equipment eq)
-            {
-                _swapItemsButton.gameObject.SetActive(true);
-                if (_inventoryModel.Equipments.TryGetValue(item.Type, out _))
-                {
-                    _swapItemsButton.SetText("UNEQUIP");
-                }
-                else
-                {
-                    _swapItemsButton.SetText("EQUIP");
-                }
-            }
+            //_swapItemsButton.gameObject.SetActive(false);
+            //if (item is Equipment eq)
+            //{
+            //    _swapItemsButton.gameObject.SetActive(true);
+            //    if (_inventoryModel.Equipments.TryGetValue(item.Type, out _))
+            //    {
+            //        _swapItemsButton.SetText("UNEQUIP");
+            //    }
+            //    else
+            //    {
+            //        _swapItemsButton.SetText("EQUIP");
+            //    }
+            //}
         }
 
 

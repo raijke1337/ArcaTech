@@ -37,7 +37,7 @@ namespace Arcatech.Units
         {
             if (strategy == null) return; // case for destructrible items
             currentDrawStrategy = strategy;
-            foreach (var e in inventoryModel.Equipments.GetAllValues())
+            foreach (var e in inventoryModel.ListEquipped)
             {
                 ItemPlaceType placeType = strategy.GetPlaces[e.Type];
                 switch (placeType)

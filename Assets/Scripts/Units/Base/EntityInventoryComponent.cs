@@ -1,4 +1,5 @@
 ﻿using Arcatech.Items;
+using Arcatech.Stat;
 using KBCore.Refs;
 using System.Collections.Generic;
 using UnityEngine;
@@ -93,26 +94,11 @@ namespace Arcatech.Units
         #endregion
 
         #region used by other components
-
+        /// <summary>
+        /// this is not very good... maybe TODO refactor
+        /// </summary>
         public IUnitActionsHandler GetUnitActionsHandler => _model.Handler;
-
-        //public bool HasItemType(EquipmentType type, out IEquippable equipment)
-        //{
-        //    if (_model.Equipments.TryGetValue(type, out var e))
-        //    {
-        //        equipment = e;
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        equipment = null;
-        //        return false;
-        //    }
-        //}
-
-
-
-        //public bool TryEquipItem(EquipSO e) => _model.EquipItem(e, out _);
+        public void AddItemToInventory(ItemSO item, int amount = 1) => _model.PickUpItem(item, amount);
 
         #endregion
 

@@ -4,19 +4,22 @@ using UnityEngine;
 namespace Arcatech.Triggers
 {
     [RequireComponent(typeof(Collider))]
-    public abstract class BaseTrigger : ValidatedMonoBehaviour
+    public class BaseTrigger : ValidatedMonoBehaviour
     {
-        public Collider Collider { get; protected set; }
-
-        protected virtual void Awake()
+        public Collider Collider => _collider;
+        [SerializeField, Self] Collider _collider;
+        private void OnEnable()
         {
-            Collider = GetComponent<Collider>();
-            Collider.isTrigger = true;
+            if (!_collider.isTrigger)
+            {
+
+                _collider.isTrigger = true;
+            }
         }
 
 
 
-        protected abstract void OnTriggerEnter(Collider other);
+        protected virtual void OnTriggerEnter(Collider other) { }
         protected virtual void OnTriggerExit(Collider other) { }
 
 

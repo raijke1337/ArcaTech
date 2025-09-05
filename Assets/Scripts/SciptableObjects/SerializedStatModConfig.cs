@@ -24,7 +24,7 @@ namespace Arcatech.Stats
         {
             Assert.IsNotNull(_condition, $"Set some condition for {this}");
             _guid = SerializableGuid.NewGuid();
-            Debug.Log($"assign {_guid.ToString()} to mod config {this}");
+           // Debug.Log($"assign {_guid.ToString()} to mod config {this}");
         }
     }
 

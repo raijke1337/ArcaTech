@@ -20,7 +20,7 @@ namespace Arcatech.Managers
 
         [SerializeField] private TargetPanel _tgtPan;
         [SerializeField] private PlayerUnitPanel _playerPan;
-        [SerializeField] private GameTextComp _text;
+        [SerializeField] private GameTextWindowComponent _text;
         [SerializeField] private GameObject _ded;
         [SerializeField] private GameObject _pause;
 

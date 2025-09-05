@@ -10,7 +10,5 @@ namespace Arcatech.Interactions
         
         public abstract void DoInteraction(IInteractor interactor, IInteractive item, IInteractionContext context);
     }
-
-    
 }
 
