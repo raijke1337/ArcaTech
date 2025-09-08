@@ -87,8 +87,6 @@ namespace Arcatech.Units
             _actionTimer = new StopwatchTimer();
         }
        
-        
-        
         protected ActiveGameUnitComponent Actor;
         public bool LockMovement { get; protected set; }
         protected NextActionSettings Next { get; }
@@ -224,11 +222,7 @@ namespace Arcatech.Units
             _actionState = UnitActionState.Completed;
             _actionTimer.Stop();
 
-            if (Actor.GetMainEntity.ShowingDebugs) { 
-                //Debug.Log($"{this}, result {fin}");
-                                   }
 
-            //OnComplete.Invoke();
         }
         public override string ToString()
         {

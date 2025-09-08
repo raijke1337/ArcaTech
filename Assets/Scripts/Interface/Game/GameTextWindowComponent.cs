@@ -48,10 +48,12 @@ namespace Arcatech.UI
                 _speakerTitle.text = value.Character.CharacterName;
                 _mainText.text = value.DialogueContent.Text;
 
+                /*
                 if (CurrentDialogue.Character.Pictures.TryGetValue(CurrentDialogue.Mood, out var p))
                 {
                    // _speakerPicture.sprite = p;
                 }               
+                */
 
                 if (value.Options.Count > 0)
                 {

@@ -1,4 +1,5 @@
 ﻿using Arcatech.Items;
+using Arcatech.Managers;
 using Arcatech.Units;
 using UnityEngine;
 
@@ -32,7 +33,7 @@ namespace Arcatech.Actions
         {
             if (user.TryGetComponent<EntityInventoryComponent>(out var inv))
             {
-                inv.AddItemToInventory(itemToAdd, amountToAdd);
+                inv.PickUpItem(DataManager.Instance.MakeItem(itemToAdd,user));
             }
         }
     }

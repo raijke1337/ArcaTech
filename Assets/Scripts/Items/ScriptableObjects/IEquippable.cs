@@ -1,5 +1,6 @@
 ﻿using Arcatech.Stats;
 using System.Collections.Generic;
+using Arcatech.UI;
 
 namespace Arcatech.Items
 {
@@ -7,11 +8,13 @@ namespace Arcatech.Items
     {
         public BaseItemComponent DisplayItem { get; }
         public List<StatsMod> StatMods { get; }
+        public void OnEquip();
+        public void OnUnequip();
     
     }
 
     public interface IItem
     {
-        public EquipmentType Type { get; }
+        public ItemType Type { get; }
     }
 }

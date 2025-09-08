@@ -31,7 +31,6 @@ namespace Arcatech
         protected override Tween Build(Transform target)
         {
             Tween tween;
-
             if (useLocalPosition)
             {
                 tween = target.DOLocalMove(targetPosition, duration, snapping);

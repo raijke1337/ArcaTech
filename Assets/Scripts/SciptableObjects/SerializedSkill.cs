@@ -1,13 +1,14 @@
 ﻿using Arcatech.Items;
 using Arcatech.Texts;
 using Arcatech.Triggers;
+using Arcatech.UI;
 using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Assertions;
 namespace Arcatech.Skills
 {
     [CreateAssetMenu(fileName = "New Skill Config", menuName = "Items/Skills/Skill")]
-    public class SerializedSkill : ScriptableObject
+    public class SerializedSkill : ScriptableObject, IIconContent
     {
         [Header("Use strategy"),SerializeField] public SerializedSkillUseStrategy UseStrategy;
         [SerializeField] DrawItemsStrategy DrawItemsStrategy;
@@ -18,7 +19,7 @@ namespace Arcatech.Skills
         [SerializeField] public SerializedStatsEffectConfig Cost;
 
 
-        public Skill CreateSkill(BaseGameEntityComponent owner, BaseItemComponent item,EquipmentType type)
+        public Skill CreateSkill(BaseGameEntityComponent owner, BaseItemComponent item,ItemType type)
         {
             return new Skill(DrawItemsStrategy, this,owner,item,type);
         }
@@ -29,5 +30,9 @@ namespace Arcatech.Skills
             Assert.IsNotNull(DrawItemsStrategy);
             Assert.IsNotNull(Description);
         }
+
+        public Sprite Icon => Description.Picture;
+        public float FillValue => 0;
+        public string IconValue => string.Empty;
     }
 }

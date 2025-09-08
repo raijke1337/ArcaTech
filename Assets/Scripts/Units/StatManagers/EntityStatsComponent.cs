@@ -16,40 +16,29 @@ namespace Arcatech.Stat
         [SerializeField] protected BaseStatsConfig startingStats;
         [SerializeField] protected float statsUpdateFrequency = 0.1f; // call some events to announce update
 
-
-        /// <summary>
-        /// used to load equipment mods
-        /// </summary>
-
-        UnitInventoryModel model = null;
-        bool firstLoad = true;
+        public event UnityAction ViewChangedInventory;
+        bool _started = false;
+        private Dictionary<BaseStatType, StatValueContainer> _stats;
+        private List<StatsMod> _startingMods = new();
 
         public void RefreshView(UnitInventoryModel m)
         {
-            if (firstLoad)
-            {
-                model = m;
-                firstLoad = false;
-                ///first load
-                ApplyStatMods(m.GetCurrentMods);
-                model.ItemEquippedEvent += Model_ItemEquippedEvent;
-                model.ItemUnequippedEvent += Model_ItemUnequippedEvent;
-            }
-            else if (m != model)
-            {
-                /// for some reason the inv model is changed, should bnot happen but...
-                Debug.LogError($"Changing unit inventory model for some reason, unhandled!");
-            }
+            ReloadMods(m.GetCurrentMods);
         }
-
-        private void Model_ItemUnequippedEvent(Equipment arg0)
+        void ReloadMods(IEnumerable<StatsMod> mods)
         {
-            RemoveStatMods(arg0.StatMods);
-        }
-
-        private void Model_ItemEquippedEvent(Equipment arg0)
-        {
-            ApplyStatMods(arg0.StatMods);
+            foreach (var container in _stats.Values)
+            {
+                container.ResetMods();
+            }
+            foreach (var initial in _startingMods)
+            {
+                ApplyStatMod(initial);
+            }
+            foreach (var mod in mods)
+            {
+                ApplyStatMod(mod);
+            }
         }
 
         void ApplyStatMod(StatsMod mod)
@@ -60,46 +49,38 @@ namespace Arcatech.Stat
             }
             _stats[mod.GetStatType].AddStatsMod(mod);
         }
-        void ApplyStatMods(IEnumerable<StatsMod> mods)
-        {
-            foreach (StatsMod mod in mods) { ApplyStatMod(mod); } 
-        }
-        void RemoveStatMod(StatsMod mod)
-        {
-            _stats[mod.GetStatType].RemoveStatMod(mod);
-        }
-        void RemoveStatMods(IEnumerable<StatsMod> mods)
-        {
-            foreach (StatsMod mod in mods) { RemoveStatMod(mod); }
-        }
 
 
 
-
-        private Dictionary<BaseStatType, StatValueContainer> _stats;
-        bool _started = false;
-        public bool DidInit => _started;
 
         private void Start()
         {
             _stats = startingStats.BuildBaseStats;
-            _started = true;
+            _startingMods = startingStats.ListMods;
             UpdateHandlers();
+            _started = true;
 
         }
         private void Update()
         {
-            if (_paused) return;
-            foreach (var stat in _stats)
+
+            foreach (var stat in _stats.ToList())
             {
                 stat.Value.UpdateInDelta(Time.deltaTime);
+                if (!stat.Value.Initialized) // update is done and container not init means that it has no mods at all, so 0/0/0 values
+                {
+                    _stats.Remove(stat.Key);
+                }
             }
+
             UpdateHandlers();
         }
 
 
 
         List<IStatUpdatesHandler> _handlers = new();
+
+
         public void RegisterStatChangesHandler(IStatUpdatesHandler handler)
         {
             if (handler != null && !_handlers.Contains(handler))
@@ -157,34 +138,9 @@ namespace Arcatech.Stat
 
         #region pause
 
-
-        EventBinding<PauseToggleEvent> _pauseBind;
-        bool _paused;
-
-        public event UnityAction<UnitInventoryViewReference> ViewChangedInventory;
-
-        private void OnEnable()
-        {
-            _pauseBind = new EventBinding<PauseToggleEvent>(HandlePauseEvent);
-            EventBus<PauseToggleEvent>.Register(_pauseBind);
-        }
-
-        void HandlePauseEvent(PauseToggleEvent e)
-        {
-            _paused = e.Value;
-        }
-
         private void OnDisable()
         {
-            EventBus<PauseToggleEvent>.Deregister(_pauseBind);
             _handlers.Clear();
-
-            if (model != null)
-            {
-                model.ItemEquippedEvent -= Model_ItemEquippedEvent;
-                model.ItemUnequippedEvent -= Model_ItemUnequippedEvent;
-            }
-            firstLoad = true;
         }
 
         #endregion

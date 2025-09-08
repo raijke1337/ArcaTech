@@ -23,8 +23,6 @@ namespace Arcatech.Items
         public UnitActionType UseActionType { get; protected set; }
         public IWeaponUseStrategy UseStrategy { get; protected set; }
 
-        //public WeaponAnimationsSet AnimationSet { get; protected set; }
-
         protected override void CollectUsables(EquipSO cfg)
         {
             cachedUsables = new List<IUsable>();
@@ -42,10 +40,10 @@ namespace Arcatech.Items
            // AnimationSet = cfg.WeaponType;
             switch (Type)
             {
-                case EquipmentType.MeleeWeap:
+                case ItemType.MeleeWeap:
                     UseActionType = UnitActionType.Melee;
                     break;
-                case EquipmentType.RangedWeap:
+                case ItemType.RangedWeap:
                     UseActionType = UnitActionType.Ranged;
                     break;
             }
@@ -79,11 +77,11 @@ namespace Arcatech.Items
 
         #region UI
 
-        public Sprite Icon => Config.Description.Picture;
+        public override Sprite Icon => Config.Description.Picture;
 
-        public float FillValue => UseStrategy.FillValue;
+        public override float FillValue => UseStrategy.FillValue;
 
-        public string IconValue => UseStrategy.IconValue;
+        public override string IconValue => UseStrategy.IconValue;
 
 
         #endregion

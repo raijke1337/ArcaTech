@@ -21,7 +21,7 @@ namespace Arcatech.Skills
         protected SkillUsageStrategy Strategy { get; }
 
         public string UsableName { get; }
-        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseGameEntityComponent owner, BaseItemComponent item, EquipmentType type)
+        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseGameEntityComponent owner, BaseItemComponent item, ItemType type)
         { 
 
             Owner = owner.GetComponent<ActiveGameUnitComponent>();
@@ -29,18 +29,18 @@ namespace Arcatech.Skills
 
             switch (type)
             {
-                case EquipmentType.None:
+                case ItemType.None:
                     break;
-                case EquipmentType.MeleeWeap:
+                case ItemType.MeleeWeap:
                     UseActionType = UnitActionType.MeleeSkill;
                     break;
-                case EquipmentType.RangedWeap:
+                case ItemType.RangedWeap:
                     UseActionType = UnitActionType.RangedSkill;
                     break;
-                case EquipmentType.Shield:
+                case ItemType.Shield:
                     UseActionType = UnitActionType.ShieldSkill;
                     break;
-                case EquipmentType.Booster:
+                case ItemType.Booster:
                     UseActionType = UnitActionType.DodgeSkill;
                     break;
                     default :

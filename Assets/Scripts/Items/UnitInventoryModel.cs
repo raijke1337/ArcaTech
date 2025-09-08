@@ -1,6 +1,7 @@
 ﻿using Arcatech.Stats;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,89 +15,80 @@ namespace Arcatech.Items
         [SerializeField][ReadOnlyText] string status = "not init";
         #endregion
 
-        public BaseGameEntityComponent Owner {get;}
-        public UsablesHandler Handler { get; protected set; }
-        List<Item> Inventory { get; set; }
-        ObservableDictionary<EquipmentType, Equipment> Equipments { get;  set; }
+        [SerializeField] public UsablesHandler Handler;
+        List<Item> inventory;
+        Dictionary<ItemType,Equipment> equipments;
 
-        public event UnityAction DrawStrategyChangedEvent;
-        public IDrawItemStrategy CurrentDrawStrategy { get; private set; }
+        public IReadOnlyList<Equipment> ListEquipped => equipments.Values.ToList().AsReadOnly();
+        public IReadOnlyList<Item> ListInventory => inventory.AsReadOnly();
 
-        public event UnityAction<Item> ItemAddedToInventoryEvent = delegate { };
-        public event UnityAction<Item> ItemRemovedFromInventoryEvent = delegate { };
-        public event UnityAction<Equipment> ItemEquippedEvent = delegate { };
-        public event UnityAction<Equipment> ItemUnequippedEvent = delegate { };
+        bool initialized = false;
+
+        public event UnityAction <IDrawItemStrategy> DrawStrategyChangedEvent = delegate { };
+        public event UnityAction ModelUpdatedEvent = delegate { };
+
+        public UnitInventoryModel(IEntityItemsList items,BaseGameEntityComponent o)
+        {
 
 
-        //public event Action<IEnumerable<Item>> OnInventoryChange
-        //{
-        //    add => Inventory.AnyRecordChanged += value;
-        //    remove => Inventory.AnyRecordChanged -= value;
-        //}
-        //public event Action<IEnumerable<Equipment>> OnEquipsChange
-        //{
-        //    add => Equipments.AnyValueChanged += value;
-        //    remove => Equipments.AnyValueChanged -= value;
-        //}
+            inventory = new();
+            equipments = new();
 
+            PickUpItems(items.GetInventory(o));
+
+            foreach (Equipment e in items.GetEquipment(o)) 
+            {
+                EquipItem(e,out _);
+            }
+            Handler = new UsablesHandler();
+
+
+            Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
+
+            status = $"init";
+            initialized = true;
+            ModelUpdatedEvent.Invoke();
+        }
+
+        private void OnDrawStrategyUpdate(IDrawItemStrategy t) => DrawStrategyChangedEvent.Invoke(t);
 
         public void UpdateDeltaModel(float delta)
         {
             Handler?.Update(delta);
-            status = $"updating OK {Owner.GetName}";
+            status = $"updating OK";
+        }
+        public void PickUpItem (Item item)
+        {
+            inventory.Add(item);
+            if (initialized) ModelUpdatedEvent.Invoke();
+        }
+        public void PickUpItems(IEnumerable<IItem> items)
+        {
+            foreach (Item item in items) PickUpItem(item);
         }
 
 
-        public UnitInventoryModel(UnitInventoryItemConfigsContainer cfgs,BaseGameEntityComponent o)
+        public void EquipItem (Equipment toEquip, out EquipSO dropped)
         {
-            Owner = o;
-            //Inventory = new ObservableArray<Item>();
-            // Equipments = new ObservableDictionary<EquipmentType, Equipment>(list.ToArray());
+            dropped = null;
 
-            List<KeyValuePair<EquipmentType, Equipment>> list = new();
-            Inventory = new();
-            Equipments = new ObservableDictionary<EquipmentType, Equipment>(list.ToArray());
-
-
-            foreach (ItemSO item in cfgs.Inventory)
+            if (equipments.TryGetValue(toEquip.Type, out var drop))
             {
-                ItemAddedToInventoryEvent?.Invoke(PickUpItem(item));
+                dropped = drop.Config as EquipSO;
+                equipments.Remove(toEquip.Type);
+                drop.OnUnequip();
             }
-            foreach (EquipSO e in cfgs.Equipment)
+
+            equipments[toEquip.Type] =toEquip;
+
+            if (initialized)
             {
-                ItemEquippedEvent.Invoke(EquipItem(e, out var un));
-                if (un != null) { ItemUnequippedEvent.Invoke(un); }
+                if (toEquip is IWeapon w)
+                {
+                    DrawStrategyChangedEvent.Invoke(w.DrawStrategy);
+                }
+                ModelUpdatedEvent.Invoke();
             }
-            Handler = new UsablesHandler(Equipments);
-            Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
-
-            status = $"init for {Owner.GetName}";
-        }
-
-        private void OnDrawStrategyUpdate(IDrawItemStrategy t)
-        {
-            CurrentDrawStrategy = t;
-            DrawStrategyChangedEvent?.Invoke();
-        }
-
-        public Item PickUpItem (ItemSO item, int amount = 1)
-        {
-            var i = (Itemfactory.Instance.ProduceItem(item, Owner) as Item);
-            Debug.Log($"added item {i} to inventory");
-            Inventory.Add(i);
-            return i;
-        }
-        Equipment EquipItem (EquipSO item, out Equipment unequipped)
-        {
-            unequipped = null;
-            var eq = Itemfactory.Instance.ProduceItem(item, Owner) as Equipment;
-            if (Equipments.TryGetValue(eq.Type, out unequipped))
-            {
-                PickUpItem(unequipped.Config);
-            }
-            Equipments.SetPair(eq.Type, eq);
-            //Add(new KeyValuePair<EquipmentType, Equipment>(eq.Type, eq as Equipment));
-            return eq;
         }
 
 
@@ -105,18 +97,17 @@ namespace Arcatech.Items
             get
             {
                 var list = new List<StatsMod>();
-                foreach (var equip in Equipments.GetAllValues())
+                foreach (var equip in equipments)
                 {
-                    if (equip.StatMods != null)
+                    if (equip.Value.StatMods != null)
                     {
-                        list.AddRange(equip.StatMods);
+                        list.AddRange(equip.Value.StatMods);
                     }
                 }
                 return list.ToArray();
             }
         }
-        public IReadOnlyList<Equipment> ListEquipped => Equipments.GetAllValues();
-        public IReadOnlyList<Item> ListInventory => Inventory.AsReadOnly();
+
 
     }
 

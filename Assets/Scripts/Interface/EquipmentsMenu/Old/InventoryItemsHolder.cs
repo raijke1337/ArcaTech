@@ -1,10 +1,11 @@
+using System;
 using Arcatech.Items;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 namespace Arcatech.UI
 {
-    public class InventoryItemsHolder : MonoBehaviour, IManagedController
+    public class InventoryItemsHolder : MonoBehaviour
     {
         [SerializeField] protected ItemTileComponent TilePrefab;
         [SerializeField] protected Transform _iconsParent;
@@ -43,22 +44,9 @@ namespace Arcatech.UI
             return tile;
         }
 
-
-        public  void StartController()
+        private void Start()
         {
             _tiles = new List<ItemTileComponent>();
-        }
-
-        public  void ControllerUpdate(float delta)
-        {
-
-        }
-        public  void FixedControllerUpdate(float fixedDelta)
-        {
-
-        }
-        public  void StopController()
-        {
         }
     }
 }

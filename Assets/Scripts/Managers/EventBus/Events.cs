@@ -9,34 +9,16 @@ namespace Arcatech.EventBus
 
     #region UI events
 
-    public struct PlayerTargetUpdateEvent : IEvent
+    public record BaseEntityMouseOverEvent : IEvent
     {
-        public PlayerTargetUpdateEvent(ITargetable target)
-        {
-            Target = target;
-        }
+        public ITargetable Target { get; set; }
+        public bool IsSelected { get; set; }
         public override string ToString()
         {
-            if (Target == null)
-            {
-                return $"no target";
-            }
-            else return $"{Target.UnitName}";
-            
-        }
-        public ITargetable Target { get; }
-
-    }
-
-    public struct PlayerStatsChangedUIEvent : IEvent
-    {
-        public BaseStatType StatType { get; }
-        public StatValueContainer Container { get; }
-        public PlayerStatsChangedUIEvent (BaseStatType statType, StatValueContainer container)
-        { 
-             StatType = statType; Container = container;
+            return $"{Target.GetEntity.GetName} {(IsSelected? "selected" : "deselected")}";
         }
     }
+
 
 
     public struct DrawDamageEvent : IEvent
@@ -65,17 +47,6 @@ namespace Arcatech.EventBus
         public override string ToString()
         {
             return string.Concat(Applied," on ", Target?.GetName, " at ", Place.position);
-        }
-    }
-    public struct VFXEvent : IEvent
-    {
-        public CFXR_Effect Effect;
-        public Transform Place;
-
-        public VFXEvent(CFXR_Effect effect, Transform place)
-        {
-            Effect = effect;
-            Place = place;
         }
     }
 

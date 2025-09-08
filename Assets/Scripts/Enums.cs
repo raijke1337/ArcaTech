@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public enum Side
 {
+    Unassigned,
     PlayerSide,
     EnemySide
 }
@@ -18,7 +19,7 @@ public enum BaseStatType : byte
     Energy
 }
 
-public enum EquipmentType
+public enum ItemType
 {
     None,
     MeleeWeap,
@@ -77,24 +78,4 @@ public enum LevelType
     Menu,
     Scene,
     Game
-}
-
-
-
-public enum FaceExpression : byte
-{
-    Neutral,
-    Happy,
-    Angry,
-    Action,
-    Bothered
-}
-
-
-
-
-[Serializable]
-public class NestedList<T> : List<T>
-{
-    public List<T> InternalList;
 }

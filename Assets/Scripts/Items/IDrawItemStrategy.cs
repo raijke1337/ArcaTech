@@ -4,7 +4,7 @@ namespace Arcatech.Items
 {
     public interface IDrawItemStrategy : IStrategy 
     {
-        public Dictionary<EquipmentType, ItemPlaceType> GetPlaces { get; }
+        public Dictionary<ItemType, ItemPlaceType> GetPlaces { get; }
     }
 
 

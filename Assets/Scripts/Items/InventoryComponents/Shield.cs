@@ -2,9 +2,9 @@
 {
     public class Shield : Equipment
     {
-        public Shield(ShieldSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
+        public Shield(SerializedShieldAbsorbStrategy st, ShieldSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
         {
-            AbsorbStrategy = cfg.absorbStrategy.ProduceStrat();
+            AbsorbStrategy = st.BuildStrategy;
         }
         public ShieldAbsorbStrategy AbsorbStrategy { get; }
     }

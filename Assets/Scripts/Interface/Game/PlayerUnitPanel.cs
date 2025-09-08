@@ -13,7 +13,7 @@ namespace Arcatech.UI
 {
     public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitActionsHandler, IUnitInventoryView, IStatUpdatesHandler
     {
-        [SerializeField,Child] protected PlayerBarIconsContainerManager _icons;
+        [SerializeField,Child] protected PlayerBarUsablesIconsContainerManager usablesIcons;
         [SerializeField, Child] protected BarsContainersManager _bars;
         [SerializeField, Self] protected RectTransform _rect;
         [SerializeField] protected float _shakeAtHealthDelta = 0.1f;
@@ -22,10 +22,10 @@ namespace Arcatech.UI
         /// <summary>
         /// not called in this component
         /// </summary>
-        public event UnityAction<UnitInventoryViewReference> ViewChangedInventory;
+        public event UnityAction ViewChangedInventory;
         PlayerUnit _player;
 
-        private void OnEnable()
+        private void Start()
         {
             _player = FindAnyObjectByType<PlayerUnit>();
             if ( _player != null )
@@ -34,39 +34,31 @@ namespace Arcatech.UI
                 inv.SetModelView(this);
                 _player.AssignActionsHandler(this);
                 _dmgGlow.color = glowColor;
+                
+                var st = _player.GetComponent<EntityStatsComponent>();
+                st.RegisterStatChangesHandler(_bars);
+                st.RegisterStatChangesHandler(this);
             }
             else
             {
                 Debug.LogWarning("No player in scene but player info panel is active");
             }
-        }
+            
 
-        private void Start()
-        {
-            if (_player != null)
-            {
-                var st = _player.GetComponent<EntityStatsComponent>();
-                st.RegisterStatChangesHandler(_bars);
-                st.RegisterStatChangesHandler(this);
-
-            }
         }
 
         #region interface
         public bool TryHandleAction(UnitActionType type, EntityStatsComponent stats, out BaseUnitAction action)
         {
             action = null;
-            _icons.HandlePlayerAction(type);
+            usablesIcons.HandlePlayerAction(type);
 
             return true;
         }
 
         public void RefreshView(UnitInventoryModel model)
         {
-            foreach (var u in model.Handler.GetUsables.Values)
-            {
-                _icons.IconUpdate(u);
-            }
+            usablesIcons.LoadIcons(model.Handler.GetUsables);
         }
 
         

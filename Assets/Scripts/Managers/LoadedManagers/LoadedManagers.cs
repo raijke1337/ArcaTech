@@ -19,7 +19,7 @@ namespace Arcatech.Managers
         [SerializeField] IsoCameraController _camPrefab;
         [SerializeField] GameInterfaceManager _gameUIprefab;
 
-        List<IManagedController> _ctrls;
+        //List<IManagedController> _ctrls;
 
         //TriggersManager _triggers;
         //LevelManager _levelBlocks;
@@ -30,7 +30,7 @@ namespace Arcatech.Managers
 
         private void Start()
         {
-            _ctrls = new();
+            /*_ctrls = new();
             EventBus<SoundClipRequest>.Raise(new SoundClipRequest(GameManager.Instance.GetCurrentLevelData.Music, false, transform.position));
 
             switch (GameManager.Instance.GetCurrentLevelData.LevelType)
@@ -42,8 +42,8 @@ namespace Arcatech.Managers
                 case LevelType.Game:
                     //_ctrls.Add(GetComponent<LevelManager>());
                     //_ctrls.Add(GetComponent<PauseManager>());
-                    _ctrls.Add(GetComponent<TriggersManager>());                    
-                    _ctrls.Add(Instantiate(_gameUIprefab));
+                    //_ctrls.Add(GetComponent<TriggersManager>());                    
+                    //_ctrls.Add(Instantiate(_gameUIprefab));
                     var cam = FindFirstObjectByType<IsoCameraController>();
                     if (cam == null)
                     {
@@ -59,41 +59,9 @@ namespace Arcatech.Managers
                         c.StartController();
                     }
                     break;
-            }            
+            }            */
         }
 
-        private void OnDisable()
-        {
-            foreach (var c in _ctrls)
-            {
-                c.StopController();
-            }
-            _ctrls.Clear();
-
-        }
-
-        private void Update()
-        {
-            if (_ctrls.Count == 0) return;
-            foreach (var c in _ctrls)
-            {
-                c.ControllerUpdate(Time.deltaTime);
-            }
-        }
-        private void FixedUpdate()
-        {
-            if (_ctrls.Count == 0) return;
-            foreach (var c in _ctrls)
-            {
-                c.FixedControllerUpdate(Time.fixedDeltaTime);
-            }
-        }
-
-        internal void OnPlayerDead()
-        {
-            var r = _ctrls.Find(t => t is GameInterfaceManager);
-            (r as GameInterfaceManager).GameOver();
-
-        }
+        
     }
 }

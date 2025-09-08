@@ -7,15 +7,18 @@ using Arcatech.Triggers;
 namespace Arcatech.Interactions
 {
     [RequireComponent(typeof(BaseGameEntityComponent),typeof(BaseTrigger))]
+    [RequireComponent(typeof(EntityMouseOverGlowComponent))]
     public class InteractiveItemComponent : ValidatedMonoBehaviour, IInteractive
     {
 
         [SerializeField] private bool _itemDisappearsWhenUsed;
         
         [Space,SerializeField, Self] private BaseGameEntityComponent baseComp;
+        [SerializeField, Self] private EntityMouseOverGlowComponent entityMouseOver;
+        [Space]
         [SerializeField] private List<InteractionHandlerBase> handlersOnThisItem;
         [SerializeField] private List<InteractionHandlerBase> handlers;
-
+        
         public BaseGameEntityComponent GetBaseComponent => baseComp;
 
         protected override void OnValidate()

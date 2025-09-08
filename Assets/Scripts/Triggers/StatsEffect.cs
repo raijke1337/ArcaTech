@@ -18,7 +18,6 @@ namespace Arcatech.Triggers
         {
             _initial = cfg.InitialValue;
             StatType = cfg.ChangedStat;
-            hash = cfg.Hash;
 
             OnApply = cfg.OnApplyResult;
             _totalDelta = cfg.OverTimeValue;

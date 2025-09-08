@@ -1,3 +1,4 @@
+using System;
 using Arcatech.Actions;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -6,7 +7,7 @@ namespace Arcatech.Triggers
     [CreateAssetMenu(fileName = "New Serialized Stats change effect", menuName = "Actions/Stat Change trigger cfg")]
     public class SerializedStatsEffectConfig : ScriptableObject
     {
-        public int Hash { get => GetHashCode(); }
+        public SerializableGuid ID { get; private set; }
         public BaseStatType ChangedStat;
         public int InitialValue; // value change
 
@@ -14,10 +15,15 @@ namespace Arcatech.Triggers
         public int OverTimeValueDuration; // over how much time
         public SerializedActionResult OnApplyResult;
 
+        private void Awake()
+        {
+            ID =  new SerializableGuid();
+        }
+
         private void OnValidate()
         {
-            Assert.IsFalse(InitialValue==0 && OverTimeValue ==0);
-
+            if (InitialValue ==0 &&  OverTimeValue ==0 && OverTimeValueDuration ==0)
+            Debug.LogWarning($"{this} has 0 values");
         }
     }
 

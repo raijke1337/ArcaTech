@@ -13,14 +13,14 @@ namespace Arcatech.UI
     {
         #region display;
 
-        [SerializeField] SerializedDictionary<EquipmentType, ItemTileComponent> _equipsTiles;
+        [SerializeField] SerializedDictionary<ItemType, ItemTileComponent> _equipsTiles;
         [SerializeField] List<ItemTileComponent> _inventoryTiles = new List<ItemTileComponent>();
 
         [Space, SerializeField] private ItemTileComponent _tilePreset; // for items
         [SerializeField] private Transform _tileParent; // for items too
 
-        [SerializeField] TooltipPanelComp _itemTooltipPanel;
-        [SerializeField] TooltipPanelComp _skillTooltipPanel;
+        [SerializeField] ItemCardComponent _itemTooltipPanel;
+        [SerializeField] ItemCardComponent _skillTooltipPanel;
 
 
 
@@ -109,7 +109,7 @@ namespace Arcatech.UI
 
         #region item operations
 
-        public event UnityAction<UnitInventoryViewReference> ViewChangedInventory = delegate { };
+        public event UnityAction ViewChangedInventory = delegate { };
 
         [SerializeField] private TextMeshProUGUI _swapItemsButton;
         private Item _selectedItem;
@@ -150,12 +150,14 @@ namespace Arcatech.UI
             if (item == null) return;
 
             var desc = item.Config.Description;
+            /*
             try
             {
                 _itemTooltipPanel.gameObject.SetActive(true);
                 _itemTooltipPanel.Texts = desc;
             }
             catch { }
+            */
 
             if (item is Equipment e)
             {
@@ -164,7 +166,7 @@ namespace Arcatech.UI
                     _skillTooltipPanel.gameObject.SetActive(true);
                    // desc = e.GetSkillData.Descrription;
 
-                    _skillTooltipPanel.Texts = desc;
+                   // _skillTooltipPanel.Texts = desc;
 
                 }
                 catch { }

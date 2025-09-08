@@ -7,5 +7,10 @@ namespace Arcatech.Texts
     {
         public string Title;
         public string Text;
+
+        public override string ToString()
+        {
+            return Title+": "+Text;
+        }
     }
 }

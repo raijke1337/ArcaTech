@@ -23,6 +23,10 @@ namespace Arcatech.Items
             Assert.IsNotNull(Cost);
             //Assert.IsFalse(WeaponType == WeaponAnimationsSet.None);
         }
+        public override IItem BuildItem(BaseGameEntityComponent owner)
+        {
+            return new Weapon(this, owner);
+        }
 
 
     }

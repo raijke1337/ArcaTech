@@ -1,34 +1,31 @@
 using Arcatech.Texts;
 using System;
+using Arcatech.UI;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Arcatech.Items
 {
     [Serializable, CreateAssetMenu(fileName = "New Backpack Item", menuName = "Items/Just Item")]
-    public class ItemSO : ScriptableObjectID
+    public class ItemSO : ScriptableObjectID, IIconContent
     {
-        public BaseItemComponent ItemPrefab;
+        [SerializeField] public BaseItemComponent itemPrefab;
         public ExtendedText Description;        
-        public EquipmentType Type;
+        public ItemType type;
 
         [Space] public int MaxStack = 1;
         protected virtual void OnValidate()
         {
-            Assert.IsFalse(Type==EquipmentType.None);
+            Assert.IsFalse(type==ItemType.None);
         }
 
+        public virtual IItem BuildItem(BaseGameEntityComponent owner)
+        {
+            return new Item(this,owner);
+        }
 
-        //[ProButton]
-        //protected void CheckAttributes()
-        //{
-        //    var type = this.GetType();
-        //    var fields = type.GetFields();
-
-        //    foreach (var field in fields)
-        //    {
-        //        Debug.Log($"public field {field.Name} type is {field.FieldType}, base is SO: {field.FieldType.BaseType.IsAssignableFrom(typeof(ScriptableObject))}");
-        //    }
-        //}
+        public Sprite Icon => Description.Picture;
+        public float FillValue => 0;
+        public string IconValue => string.Empty;
     }
 }

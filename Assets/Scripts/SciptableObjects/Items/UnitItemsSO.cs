@@ -1,4 +1,6 @@
+using Arcatech.Managers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -6,10 +8,31 @@ namespace Arcatech.Items
 {
     [Serializable]
     [CreateAssetMenu(fileName = "New Unit Items Preset", menuName = "Items/Inventory preset", order = 3)]
-    public class UnitItemsSO : ScriptableObjectID
+    public class UnitItemsSO : ScriptableObjectID, IEntityItemsList
     {
-        [SerializeField] public List<EquipSO> Equipment;
-        [SerializeField, Space] public List<ItemSO> Inventory;
+        [SerializeField] List<EquipSO> Equipment;
+        [SerializeField, Space] List<ItemSO> Inventory;
+
+        public List<IItem> GetEquipment(BaseGameEntityComponent owner)
+        {
+            List<IItem> equipList = new List<IItem>();
+
+            foreach (EquipSO equip in Equipment)
+            {
+                equipList.Add(DataManager.Instance.MakeItem(equip,owner));
+            }
+            return equipList;
+        }
+
+        public List<IItem> GetInventory(BaseGameEntityComponent owner)
+        {
+            List<IItem> invList = new List<IItem>();
+            foreach (ItemSO item in Inventory)
+            {
+                invList.Add(DataManager.Instance.MakeItem(item, owner));
+            }
+            return invList;
+        }
 
         private void OnValidate()
         {
@@ -23,9 +46,14 @@ namespace Arcatech.Items
             }
         }
 
-        public UnitInventoryItemConfigsContainer BuildContainer()
-        {
-            return new UnitInventoryItemConfigsContainer(this);
-        }
+    }
+
+
+    public interface IEntityItemsList
+    {
+        public List<IItem> GetEquipment(BaseGameEntityComponent owner);
+        public List<IItem> GetInventory(BaseGameEntityComponent owner);
+
+
     }
 }

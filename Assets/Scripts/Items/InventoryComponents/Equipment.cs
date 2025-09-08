@@ -18,8 +18,9 @@ namespace Arcatech.Items
         }
         public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
         {
+            Debug.Log($"Build equipment class {this}");
             StatMods = new();
-            DisplayItem = GameObject.Instantiate(cfg.ItemPrefab);
+            DisplayItem = GameObject.Instantiate(cfg.itemPrefab);
             if (cfg.StatMods != null)
             {
                 foreach (var m in cfg.StatMods)
@@ -27,27 +28,12 @@ namespace Arcatech.Items
                     if (m != null)
                         StatMods.Add(m.BuildMod);
                 }
-
-            }
-
-            DisplayItem.gameObject.SetActive(false);
-          //  Debug.Log($"setup equipment{this}");
-        }               
+            }            
+        }          
         
         public void SetItemEmpty(Transform pos)
-        {
-            ItemShown = true;            
+        {        
             DisplayItem.transform.SetParent(pos.transform,false);
-        }
-
-
-        public bool ItemShown
-        {
-            get { return DisplayItem.gameObject.activeSelf; }
-            set
-            {
-                DisplayItem.gameObject.SetActive(value);
-            }
         }
 
         public BaseItemComponent DisplayItem { get; protected set; }
@@ -61,6 +47,18 @@ namespace Arcatech.Items
                 if (cachedUsables == null) CollectUsables(Config as EquipSO);
                 return cachedUsables;
             }
+        }
+
+
+
+        public void OnEquip()
+        {
+            DisplayItem.gameObject.SetActive(true);
+        }
+
+        public void OnUnequip()
+        {
+            DisplayItem.gameObject.SetActive(false);
         }
     }
 }

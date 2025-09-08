@@ -5,8 +5,8 @@ namespace Arcatech.Managers
     public class GameSaveData
     {
         public List<string> OpenedLevelsID;
-        public UnitInventoryItemConfigsContainer Inventory { get; protected set; }
-        public void UpdateInventory(UnitInventoryItemConfigsContainer c) 
+        public UnitInventoryContainer Inventory { get; protected set; }
+        public void UpdateInventory(UnitInventoryContainer c) 
         {
             Inventory = c;
         }

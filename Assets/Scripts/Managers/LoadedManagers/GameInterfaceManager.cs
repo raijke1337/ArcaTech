@@ -2,12 +2,13 @@ using Arcatech.EventBus;
 using Arcatech.Texts;
 using Arcatech.UI;
 using Arcatech.Units;
+using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Arcatech.Managers
 {
-    public class GameInterfaceManager : MonoBehaviour, IManagedController
+    public class GameInterfaceManager : ValidatedMonoBehaviour
     {
 
         public static GameInterfaceManager Instance;
@@ -17,42 +18,27 @@ namespace Arcatech.Managers
             else Destroy(this.gameObject);
         }
 
-
-        [SerializeField] private TargetPanel _tgtPan;
-        [SerializeField] private PlayerUnitPanel _playerPan;
-        [SerializeField] private GameTextWindowComponent _text;
+//unused
+        //[SerializeField,Self] private TargetPanel _tgtPan;
+        [SerializeField,Child] private PlayerUnitPanel _playerPan;
+     //unused   //[SerializeField,Child] private GameTextWindowComponent _text;
         [SerializeField] private GameObject _ded;
         [SerializeField] private GameObject _pause;
-
-        EventBinding<PlayerStatsChangedUIEvent> _statChangedBind;
+        [SerializeField,Child,Self] private ItemCardComponent _inspectItemCard;
         
+
         EventBinding<PauseToggleEvent> _pauseToggleBind;
-        EventBinding<PlayerTargetUpdateEvent> _targetUpdateBinding;
+        EventBinding<BaseEntityMouseOverEvent> _mouseOverBind;
         
 
         #region managed
-        public virtual void StartController()
-        {
-        }
-
-
-        public virtual void FixedControllerUpdate(float fixedDelta)
-        {
-
-        }
-
-        public virtual void ControllerUpdate(float delta)
-        {
-
-        }
 
         private void OnEnable()
         {
             _pauseToggleBind = new EventBinding<PauseToggleEvent>(ShowPauseMenu);
-            _targetUpdateBinding = new EventBinding<PlayerTargetUpdateEvent>(OnTargetUpdate);
-
+            _mouseOverBind = new EventBinding<BaseEntityMouseOverEvent>(OnMouseOver);
             EventBus<PauseToggleEvent>.Register(_pauseToggleBind);
-            EventBus<PlayerTargetUpdateEvent>.Register(_targetUpdateBinding);
+            EventBus<BaseEntityMouseOverEvent>.Register(_mouseOverBind);
         }
 
         private void Start()
@@ -61,38 +47,35 @@ namespace Arcatech.Managers
             if (GameManager.Instance.GetCurrentLevelData.LevelType == LevelType.Game)
             {
                 _playerPan.gameObject.SetActive(true);
-
-                _text.gameObject.SetActive(false);
-                _text.DialogueCompleteEvent += OnDialogueCompletedInTextWindow;
                 _ded.SetActive(false);
-                _tgtPan.gameObject.SetActive(false); /// placeholder
             }
             else
             {
                 _playerPan.gameObject.SetActive(false);
-                _text.gameObject.SetActive(false);
-                _text.DialogueCompleteEvent += OnDialogueCompletedInTextWindow; // dialogues also happen in scene levels
                 _ded.SetActive(false);
-                _tgtPan.gameObject.SetActive(false);
             }
         }
         private void OnDisable()
         {
             EventBus<PauseToggleEvent>.Deregister(_pauseToggleBind);
-            EventBus<PlayerTargetUpdateEvent>.Deregister(_targetUpdateBinding);
+            EventBus<BaseEntityMouseOverEvent>.Deregister(_mouseOverBind);
         }
-        public virtual void StopController()
-        {
-        }
+
         #endregion
 
 
         #region game dialogues and texts
 
+        void SetupGameTextWindow()
+        {
+            /*_text.gameObject.SetActive(false);
+            _text.DialogueCompleteEvent += OnDialogueCompletedInTextWindow;*/
+        }
 
         public void UpdateGameText(DialoguePart text, bool isShown)
         {
 
+            /*
             if (isShown)
             {
                 //_playerPan.LoadedDialogue(text, isShown);
@@ -108,38 +91,30 @@ namespace Arcatech.Managers
                 //_playerPan.LoadedDialogue(text, isShown);
                 _text.gameObject.SetActive(isShown);
                 EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(isShown));
-            }
+            }*/
 
         }
         private void OnDialogueCompletedInTextWindow()
         {
             EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(false));
-            _text.gameObject.SetActive(false);
+           // _text.gameObject.SetActive(false);
         }
 
 
         #endregion
 
- 
-        #region UI events from event bus
-
-
-        void OnTargetUpdate(PlayerTargetUpdateEvent e)
+        void OnMouseOver(BaseEntityMouseOverEvent info)
         {
-           // Debug.Log($"{e}");
-            if (e.Target is PlayerUnit) return; //dont show playuer
-
-            //_tgtPan.UpdateTargeted(e.Target);
-            //_tgtPan.gameObject.SetActive(e.Target != null);
-
-
+            // TODO: show hotkeys tooltip: use/inspect
         }
 
-        #endregion
+
 
 
         #region menus
 
+        
+        
         public void ShowPauseMenu(PauseToggleEvent isPause)
         {
             // dont pause the game here

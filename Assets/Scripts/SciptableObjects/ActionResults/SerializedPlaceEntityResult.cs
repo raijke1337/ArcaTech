@@ -28,5 +28,4 @@ namespace Arcatech.Actions
             GameObject.Instantiate(EntityToPlace, place.position, place.rotation);
         }
     }
-
 }

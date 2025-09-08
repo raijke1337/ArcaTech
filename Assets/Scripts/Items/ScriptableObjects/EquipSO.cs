@@ -16,8 +16,13 @@ namespace Arcatech.Items
         protected override void OnValidate()
         {
             base.OnValidate();
-            Assert.IsNotNull(ItemPrefab);
+            Assert.IsNotNull(itemPrefab);
           //  Assert.IsNotNull(Skill);
+        }
+
+        public override IItem BuildItem(BaseGameEntityComponent owner)
+        {
+            return new Equipment(this, owner);
         }
     }
 

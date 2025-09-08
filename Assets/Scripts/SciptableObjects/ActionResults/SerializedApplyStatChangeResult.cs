@@ -60,20 +60,21 @@ namespace Arcatech.Actions
                         }
                         break;
                     case TargetingType.AnyUnit:
+                        if (target.GetEntitySide == Side.Unassigned) return;
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
                         }
                         break;
                     case TargetingType.AnyEnemy:
-                        if (target.GetEntitySide== user.GetEntitySide) return;
+                        if (target.GetEntitySide== user.GetEntitySide && target.GetEntitySide != Side.Unassigned) return;
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
                         }
                         break;
                     case TargetingType.AnyAlly:
-                        if (target.GetEntitySide != user.GetEntitySide) return;
+                        if (target.GetEntitySide != user.GetEntitySide && target.GetEntitySide != Side.Unassigned) return;
                         foreach (var e in _effs[type])
                         {
                             EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));

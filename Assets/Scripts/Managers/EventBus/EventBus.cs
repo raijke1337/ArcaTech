@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Arcatech.EventBus
 {
@@ -12,6 +13,10 @@ namespace Arcatech.EventBus
 
         public static void Raise(T @event)
         {
+            if (bindings.Count == 0)
+            {
+                Debug.LogWarning($"Event of type {typeof(T)} raised but there are no bindings.");
+            }
             foreach (var binding in bindings)
             {
                 binding.OnEvent.Invoke(@event);

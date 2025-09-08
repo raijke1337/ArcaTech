@@ -1,8 +1,9 @@
+using System;
 using Arcatech.Units.Inputs;
 using UnityEngine;
 namespace Arcatech.Scenes.Cameras
 {
-    public class IsoCameraController : MonoBehaviour, IManagedController
+    public class IsoCameraController : MonoBehaviour
     {
         private PlayerAimingComponent _playerAimingComponent;
         private Vector3 _cameraTargetPoint;
@@ -16,19 +17,16 @@ namespace Arcatech.Scenes.Cameras
 
         
 
-        #region managed
-        public void StartController()
+        private void Start()
         {
             _camera = GetComponent<Camera>();      
-           // _cors = new Dictionary<FadingDecorComponent, Coroutine>();           
-
         }
 
-        public void ControllerUpdate(float delta)
+        public void Update()
         {
             if (_playerAimingComponent == null)
             {
-                _playerAimingComponent = FindObjectOfType<PlayerAimingComponent>();
+                _playerAimingComponent = FindAnyObjectByType<PlayerAimingComponent>();
                 transform.position = _playerAimingComponent.transform.position + _desiredOffsetFromPlayer;
             }
             else
@@ -41,27 +39,19 @@ namespace Arcatech.Scenes.Cameras
                 else
                 {
 
-                    _cameraTargetPoint = _playerAimingComponent.transform.position + _playerAimingComponent.GetNormalizedDirectionToTaget * _lookDist;
+                    _cameraTargetPoint = _playerAimingComponent.transform.position +
+                                         _playerAimingComponent.GetNormalizedDirectionToTaget * _lookDist;
 
                 }
 
-                transform.position = Vector3.Slerp(transform.position, _cameraTargetPoint + _desiredOffsetFromPlayer, Time.deltaTime * _catchUpSpeed);
+                transform.position = Vector3.Slerp(transform.position, _cameraTargetPoint + _desiredOffsetFromPlayer,
+                    Time.deltaTime * _catchUpSpeed);
 
             }
 
 
         }
-        public void FixedControllerUpdate(float fixedDelta)
-        {
 
-        }
-        public void StopController()
-        {
-
-        }
-
-        #endregion
-    
     }
 
 

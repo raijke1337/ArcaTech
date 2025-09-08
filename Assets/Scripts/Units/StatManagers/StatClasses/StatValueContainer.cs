@@ -31,6 +31,19 @@ namespace Arcatech.Stats
         private float _initValue = 0f;
         private bool _setup = false;
 
+
+
+        public void ResetMods()
+        {
+            _inactiveMods.Clear();
+            _activeMods.Clear();
+            _maxValue = 0f;
+            _currentValue= 0f;
+            _cachedValue = 0f;
+            _minValue = 0f;
+            _setup = false;
+        }
+
         public override string ToString()
         {
             return ($"{Mathf.RoundToInt(GetCurrent)} / {Mathf.RoundToInt(GetMax)}");
@@ -53,7 +66,7 @@ namespace Arcatech.Stats
             else
             {
                 UpdateMods(deltaTime);
-                if (_activeMods.Count > 0) 
+                if (_activeMods.Count > 0 || _inactiveMods.Count > 0) 
                 { 
                     _currentValue = _initValue;
                     _cachedValue = _initValue;
@@ -80,6 +93,7 @@ namespace Arcatech.Stats
                 Debug.Log($"Removed mod {mod.ID}");
             }
 
+            UpdateMods(Time.deltaTime);
         }
 
         void UpdateMods(float d)
@@ -91,7 +105,7 @@ namespace Arcatech.Stats
                     _activeMods.Add(mod);
                     _inactiveMods.Remove(mod);
                     _initValue += mod.GetInitValue;
-                    _maxValue += mod.GetMaxValue;                 
+                    _maxValue += mod.GetMaxValue; 
                 }
             }
             foreach (var mod in _activeMods.ToList())

@@ -12,7 +12,14 @@ namespace Arcatech.UI
         [SerializeField] private TextMeshProUGUI _text;
         IIconContent iconContent;
 
-        public void AssignIcon(IIconContent content) => iconContent = content;
+        public void AssignIcon(IIconContent content)
+        {
+            iconContent = content;
+            _icon.sprite = iconContent.Icon;
+            _text.text = iconContent.IconValue;
+            _timerFill.fillAmount = iconContent.FillValue;
+        }
+        
         public void OnUse()
         {
             RectTransform rectTransform = GetComponent<RectTransform>();
@@ -23,7 +30,6 @@ namespace Arcatech.UI
         {
             if (iconContent != null)
             {
-
                 _icon.sprite = iconContent.Icon;
                 _text.text = iconContent.IconValue;
                 _timerFill.fillAmount = iconContent.FillValue;

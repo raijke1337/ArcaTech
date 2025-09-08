@@ -67,10 +67,6 @@ namespace Arcatech.Units.Inputs
             _aimPlane = new Plane(Vector3.down, planeY);
             GetLookTarget = transform.forward;
 
-            targetUpdate = new CountDownTimer(targetingUpdateFreq);
-            resetTargetTimer = new CountDownTimer(1f); //todo
-            targetUpdate.Start();
-            resetTargetTimer.Start();
             init = true;
         }
 
@@ -87,7 +83,6 @@ namespace Arcatech.Units.Inputs
             // aim at plane
             ////raycast at plane
             Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
-           // Ray r = _br.OutputCamera.ScreenPointToRay(Input.mousePosition);
             
             _aimPlane.Raycast(r, out float rayDist);
             GetLookTarget = r.GetPoint(rayDist);
@@ -99,62 +94,14 @@ namespace Arcatech.Units.Inputs
             _dotProduct = Vector3.Dot(transform.forward, GetNormalizedDirectionToTaget);
             _rotationToTarget = Vector3.Cross(transform.forward, GetNormalizedDirectionToTaget).y;
 
-
-            //if (currentTgt is IInteractible)
-            //{
-            //    GameUIManager.Instance.SetCursor(CursorType.Item);
-            //    if (currentTgt is BaseEntity)
-            //    {
-            //        GameUIManager.Instance.SetCursor(CursorType.EnemyTarget);
-            //    }
-            //}
-            //else
-            //{
-            //    GameUIManager.Instance.SetCursor(CursorType.Explore);
-            //}
-
-
-            targetUpdate.Tick(Time.deltaTime);
-            resetTargetTimer.Tick(Time.deltaTime);
-            if (targetUpdate.IsReady)
-            {
-                //CheckTargetables(_target);
-                targetUpdate.Reset();
-                targetUpdate.Start();
-            }
         }
         private void OnDisable()
         {
             init = false;
         }
-        //void CheckTargetables(Vector3 target)
-        //{
-        //    if (target == null) return; 
-
-        //    if (Physics.OverlapSphereNonAlloc(target, targetingSphereRadius, checkColliders, LayerMask.NameToLayer("Ground")) > 0) // dont check ground layer objects
-        //    {
-        //        for (int i = 0; i < checkColliders.Length; i++)
-        //        {
-        //            if (checkColliders[i] == null) return;
-        //            if (checkColliders[i].TryGetComponent<ITargetable>(out var component))
-        //            {
-        //                currentTgt = component;
-        //                break;
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        currentTgt = null;
-        //    }
-
-        //    EventBus<PlayerTargetUpdateEvent>.Raise(new PlayerTargetUpdateEvent(currentTgt));
-        //}
 
         #endregion
 
-        // this is now done through event system  
-        
 
 
     }

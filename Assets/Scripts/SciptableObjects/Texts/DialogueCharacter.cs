@@ -6,7 +6,7 @@ namespace Arcatech.Texts
     public class DialogueCharacter : ScriptableObject
     {
         public string CharacterName;
-        public SerializedDictionary<FaceExpression, Sprite> Pictures;
+      //  public SerializedDictionary<FaceExpression, Sprite> Pictures;
         
     }
 }

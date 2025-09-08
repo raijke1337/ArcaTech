@@ -3,49 +3,49 @@ using Arcatech.Stat;
 using Arcatech.Units;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Arcatech.Items
 {
     [Serializable]
-    public class UsablesHandler : IUnitActionsHandler
+    public class UsablesHandler : IUnitActionsHandler, IUnitInventoryView
     {
         #region serialize
         [SerializeField, ReadOnlyText] string info;
         #endregion
 
-
+        IDrawItemStrategy currentDrawItemStrategy;
         public event UnityAction<IDrawItemStrategy> DrawStrategyUpdateEvent = delegate { };
+        public event UnityAction ViewChangedInventory;
 
-        ObservableDictionary<EquipmentType, Equipment> _dict;
         Dictionary<UnitActionType, IUsable> _usables;
-        public Dictionary<UnitActionType, IUsable> GetUsables => _usables;
+        public List<IUsable> GetUsables => _usables.Values.ToList();
 
-        public UsablesHandler(ObservableDictionary<EquipmentType,Equipment> equipments)
+        public UsablesHandler ()
         {
             _usables = new();
-            _dict = equipments;
-            Refresh();
-
-            _dict.AnyValueChanged += _dict_AnyValueChanged;
             info = "Init";
         }
 
-        private void _dict_AnyValueChanged(IEnumerable<Equipment> obj)
+        public void RefreshView(UnitInventoryModel model)
         {
-            Refresh();
-        }
+            Debug.Log("Refresh usables in handler");
 
+            var newEquips = model.ListEquipped;
+            List<IUsable> newList = new();
 
-        void Refresh()
-        {
-            foreach (var eq in _dict.GetAllValues())
+            foreach (var equipment in newEquips)
             {
-                var u = eq.GetUsables;
-                foreach (var uu in u)
+                newList.AddRange(equipment.GetUsables);
+            }
+            foreach (var sk in newList)
+            {
+                if (!_usables.TryGetValue(sk.UseActionType, out IUsable usable) || usable != sk)
                 {
-                    _usables[uu.UseActionType] = uu;
+                    // no key or different skill loaded
+                    _usables[sk.UseActionType] = sk;
                 }
             }
         }
@@ -63,18 +63,30 @@ namespace Arcatech.Items
             action = null;
             if (_usables.TryGetValue(type, out var usable))
             {
+                if (usable == null)
+                {
+                    info = $"No usable assigned for {type}";
+                    return false;
+                }
+
                 bool ok = usable.TryUseItem(stats, out action);
 
                 info = $"Use {usable} result {ok} ";
 
                 if (usable is IAffectsItemDisplay disp)
                 {
-                    DrawStrategyUpdateEvent?.Invoke(disp.DrawStrategy);
+                    if (disp.DrawStrategy != currentDrawItemStrategy)
+                    {
+                        currentDrawItemStrategy = disp.DrawStrategy;
+                        DrawStrategyUpdateEvent?.Invoke(disp.DrawStrategy);
+                    }
                 }
                 return ok;
             }
             return false;
         }
+
+
     }
 
 

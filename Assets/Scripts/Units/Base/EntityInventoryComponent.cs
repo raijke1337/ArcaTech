@@ -2,6 +2,8 @@
 using Arcatech.Stat;
 using KBCore.Refs;
 using System.Collections.Generic;
+using Arcatech.Actions;
+using Arcatech.Interactions;
 using UnityEngine;
 
 namespace Arcatech.Units
@@ -21,29 +23,21 @@ namespace Arcatech.Units
 
         private List<IUnitInventoryView> _views;
         [SerializeField] private UnitInventoryModel _model;
-
+        [SerializeField] private ActionResultIsProducedInteractionHandler droppedItemPrefab;
 
         private void OnEnable()
         {
             _views = new();
-            _model = new UnitInventoryModel(defaultEquips.BuildContainer(),baseGameEntity);
+            _model = new UnitInventoryModel(defaultEquips,baseGameEntity);
 
-            _model.ItemAddedToInventoryEvent += ModelInventoryChanges;
-            _model.ItemRemovedFromInventoryEvent += ModelInventoryChanges;
-            _model.ItemEquippedEvent += ModelInventoryChanges;
-            _model.ItemUnequippedEvent += ModelInventoryChanges;
+            SetModelView(_model.Handler);
+            _model.ModelUpdatedEvent += RefreshViews;
         }
-        private void ModelInventoryChanges(Item arg0)
-        {
-            RefreshViews();
-        }
+
 
         private void OnDisable()
         {
-            _model.ItemAddedToInventoryEvent -= ModelInventoryChanges;
-            _model.ItemRemovedFromInventoryEvent -= ModelInventoryChanges;
-            _model.ItemEquippedEvent -= ModelInventoryChanges;
-            _model.ItemUnequippedEvent -= ModelInventoryChanges;
+            _model.ModelUpdatedEvent -= RefreshViews;
             foreach (var view in _views)
             {
                 view.ViewChangedInventory-= OnInvenoryChangedUI;
@@ -55,7 +49,6 @@ namespace Arcatech.Units
         {
             if (baseGameEntity.Paused) return;
             _model?.UpdateDeltaModel(Time.deltaTime);
-            _model.DrawStrategyChangedEvent += RefreshViews;
         }
 
         private void RefreshViews()
@@ -64,6 +57,7 @@ namespace Arcatech.Units
             {
                 view.RefreshView(_model);
             }
+            
         }
 
 
@@ -86,7 +80,7 @@ namespace Arcatech.Units
                 }
             }
         }
-        private void OnInvenoryChangedUI(UnitInventoryViewReference reference)
+        private void OnInvenoryChangedUI()
         {
             Debug.Log($"Something happened in inventory view");
         }
@@ -98,7 +92,28 @@ namespace Arcatech.Units
         /// this is not very good... maybe TODO refactor
         /// </summary>
         public IUnitActionsHandler GetUnitActionsHandler => _model.Handler;
-        public void AddItemToInventory(ItemSO item, int amount = 1) => _model.PickUpItem(item, amount);
+
+        public void PickUpItem(IItem item, int amount = 1)
+        {
+            if (item is Equipment e)
+            {
+                // equip new or replace equipped
+                _model.EquipItem(e, out var un);
+                if (un != null) // something was dropped
+                {
+                    if (droppedItemPrefab != null)
+                    {
+                        var d = Instantiate(droppedItemPrefab,transform.position,Quaternion.identity);
+                        d.OverrideResults(new AddItemToInventoryResult(un,1));
+                        d.RedrawItem(un.itemPrefab);                        
+                    }
+                }
+            }
+            else
+            {
+                _model.PickUpItem(item as Item);
+            }
+        }
 
         #endregion
 

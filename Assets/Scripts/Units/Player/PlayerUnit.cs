@@ -10,8 +10,6 @@ namespace Arcatech.Units
     public class PlayerUnit : ActiveGameUnitComponent
     {
         [Space, Header("Player Unit")]
-        //[SerializeField] int _armorBreakStam = 30;
-        //[SerializeField] int _armorBreakEnergy = 30;
 
         [SerializeField, Child] protected Camera _faceCam;
         [SerializeField, Self] protected GroundDetection _ground;

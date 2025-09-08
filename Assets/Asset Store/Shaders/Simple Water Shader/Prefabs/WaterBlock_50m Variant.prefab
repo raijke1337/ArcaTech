@@ -172,6 +172,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: WaterBlock_50m Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 1507636620937791836, guid: 7097ba7ba649e1f41bba232312bdcbd8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 1507636620937791839, guid: 7097ba7ba649e1f41bba232312bdcbd8,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -247,6 +252,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4576d274f70943841aa5bd731b925574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _collider: {fileID: 1067013418687965686}
   targetType: 2
   ReapplyWhileActorInsideTimer: 0
   ResultOnEntry:
@@ -268,10 +274,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _name: Deep Water
-  entitySide: 1
+  entitySide: 0
   _showDebugs: 0
   _rigidbody: {fileID: 6858666473734577872}
   gravity: 0
+  usePhysics: 0
 --- !u!54 &6858666473734577872
 Rigidbody:
   m_ObjectHideFlags: 0

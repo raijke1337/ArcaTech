@@ -5,16 +5,19 @@ namespace Arcatech
 {/// <summary>
  /// new component that defines any game enitity that does something
  /// </summary>
-    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Rigidbody),typeof(Collider))]
     public class BaseGameEntityComponent : ValidatedMonoBehaviour
     {
         [SerializeField] string _name;
         [SerializeField] Side entitySide;
         [Space,SerializeField] protected bool _showDebugs = false;
 
+        
         public string GetName { get => _name; }
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
+        public Collider Collider { get; protected set; }
+    
 
         public bool Paused { get => _paused;  }
         protected bool _paused;
@@ -23,6 +26,14 @@ namespace Arcatech
         [SerializeField] bool usePhysics = false;
 
         EventBinding<PauseToggleEvent> _pauseBind;
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            gameObject.layer = LayerMask.NameToLayer("Entities");
+            Collider = GetComponent<Collider>(); 
+        }
+
         private void OnEnable()
         {
             _pauseBind = new EventBinding<PauseToggleEvent>(HandlePauseEvent);
@@ -43,9 +54,8 @@ namespace Arcatech
 
         public void KillEntity()
         {
-            gameObject.SendMessage("OnDisable");        
-            
-           // Destroy(gameObject,5f);
+            //gameObject.SendMessage("OnDisable");        
         }
+        
     }
 }

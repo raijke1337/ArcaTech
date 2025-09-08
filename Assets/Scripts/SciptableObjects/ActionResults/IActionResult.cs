@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 
 namespace Arcatech.Actions
 {
@@ -7,4 +8,6 @@ namespace Arcatech.Actions
         void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place);
     }
 
+
+    
 }

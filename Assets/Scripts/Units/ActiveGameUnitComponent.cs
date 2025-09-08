@@ -1,3 +1,4 @@
+using System;
 using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Stat;
@@ -27,6 +28,8 @@ namespace Arcatech
 
         BaseUnitAction _damageAction;
         BaseUnitAction _deathAction;
+        
+        SimpleEntityShadowComponent _entityShadowComponent;
 
         /// <summary>
         /// TODO maybe in future
@@ -54,6 +57,7 @@ namespace Arcatech
 
             _damageAction = ActionOnDamage.ProduceAction(this,transform);
             _deathAction = ActionOnDeath.ProduceAction(this, transform);
+
         }
 
         private void Update()
@@ -61,7 +65,7 @@ namespace Arcatech
 
             if (currentAction != null)
             {
-                switch (currentAction?.UpdateAction(Time.deltaTime))
+                switch (currentAction.UpdateAction(Time.deltaTime))
                 {
                     case UnitActionState.None:
                         break;
@@ -188,6 +192,8 @@ namespace Arcatech
             var hp = stats[BaseStatType.Health];
             if (hp != null && hp.Initialized)
             {
+
+              //  Debug.Log($"HP delta {hp.GetFrameDeltaValue}");
                 if (Mathf.Abs(hp.GetFrameDeltaValue)>20) //todo)
                 {
                     EventBus<DrawDamageEvent>.Raise(new DrawDamageEvent(GetMainEntity, hp.GetFrameDeltaValue));

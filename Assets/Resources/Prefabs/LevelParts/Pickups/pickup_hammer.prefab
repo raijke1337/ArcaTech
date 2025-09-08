@@ -17,7 +17,9 @@ GameObject:
   - component: {fileID: 8224275198194761622}
   - component: {fileID: 2582706125086365489}
   - component: {fileID: 5586239703572642459}
-  m_Layer: 0
+  - component: {fileID: 5287220027445504331}
+  - component: {fileID: 4010592558988301257}
+  m_Layer: 6
   m_Name: pickup_hammer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -186,6 +188,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _itemDisappearsWhenUsed: 1
   baseComp: {fileID: 6707420656619622707}
+  entityMouseOver: {fileID: 4010592558988301257}
   handlersOnThisItem:
   - {fileID: 5586239703572642459}
   handlers: []
@@ -202,8 +205,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1028b416ce9e4168bc449c533c991a29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _results:
+  serializedResults:
   - {fileID: 11400000, guid: 0d1efe6750c378b41b46ede4e2e7c978, type: 2}
+--- !u!114 &5287220027445504331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5851101444661264902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _collider: {fileID: 1337123451077350153}
+--- !u!114 &4010592558988301257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5851101444661264902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d98429605effd164e904647258488147, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entity: {fileID: 6707420656619622707}
+  outlineMaterial: {fileID: 0}
+  outlineColor: {r: 0, g: 1, b: 1, a: 1}
+  outlineWidth: 0.02
+  useGlow: 1
+  glowIntensity: 2
+  animateAppearance: 1
+  fadeInDuration: 0.2
+  fadeOutDuration: 0.15
+  fadeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _glows: []
 --- !u!1001 &1750235107736355532
 PrefabInstance:
   m_ObjectHideFlags: 0

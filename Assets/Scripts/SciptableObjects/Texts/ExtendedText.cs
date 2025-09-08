@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 namespace Arcatech.Texts
 {
@@ -6,5 +7,11 @@ namespace Arcatech.Texts
     {
         public Sprite Picture;
         public string FlavorText;
+        public override string ToString()
+        {
+            var s = base.ToString();
+            s += "\n" + FlavorText;
+            return s;
+        }
     }
 }

@@ -24,7 +24,10 @@ namespace Arcatech.UI
         #region setup
         public StatBarContainerUIScript LinkContainer(StatValueContainer c)
         {
-            _valueContainer = c;
+            if (c != _valueContainer)
+            {
+                _valueContainer = c;
+            }
             return this;    
         }
         public StatBarContainerUIScript SetColors(ColorSet color)
@@ -46,7 +49,7 @@ namespace Arcatech.UI
             return this;
         }
         
-        public StatBarContainerUIScript SetShake(float deltaTr)
+        public StatBarContainerUIScript SetBrightGlowAT(float deltaTr)
         {
             deltaTreschold = deltaTr;
             return this;
@@ -54,9 +57,7 @@ namespace Arcatech.UI
         #endregion
 
         private void Update()
-        {
-            
-
+        {            
             if (_valueContainer != null && _valueContainer.Initialized)
             {
                 _fill.DOFillAmount(_valueContainer.GetPercent, fillTime).SetEase(_ease).Play();

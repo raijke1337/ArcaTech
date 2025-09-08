@@ -16,9 +16,12 @@ namespace Arcatech.Items
         {
             Assert.IsNotNull(OnApply);
         }
-        public ShieldAbsorbStrategy ProduceStrat()
+        public ShieldAbsorbStrategy BuildStrategy
         {
-            return new ShieldAbsorbStrategy(AbsorbPercent, AbsorbReduction, AbsorbTime, OnApply);
+            get
+            {
+                return new ShieldAbsorbStrategy(AbsorbPercent, AbsorbReduction, AbsorbTime, OnApply);
+            }
         }
     }
 

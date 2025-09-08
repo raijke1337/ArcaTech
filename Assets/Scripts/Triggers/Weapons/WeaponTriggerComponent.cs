@@ -21,7 +21,7 @@ namespace Arcatech.Triggers
 
             if (other.TryGetComponent<BaseGameEntityComponent>(out var o))
             {
-                Debug.Log($"{this} hit entity trigger {o.GetName}");
+                //Debug.Log($"{this} hit entity trigger {o.GetName}");
                 SomeColliderWasHitEvent?.Invoke(other);
             }
 
