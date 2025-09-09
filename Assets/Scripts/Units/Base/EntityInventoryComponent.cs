@@ -115,6 +115,19 @@ namespace Arcatech.Units
             }
         }
 
+        public bool TryUseItem(ItemSO what, int amount)
+        {
+            if (amount == 0)
+            {
+                bool ok = _model.HasItem(what);
+                Debug.Log($"{(ok? what +" found": "no item:")}");
+                return ok;
+            }
+            else
+            {
+                return _model.DropItem(what);
+            }
+        }
         #endregion
 
 

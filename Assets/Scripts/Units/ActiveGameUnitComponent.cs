@@ -205,7 +205,7 @@ namespace Arcatech
                     ForceUnitAction(_deathAction);
                     ActionLock = true;
 
-                    GetMainEntity.KillEntity();
+                   // GetMainEntity.Kill();
                 }
             }
 

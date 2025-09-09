@@ -72,7 +72,6 @@ namespace Arcatech.UI
 
                     if (_dmgGlow != null)
                     {
-
                         _dmgGlow.DOFade(1, 0.3f).OnComplete(()=>_dmgGlow.DOFade(0, 0.3f));
                     }
             }

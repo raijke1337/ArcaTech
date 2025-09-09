@@ -4,7 +4,6 @@ namespace Arcatech.Items
 {
     public interface IWeaponUseStrategy : IUsablesStrategy, IIconContent
     {
-        
     }
 
 }

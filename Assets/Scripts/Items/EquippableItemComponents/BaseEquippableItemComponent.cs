@@ -1,23 +1,19 @@
-﻿using KBCore.Refs;
+﻿using Arcatech.Units;
+using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Arcatech.Items
 {
-    public class BaseItemComponent : MonoBehaviour
+    public class BaseItemComponent : ValidatedMonoBehaviour,IActionStateItem
     {
-        [SerializeField] protected Transform _spawner;
-        public Transform Spawner { get => _spawner; }
-
-        protected virtual void OnValidate()
+        [SerializeField] protected Transform spawner;
+        public Transform Spawner => spawner;
+        public virtual void HandleActionState(UnitActionState s)
         {
-            Assert.IsNotNull(_spawner);
-            this.ValidateRefs();
+            Debug.Log($"ActionState {s}");
         }
-        public virtual void OnUse()
-        {
 
-        }
     }
 }
 

@@ -10,19 +10,19 @@ namespace Arcatech.Items
     {
         public ActiveGameUnitComponent Owner { get; }
         public WeaponSO Config { get; }
-        protected BaseWeaponComponent WeaponComponent { get; }
+        protected BaseEquipmentComponent GameObjectComponent { get; }
 
 
-        public WeaponStrategy (SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseWeaponComponent comp)
+        public WeaponStrategy (SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseEquipmentComponent comp)
         {
             Owner = unit.GetComponent<ActiveGameUnitComponent>();
             Config = cfg;
             ChargeReload = reload;
             InternalDelay = intcd;
             MaxCharges = charges;
-            WeaponComponent = comp;
+            GameObjectComponent = comp;
 
-            Action = act.ProduceAction(Owner, comp.Spawner);
+            InitialAction = act.ProduceAction(Owner, comp.Spawner);
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);
@@ -60,15 +60,15 @@ namespace Arcatech.Items
         #endregion
         #region usable
 
-        protected BaseUnitAction Action { get; }
+        protected BaseUnitAction InitialAction { get; }
 
         public virtual bool TryUseUsable(out BaseUnitAction action)
         {
-            action = Action;
+            action = InitialAction;
+            // if there are other actions they will be contained inside that one
             if (CanUseUsable())
             {
                 ChargesLogicOnUse();
-                WeaponComponent.OnUse();
                 return true;
             }
             else return false;
@@ -114,6 +114,8 @@ namespace Arcatech.Items
         public string IconValue => _remainingCharges > 0 ? "OK" : "CHARGING";
 
         #endregion
+
+
     }
 
 

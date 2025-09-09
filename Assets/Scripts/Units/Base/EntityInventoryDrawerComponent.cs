@@ -33,14 +33,16 @@ namespace Arcatech.Units
                 inventoryModel.DrawStrategyChangedEvent -= OnDrawStrategyChange; 
                 inventoryModel = model;
                 model.DrawStrategyChangedEvent += OnDrawStrategyChange;
+                OnDrawStrategyChange(defaultItemsDrawStrat);
             }
             if (inventoryModel == null)
             {
                 // first init
                 model.DrawStrategyChangedEvent += OnDrawStrategyChange;
                 inventoryModel = model;
+                OnDrawStrategyChange(defaultItemsDrawStrat);
             }
-            Debug.Log($"Refresh view in inventiory drawer");
+           // Debug.Log($"Refresh view in inventiory drawer");
 
         }
 

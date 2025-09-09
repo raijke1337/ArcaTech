@@ -1,4 +1,5 @@
 using Arcatech.EventBus;
+using Arcatech.Units;
 using KBCore.Refs;
 using UnityEngine;
 namespace Arcatech
@@ -17,10 +18,7 @@ namespace Arcatech
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
         public Collider Collider { get; protected set; }
-    
 
-        public bool Paused { get => _paused;  }
-        protected bool _paused;
         [Space,Header("Rigidbody override"),SerializeField,Self] Rigidbody _rigidbody;
         [SerializeField] bool gravity = false;
         [SerializeField] bool usePhysics = false;
@@ -36,26 +34,16 @@ namespace Arcatech
 
         private void OnEnable()
         {
-            _pauseBind = new EventBinding<PauseToggleEvent>(HandlePauseEvent);
-            EventBus<PauseToggleEvent>.Register(_pauseBind);
             _rigidbody.useGravity = gravity;
             _rigidbody.isKinematic = !usePhysics;
         }
-
-        void HandlePauseEvent(PauseToggleEvent e)
-        {
-            _paused = e.Value;
-        }
-
-        private void OnDisable()
-        {
-            EventBus<PauseToggleEvent>.Deregister(_pauseBind);
-        }
-
-        public void KillEntity()
-        {
-            //gameObject.SendMessage("OnDisable");        
-        }
+        
+            
+/// <summary>
+/// TODO rewrite this to use the new interfaces (ipausalbe, ikillable) etc
+/// </summary>
+        public bool Paused { get => _paused;  }
+        protected bool _paused;
         
     }
 }

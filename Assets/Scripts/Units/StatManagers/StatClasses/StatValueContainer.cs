@@ -41,6 +41,7 @@ namespace Arcatech.Stats
             _currentValue= 0f;
             _cachedValue = 0f;
             _minValue = 0f;
+            _initValue = 0f;
             _setup = false;
         }
 

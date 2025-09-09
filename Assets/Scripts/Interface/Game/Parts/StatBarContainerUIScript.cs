@@ -1,3 +1,4 @@
+using System;
 using Arcatech.Stats;
 using DG.Tweening;
 using KBCore.Refs;
@@ -21,12 +22,16 @@ namespace Arcatech.UI
         StatValueContainer _valueContainer;
         float deltaTreschold = 1;
 
+        public bool Setup { get; private set; } = false;
+        
+        
         #region setup
-        public StatBarContainerUIScript LinkContainer(StatValueContainer c)
+        public StatBarContainerUIScript LinkContainer(ref StatValueContainer c)
         {
             if (c != _valueContainer)
             {
                 _valueContainer = c;
+                Setup = true;
             }
             return this;    
         }
@@ -77,5 +82,10 @@ namespace Arcatech.UI
             }
         }
 
+        private void OnDisable()
+        {
+            Debug.Log("On disable bar");
+            Setup = false;
+        }
     }
 }

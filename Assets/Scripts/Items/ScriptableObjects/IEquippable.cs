@@ -15,6 +15,7 @@ namespace Arcatech.Items
 
     public interface IItem
     {
+        public SerializableGuid ID { get; }
         public ItemType Type { get; }
     }
 }

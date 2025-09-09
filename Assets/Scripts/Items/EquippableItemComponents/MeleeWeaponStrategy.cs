@@ -8,14 +8,11 @@ namespace Arcatech.Items
 {
     public class MeleeWeaponStrategy : WeaponStrategy
     {
-        public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, BaseWeaponComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
+        public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, BaseEquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
         {
-            Trigger = (comp as MeleeWeaponComponent).Trigger;
+            Trigger = (comp as MeleeWeaponBaseEquipmentComponent).Trigger;
             Trigger.SomeColliderWasHitEvent += HandleColliderHitEvent;
-            Trigger.ToggleCollider(false);
-
-            Trail = (comp as MeleeWeaponComponent).Trail;
-
+            
             OnColliderHit = new IActionResult[onHit.Length];
 
             for (int i = 0; i < onHit.Length; i++)
@@ -25,17 +22,8 @@ namespace Arcatech.Items
 
         }
         protected WeaponTriggerComponent Trigger;
-        protected MeleeWeaponTrail Trail;
         protected IActionResult[] OnColliderHit { get; }
         protected BaseUnitAction currentAction;
-
-
-         void SwitchCollider(bool state, float delay)
-        {
-            Trail.Emit = state;
-            Trigger.ToggleCollider(state);
-            if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"collider on {WeaponComponent} {(state == true ? "on" : "off")} ");
-        }
 
         public override bool TryUseUsable(out BaseUnitAction action)
         {
@@ -55,7 +43,7 @@ namespace Arcatech.Items
             // case advancing
            if (currentAction != null && currentAction.CanAdvance(out var next))
             {
-                action = next.ProduceAction(Owner,WeaponComponent.Spawner);
+                action = next.ProduceAction(Owner,GameObjectComponent.Spawner);
                 ChargesLogicOnUse();
                 currentAction.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
                 currentAction = action;
@@ -67,7 +55,7 @@ namespace Arcatech.Items
            else
             {
                 ChargesLogicOnUse();
-                action = Action;
+                action = InitialAction;
                 currentAction = action;
                 if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {action}");
                 action.ActionStateChangedEvent += Action_ActionStateChangedEvent;
@@ -77,17 +65,16 @@ namespace Arcatech.Items
 
         private void Action_ActionStateChangedEvent(UnitActionState state)
         {
+            GameObjectComponent.HandleActionState(state);
             switch (state)
             {
                 case UnitActionState.None:
                     break;
                 case UnitActionState.Started:
-                    SwitchCollider(true, 0);
                     break;
                 case UnitActionState.ExitTime:
                     break;
                 case UnitActionState.Completed:
-                    SwitchCollider(false, 0);
                     currentAction.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
                     break;
             }
@@ -103,7 +90,7 @@ namespace Arcatech.Items
                 {
                     if (!hitsThisSwing.Contains(e))
                     {
-                        PerformOnHit(Owner, e, WeaponComponent.Spawner);
+                        PerformOnHit(Owner, e, GameObjectComponent.Spawner);
                         hitsThisSwing.Add(e);
                     }
                 }

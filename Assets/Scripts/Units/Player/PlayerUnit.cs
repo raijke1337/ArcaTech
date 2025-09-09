@@ -1,3 +1,4 @@
+using System;
 using Arcatech.Interactions;
 using ECM.Components;
 using KBCore.Refs;
@@ -14,15 +15,16 @@ namespace Arcatech.Units
         [SerializeField, Child] protected Camera _faceCam;
         [SerializeField, Self] protected GroundDetection _ground;
 
+        [SerializeField] private bool stickToPlatforms = true;
+        [SerializeField] private string platfromTag;
         
         CostumesControllerComponent costumes;
 
-        protected void ToggleCamera(bool value) { _faceCam.enabled = value; }
 
         
         protected override void Start()
         {
-            ToggleCamera(true);
+            _faceCam.enabled = true;
             base.Start();
         }
 
@@ -35,6 +37,23 @@ namespace Arcatech.Units
         {
             return _ground.isOnGround && _ground.isValidGround;
         }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (collision.gameObject.CompareTag(platfromTag))
+            {
+                transform.parent = collision.transform;
+            }
+        }
+
+        private void OnCollisionExit(Collision other)
+        {
+            if (other.gameObject.CompareTag(platfromTag))
+            {
+                transform.parent = null;
+            }
+        }
+
 
         #region inventory
 

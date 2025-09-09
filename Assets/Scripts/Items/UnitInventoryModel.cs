@@ -12,22 +12,24 @@ namespace Arcatech.Items
     {
 
         #region serialize
-        [SerializeField][ReadOnlyText] string status = "not init";
+
+        [SerializeField] [ReadOnlyText] string status = "not init";
+
         #endregion
 
         [SerializeField] public UsablesHandler Handler;
         List<Item> inventory;
-        Dictionary<ItemType,Equipment> equipments;
+        Dictionary<ItemType, Equipment> equipments;
 
         public IReadOnlyList<Equipment> ListEquipped => equipments.Values.ToList().AsReadOnly();
         public IReadOnlyList<Item> ListInventory => inventory.AsReadOnly();
 
         bool initialized = false;
 
-        public event UnityAction <IDrawItemStrategy> DrawStrategyChangedEvent = delegate { };
+        public event UnityAction<IDrawItemStrategy> DrawStrategyChangedEvent = delegate { };
         public event UnityAction ModelUpdatedEvent = delegate { };
 
-        public UnitInventoryModel(IEntityItemsList items,BaseGameEntityComponent o)
+        public UnitInventoryModel(IEntityItemsList items, BaseGameEntityComponent o)
         {
 
 
@@ -36,10 +38,11 @@ namespace Arcatech.Items
 
             PickUpItems(items.GetInventory(o));
 
-            foreach (Equipment e in items.GetEquipment(o)) 
+            foreach (Equipment e in items.GetEquipment(o))
             {
-                EquipItem(e,out _);
+                EquipItem(e, out _);
             }
+
             Handler = new UsablesHandler();
 
 
@@ -57,14 +60,39 @@ namespace Arcatech.Items
             Handler?.Update(delta);
             status = $"updating OK";
         }
-        public void PickUpItem (Item item)
+
+        public void PickUpItem(Item item)
         {
             inventory.Add(item);
             if (initialized) ModelUpdatedEvent.Invoke();
         }
+
         public void PickUpItems(IEnumerable<IItem> items)
         {
             foreach (Item item in items) PickUpItem(item);
+        }
+
+
+        public bool HasItem(ItemSO item)
+        {
+            return inventory.FirstOrDefault(t => t.ID == item.ID) != null;
+        }
+        public bool DropItem(Item item)
+        {
+            if (item == null) return false;
+            if (inventory.Contains(item))
+            {
+                inventory.Remove(item);
+                return true;
+            }
+
+            return false;
+        }
+    
+    public bool DropItem(ItemSO item)
+        {
+            var it = inventory.First(t => t.ID == item.ID);
+            return DropItem(it);    
         }
 
 

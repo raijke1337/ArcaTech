@@ -21,7 +21,7 @@ namespace Arcatech.Stats
                         var a = actionOnDeath.ProduceAction(activeEntity, activeEntity.transform);
                         activeEntity.ForceUnitAction(a);
                     }
-                    baseEntity.KillEntity();
+                    baseEntity.Kill();
                 }
             }
         }

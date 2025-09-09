@@ -7,7 +7,7 @@ namespace Arcatech.Items
     {
        // [SerializeField] protected SerializedProjectileConfiguration Projectile;
        // projectiles are now spawned as "action result"
-        public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, BaseWeaponComponent comp)
+        public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, BaseEquipmentComponent comp)
         {
             return new RangedWeaponStrategy(Action,  unit, cfg, TotalCharges, ChargeRestoreTime, InternalCooldown, comp);
         }

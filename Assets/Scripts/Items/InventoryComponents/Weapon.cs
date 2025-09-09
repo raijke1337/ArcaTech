@@ -1,4 +1,5 @@
-﻿using Arcatech.Stat;
+﻿using System;
+using Arcatech.Stat;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Arcatech.Items
     {
 
         private SerializedStatsEffectConfig _cost;
-        protected BaseWeaponComponent _weaponGameobject;
+        protected BaseEquipmentComponent _weaponGameobject;
         public StatsEffect GetCost 
             {
                 get
@@ -34,7 +35,7 @@ namespace Arcatech.Items
         }
         public Weapon(WeaponSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
         {
-            _weaponGameobject = DisplayItem as BaseWeaponComponent;
+            _weaponGameobject = DisplayItem as BaseEquipmentComponent;
 
             _cost = cfg.Cost;
            // AnimationSet = cfg.WeaponType;
@@ -77,7 +78,22 @@ namespace Arcatech.Items
 
         #region UI
 
-        public override Sprite Icon => Config.Description.Picture;
+        public override Sprite Icon
+        {
+            get
+            {
+                try
+                {
+                    return Config.Description.Picture;
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"missing picture in {Config}");
+                    return null;
+                } 
+            }
+        }
 
         public override float FillValue => UseStrategy.FillValue;
 

@@ -22,43 +22,47 @@ namespace Arcatech.UI
 
         bool init = false;
 
-
+        private BaseStatType[] _typesCached;
+        
         public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
         {
             // initial setup
 
             if (!init)
             {
-                var enumKeys = Enum.GetNames(typeof(BaseStatType));
-
                 _barsDict = new();
-                foreach (var enumKey in enumKeys)
+                _typesCached = Enum.GetValues(typeof(BaseStatType)) as BaseStatType[];
+                
+                foreach (var enumKey in _typesCached)
                 {
-                    BaseStatType type = Enum.Parse<BaseStatType>(enumKey);
                     var b = Instantiate(_barPrefab, transform);
-                    _barsDict[type] = b;
+                    _barsDict[enumKey] = b;
                     b.gameObject.SetActive(false);
                 }
                 init = true;
             }
 
-            foreach (var pair in stats)
+            foreach (var stat in _typesCached)
             {
-                if (pair.Value.Initialized)
+                if (!stats.ContainsKey(stat))
                 {
-                    _barsDict[pair.Key].gameObject.SetActive(true);
-                    SetupBar(pair.Key, pair.Value);                    
+                    _barsDict[stat].gameObject.SetActive(false);
                 }
                 else
                 {
-                    _barsDict[pair.Key].gameObject.SetActive(false);
+                    if (!_barsDict[stat].Setup && stats[stat].Initialized)
+                    {
+                        SetupBar(stat, stats[stat]);  
+                    }
+                    _barsDict[stat].gameObject.SetActive(true);
                 }
             }
         }
 
         void SetupBar(BaseStatType stat, StatValueContainer cont)
         {
-            _barsDict[stat].LinkContainer(cont).SetColors(_statColors[stat]).
+            Debug.Log($"Setting up bar for {stat} ");
+            _barsDict[stat].LinkContainer(ref cont).SetColors(_statColors[stat]).
                 SetEaseMethod(_barsEaseMethod).SetFillTime(_barsEaseTime).SetBrightGlowAT(_barFlashTreschold);
         }
     }
