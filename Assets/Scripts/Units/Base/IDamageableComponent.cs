@@ -1,31 +1,31 @@
 ﻿namespace Arcatech.Units
 {
     /// <summary>
-    /// interface indicates any class that is affected by changes in some stat
+    /// called by active game unit component because it is a statsupdatehanlder for stats component
     /// </summary>
     public interface IDamageableComponent
     {
         public void Damage(int damage, BaseStatType stat);
     }
     /// <summary>
-    /// interface will receive a command on 0 hp
+    /// called by active game unit component because it is a statsupdatehanlder for stats component
     /// </summary>
     public interface IKillableComponent
     {
         public void Kill();
     }
-/// <summary>
-/// interface will receive a command at 0 stamina
-/// </summary>
+    /// <summary>
+    /// called by active game unit component because it is a statsupdatehanlder for stats component
+    /// </summary>
     public interface IStunnableComponent
     {
         public void Stun();
     }
 /// <summary>
-/// interface will handle the pause command
+/// called by the pause helper on base entity
 /// </summary>
     public interface IPausableComponent
     {
-        public void Pause(bool pause);
+        public bool Paused { get; set; }
     }
 }

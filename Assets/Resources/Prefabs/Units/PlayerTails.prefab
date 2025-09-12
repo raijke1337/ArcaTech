@@ -26,6 +26,7 @@ GameObject:
   - component: {fileID: 5399239475824375360}
   - component: {fileID: 4391576507351940185}
   - component: {fileID: 4461434644115553138}
+  - component: {fileID: 922206793911062045}
   m_Layer: 6
   m_Name: PlayerTails
   m_TagString: Player
@@ -120,8 +121,13 @@ MonoBehaviour:
   _stats: {fileID: 7664370127433558518}
   ActionOnDamage: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
   ActionOnDeath: {fileID: 11400000, guid: 0b8a8ee7cdc62a646a39b231248b013b, type: 2}
+  statsUpdateStrategies:
+  - {fileID: 11400000, guid: cf19fade51a7a324592c2326ee7bd2c5, type: 2}
+  - {fileID: 11400000, guid: 74c306b8b8e2fd4499f4b78ac219f8f7, type: 2}
   _faceCam: {fileID: 7308556046430610913}
   _ground: {fileID: 1474046039949355583}
+  stickToPlatforms: 1
+  platfromTag: MovingPlatform
 --- !u!114 &6393574289409902451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,6 +335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pauser: {fileID: 922206793911062045}
   _name: Tails
   entitySide: 1
   _showDebugs: 0
@@ -437,6 +444,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 9
   maxRaycastDistance: 10
+--- !u!114 &922206793911062045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142820635933682374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1394105577972376063
 GameObject:
   m_ObjectHideFlags: 0

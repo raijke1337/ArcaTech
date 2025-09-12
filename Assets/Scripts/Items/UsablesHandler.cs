@@ -1,5 +1,5 @@
 ﻿using Arcatech.Skills;
-using Arcatech.Stat;
+using Arcatech.Stats;
 using Arcatech.Units;
 using System;
 using System.Collections.Generic;

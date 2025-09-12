@@ -1,10 +1,11 @@
 using Arcatech.Items;
+using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Assertions;
 namespace Arcatech.Skills
 {
     [RequireComponent(typeof(SphereCollider),typeof(ProjectileComponent))]
-    public class AreaOfEffectSphereScalerComponent : MonoBehaviour
+    public class AreaOfEffectSphereScalerComponent : MonoBehaviour, IPausableComponent
     {
         SphereCollider _col;
         ProjectileComponent _projectile;
@@ -13,7 +14,9 @@ namespace Arcatech.Skills
         float startRad;
         float time;
         float progress;
-       // bool start = false;
+
+        public bool Paused { get; set; } = false;
+        // bool start = false;
 
         private void Start()
         {
@@ -32,6 +35,8 @@ namespace Arcatech.Skills
 
         private void Update()
         {
+            if (Paused) return;
+
             progress += Time.deltaTime * (1/time);
             Mathf.Clamp01(progress);
             if (_col.radius > desiredRad) return;

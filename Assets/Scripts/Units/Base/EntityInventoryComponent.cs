@@ -1,5 +1,4 @@
 ﻿using Arcatech.Items;
-using Arcatech.Stat;
 using KBCore.Refs;
 using System.Collections.Generic;
 using Arcatech.Actions;
@@ -15,7 +14,7 @@ namespace Arcatech.Units
     /// model is deserialized from saves or loaded from a preset SO.
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class EntityInventoryComponent : ValidatedMonoBehaviour
+    public class EntityInventoryComponent : ValidatedMonoBehaviour, IPausableComponent
     {
         [Self, SerializeField] BaseGameEntityComponent baseGameEntity;
         [Space, Header("Items list"), SerializeField] protected UnitItemsSO defaultEquips;
@@ -47,7 +46,7 @@ namespace Arcatech.Units
 
         private void Update()
         {
-            if (baseGameEntity.Paused) return;
+            if (Paused) return;
             _model?.UpdateDeltaModel(Time.deltaTime);
         }
 
@@ -130,6 +129,8 @@ namespace Arcatech.Units
         }
         #endregion
 
+
+        public bool Paused { get; set; } = false;
 
     }
 

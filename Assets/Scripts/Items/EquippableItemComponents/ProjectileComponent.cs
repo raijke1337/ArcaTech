@@ -1,6 +1,7 @@
 ﻿using Arcatech.Actions;
 using Arcatech.Skills;
 using Arcatech.Triggers;
+using Arcatech.Units;
 using System.Linq;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace Arcatech.Items
 
 
     [RequireComponent(typeof(WeaponTriggerComponent))]
-    public class ProjectileComponent : MonoBehaviour
+    public class ProjectileComponent : MonoBehaviour, IPausableComponent
     {
         public ActiveGameUnitComponent Owner { get; set; }
         [HideInInspector] public int RemainingHits;
@@ -115,6 +116,8 @@ namespace Arcatech.Items
 
         protected virtual void Update()
         {
+            if (Paused) return;
+
             transform.position += Speed * Time.deltaTime * transform.forward;
             Lifetime -= Time.deltaTime;
             if (Lifetime < 0)
@@ -135,7 +138,7 @@ namespace Arcatech.Items
             }
         }
 
-
+        public bool Paused { get; set; } = false;
 
 
     }

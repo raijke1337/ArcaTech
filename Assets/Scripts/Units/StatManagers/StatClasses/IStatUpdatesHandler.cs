@@ -7,10 +7,4 @@ namespace Arcatech.Stats
         public void HandleStatsUpdate (IDictionary <BaseStatType,StatValueContainer> stats);
     }
 
-    public interface IStatUpdateHandlingStrategy : IStrategy
-    {
-        public void HandleUpdate(IDictionary<BaseStatType, StatValueContainer> stats, BaseGameEntityComponent baseEntity,ActiveGameUnitComponent activeEntity);
-    }
-
-
 }

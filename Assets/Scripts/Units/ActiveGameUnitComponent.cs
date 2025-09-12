@@ -1,12 +1,11 @@
-using System;
 using Arcatech.EventBus;
 using Arcatech.Items;
-using Arcatech.Stat;
 using Arcatech.Stats;
 using Arcatech.Units;
 using DG.Tweening;
 using KBCore.Refs;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 namespace Arcatech
@@ -16,7 +15,7 @@ namespace Arcatech
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent), typeof(Animator), typeof(EntityStatsComponent))]
 
-    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IStatUpdatesHandler
+    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IStatUpdatesHandler, IPausableComponent
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Self] protected Animator _animator;
@@ -39,8 +38,10 @@ namespace Arcatech
 
         public BaseGameEntityComponent GetMainEntity { get => gameEntity; }
         public Animator GetAnimatorReference => _animator;
-        
 
+        [Space, Header("Stats changes handlers")]
+        [SerializeField] StatsUpdateStrategy[] statsUpdateStrategies;
+        IOnStatsChangeStrategy[] _statsStrats;
 
         protected virtual void Start()
         {
@@ -58,10 +59,16 @@ namespace Arcatech
             _damageAction = ActionOnDamage.ProduceAction(this,transform);
             _deathAction = ActionOnDeath.ProduceAction(this, transform);
 
+            for (int i = 0; i < statsUpdateStrategies.Length; i++)
+            {
+                _statsStrats[i] = statsUpdateStrategies[i].BuildStrategy(this);
+            }
+
         }
 
         private void Update()
         {
+            if (Paused) return;
 
             if (currentAction != null)
             {
@@ -94,8 +101,11 @@ namespace Arcatech
                 _lockAction = value;
             }
         }
+
         protected virtual void OnActionLock(bool locking) { } // do something if needed
         #endregion
+
+
         #region actions
 
         List<IUnitActionsHandler> _actionsHandlers;
@@ -115,7 +125,7 @@ namespace Arcatech
 
         public virtual void Command(UnitActionType obj)
         {
-            if (_lockAction ||  GetMainEntity.Paused || !CanAct()) return;
+            if (_lockAction ||  Paused || !CanAct()) return;
 
             foreach (var h in _actionsHandlers)
             {
@@ -136,7 +146,7 @@ namespace Arcatech
 
         public void ForceUnitAction(BaseUnitAction act)
         {
-            if (gameEntity.Paused || act == null) return;
+            if (Paused || act == null) return;
             OnForceAction(act);
         }
         protected virtual void OnForceAction(BaseUnitAction act)
@@ -170,47 +180,25 @@ namespace Arcatech
                 Debug.Log($"Tried to apply impulse {distance} to {gameEntity.GetName} but it has no rigidbody");
             }
         }
-        private void OnCollisionEnter(Collision collision)
-        {
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-            {
-                //if (_showDebugs) Debug.Log("Boom");
-                force?.Kill();
-            }
-        }
 
+        #endregion
+
+        #region ipausable
+
+        public bool Paused { get; set; } = false;
 
         #endregion
 
         #region on stat change
+
         public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
         {
-            //foreach (var s in strategies)
-            //{
-            //    s.HandleUpdate(stats, GetMainEntity, this);
-            //}
-            var hp = stats[BaseStatType.Health];
-            if (hp != null && hp.Initialized)
+
+            foreach (var st in _statsStrats)
             {
-
-              //  Debug.Log($"HP delta {hp.GetFrameDeltaValue}");
-                if (Mathf.Abs(hp.GetFrameDeltaValue)>20) //todo)
-                {
-                    EventBus<DrawDamageEvent>.Raise(new DrawDamageEvent(GetMainEntity, hp.GetFrameDeltaValue));
-                    ForceUnitAction(_damageAction);
-                }
-                if (hp.GetCurrent <= 0)
-                {
-                    OnUnitDeath();
-                    ForceUnitAction(_deathAction);
-                    ActionLock = true;
-
-                   // GetMainEntity.Kill();
-                }
+                st.HandleStats(stats);
             }
-
         }
-        protected virtual void OnUnitDeath() { Debug.Log($"{GetMainEntity.GetName} died"); }
 
         #endregion
     }

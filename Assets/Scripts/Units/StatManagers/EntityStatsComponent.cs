@@ -1,17 +1,17 @@
 using Arcatech.EventBus;
 using Arcatech.Items;
-using Arcatech.Stats;
 using Arcatech.Triggers;
+using Arcatech.Units;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-namespace Arcatech.Stat
+namespace Arcatech.Stats
 {
     /// <summary>
     /// new component to handle the current stats and their changes on any game entity
     /// </summary>
-    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView
+    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView,IPausableComponent
     {
         [SerializeField] protected BaseStatsConfig startingStats;
         [SerializeField] protected float statsUpdateFrequency = 0.1f; // call some events to announce update
@@ -63,7 +63,7 @@ namespace Arcatech.Stat
         }
         private void Update()
         {
-
+            if (Paused) return;
             foreach (var stat in _stats.ToList())
             {
                 stat.Value.UpdateInDelta(Time.deltaTime);
@@ -134,14 +134,14 @@ namespace Arcatech.Stat
                 Debug.LogError($"tried to apply cost {cost} in {gameObject.name} without checking if its possible");
             }
         }
-
-
-        #region pause
-
         private void OnDisable()
         {
             _handlers.Clear();
         }
+
+        #region pause
+        public bool Paused { get; set; } = false;
+
 
         #endregion
     }

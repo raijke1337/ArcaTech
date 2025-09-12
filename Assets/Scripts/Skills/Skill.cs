@@ -1,5 +1,5 @@
 ﻿using Arcatech.Items;
-using Arcatech.Stat;
+using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;

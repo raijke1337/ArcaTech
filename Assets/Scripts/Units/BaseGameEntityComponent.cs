@@ -1,4 +1,4 @@
-using Arcatech.EventBus;
+
 using Arcatech.Units;
 using KBCore.Refs;
 using UnityEngine;
@@ -6,13 +6,16 @@ namespace Arcatech
 {/// <summary>
  /// new component that defines any game enitity that does something
  /// </summary>
-    [RequireComponent(typeof(Rigidbody),typeof(Collider))]
+    [RequireComponent(typeof(Rigidbody),typeof(Collider),typeof(LittlePauseHelperComponent))]
     public class BaseGameEntityComponent : ValidatedMonoBehaviour
     {
-        [SerializeField] string _name;
+        [SerializeField, Self]
+        LittlePauseHelperComponent _pauser;
+
+        [Space,SerializeField] string _name;
         [SerializeField] Side entitySide;
         [Space,SerializeField] protected bool _showDebugs = false;
-
+        
         
         public string GetName { get => _name; }
         public Side GetEntitySide => entitySide;
@@ -23,7 +26,6 @@ namespace Arcatech
         [SerializeField] bool gravity = false;
         [SerializeField] bool usePhysics = false;
 
-        EventBinding<PauseToggleEvent> _pauseBind;
 
         protected override void OnValidate()
         {
@@ -36,14 +38,6 @@ namespace Arcatech
         {
             _rigidbody.useGravity = gravity;
             _rigidbody.isKinematic = !usePhysics;
-        }
-        
-            
-/// <summary>
-/// TODO rewrite this to use the new interfaces (ipausalbe, ikillable) etc
-/// </summary>
-        public bool Paused { get => _paused;  }
-        protected bool _paused;
-        
+        }        
     }
 }

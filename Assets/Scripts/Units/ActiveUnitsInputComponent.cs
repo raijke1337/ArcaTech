@@ -1,4 +1,5 @@
-﻿using KBCore.Refs;
+﻿using Arcatech.Units;
+using KBCore.Refs;
 using UnityEngine;
 namespace Arcatech
 {
@@ -6,10 +7,14 @@ namespace Arcatech
     /// abstract class that handles inputs from Behavior tree or player commands
     /// </summary>
     [RequireComponent (typeof(ActiveGameUnitComponent))]
-    public abstract class ActiveUnitsInputComponent : ValidatedMonoBehaviour
+    public abstract class ActiveUnitsInputComponent : ValidatedMonoBehaviour, IPausableComponent
     {
         [SerializeField,Self] ActiveGameUnitComponent gameUnitComponent;
-        protected virtual void RequestCombatAction(UnitActionType type) => gameUnitComponent.Command(type);
+        protected virtual void RequestCombatAction(UnitActionType type)
+        {
+            if (Paused) return;
+             gameUnitComponent.Command(type);
+        }
         private void OnEnable()
         {
             ControllerStartBindings(true);  
@@ -21,5 +26,7 @@ namespace Arcatech
         }
 
         protected abstract void ControllerStartBindings(bool enabling);
+
+        public bool Paused { get; set; } = false;
     }
 }

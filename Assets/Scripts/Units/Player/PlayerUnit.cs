@@ -40,6 +40,7 @@ namespace Arcatech.Units
 
         private void OnCollisionEnter(Collision collision)
         {
+            if (!stickToPlatforms) return;
             if (collision.gameObject.CompareTag(platfromTag))
             {
                 transform.parent = collision.transform;
@@ -48,6 +49,7 @@ namespace Arcatech.Units
 
         private void OnCollisionExit(Collision other)
         {
+            if (!stickToPlatforms) return;
             if (other.gameObject.CompareTag(platfromTag))
             {
                 transform.parent = null;

@@ -1,0 +1,53 @@
+﻿using Arcatech.Units;
+using DG.Tweening;
+using TMPro;
+using UnityEngine;
+
+namespace Arcatech.Interactions
+{
+    [RequireComponent(typeof(BaseGameEntityComponent))]
+    public class TweenMovedItem : InteractionHandlerBase, IPausableComponent
+    {
+        [SerializeField] bool runFromEnable = true;
+        [SerializeField] SerializedDOTweener tween;
+        Tween cached;
+        bool _pause = false;
+        bool toggled = false;
+
+        public bool Paused
+        {
+            get => _pause; 
+            set
+            {
+                if (runFromEnable)
+                {
+                    cached.TogglePause();
+                }
+                else
+                {
+                    if (toggled) // activated by condition
+                    {
+                        cached.TogglePause();
+                    }
+                }
+            }
+        }
+        private void OnEnable()
+        {
+            cached = tween.GetTween(transform).Pause(); 
+            if (runFromEnable)
+            {
+                toggled = true;
+                cached.Play(); 
+            }
+        }
+        public override void DoInteraction(IInteractor interactor, IInteractive item, IInteractionContext context)
+        {
+            if (!runFromEnable) 
+            cached.Play();
+            toggled = true;
+        }
+
+    }
+
+}
