@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using Random = UnityEngine.Random;
 
 namespace Arcatech.Items
 {
@@ -38,14 +39,30 @@ namespace Arcatech.Items
 
             PickUpItems(items.GetInventory(o));
 
+            Dictionary<ItemType, List<Equipment>> equipmentDict = new();
+            
+
             foreach (Equipment e in items.GetEquipment(o))
             {
-                EquipItem(e, out _);
+                if (!equipmentDict.ContainsKey(e.Type))
+                {
+                    equipmentDict[e.Type] = new List<Equipment>();
+                }
+                equipmentDict[e.Type].Add(e);
+               // EquipItem(e, out _);
             }
+            // here is the case if multiple items of the same type are in the "equipment".
+            // pick a random and more the rest to inventory
+
+            foreach (var pair in equipmentDict)
+            {
+                var selected =  pair.Value[Random.Range(0, pair.Value.Count-1)];
+                EquipItem(selected, out _);
+            }
+            
+            // for example small bots have different items that they equip but with the same stats
 
             Handler = new UsablesHandler();
-
-
             Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
 
             status = $"init";

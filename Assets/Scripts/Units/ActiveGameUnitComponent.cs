@@ -13,12 +13,12 @@ namespace Arcatech
     /// <summary>
     /// new component to define a unit that has stats (can be damaged and killed)
     /// </summary>
-    [RequireComponent(typeof(BaseGameEntityComponent), typeof(Animator), typeof(EntityStatsComponent))]
+    [RequireComponent(typeof(BaseGameEntityComponent),typeof(EntityStatsComponent))]
 
     public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IStatUpdatesHandler, IPausableComponent,IKillableComponent
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
-        [SerializeField, Self] protected Animator _animator;
+        [SerializeField, Child] protected Animator animator;
         [SerializeField, Self] protected EntityStatsComponent _stats;
 
 
@@ -31,7 +31,7 @@ namespace Arcatech
         SimpleEntityShadowComponent _entityShadowComponent;
 
         public BaseGameEntityComponent GetMainEntity { get => gameEntity; }
-        public Animator GetAnimatorReference => _animator;
+        public Animator GetAnimatorReference => animator;
 
         [Space, Header("Stats changes handlers")]
         [SerializeField] StatsUpdateStrategy[] statsUpdateStrategies;

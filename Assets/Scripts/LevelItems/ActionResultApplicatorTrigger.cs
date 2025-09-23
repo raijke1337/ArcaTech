@@ -53,7 +53,7 @@ namespace Arcatech.Triggers
         protected override void OnTriggerEnter(Collider other)
         {
             if (componentKilled) return;
-            Debug.Log(other.name);
+          //  Debug.Log(other.name);
 
             if (other.gameObject.TryGetComponent(out ActiveGameUnitComponent p))
             {

@@ -84,7 +84,7 @@ namespace Arcatech.UI
 
         private void OnDisable()
         {
-            Debug.Log("On disable bar");
+           // Debug.Log("On disable bar");
             Setup = false;
         }
     }
