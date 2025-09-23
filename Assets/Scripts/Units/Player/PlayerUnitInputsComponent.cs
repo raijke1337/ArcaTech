@@ -19,7 +19,6 @@ namespace Arcatech.Units.Inputs
         
         [Space,Header("Jump!"),SerializeField] SerializedUnitAction _jump;
 
-        public PlayerAimingComponent Aiming => _aim;
         private IsoCamAdjust _adj;
 
         Vector3 _movementVector;
@@ -45,7 +44,7 @@ namespace Arcatech.Units.Inputs
                 _playerInputReader.ShieldSpec += OnShieldSkill;
 
                 _playerInputReader.PausePressed += OnPauseButton;
-                _playerInputReader.MountAction += OnMountButton;
+                _playerInputReader.MountAction += OnUseButton;
             }
             else
             {
@@ -63,7 +62,7 @@ namespace Arcatech.Units.Inputs
                 _playerInputReader.RangedSpec -= OnRangedSkill;
                 _playerInputReader.ShieldSpec -= OnShieldSkill;
                 _playerInputReader.PausePressed -= OnPauseButton;
-                _playerInputReader.MountAction -= OnMountButton;
+                _playerInputReader.MountAction -= OnUseButton;
             }
         }
 
@@ -91,32 +90,37 @@ namespace Arcatech.Units.Inputs
         }
 
 
-        private void OnMountButton()
+        private void OnUseButton()
         {
+            if (Paused) return;
             _interaction.DoInteraction((InteractionContext.Create(_player,transform)));
         }
         private void OnPauseButton()
         {
-            EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent());
+            EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(!Paused));
         }
 
         private void OnShieldSkill()
         {
+            if (Paused) return;
             RequestCombatAction(UnitActionType.ShieldSkill);
         }
         private void OnRangedSkill()
         {
+            if (Paused) return;
             RequestCombatAction(UnitActionType.RangedSkill);
         }
 
         private void OnMeleeSkill()
         {
+            if (Paused) return;
             RequestCombatAction(UnitActionType.MeleeSkill);
         }
 
         private void OnJumpAction()
         {
-            
+            if (Paused) return;
+
             transform.parent = null;
             _movement.DoJump();
             _player.ForceUnitAction(_jump.ProduceAction(_player, transform));
@@ -124,12 +128,13 @@ namespace Arcatech.Units.Inputs
 
         private void OnDodgeSkill()
         {
+            if (Paused) return;
             RequestCombatAction(UnitActionType.DodgeSkill);
         }
 
         private void OnMovementAction(Vector2 dir)
         {
-
+            if (Paused) return;
             Vector3 AD = _adj.Isoright * _playerInputReader.InputDirection.x;
             Vector3 WS = _adj.Isoforward * _playerInputReader.InputDirection.z;
 
@@ -138,16 +143,19 @@ namespace Arcatech.Units.Inputs
 
         private void OnAimAction(Vector2 point)
         {
+            if (Paused) return;
             _lookVector = _aim.GetDirectionToTarget;
         }
 
         private void OnRangedAction()
         {
+            if (Paused) return;
             RequestCombatAction(UnitActionType.Ranged);
         }
 
         private void OnMeleeAction()
         {
+            if (Paused) return;
             RequestCombatAction(UnitActionType.Melee);
         }
 

@@ -11,7 +11,7 @@ namespace Arcatech.Stats
     /// <summary>
     /// new component to handle the current stats and their changes on any game entity
     /// </summary>
-    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView,IPausableComponent
+    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView,IPausableComponent, IKillableComponent
     {
         [SerializeField] protected BaseStatsConfig startingStats;
         [SerializeField] protected float statsUpdateFrequency = 0.1f; // call some events to announce update
@@ -137,6 +137,11 @@ namespace Arcatech.Stats
         private void OnDisable()
         {
             _handlers.Clear();
+        }
+
+        public void Kill()
+        {
+            Paused = true;
         }
 
         #region pause

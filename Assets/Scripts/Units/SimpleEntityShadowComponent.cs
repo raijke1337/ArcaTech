@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Arcatech
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class SimpleEntityShadowComponent : ValidatedMonoBehaviour
+    public class SimpleEntityShadowComponent : MonoBehaviour
     {
        // [SerializeField,Self] BaseGameEntityComponent _entity;
         

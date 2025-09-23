@@ -1,5 +1,3 @@
-using System;
-using Arcatech.Interactions;
 using ECM.Components;
 using KBCore.Refs;
 using UnityEngine;
@@ -28,11 +26,11 @@ namespace Arcatech.Units
             base.Start();
         }
 
-        public override void ApplyForceResultToUnit(float speed, float distance)
+        /*public override void ApplyForceResultToUnit(float speed, float distance)
         {
             base.ApplyForceResultToUnit(speed, distance);
-            //_movement.DisableGroundingOnUnitImpulse(speed, distance);
-        }
+            _movement.DisableGroundingOnUnitImpulse(speed, distance);
+        }*/
         protected override bool CanAct()
         {
             return _ground.isOnGround && _ground.isValidGround;

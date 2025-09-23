@@ -7,6 +7,4 @@ namespace Arcatech
         public Tween GetTween(Transform target) => Build(target);
         protected abstract Tween Build(Transform t);
     }
-
-
 }

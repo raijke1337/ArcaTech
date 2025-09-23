@@ -24,7 +24,7 @@ namespace Arcatech.Stats
 
         public override void HandleStats(IDictionary<BaseStatType, StatValueContainer> stats)
         {
-            if (stats[BaseStatType.Health].Initialized && stats[BaseStatType.Health].GetCurrent == 0)
+            if (stats[BaseStatType.Health].Initialized && stats[BaseStatType.Health].GetCurrent <= 0)
             {
                 foreach (var component in components) { component.Kill(); }
             }

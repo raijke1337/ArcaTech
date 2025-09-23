@@ -15,7 +15,7 @@ namespace Arcatech
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent), typeof(Animator), typeof(EntityStatsComponent))]
 
-    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IStatUpdatesHandler, IPausableComponent
+    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IStatUpdatesHandler, IPausableComponent,IKillableComponent
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Self] protected Animator _animator;
@@ -29,12 +29,6 @@ namespace Arcatech
         BaseUnitAction _deathAction;
         
         SimpleEntityShadowComponent _entityShadowComponent;
-
-        /// <summary>
-        /// TODO maybe in future
-        /// </summary>
-       // [Header("Stat change handling")]
-       // [SerializeField] List<IStatUpdateHandlingStrategy> strategies = new List<IStatUpdateHandlingStrategy>();
 
         public BaseGameEntityComponent GetMainEntity { get => gameEntity; }
         public Animator GetAnimatorReference => _animator;
@@ -59,6 +53,13 @@ namespace Arcatech
             _damageAction = ActionOnDamage.ProduceAction(this,transform);
             _deathAction = ActionOnDeath.ProduceAction(this, transform);
 
+
+            if (statsUpdateStrategies == null || statsUpdateStrategies.Length == 0)
+            {
+                Debug.LogWarning($"{gameEntity.GetName} has no stats update strategies assigned");
+                return;
+            }
+            _statsStrats = new IOnStatsChangeStrategy[statsUpdateStrategies.Length];
             for (int i = 0; i < statsUpdateStrategies.Length; i++)
             {
                 _statsStrats[i] = statsUpdateStrategies[i].BuildStrategy(this);
@@ -193,13 +194,28 @@ namespace Arcatech
 
         public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
         {
-
+            if (_statsStrats == null || _statsStrats.Length == 0)
+            {
+                return;
+            }
             foreach (var st in _statsStrats)
             {
                 st.HandleStats(stats);
             }
         }
 
+
+        #endregion
+
+        #region IKillable
+
+
+        public void Kill()
+        {
+            Debug.Log($"{GetMainEntity.GetName} died");
+            Paused = true;
+            _deathAction?.StartAction();
+        }
         #endregion
     }
 }

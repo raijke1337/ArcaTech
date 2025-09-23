@@ -19,11 +19,12 @@ namespace Arcatech
 
         private void OnApplicationPause(bool pause)
         {
-            Debug.Log($"pause {pause}");
+
             foreach (var component in _components)
             {
                 component.Paused = pause;
             }
+            //Debug.Log(pause ? "Pausing" : "Resuming"+$" {_components.Count} components");
 
         }
         private void OnPauseCommand(PauseToggleEvent pause)

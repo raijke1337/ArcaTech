@@ -24,7 +24,7 @@ namespace Arcatech.Managers
      //unused   //[SerializeField,Child] private GameTextWindowComponent _text;
         [SerializeField] private GameObject _ded;
         [SerializeField] private GameObject _pause;
-        [SerializeField,Child,Self] private ItemCardComponent _inspectItemCard;
+        [SerializeField,Child] private ItemCardComponent _inspectItemCard;
         
 
         EventBinding<PauseToggleEvent> _pauseToggleBind;

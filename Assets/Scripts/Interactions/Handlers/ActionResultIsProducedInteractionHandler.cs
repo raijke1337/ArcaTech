@@ -12,7 +12,7 @@ namespace Arcatech.Interactions
 
         [SerializeField] private List<SerializedActionResult> serializedResults;
         private List<IActionResult> _list;
-        protected override void OnValidate()
+        protected void OnValidate()
         {
             Assert.IsNotNull(serializedResults);
             Assert.IsNotEmpty(serializedResults);

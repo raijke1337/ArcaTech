@@ -70,6 +70,8 @@ namespace Arcatech.Stats
             return !(left == right);
         }
 
+        public override int GetHashCode() => base.GetHashCode();
+
     }
 
     public abstract class SerializedStatModCondition : ScriptableObject
