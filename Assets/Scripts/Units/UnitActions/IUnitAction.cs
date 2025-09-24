@@ -1,4 +1,6 @@
-﻿namespace Arcatech.Units
+﻿using Arcatech.Actions;
+
+namespace Arcatech.Units
 {
     public interface IUnitAction
     {
@@ -14,5 +16,14 @@
         Started,
         ExitTime,
         Completed
+    }
+
+
+
+    public interface IUnitState
+    {
+        public ActionResult[] OnEnterState { get; }
+        public ActionResult[] OnExitState { get; }
+        
     }
 }

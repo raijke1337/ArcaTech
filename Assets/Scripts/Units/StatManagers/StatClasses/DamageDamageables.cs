@@ -23,5 +23,4 @@ namespace Arcatech.Stats
             throw new System.NotImplementedException();
         }
     }
-
 }

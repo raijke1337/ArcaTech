@@ -61,7 +61,7 @@ namespace Arcatech.UI
 
         void SetupBar(BaseStatType stat, StatValueContainer cont)
         {
-            Debug.Log($"Setting up bar for {stat} ");
+            //Debug.Log($"Setting up bar for {stat} ");
             _barsDict[stat].LinkContainer(ref cont).SetColors(_statColors[stat]).
                 SetEaseMethod(_barsEaseMethod).SetFillTime(_barsEaseTime).SetBrightGlowAT(_barFlashTreschold);
         }

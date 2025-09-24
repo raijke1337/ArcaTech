@@ -14,7 +14,6 @@ namespace Arcatech.Stats
     public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView,IPausableComponent, IKillableComponent
     {
         [SerializeField] protected BaseStatsConfig startingStats;
-        [SerializeField] protected float statsUpdateFrequency = 0.1f; // call some events to announce update
 
         public event UnityAction ViewChangedInventory;
         bool _started = false;
@@ -27,6 +26,8 @@ namespace Arcatech.Stats
         }
         void ReloadMods(IEnumerable<StatsMod> mods)
         {
+            if (!_started) Start();
+            
             foreach (var container in _stats.Values)
             {
                 container.ResetMods();
@@ -43,6 +44,8 @@ namespace Arcatech.Stats
 
         void ApplyStatMod(StatsMod mod)
         {
+            if (!_started) Start(); 
+            
             if (!_stats.ContainsKey(mod.GetStatType))
             {
                 _stats[mod.GetStatType] = new StatValueContainer();
@@ -55,10 +58,13 @@ namespace Arcatech.Stats
 
         private void Start()
         {
+            if (_started) return;
+            
             _stats = startingStats.BuildBaseStats;
             _startingMods = startingStats.ListMods;
             UpdateHandlers();
             _started = true;
+            // need to run update once to init containers
 
         }
         private void Update()

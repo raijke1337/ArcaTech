@@ -18,7 +18,13 @@ namespace Arcatech.Units
 
            animator.SetBool("isMoving", false);
         }
-        
-   }
+
+        public override void Kill()
+        {
+            base.Kill();
+            agent.isStopped = true;
+            behavior.End();
+        }
+    }
 }
 

@@ -31,8 +31,6 @@ namespace Arcatech.Items
 
         public void RefreshView(UnitInventoryModel model)
         {
-            Debug.Log("Refresh usables in handler");
-
             var newEquips = model.ListEquipped;
             List<IUsable> newList = new();
 

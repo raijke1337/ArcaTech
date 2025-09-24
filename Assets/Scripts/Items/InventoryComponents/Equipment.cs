@@ -18,21 +18,23 @@ namespace Arcatech.Items
         }
         public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
         {
-            Debug.Log($"Build equipment class {this}");
+            if (ow.ShowingDebugs) Debug.Log($"Build equipment class {this}");
             StatMods = new();
-            DisplayItem = GameObject.Instantiate(cfg.itemPrefab);
             if (cfg.StatMods != null)
             {
                 foreach (var m in cfg.StatMods)
                 {
-                    if (m != null)
-                        StatMods.Add(m.BuildMod);
+                    if (m) StatMods.Add(m.BuildMod);
                 }
-            }            
+            }   
+            DisplayItem = GameObject.Instantiate(cfg.itemPrefab,ow.transform);
+            DisplayItem.gameObject.SetActive(false);
         }          
         
         public void SetItemEmpty(Transform pos)
-        {        
+        {       
+            if (!DisplayItem.isActiveAndEnabled) DisplayItem.gameObject.SetActive(true);
+            
             DisplayItem.transform.SetParent(pos.transform,false);
         }
 

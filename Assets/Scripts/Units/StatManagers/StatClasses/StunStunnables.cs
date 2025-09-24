@@ -8,7 +8,7 @@ namespace Arcatech.Stats
     {
         public override IOnStatsChangeStrategy BuildStrategy(ActiveGameUnitComponent unit)
         {
-            throw new System.NotImplementedException();
+            return new IStunnablesTrigger(unit);
         }
     }
 
@@ -20,7 +20,10 @@ namespace Arcatech.Stats
 
         public override void HandleStats(IDictionary<BaseStatType, StatValueContainer> stats)
         {
-            throw new System.NotImplementedException();
+            if (stats.TryGetValue(BaseStatType.Stamina, out var st) && st.GetCurrent <= 0)
+            {
+                Debug.Log("Stun");
+            }
         }
     }
 }

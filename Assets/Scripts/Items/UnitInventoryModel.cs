@@ -33,12 +33,17 @@ namespace Arcatech.Items
         public UnitInventoryModel(IEntityItemsList items, BaseGameEntityComponent o)
         {
 
-
             inventory = new();
             equipments = new();
 
+            Handler = new UsablesHandler();
+            Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
+            
+            status = $"No items loaded!";
+            
+            if (items == null) return;
+            
             PickUpItems(items.GetInventory(o));
-
             Dictionary<ItemType, List<Equipment>> equipmentDict = new();
             
 
@@ -56,16 +61,23 @@ namespace Arcatech.Items
 
             foreach (var pair in equipmentDict)
             {
-                var selected =  pair.Value[Random.Range(0, pair.Value.Count-1)];
-                EquipItem(selected, out _);
+                int randomIndex = Random.Range(0, pair.Value.Count-1);
+                for (int i = 0; i < pair.Value.Count; i++)
+                {
+                    if (i == randomIndex)
+                    {
+                        EquipItem(pair.Value[i],out _);
+                    }
+                    else
+                    {
+                        PickUpItem(pair.Value[i]);
+                    }
+                }
             }
             
             // for example small bots have different items that they equip but with the same stats
 
-            Handler = new UsablesHandler();
-            Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
-
-            status = $"init";
+            status = $"items loaded";
             initialized = true;
             ModelUpdatedEvent.Invoke();
         }

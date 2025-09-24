@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Arcatech.Stats
 {
-    [CreateAssetMenu(fileName = "New BaseStatsConfig", menuName = "Units/Base Stats")]
+    [CreateAssetMenu(fileName = "New BaseStatsConfig", menuName = "Units/Base Stats/Collection", order = 1)]
     public class BaseStatsConfig : ScriptableObjectID
     {
         [SerializeField] SerializedStatModConfig[] InitialStats;

@@ -14,7 +14,7 @@ namespace Arcatech.Interactions
         private void OnValidate()
         {
             Assert.IsNotNull(itemNeeded);
-            Debug.Log(itemNeeded.ID);
+          //  Debug.Log(itemNeeded.ID);
         }
 
         public override bool CheckCondition(IInteractor actor, IInteractive item, IInteractionContext context)

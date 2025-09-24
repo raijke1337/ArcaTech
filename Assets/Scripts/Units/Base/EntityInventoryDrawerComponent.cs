@@ -16,7 +16,7 @@ namespace Arcatech.Units
         [SerializeField] protected ItemEmpties itemEmpties;
         [SerializeField] protected DrawItemsStrategy defaultItemsDrawStrat;
 
-        bool needsRedraw = true; // meh but it works
+        bool needsRedraw = true; // meh, but it works
 
         UnitInventoryModel inventoryModel;
         IDrawItemStrategy currentDrawStrategy;
@@ -42,15 +42,12 @@ namespace Arcatech.Units
                 inventoryModel = model;
                 OnDrawStrategyChange(defaultItemsDrawStrat);
             }
-           // Debug.Log($"Refresh view in inventiory drawer");
-
         }
 
         private void OnDrawStrategyChange(IDrawItemStrategy strat)
         {
 
             currentDrawStrategy = strat;
-            Debug.Log($"Running DrawItems()");
 
             foreach (var e in inventoryModel.ListEquipped)
             {

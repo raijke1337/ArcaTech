@@ -210,7 +210,7 @@ namespace Arcatech
         #region IKillable
 
 
-        public void Kill()
+        public virtual void Kill()
         {
             Debug.Log($"{GetMainEntity.GetName} died");
             Paused = true;
