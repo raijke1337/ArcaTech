@@ -111,7 +111,7 @@ namespace Arcatech
 
         List<IUnitActionsHandler> _actionsHandlers;
 
-        public event UnityAction <UnitActionType> DidActionAnnounceEvent = delegate { };
+        //public event UnityAction <UnitActionType> DidActionAnnounceEvent = delegate { };
 
         protected BaseUnitAction currentAction;
         /// <summary>
@@ -124,24 +124,32 @@ namespace Arcatech
         }
 
 
-        public virtual void Command(UnitActionType obj)
+        public virtual bool Command(UnitActionType obj)
         {
-            if (_lockAction ||  Paused || !CanAct()) return;
+            bool allSuccess = true;
+            
+            if (_lockAction ||  Paused || !CanAct()) return false;
 
             foreach (var h in _actionsHandlers)
             {
                 if (h.TryHandleAction(obj, _stats, out var a))
                 {
                     DoActionLogic(a);
-                    DidActionAnnounceEvent?.Invoke(obj);
+                    //DidActionAnnounceEvent?.Invoke(obj);
+                    // unused for now
+                }
+                else
+                {
+                    allSuccess = false;
                 }
             }
+            return allSuccess;
         }
 
 
         protected virtual bool CanAct()
         {
-            /// extra checks in npc and player
+            // extra checks in npc and player
             return true;
         }
 

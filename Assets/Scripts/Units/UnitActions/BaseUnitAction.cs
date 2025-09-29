@@ -136,7 +136,7 @@ namespace Arcatech.Units
         {
             next = null;
 
-            bool ok = Next != null && Next.CheckTime(_actionTimer.GetTime / _totalActionTime);
+            bool ok = Next.GetNextAction != null && Next.CheckTime(_actionTimer.GetTime / _totalActionTime);
             if (ok)
             {
                 next = Next.GetNextAction;
