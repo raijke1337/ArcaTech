@@ -29,11 +29,10 @@ namespace Arcatech.Stats
 
         public void HandleStats(IDictionary<BaseStatType, StatValueContainer> stats)
         {
-            if (bb != null)
-            {
-                var hp = stats[BaseStatType.Health];
-                bb.SetVariableValue("hpPercent", hp.GetPercent);
-            }
+            if (bb == null) return;
+            var hp = stats[BaseStatType.Health];
+            if (!hp.Initialized) return;
+            bb.SetVariableValue("hpPercent", hp.GetPercent);
         }
     }
 }

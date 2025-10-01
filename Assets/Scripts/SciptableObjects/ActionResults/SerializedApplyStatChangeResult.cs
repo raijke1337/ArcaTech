@@ -56,28 +56,28 @@ namespace Arcatech.Actions
                     case TargetingType.OnlyUser:
                         foreach (var e in _effs[type])
                         {
-                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(user, new StatsEffect(e), place));
+                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(user, new StatsEffect(e), place,user));
                         }
                         break;
                     case TargetingType.AnyUnit:
                         if (target.GetEntitySide == Side.Unassigned) return;
                         foreach (var e in _effs[type])
                         {
-                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
+                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place,user));
                         }
                         break;
                     case TargetingType.AnyEnemy:
                         if (target.GetEntitySide== user.GetEntitySide && target.GetEntitySide != Side.Unassigned) return;
                         foreach (var e in _effs[type])
                         {
-                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
+                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place,user));
                         }
                         break;
                     case TargetingType.AnyAlly:
                         if (target.GetEntitySide != user.GetEntitySide && target.GetEntitySide != Side.Unassigned) return;
                         foreach (var e in _effs[type])
                         {
-                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place));
+                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place,user));
                         }
                         break;
                 }

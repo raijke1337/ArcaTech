@@ -1,4 +1,6 @@
-﻿namespace Arcatech.Units
+﻿using Arcatech.Triggers;
+
+namespace Arcatech.Units
 {
     /// <summary>
     /// called by active game unit component because it is a statsupdatehanlder for stats component
@@ -27,5 +29,10 @@
     public interface IPausableComponent
     {
         public bool Paused { get; set; }
+    }
+
+    public interface IEffectsTakerComponent
+    {
+        public void ApplyEffect(StatsEffect effect,BaseGameEntityComponent source);
     }
 }

@@ -11,7 +11,7 @@ namespace Arcatech.Stats
     /// <summary>
     /// new component to handle the current stats and their changes on any game entity
     /// </summary>
-    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView,IPausableComponent, IKillableComponent
+    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView,IPausableComponent, IKillableComponent,IEffectsTakerComponent
     {
         [SerializeField] protected BaseStatsConfig startingStats;
 
@@ -104,13 +104,6 @@ namespace Arcatech.Stats
                 h.HandleStatsUpdate(_stats);
             }
         }
-        public void ApplyStatsEffect(StatsEffect eff)
-        {
-            if (_stats.ContainsKey(eff.StatType))
-            {
-                _stats[eff.StatType].ApplyStatsEffect(eff);
-            }
-        }
 
         public bool CanApplyCost(StatsEffect cost)
         {
@@ -155,5 +148,13 @@ namespace Arcatech.Stats
 
 
         #endregion
+
+        public void ApplyEffect(StatsEffect eff, BaseGameEntityComponent s)
+        {
+            if (_stats.ContainsKey(eff.StatType))
+            {
+                _stats[eff.StatType].ApplyStatsEffect(eff);
+            }
+        }
     }
 }

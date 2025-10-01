@@ -3,6 +3,7 @@ using Arcatech.EventBus;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 namespace Arcatech.Managers
 {
@@ -12,7 +13,7 @@ namespace Arcatech.Managers
 
         private void OnEnable()
         {
-            _alreadyAppliedTO = new Dictionary<StatsEffect, List<EntityStatsComponent>>();
+            _alreadyAppliedTO = new Dictionary<StatsEffect, List<BaseGameEntityComponent>>();
             if (_triggersBinding == null) _triggersBinding = new EventBinding<StatsEffectTriggerEvent>(HandleStatsEffectEvent);
             EventBus<StatsEffectTriggerEvent>.Register(_triggersBinding);
         }
@@ -25,22 +26,24 @@ namespace Arcatech.Managers
 
         #region triggers
 
-        private Dictionary<StatsEffect, List<EntityStatsComponent>> _alreadyAppliedTO;
+        private Dictionary<StatsEffect, List<BaseGameEntityComponent>> _alreadyAppliedTO;
         private void HandleStatsEffectEvent(StatsEffectTriggerEvent obj)
         {
+            
+            var target = obj.Target;
 
-            if (obj.Target.TryGetComponent<EntityStatsComponent>(out var stats)) // check if the hit entity has some stats that can be changed
+            //if (obj.Target.TryGetComponent<EntityStatsComponent>(out var stats)) // check if the hit entity has some stats that can be changed
             {
                 if (_alreadyAppliedTO.TryGetValue(obj.Applied, out var listOfAffectedEntities))
                 {
                     // effect in list
 
-                    if (listOfAffectedEntities.Contains(stats)) return; // already applied to to target
+                    if (listOfAffectedEntities.Contains(target)) return; // already applied  to target
                     else
                     {
                         // target not in list
-                        stats.ApplyStatsEffect(obj.Applied);
-                        listOfAffectedEntities.Add(stats);
+                        target.ApplyStatsEffect(obj.Applied,obj.Source);
+                        listOfAffectedEntities.Add(target);
 
                         if (obj.Applied.OnApply != null)
                         {
@@ -51,8 +54,8 @@ namespace Arcatech.Managers
                 // effect not in list just do normally and create a new entry
                 else
                 {
-                    stats.ApplyStatsEffect(obj.Applied);
-                    _alreadyAppliedTO[obj.Applied] = new List<EntityStatsComponent>() { stats };
+                    target.ApplyStatsEffect(obj.Applied,obj.Source);
+                    _alreadyAppliedTO[obj.Applied] = new List<BaseGameEntityComponent> { target };
 
                     if (obj.Applied.OnApply != null)
                     {
