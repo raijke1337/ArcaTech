@@ -194,8 +194,23 @@ namespace Arcatech
 
         #region ipausable
 
-        public bool Paused { get; set; } = false;
+        private bool _p;
 
+        public bool Paused
+        {
+            get => _p;
+            set
+            {
+                _p = value;
+                OnPause(value);
+            }
+        }
+
+        protected virtual void OnPause(bool paused)
+        {
+            // do something
+        }
+        
         #endregion
 
         #region on stat change

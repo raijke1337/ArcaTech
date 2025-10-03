@@ -28,6 +28,7 @@ namespace Arcatech.Units
             }
         }
 
+         
         
         override protected void Start()
         {
@@ -38,7 +39,13 @@ namespace Arcatech.Units
         
         protected override void OnActionLock(bool locking)
         {
-           agent.isStopped = locking;
+            agent.isStopped = locking;
+        }
+
+        protected override void OnPause(bool paused)
+        {
+            agent.isStopped = paused;
+            behavior.enabled = !paused;
         }
 
         public override void Kill()
