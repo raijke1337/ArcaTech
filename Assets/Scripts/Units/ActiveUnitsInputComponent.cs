@@ -1,5 +1,6 @@
 ﻿using Arcatech.Units;
 using KBCore.Refs;
+using UnityEditor.Rendering.Universal;
 using UnityEngine;
 namespace Arcatech
 {
@@ -7,12 +8,12 @@ namespace Arcatech
     /// abstract class that handles inputs from Behavior tree or player commands
     /// </summary>
     [RequireComponent (typeof(ActiveGameUnitComponent))]
-    public abstract class ActiveUnitsInputComponent : ValidatedMonoBehaviour, IPausableComponent
+    public abstract class ActiveUnitsInputComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent
     {
         [SerializeField,Self] ActiveGameUnitComponent gameUnitComponent;
         protected virtual void RequestCombatAction(UnitActionType type)
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
              gameUnitComponent.Command(type);
         }
         private void OnEnable()
@@ -27,6 +28,11 @@ namespace Arcatech
 
         protected abstract void ControllerStartBindings(bool enabling);
 
+        protected bool _killed = false;
         public bool Paused { get; set; } = false;
+        public void Kill()
+        {
+            _killed = true;
+        }
     }
 }

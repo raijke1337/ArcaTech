@@ -92,7 +92,7 @@ namespace Arcatech.Units.Inputs
 
         private void OnUseButton()
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
             _interaction.DoInteraction((InteractionContext.Create(_player,transform)));
         }
         private void OnPauseButton()
@@ -102,25 +102,24 @@ namespace Arcatech.Units.Inputs
 
         private void OnShieldSkill()
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
             RequestCombatAction(UnitActionType.ShieldSkill);
         }
         private void OnRangedSkill()
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
             RequestCombatAction(UnitActionType.RangedSkill);
         }
 
         private void OnMeleeSkill()
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
             RequestCombatAction(UnitActionType.MeleeSkill);
         }
 
         private void OnJumpAction()
         {
-            if (Paused) return;
-
+            if (Paused || _killed) return;
             transform.parent = null;
             _movement.DoJump();
             _player.ForceUnitAction(_jump.ProduceAction(_player, transform));
@@ -128,13 +127,14 @@ namespace Arcatech.Units.Inputs
 
         private void OnDodgeSkill()
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
             RequestCombatAction(UnitActionType.DodgeSkill);
         }
 
         private void OnMovementAction(Vector2 dir)
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
+            
             Vector3 AD = _adj.Isoright * _playerInputReader.InputDirection.x;
             Vector3 WS = _adj.Isoforward * _playerInputReader.InputDirection.z;
 
@@ -143,19 +143,19 @@ namespace Arcatech.Units.Inputs
 
         private void OnAimAction(Vector2 point)
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
             _lookVector = _aim.GetDirectionToTarget;
         }
 
         private void OnRangedAction()
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
             RequestCombatAction(UnitActionType.Ranged);
         }
 
         private void OnMeleeAction()
         {
-            if (Paused) return;
+            if (Paused || _killed) return;
             RequestCombatAction(UnitActionType.Melee);
         }
 

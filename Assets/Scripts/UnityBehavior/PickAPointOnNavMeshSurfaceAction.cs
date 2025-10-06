@@ -8,7 +8,7 @@ using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Pick a point on NavMesh Surface", story: "[Agent] selects a point in [range] on NavmeshSurface and sets it as [target]", category: "Action/Navigation", id: "e77d4315743160a2f4a00a4f1ffaef9a")]
+[NodeDescription(name: "Pick a point on NavMesh Surface", story: "[Agent] tries to find a point in [range] on NavmeshSurface and sets it as [target]", category: "Action/Navigation", id: "e77d4315743160a2f4a00a4f1ffaef9a")]
 public partial class PickAPointOnNavMeshSurfaceAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;

@@ -34,7 +34,7 @@ namespace Arcatech.Units
         {
             base.Start();
             bbref = behavior.BlackboardReference;
-            bbref.GetVariableValue("CombatEventChannel", out combatEventChannel);
+            bbref.GetVariableValue("PlayerAttackedEvent", out combatEventChannel);
         }
         
         protected override void OnActionLock(bool locking)
@@ -60,7 +60,7 @@ namespace Arcatech.Units
             if (source.GetEntitySide != GetMainEntity.GetEntitySide && GetMainEntity.GetEntitySide != Side.Unassigned)
             {
                 CombatState = true;
-                Debug.Log($"{GetMainEntity.GetName} received {effect} from {source}, entering combat");
+               // Debug.Log($"{GetMainEntity.GetName} received {effect} from {source}, entering combat");
             }
         }
     }
