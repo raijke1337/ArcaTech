@@ -12,8 +12,8 @@ public partial class RotateTowardsAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Target;
     [SerializeReference] public BlackboardVariable<float> Angle;
     [SerializeReference] public BlackboardVariable<float> Speed;
-    [SerializeReference] public BlackboardVariable<string> AnimatorValue;
     [SerializeReference] public BlackboardVariable<Animator> Animator;
+    [SerializeReference] public BlackboardVariable<string> Value;
     // is rotation clockwise?
 
     
@@ -22,12 +22,13 @@ public partial class RotateTowardsAction : Action
     protected override Status OnStart()
     {
         if (Agent.Value == null || Target.Value == null) return Status.Failure;
-
-        if (!Agent.Value.TryGetComponent<Animator>(out Animator animator))
+        if (Agent.Value.TryGetComponent(out Animator animator) )
         {
-            return Status.Failure;
         }
-
+        else
+        {
+            animator = Agent.Value.GetComponentInChildren<Animator>();
+        }
         Animator.Value = animator;
         return Status.Running;
     }
@@ -58,13 +59,20 @@ public partial class RotateTowardsAction : Action
         
         // Determine rotation direction using signed angle
         float signedAngle = GetSignedAngleToTarget(currentForward, directionToTarget);
-        Animator.Value.SetFloat(AnimatorValue.Value, signedAngle);
+
+
+        if (Animator.Value != null)
+        {
+            Animator.Value.SetFloat(Value.Value, signedAngle);
+        }
         
         // Calculate target rotation
         Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
         
         // Smoothly rotate toward target
         float rotationStep = Speed.Value * Time.deltaTime;
+        
+        
         Agent.Value.transform.rotation = Quaternion.RotateTowards(Agent.Value.transform.rotation, targetRotation, rotationStep);
         
         return Status.Running;

@@ -13,16 +13,21 @@ public partial class DoInputAction : Action
     [SerializeReference] public BlackboardVariable<UnitInputAction> InputAction;
 
     private ActiveGameUnitComponent comp;
-    
+
+    private bool bandaid = false;
     protected override Status OnStart()
     {
+        bandaid = false;
         return !Agent.Value.TryGetComponent(out comp) ? Status.Failure : Status.Running;
     }
 
     protected override Status OnUpdate()
     {
+        if (bandaid) return Status.Success;
+        bandaid = true;
         switch (InputAction.Value)
         {
+
             case UnitInputAction.MeleeAttack:
                 return comp.Command(UnitActionType.Melee) ? Status.Success : Status.Failure;
             case UnitInputAction.RangedAttack:
@@ -41,6 +46,7 @@ public partial class DoInputAction : Action
 
     protected override void OnEnd()
     {
+        bandaid = false;
     }
 }
 
