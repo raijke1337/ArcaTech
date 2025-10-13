@@ -14,7 +14,7 @@ namespace Arcatech.Units
     /// model is deserialized from saves or loaded from a preset SO.
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class EntityInventoryComponent : ValidatedMonoBehaviour, IPausableComponent
+    public class EntityInventoryComponent : ValidatedMonoBehaviour
     {
         [Self, SerializeField] BaseGameEntityComponent baseGameEntity;
         [Space, Header("Items list"), SerializeField] protected UnitItemsSO defaultEquips;
@@ -28,8 +28,14 @@ namespace Arcatech.Units
         {
             _views = new();
             _model = new UnitInventoryModel(defaultEquips,baseGameEntity);
+            var views = gameObject.GetComponentsInChildren<IUnitInventoryView>();
 
-            SetModelView(_model.Handler);
+            foreach (var view in views)
+            {
+                SetModelView(view);
+            }
+                
+            //SetModelView(_model.casterComponent);
             _model.ModelUpdatedEvent += RefreshViews;
         }
 
@@ -39,16 +45,12 @@ namespace Arcatech.Units
             _model.ModelUpdatedEvent -= RefreshViews;
             foreach (var view in _views)
             {
-                view.ViewChangedInventory-= OnInvenoryChangedUI;
+                view.ViewChangedInventory -= HandleViewChange;
             }
             _views.Clear();
         }
 
-        private void Update()
-        {
-            if (Paused) return;
-            _model?.UpdateDeltaModel(Time.deltaTime);
-        }
+
 
         private void RefreshViews()
         {
@@ -66,7 +68,10 @@ namespace Arcatech.Units
 
         #region setup
 
-
+/// <summary>
+/// views attached to same gameobject are found automatically
+/// </summary>
+/// <param name="view"></param>
         public void SetModelView(IUnitInventoryView view)
         {
             if (view != null)
@@ -75,22 +80,23 @@ namespace Arcatech.Units
                 {
                     _views.Add(view);
                     view.RefreshView(_model);
-                    view.ViewChangedInventory += OnInvenoryChangedUI;
+                    view.ViewChangedInventory += HandleViewChange;
+                }
+                else
+                {
+                    Debug.LogWarning($"Tried to register {view} twice in {this}");
                 }
             }
         }
-        private void OnInvenoryChangedUI()
+
+        private void HandleViewChange()
         {
-            Debug.Log($"Something happened in inventory view");
+            Debug.Log($"view changed inventory");
         }
 
         #endregion
 
         #region used by other components
-        /// <summary>
-        /// this is not very good... maybe TODO refactor
-        /// </summary>
-        public IUnitActionsHandler GetUnitActionsHandler => _model.Handler;
 
         public void PickUpItem(IItem item, int amount = 1)
         {
@@ -129,8 +135,6 @@ namespace Arcatech.Units
         }
         #endregion
 
-
-        public bool Paused { get; set; } = false;
 
     }
 

@@ -9,7 +9,7 @@ namespace Arcatech
     {
         public string UsableName { get; }
         public bool CanUseItem(EntityStatsComponent stats);
-        public bool TryUseItem(EntityStatsComponent stats, out BaseUnitAction action);
+        public bool TryUseItem(EntityStatsComponent stats, out UnitState state);
         void DoUpdate(float delta);
     }
 

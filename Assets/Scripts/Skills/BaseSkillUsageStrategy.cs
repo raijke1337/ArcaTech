@@ -8,13 +8,13 @@ using UnityEngine;
 
 namespace Arcatech.Skills
 {
-    public  class SkillUsageStrategy : IUsablesStrategy    , IIconContent
+    public  class SkillUsageStrategy : IUsablesStrategy , IIconContent
     {
         public ActiveGameUnitComponent Owner {get;protected set;}
-        SerializedUnitAction SkillAction { get; }
+        SerializedUnitState SkillState { get; }
 
         protected Transform Spawner;
-        readonly ExtendedText _desc;
+        readonly Description _desc;
 
         int MaxCharges { get; }
         float ChargeReload { get; }
@@ -26,7 +26,7 @@ namespace Arcatech.Skills
 
 
 
-        public SkillUsageStrategy(BaseItemComponent item, SerializedUnitAction useaction, ActiveGameUnitComponent unit, ExtendedText desc, int charges, float reload)
+        public SkillUsageStrategy(BaseItemComponent item, SerializedUnitState useaction, ActiveGameUnitComponent unit, Description desc, int charges, float reload)
         {
 
             Owner = unit;
@@ -34,7 +34,7 @@ namespace Arcatech.Skills
             ChargeReload = reload;
             InternalDelay = 0.1f; // placeholder?
             MaxCharges = charges;
-            SkillAction = useaction;
+            SkillState = useaction;
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);
@@ -44,9 +44,9 @@ namespace Arcatech.Skills
 
         }
 
-        public bool TryUseUsable(out BaseUnitAction action)
+        public bool TryUseUsable(out UnitState state)
         {
-            action = SkillAction.ProduceAction(Owner,Spawner);
+            state = SkillState.ProduceAction(Owner,Spawner);
             if (!_internalCdTimer.IsReady) return false;
             else
             {
@@ -94,7 +94,8 @@ namespace Arcatech.Skills
         }
 
         #region UI
-        public Sprite Icon => _desc.Picture;
+
+        public Description Description => _desc;
 
         public float FillValue
         {
@@ -108,7 +109,9 @@ namespace Arcatech.Skills
             }
         }
 
-        public string IconValue => _remainingCharges > 0 ? "OK" : "CHARGING";
+        public string IconNumber => _remainingCharges > 0 ? "OK" : "CHARGING";
+
+
 
         #endregion
 

@@ -15,8 +15,8 @@ namespace Arcatech.UI
         public void AssignIcon(IIconContent content)
         {
             iconContent = content;
-            _icon.sprite = iconContent.Icon;
-            _text.text = iconContent.IconValue;
+            _icon.sprite = iconContent.Description.Picture;
+            _text.text = iconContent.IconNumber;
             _timerFill.fillAmount = iconContent.FillValue;
         }
         
@@ -30,8 +30,8 @@ namespace Arcatech.UI
         {
             if (iconContent != null)
             {
-                _icon.sprite = iconContent.Icon;
-                _text.text = iconContent.IconValue;
+                _icon.sprite = iconContent.Description.Picture;
+                _text.text = iconContent.IconNumber;
                 _timerFill.fillAmount = iconContent.FillValue;
             }
         }

@@ -6,18 +6,18 @@ namespace Arcatech.Actions
     [CreateAssetMenu(fileName = "New unit action result ", menuName = "Actions/Action Result/Do unit action")]
     public class SerializedUnitActionResult : SerializedActionResult
     {
-        [SerializeField] SerializedUnitAction _action;
+        [SerializeField] SerializedUnitState state;
 
         public override IActionResult BuildActionResult()
         {
-            return new UnitActionResult(_action);
+            return new UnitActionResult(state);
         }
     }
 
     public class UnitActionResult : IActionResult
     {
-        SerializedUnitAction act;
-        public UnitActionResult (SerializedUnitAction a)
+        SerializedUnitState act;
+        public UnitActionResult (SerializedUnitState a)
         {
             act = a;
         }
@@ -26,7 +26,7 @@ namespace Arcatech.Actions
             if (user.TryGetComponent<ActiveGameUnitComponent>(out var actor))
             {
 
-                actor.ForceUnitAction(act.ProduceAction(actor, place));
+                actor.ForceUnitState(act.ProduceAction(actor, place));
             }
         }
     }

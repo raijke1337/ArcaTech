@@ -11,7 +11,7 @@ namespace Arcatech.Items
         public Transform Spawner => spawner;
         public virtual void HandleActionState(UnitActionState s)
         {
-            Debug.Log($"ActionState {s}");
+           // Debug.Log($"ActionState {s} {this}");
         }
 
     }

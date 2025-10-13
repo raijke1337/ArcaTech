@@ -36,7 +36,7 @@ namespace Arcatech.Items
         public Weapon(WeaponSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
         {
             _weaponGameobject = DisplayItem as BaseEquipmentComponent;
-
+            UsableName = cfg.Description.Title;
             _cost = cfg.Cost;
            // AnimationSet = cfg.WeaponType;
             switch (Type)
@@ -52,7 +52,7 @@ namespace Arcatech.Items
             UseStrategy = cfg.WeaponUseStrategy.ProduceStrategy(Owner, cfg,_weaponGameobject);
         }
 
-        public bool TryUseItem(EntityStatsComponent stats, out BaseUnitAction act)
+        public bool TryUseItem(EntityStatsComponent stats, out UnitState act)
         {
             act = null;
             bool ok = false;
@@ -74,31 +74,11 @@ namespace Arcatech.Items
            // EventBus<UpdateIconEvent>.Raise(new UpdateIconEvent(this, Owner));
         }
 
-        public string UsableName { get => Config.Description.Text; }
+        public string UsableName { get; }
 
         #region UI
-
-        public override Sprite Icon
-        {
-            get
-            {
-                try
-                {
-                    return Config.Description.Picture;
-
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"missing picture in {Config}");
-                    return null;
-                } 
-            }
-        }
-
         public override float FillValue => UseStrategy.FillValue;
-
-        public override string IconValue => UseStrategy.IconValue;
-
+        public override string IconNumber => UseStrategy.IconNumber;
 
         #endregion
     }

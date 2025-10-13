@@ -1,4 +1,5 @@
 using System;
+using Arcatech.Texts;
 using Arcatech.UI;
 using UnityEditor;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace Arcatech.Items
     {
         public BaseGameEntityComponent Owner { get; }
         public SerializableGuid ID => Config.ID;
-        public ItemSO Config;
+        public ItemSO Config { get; }
         public Item(ItemSO cfg, BaseGameEntityComponent ow)
         {
             Owner = ow;
@@ -20,9 +21,9 @@ namespace Arcatech.Items
         }
         
         public ItemType Type { get; protected set; }
-        public virtual Sprite Icon =>  Config.Description.Picture;
+        public virtual Description Description =>  Config.Description;
         public virtual float FillValue => 0;
-        public virtual string IconValue => string.Empty;
+        public virtual string IconNumber => string.Empty;
 
     }
 }

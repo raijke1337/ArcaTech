@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace Arcatech.UI
 {
-    public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitActionsHandler, IUnitInventoryView, IStatUpdatesHandler
+    public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitCommandHandler, IUnitInventoryView, IStatUpdatesHandler
     {
         [SerializeField,Child] protected PlayerBarUsablesIconsContainerManager usablesIcons;
         [SerializeField, Child] protected BarsContainersManager _bars;
@@ -23,41 +23,68 @@ namespace Arcatech.UI
         /// </summary>
         public event UnityAction ViewChangedInventory;
         PlayerUnit _player;
+        UsablesCasterComponent _usablesCasterComponent;
 
         private void Start()
         {
             _player = FindAnyObjectByType<PlayerUnit>();
             if ( _player != null )
             {
-                var inv = _player.GetComponent<EntityInventoryComponent>();
-                inv.SetModelView(this);
-                _player.AssignActionsHandler(this);
-                _dmgGlow.color = glowColor;
-                
                 var st = _player.GetComponent<EntityStatsComponent>();
-                st.RegisterStatChangesHandler(_bars);
-                st.RegisterStatChangesHandler(this);
+                if (st != null)
+                {
+                    st.RegisterStatChangesHandler(_bars);
+                    st.RegisterStatChangesHandler(this);
+                }
+                else
+                {
+                    Debug.LogWarning("Player has no stats component, disabling");
+                    gameObject.SetActive(false);
+                }
+                
+                var inv = _player.GetComponent<EntityInventoryComponent>();
+                if (inv != null)
+                {
+                    inv.SetModelView(this);
+                    _player.AssignActionsHandler(this);
+                    _dmgGlow.color = glowColor;
+                }
+                else
+                {
+                    Debug.LogWarning("Player has no inventory component");
+                }
+
+
+                _usablesCasterComponent = _player.GetComponent<UsablesCasterComponent>();
+                if (_usablesCasterComponent != null)
+                {
+                    usablesIcons.LoadIcons(_usablesCasterComponent.GetUsables);
+                }
+                else
+                {
+                    Debug.LogWarning("Player has no usablesCaster component");
+                }
             }
             else
             {
-                Debug.LogWarning("No player in scene but player info panel is active");
+                Debug.LogWarning("No player in scene but player info panel is active, disabling");
+                gameObject.SetActive(false);
             }
-            
-
         }
 
         #region interface
-        public bool TryHandleAction(UnitActionType type, EntityStatsComponent stats, out BaseUnitAction action)
+        public bool TryHandleUnitCommand(UnitActionType type, EntityStatsComponent stats, out UnitState state)
         {
-            action = null;
+            state = null;
             usablesIcons.HandlePlayerAction(type);
-
             return true;
         }
 
         public void RefreshView(UnitInventoryModel model)
         {
-            usablesIcons.LoadIcons(model.Handler.GetUsables);
+            // reload icons in case items have changed
+            if (!_usablesCasterComponent) return;
+            usablesIcons.LoadIcons(_usablesCasterComponent.GetUsables);
         }
 
         

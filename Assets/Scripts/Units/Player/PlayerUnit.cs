@@ -18,6 +18,8 @@ namespace Arcatech.Units
         
         CostumesControllerComponent costumes;
 
+        
+        [Space,Header("Jump!"),SerializeField] SerializedUnitState jumpState;
 
         
         protected override void Start()
@@ -52,6 +54,11 @@ namespace Arcatech.Units
             {
                 transform.parent = null;
             }
+        }
+
+        public void PlayerJump()
+        {
+            ForceUnitState(jumpState.ProduceAction(this, transform));
         }
 
 

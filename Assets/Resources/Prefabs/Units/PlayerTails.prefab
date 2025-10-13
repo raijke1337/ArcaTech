@@ -27,6 +27,7 @@ GameObject:
   - component: {fileID: 4391576507351940185}
   - component: {fileID: 4461434644115553138}
   - component: {fileID: 922206793911062045}
+  - component: {fileID: 120882981402347354}
   m_Layer: 6
   m_Name: PlayerTails
   m_TagString: Player
@@ -119,8 +120,9 @@ MonoBehaviour:
   gameEntity: {fileID: 3366141834993022237}
   animator: {fileID: 4114088046827010313}
   _stats: {fileID: 7664370127433558518}
-  ActionOnDamage: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
-  ActionOnDeath: {fileID: 11400000, guid: 0b8a8ee7cdc62a646a39b231248b013b, type: 2}
+  StaggeredState: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
+  DeadState: {fileID: 11400000, guid: 0b8a8ee7cdc62a646a39b231248b013b, type: 2}
+  StunnedState: {fileID: 11400000, guid: f2f512d0267193c4692ef39181e44f00, type: 2}
   statsUpdateStrategies:
   - {fileID: 11400000, guid: cf19fade51a7a324592c2326ee7bd2c5, type: 2}
   - {fileID: 11400000, guid: 74c306b8b8e2fd4499f4b78ac219f8f7, type: 2}
@@ -129,6 +131,7 @@ MonoBehaviour:
   _ground: {fileID: 1474046039949355583}
   stickToPlatforms: 1
   platfromTag: MovingPlatform
+  jumpState: {fileID: 11400000, guid: 34a934e2c3c277f4982fc026112f51bb, type: 2}
 --- !u!114 &6393574289409902451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,7 +150,6 @@ MonoBehaviour:
   _movement: {fileID: 9023219905071168565}
   _player: {fileID: 803216748275383574}
   _interaction: {fileID: 4391576507351940185}
-  _jump: {fileID: 11400000, guid: 34a934e2c3c277f4982fc026112f51bb, type: 2}
 --- !u!114 &3067075735426861288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,8 +374,6 @@ MonoBehaviour:
   defaultEquips: {fileID: 11400000, guid: 00b9c3121edc84543aa3f98d4e0881de, type: 2}
   _model:
     status: 
-    Handler:
-      info: 
   droppedItemPrefab: {fileID: 5586239703572642459, guid: d3a01ae0b8b0a504089468d3120a2ff9,
     type: 3}
 --- !u!114 &5399239475824375360
@@ -420,8 +420,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactRange: 3
   scanFrequency: 0.2
-  _actionSuccess: {fileID: 11400000, guid: 821d0918054feca41a59a1183644b537, type: 2}
-  _actionFail: {fileID: 11400000, guid: 2373aaf38583adc42b4c896adba745a5, type: 2}
+  stateSuccess: {fileID: 0}
+  stateFail: {fileID: 0}
 --- !u!114 &4461434644115553138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -456,6 +456,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &120882981402347354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142820635933682374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f0fb6fb52a41b64289165c1f54fb5ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  info: Init
+  entityInventory: {fileID: 7053870004041703321}
 --- !u!1 &1394105577972376063
 GameObject:
   m_ObjectHideFlags: 0
@@ -1043,13 +1057,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8260897541854478676}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.6331769, y: -0.36311665, z: -0.33160815, w: 0.59772015}
-  m_LocalPosition: {x: -0.0185, y: 0.0905, z: -0.0348}
+  m_LocalRotation: {x: -0.50649416, y: -0.52276903, z: -0.44146687, w: 0.5246745}
+  m_LocalPosition: {x: -0.0197, y: 0.0898, z: -0.0457}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8092865876064475010}
-  m_LocalEulerAnglesHint: {x: -86.156, y: -167.815, z: 108.934}
+  m_LocalEulerAnglesHint: {x: -83.246, y: -120.474, z: 34.316}
 --- !u!1 &8277033414320545787
 GameObject:
   m_ObjectHideFlags: 0

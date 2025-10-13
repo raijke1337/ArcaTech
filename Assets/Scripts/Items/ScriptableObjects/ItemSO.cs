@@ -1,5 +1,6 @@
 using Arcatech.Texts;
 using System;
+using System.Security.Cryptography;
 using Arcatech.UI;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -10,7 +11,7 @@ namespace Arcatech.Items
     public class ItemSO : ScriptableObjectID, IIconContent
     {
         [SerializeField] public BaseItemComponent itemPrefab;
-        public ExtendedText Description;        
+        [SerializeField] Description description;        
         public ItemType type;
 
         [Space] public int MaxStack = 1;
@@ -24,8 +25,8 @@ namespace Arcatech.Items
             return new Item(this,owner);
         }
 
-        public Sprite Icon => Description.Picture;
+        public Description Description => description;
         public float FillValue => 0;
-        public string IconValue => string.Empty;
+        public string IconNumber => string.Empty;
     }
 }

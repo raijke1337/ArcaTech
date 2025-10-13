@@ -23,6 +23,7 @@ namespace Arcatech.Items
 
         public override void HandleActionState(UnitActionState s)
         {
+            base.HandleActionState(s);
             switch (s)
             {
                 case UnitActionState.None:

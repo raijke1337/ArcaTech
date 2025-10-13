@@ -14,20 +14,17 @@ namespace Arcatech.Items
 
         #region serialize
 
-        [SerializeField] [ReadOnlyText] string status = "not init";
+       [SerializeField] [ReadOnlyText] string status = "not init";
 
         #endregion
 
-        [SerializeField] public UsablesHandler Handler;
+       
+        bool initialized = false;
         List<Item> inventory;
         Dictionary<ItemType, Equipment> equipments;
 
         public IReadOnlyList<Equipment> ListEquipped => equipments.Values.ToList().AsReadOnly();
         public IReadOnlyList<Item> ListInventory => inventory.AsReadOnly();
-
-        bool initialized = false;
-
-        public event UnityAction<IDrawItemStrategy> DrawStrategyChangedEvent = delegate { };
         public event UnityAction ModelUpdatedEvent = delegate { };
 
         public UnitInventoryModel(IEntityItemsList items, BaseGameEntityComponent o)
@@ -35,9 +32,6 @@ namespace Arcatech.Items
 
             inventory = new();
             equipments = new();
-
-            Handler = new UsablesHandler();
-            Handler.DrawStrategyUpdateEvent += OnDrawStrategyUpdate;
             
             status = $"No items loaded!";
             
@@ -81,15 +75,7 @@ namespace Arcatech.Items
             initialized = true;
             ModelUpdatedEvent.Invoke();
         }
-
-        private void OnDrawStrategyUpdate(IDrawItemStrategy t) => DrawStrategyChangedEvent.Invoke(t);
-
-        public void UpdateDeltaModel(float delta)
-        {
-            Handler?.Update(delta);
-            status = $"updating OK";
-        }
-
+        
         public void PickUpItem(Item item)
         {
             inventory.Add(item);
@@ -142,7 +128,8 @@ namespace Arcatech.Items
             {
                 if (toEquip is IWeapon w)
                 {
-                    DrawStrategyChangedEvent.Invoke(w.DrawStrategy);
+                    //DrawStrategyChangedEvent.Invoke(w.DrawStrategy);
+                    // maybe return it but for now only 1 draw strategy provider
                 }
                 ModelUpdatedEvent.Invoke();
             }
@@ -164,7 +151,6 @@ namespace Arcatech.Items
                 return list.ToArray();
             }
         }
-
 
     }
 

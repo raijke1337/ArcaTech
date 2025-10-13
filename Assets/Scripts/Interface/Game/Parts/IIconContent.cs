@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+﻿using Arcatech.Texts;
+using UnityEngine;
 
 namespace Arcatech.UI
 {
     public interface IIconContent
     {
-        public Sprite Icon { get; }
+        public Description Description { get; }
         public float FillValue { get; }
-        public string IconValue { get; }
-
+        public string IconNumber { get; }
     }
 }

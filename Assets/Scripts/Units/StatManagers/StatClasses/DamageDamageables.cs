@@ -8,7 +8,7 @@ namespace Arcatech.Stats
     {
         public override IOnStatsChangeStrategy BuildStrategy(ActiveGameUnitComponent unit)
         {
-            throw new System.NotImplementedException();
+            return new IDamageableTrigger(unit);
         }
     }
 

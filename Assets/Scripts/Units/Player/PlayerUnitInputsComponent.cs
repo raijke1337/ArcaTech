@@ -16,8 +16,6 @@ namespace Arcatech.Units.Inputs
         [SerializeField, Self] DashJumpMovementController _movement;
         [SerializeField, Self] PlayerUnit _player;
         [SerializeField, Self] protected InteractionComponent _interaction;
-        
-        [Space,Header("Jump!"),SerializeField] SerializedUnitAction _jump;
 
         private IsoCamAdjust _adj;
 
@@ -122,7 +120,7 @@ namespace Arcatech.Units.Inputs
             if (Paused || _killed) return;
             transform.parent = null;
             _movement.DoJump();
-            _player.ForceUnitAction(_jump.ProduceAction(_player, transform));
+            _player.PlayerJump();
         }
 
         private void OnDodgeSkill()

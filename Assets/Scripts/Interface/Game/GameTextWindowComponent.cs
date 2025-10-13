@@ -24,7 +24,7 @@ namespace Arcatech.UI
  
 
         public event SimpleEventsHandler DialogueCompleteEvent;
-        public event UnityAction<UnitInventoryViewReference> ViewChangedInventory;
+        public event UnityAction ViewChangedInventory;
 
         private DialoguePart _currentDialogue;
 
@@ -73,7 +73,7 @@ namespace Arcatech.UI
             }
         }
 
-        private void B_OptionClickedEvent(SimpleText arg)
+        private void B_OptionClickedEvent(Description arg)
         {
             foreach (var b in _buttons.ToArray())
             {

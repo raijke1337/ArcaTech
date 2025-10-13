@@ -22,16 +22,17 @@ namespace Arcatech
         [SerializeField, Self] protected EntityStatsComponent _stats;
 
 
-        [Space, SerializeField] protected SerializedUnitAction ActionOnDamage;
-        [SerializeField] protected SerializedUnitAction ActionOnDeath;
+        [Space, SerializeField] protected SerializedUnitState StaggeredState;
+        [SerializeField] protected SerializedUnitState DeadState;
+        [SerializeField] protected SerializedUnitState StunnedState;
 
-        BaseUnitAction _damageAction;
-        BaseUnitAction _deathAction;
+        UnitState _staggerState;
+        UnitState _deathState;
         
         SimpleEntityShadowComponent _entityShadowComponent;
 
         public BaseGameEntityComponent GetMainEntity { get => gameEntity; }
-        public Animator GetAnimatorReference => animator;
+        //public Animator GetAnimatorReference => animator;
 
         [Space, Header("Stats changes handlers")]
         [SerializeField] StatsUpdateStrategy[] statsUpdateStrategies;
@@ -39,19 +40,34 @@ namespace Arcatech
 
         protected virtual void Start()
         {
-            if (TryGetComponent<EntityInventoryComponent>(out var inv))
-            {
-                AssignActionsHandler(inv.GetUnitActionsHandler);
-                inv.SetModelView(_stats);
-            }
-            else
-            {
-                Debug.LogWarning($"{GetMainEntity.GetName} has no actions handler assigned at startup because it has no inventory");
-            }
+            // removed because inventory now finds attached views automatically
+            
+            // if (TryGetComponent<EntityInventoryComponent>(out var inv))
+            // {
+            //     AssignActionsHandler(inv.GetUnitActionsCasterComponent);
+            //     inv.SetModelView(_stats);
+            // }
+            // else
+            // {
+            //     Debug.LogWarning($"{GetMainEntity.GetName} has no actions handler assigned at startup because it has no inventory");
+            // }
+            
+            
             _stats.RegisterStatChangesHandler(this);
 
-            _damageAction = ActionOnDamage.ProduceAction(this,transform);
-            _deathAction = ActionOnDeath.ProduceAction(this, transform);
+            var handlers = GetComponentsInChildren<IUnitCommandHandler>();
+
+            if (handlers.Length == 0)
+            {
+                Debug.Log($"No handlers found {GetMainEntity.GetName}");
+            }
+            foreach (var handler in handlers)
+            {
+                AssignActionsHandler(handler);
+            }
+            
+            _staggerState = StaggeredState.ProduceAction(this,transform);
+            _deathState = DeadState.ProduceAction(this, transform);
 
 
             if (statsUpdateStrategies == null || statsUpdateStrategies.Length == 0)
@@ -71,14 +87,14 @@ namespace Arcatech
         {
             if (Paused) return;
 
-            if (currentAction != null)
+            if (CurrentState != null)
             {
-                switch (currentAction.UpdateAction(Time.deltaTime))
+                switch (CurrentState.UpdateAction(Time.deltaTime))
                 {
                     case UnitActionState.None:
                         break;
                     case UnitActionState.Started:
-                        ActionLock = currentAction.LockMovement;
+                        ActionLock = CurrentState.LockMovement;
                         break;
                     case UnitActionState.ExitTime:
                         ActionLock = false;
@@ -106,21 +122,22 @@ namespace Arcatech
         protected virtual void OnActionLock(bool locking) { } // do something if needed
         #endregion
 
+        /// <summary>
+        /// TODO replace this with states with transitions
+        /// ie Idle state, Movement state, Attacking (UnitAction) state
+        /// </summary>
 
         #region actions
 
-        List<IUnitActionsHandler> _actionsHandlers;
-
-        //public event UnityAction <UnitActionType> DidActionAnnounceEvent = delegate { };
-
-        protected BaseUnitAction currentAction;
+        private List<IUnitCommandHandler> _actionsHandlers = new List<IUnitCommandHandler>();
+        protected UnitState CurrentState;
         /// <summary>
-        /// assign some other handler that isnt the one in inventory
+        /// assign some other handler that isn't attached to the gameobject
         /// </summary>
-        public virtual void AssignActionsHandler(IUnitActionsHandler handler)
+        public virtual void AssignActionsHandler(IUnitCommandHandler handler)
         { 
-            if (_actionsHandlers == null) _actionsHandlers = new List<IUnitActionsHandler>();
-            _actionsHandlers.Add(handler);
+            if (!_actionsHandlers.Contains(handler)) _actionsHandlers.Add(handler);
+            else Debug.LogWarning($"Tried to assigned the same handler {handler} twice");
         }
 
 
@@ -132,11 +149,9 @@ namespace Arcatech
 
             foreach (var h in _actionsHandlers)
             {
-                if (h.TryHandleAction(obj, _stats, out var a))
+                if (h.TryHandleUnitCommand(obj, _stats, out var a))
                 {
                     DoActionLogic(a);
-                    //DidActionAnnounceEvent?.Invoke(obj);
-                    // unused for now
                 }
                 else
                 {
@@ -153,25 +168,24 @@ namespace Arcatech
             return true;
         }
 
-        public void ForceUnitAction(BaseUnitAction act)
+        public void ForceUnitState(UnitState act)
         {
             if (Paused || act == null) return;
-            OnForceAction(act);
-        }
-        protected virtual void OnForceAction(BaseUnitAction act)
-        {
             DoActionLogic(act);
         }
-        protected void DoActionLogic(BaseUnitAction act)
+
+        protected void DoActionLogic(UnitState act)
         {
             if (act == null) return;
-            if (currentAction != null && currentAction != act && currentAction.GetActionState != UnitActionState.Completed)
+            if (CurrentState != null && CurrentState != act && CurrentState.GetActionState != UnitActionState.Completed)
             {
-                currentAction.CompleteAction();
+                CurrentState.ExitState();
             }
-            currentAction = act;
-            ActionLock = currentAction.LockMovement;
-            currentAction.StartAction();
+            CurrentState = act;
+            ActionLock = CurrentState.LockMovement;
+            
+            CurrentState.StartState();
+            
         }
 
         #endregion
@@ -237,7 +251,7 @@ namespace Arcatech
         {
             Debug.Log($"{GetMainEntity.GetName} died");
             Paused = true;
-            _deathAction?.StartAction();
+            _deathState?.StartState();
         }
         #endregion
     }

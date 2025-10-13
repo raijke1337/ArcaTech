@@ -8,7 +8,7 @@ namespace Arcatech.Items
 {
     public class MeleeWeaponStrategy : WeaponStrategy
     {
-        public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, BaseEquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
+        public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, BaseEquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
         {
             Trigger = (comp as MeleeWeaponBaseEquipmentComponent).Trigger;
             Trigger.SomeColliderWasHitEvent += HandleColliderHitEvent;
@@ -23,16 +23,16 @@ namespace Arcatech.Items
         }
         protected WeaponTriggerComponent Trigger;
         protected IActionResult[] OnColliderHit { get; }
-        protected BaseUnitAction currentAction;
+        protected UnitState CurrentState;
 
-        public override bool TryUseUsable(out BaseUnitAction action)
+        public override bool TryUseUsable(out UnitState state)
         {
 
             // TODO needs debug
             // add checks to prevent additional triggering
 
             bool ok = CanUseUsable();
-            action = null;
+            state = null;
             if (!ok)
             {
                 if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Can't use weapon because CD");
@@ -41,12 +41,12 @@ namespace Arcatech.Items
             hitsThisSwing.Clear();
 
             // case advancing
-           if (currentAction != null && currentAction.CanAdvance(out var next))
+           if (CurrentState != null && CurrentState.CanAdvance(out var next))
             {
-                action = next.ProduceAction(Owner,GameObjectComponent.Spawner);
+                state = next.ProduceAction(Owner,GameObjectComponent.Spawner);
                 ChargesLogicOnUse();
-                currentAction.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
-                currentAction = action;
+                CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
+                CurrentState = state;
                 if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Advancing weapon combo {next}");
                 return true;
             }
@@ -55,10 +55,10 @@ namespace Arcatech.Items
            else
             {
                 ChargesLogicOnUse();
-                action = InitialAction;
-                currentAction = action;
-                if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {action}");
-                action.ActionStateChangedEvent += Action_ActionStateChangedEvent;
+                state = InitialState;
+                CurrentState = state;
+                if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {state}");
+                state.ActionStateChangedEvent += Action_ActionStateChangedEvent;
                 return true;
             }
         }
@@ -75,7 +75,7 @@ namespace Arcatech.Items
                 case UnitActionState.ExitTime:
                     break;
                 case UnitActionState.Completed:
-                    currentAction.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
+                    CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
                     break;
             }
         }

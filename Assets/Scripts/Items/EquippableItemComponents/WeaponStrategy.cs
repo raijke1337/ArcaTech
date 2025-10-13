@@ -1,6 +1,7 @@
 ﻿using Arcatech.Units;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Texts;
 using UnityEngine;
 
 namespace Arcatech.Items
@@ -13,7 +14,7 @@ namespace Arcatech.Items
         protected BaseEquipmentComponent GameObjectComponent { get; }
 
 
-        public WeaponStrategy (SerializedUnitAction act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseEquipmentComponent comp)
+        public WeaponStrategy (SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseEquipmentComponent comp)
         {
             Owner = unit.GetComponent<ActiveGameUnitComponent>();
             Config = cfg;
@@ -22,7 +23,7 @@ namespace Arcatech.Items
             MaxCharges = charges;
             GameObjectComponent = comp;
 
-            InitialAction = act.ProduceAction(Owner, comp.Spawner);
+            InitialState = act.ProduceAction(Owner, comp.Spawner);
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);
@@ -60,11 +61,11 @@ namespace Arcatech.Items
         #endregion
         #region usable
 
-        protected BaseUnitAction InitialAction { get; }
+        protected UnitState InitialState { get; }
 
-        public virtual bool TryUseUsable(out BaseUnitAction action)
+        public virtual bool TryUseUsable(out UnitState state)
         {
-            action = InitialAction;
+            state = InitialState;
             // if there are other actions they will be contained inside that one
             if (CanUseUsable())
             {
@@ -97,7 +98,8 @@ namespace Arcatech.Items
         }
         #endregion
         #region UI
-        public Sprite Icon => Config.Description.Picture;
+
+        public Description Description => Config.Description;
 
         public float FillValue
         {
@@ -111,7 +113,7 @@ namespace Arcatech.Items
             }
         }
 
-        public string IconValue => _remainingCharges > 0 ? "OK" : "CHARGING";
+        public string IconNumber => _remainingCharges.ToString("D");
 
         #endregion
 

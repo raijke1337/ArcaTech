@@ -12,16 +12,16 @@ namespace Arcatech.Skills
         [SerializeField] float ChargeReload;
 
         [Space,Header("Usage")]
-        [SerializeField] SerializedUnitAction SkillAction;
+        [SerializeField] SerializedUnitState skillState;
 
         public virtual SkillUsageStrategy ProduceStrategy(ActiveGameUnitComponent owner,SerializedSkill cfg, BaseItemComponent item)
         {
-            return new SkillUsageStrategy(item, SkillAction,owner,cfg.Description,Charges,ChargeReload);
+            return new SkillUsageStrategy(item, skillState,owner,cfg.Description,Charges,ChargeReload);
         }
 
         private void OnValidate()
         {
-            Assert.IsNotNull(SkillAction);
+            Assert.IsNotNull(skillState);
             Assert.IsFalse(Charges==0);
         }
     }

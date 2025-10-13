@@ -7,13 +7,5 @@ namespace Arcatech.Items
     {
         public event UnityAction ViewChangedInventory;
         void RefreshView (UnitInventoryModel model);
-
-    }
-
-    public class UnitInventoryViewReference
-    {
-        public List<Equipment> Equips { get; set; }
-        public List<Item> Inventory { get; set; }
-
     }
 }

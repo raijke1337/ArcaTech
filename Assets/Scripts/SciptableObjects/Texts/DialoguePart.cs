@@ -9,9 +9,9 @@ namespace Arcatech.Texts
         public DialogueCharacter Character;
 
     //   public FaceExpression Mood;
-        public SimpleText DialogueContent;
+        public Description DialogueContent;
 
-        public SerializedDictionary<SimpleText, DialoguePart> Options;
+        public SerializedDictionary<Description, DialoguePart> Options;
 
     }
 }

@@ -7,7 +7,7 @@ namespace Arcatech.Items
     public abstract class SerializedWeaponUseStrategy : ScriptableObject
     {
         [Header("Actions")]
-        public SerializedUnitAction Action;
+        public SerializedUnitState state;
 
         [Space,Header("Stats")]
         public int TotalCharges;
@@ -17,11 +17,11 @@ namespace Arcatech.Items
         private void OnValidate()
         {
             Assert.IsFalse(TotalCharges == 0);
-            Assert.IsNotNull(Action);
+            Assert.IsNotNull(state);
         }
         public virtual WeaponStrategy ProduceStrategy (BaseGameEntityComponent unit, WeaponSO cfg,BaseEquipmentComponent comp)
         {
-            return new WeaponStrategy(Action, unit, cfg,TotalCharges,ChargeRestoreTime, InternalCooldown,comp);   
+            return new WeaponStrategy(state, unit, cfg,TotalCharges,ChargeRestoreTime, InternalCooldown,comp);   
         }
     }
 

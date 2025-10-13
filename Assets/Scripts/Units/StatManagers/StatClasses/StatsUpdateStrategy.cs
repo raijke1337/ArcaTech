@@ -6,7 +6,6 @@ namespace Arcatech.Stats
     {
         public abstract IOnStatsChangeStrategy BuildStrategy(ActiveGameUnitComponent unit);
     }
-
     public interface IOnStatsChangeStrategy : IStrategy
     {
         public void HandleStats(IDictionary<BaseStatType, StatValueContainer> stats);

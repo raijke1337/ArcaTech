@@ -9,12 +9,7 @@ namespace Arcatech.Triggers
 
         public event UnityAction<Collider> SomeColliderWasHitEvent = delegate { };
 
-        public void ToggleCollider(bool isEnable)
-        {
-            // Collider.enabled = isEnable;
-            // TODO FIX THIS
-            Collider.enabled = true;
-        }
+        public void ToggleCollider(bool isEnable) => Collider.enabled = isEnable;
 
         protected override void OnTriggerEnter(Collider other)
         {

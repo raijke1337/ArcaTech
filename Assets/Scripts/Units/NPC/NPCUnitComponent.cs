@@ -50,6 +50,8 @@ namespace Arcatech.Units
 
         public override void Kill()
         {
+            
+            Debug.Log($"{GetMainEntity.GetName} died");
             base.Kill();
             agent.isStopped = true;
             behavior.End();

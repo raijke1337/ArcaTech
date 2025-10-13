@@ -10,16 +10,16 @@ namespace Arcatech.Interactions
     {
         [SerializeField, Range(0, 5)] private float interactRange = 3f;
         [SerializeField, Range(0.016f,1),Tooltip("seconds per 1 scan, min is each frame")] private float scanFrequency = 0.2f;
-        [SerializeField] private SerializedUnitAction _actionSuccess;
-        [SerializeField] private SerializedUnitAction _actionFail;
+        [SerializeField] private SerializedUnitState stateSuccess;
+        [SerializeField] private SerializedUnitState stateFail;
         
         
         private IInteractive currentInteractive;
         private ActiveGameUnitComponent cachedActor;
         private Transform cachedTransform;
 
-        private BaseUnitAction successAction;
-        private BaseUnitAction failAction;
+        private UnitState _successState;
+        private UnitState _failState;
 
         private float time = 0f;
 
@@ -58,22 +58,22 @@ namespace Arcatech.Interactions
             if (cachedActor == null)
             {
                 cachedActor = context.ActiveGameUnitComponent;
-                if (_actionSuccess != null)
+                if (stateSuccess != null)
                 {
-                    successAction = _actionSuccess.ProduceAction(cachedActor, cachedTransform);
+                    _successState = stateSuccess.ProduceAction(cachedActor, cachedTransform);
                 }
 
-                if (_actionFail != null)
+                if (stateFail != null)
                 {
-                    failAction = _actionFail.ProduceAction(cachedActor, cachedTransform);
+                    _failState = stateFail.ProduceAction(cachedActor, cachedTransform);
                 }
             }
 
             if (currentInteractive != null)
             {
                 bool ok = currentInteractive.OnInteraction(this, context);
-                if (successAction != null && failAction != null)
-                    cachedActor.ForceUnitAction(ok ? successAction : failAction);
+                if (_successState != null && _failState != null)
+                    cachedActor.ForceUnitState(ok ? _successState : _failState);
             }
             else
             {

@@ -9,7 +9,7 @@ namespace Arcatech.Items
        // projectiles are now spawned as "action result"
         public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, BaseEquipmentComponent comp)
         {
-            return new RangedWeaponStrategy(Action,  unit, cfg, TotalCharges, ChargeRestoreTime, InternalCooldown, comp);
+            return new RangedWeaponStrategy(state,  unit, cfg, TotalCharges, ChargeRestoreTime, InternalCooldown, comp);
         }
 
     }

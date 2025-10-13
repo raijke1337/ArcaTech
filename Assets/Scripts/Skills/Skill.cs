@@ -1,5 +1,6 @@
 ﻿using Arcatech.Items;
 using Arcatech.Stats;
+using Arcatech.Texts;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
@@ -54,7 +55,7 @@ namespace Arcatech.Skills
             UsableName = settings.Description.Text;
         }
 
-        public bool TryUseItem(EntityStatsComponent stats, out BaseUnitAction onUse)
+        public bool TryUseItem(EntityStatsComponent stats, out UnitState onUse)
         {
             onUse = null;
             if (stats.CanApplyCost(GetCost) && Strategy.TryUseUsable(out onUse))
@@ -82,11 +83,11 @@ namespace Arcatech.Skills
         #region UI
 
 
-        public Sprite Icon => Strategy.Icon;
+        public Description Description => Strategy.Description;
 
         public float FillValue => Strategy.FillValue;
 
-        public string IconValue => Strategy.IconValue;
+        public string IconNumber => Strategy.IconNumber;
 
 
         #endregion

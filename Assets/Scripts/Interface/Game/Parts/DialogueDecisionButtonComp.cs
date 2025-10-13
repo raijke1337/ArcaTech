@@ -4,10 +4,10 @@ namespace Arcatech.Texts
     public class DialogueDecisionButtonComp : MonoBehaviour
     {
         [SerializeField] private TMPro.TextMeshProUGUI _text;
-        private SimpleText _txt;
+        private Description _txt;
 
-        public event SimpleEventsHandler<SimpleText> OptionClickedEvent;
-        public SimpleText CurrentText
+        public event SimpleEventsHandler<Description> OptionClickedEvent;
+        public Description CurrentText
         {
             get
             {

@@ -51,6 +51,7 @@ GameObject:
   - component: {fileID: 6017142278139704755}
   - component: {fileID: 6668240942958006498}
   - component: {fileID: 1376333295245354474}
+  - component: {fileID: 8598743006618296905}
   m_Layer: 6
   m_Name: Small Bot
   m_TagString: Enemy
@@ -218,7 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4980b1095bba4ba4e9dc04954162be1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingStats: {fileID: 11400000, guid: c9551a180c74d634b9aaaf7c896ec589, type: 2}
+  startingStats: {fileID: 11400000, guid: 96e9149187430bf4d8be1fa0ccbd7b0d, type: 2}
 --- !u!114 &4115950820855998346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,8 +235,9 @@ MonoBehaviour:
   gameEntity: {fileID: 2276539188783938308}
   animator: {fileID: 5349238622031444643}
   _stats: {fileID: 2712598585342110039}
-  ActionOnDamage: {fileID: 11400000, guid: 46fd9f2dd58036a4daeb03216e91fdad, type: 2}
-  ActionOnDeath: {fileID: 11400000, guid: f722cb6c4e67f3f4eb6c323e10c7a154, type: 2}
+  StaggeredState: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
+  DeadState: {fileID: 11400000, guid: 0b8a8ee7cdc62a646a39b231248b013b, type: 2}
+  StunnedState: {fileID: 11400000, guid: f2f512d0267193c4692ef39181e44f00, type: 2}
   statsUpdateStrategies:
   - {fileID: 11400000, guid: cf19fade51a7a324592c2326ee7bd2c5, type: 2}
   - {fileID: 11400000, guid: 74c306b8b8e2fd4499f4b78ac219f8f7, type: 2}
@@ -281,8 +283,6 @@ MonoBehaviour:
   defaultEquips: {fileID: 11400000, guid: 65cb535157050ef42a4ec36a0c96ad45, type: 2}
   _model:
     status: 
-    Handler:
-      info: Init
   droppedItemPrefab: {fileID: 0}
 --- !u!114 &1376333295245354474
 MonoBehaviour:
@@ -306,6 +306,20 @@ MonoBehaviour:
         Value: {fileID: 492853373599057877}
   defaultItemsDrawStrat: {fileID: 11400000, guid: 00c3eeea7d325d1498271fbf5c7cc775,
     type: 2}
+--- !u!114 &8598743006618296905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9155761612785111638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f0fb6fb52a41b64289165c1f54fb5ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  info: 
+  entityInventory: {fileID: 6668240942958006498}
 --- !u!1001 &1969979068874704690
 PrefabInstance:
   m_ObjectHideFlags: 0

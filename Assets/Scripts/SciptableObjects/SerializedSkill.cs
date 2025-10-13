@@ -1,4 +1,5 @@
-﻿using Arcatech.Items;
+﻿using System.Security.Cryptography;
+using Arcatech.Items;
 using Arcatech.Texts;
 using Arcatech.Triggers;
 using Arcatech.UI;
@@ -12,7 +13,7 @@ namespace Arcatech.Skills
     {
         [Header("Use strategy"),SerializeField] public SerializedSkillUseStrategy UseStrategy;
         [SerializeField] DrawItemsStrategy DrawItemsStrategy;
-        [Header("Text"), SerializeField] public ExtendedText Description;
+        [Header("Text"), SerializeField] Description description;
 
         [Space, Header("Combat")]
         //public UnitActionType UnitActionType;
@@ -31,8 +32,8 @@ namespace Arcatech.Skills
             Assert.IsNotNull(Description);
         }
 
-        public Sprite Icon => Description.Picture;
+        public Description Description => description;
         public float FillValue => 0;
-        public string IconValue => string.Empty;
+        public string IconNumber => string.Empty;
     }
 }
