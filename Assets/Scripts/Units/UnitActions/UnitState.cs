@@ -9,7 +9,7 @@ namespace Arcatech.Units
 {
     public class UnitState : IUnitAction
     {
-        public static UnitState BuildAction(ActiveGameUnitComponent u, bool lck, NextActionSettings next, string anim, float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place, float crossfade)
+        public static UnitState Build(ActiveGameUnitComponent u, bool lck, NextActionSettings next, string anim, float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place, float crossfade)
         {
             return new UnitState(u, lck, next, anim, exit,onstart, onfinish, onExit,place,crossfade);
         }

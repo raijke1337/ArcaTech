@@ -20,9 +20,9 @@ namespace Arcatech.Units
         [SerializeField] SerializedActionResult[] _onExit;
         [SerializeField] SerializedActionResult[] _onFinish;
 
-        public UnitState ProduceAction(ActiveGameUnitComponent unit, Transform place)
+        public UnitState DeserializeState(ActiveGameUnitComponent unit, Transform place)
         {
-            return UnitState.BuildAction(unit, _locksMovement, _nextAct, _animationName, _exitTime, _onStart,
+            return UnitState.Build(unit, _locksMovement, _nextAct, _animationName, _exitTime, _onStart,
                 _onFinish, _onExit, place, _crossFadeTime);
         }
 

@@ -60,12 +60,12 @@ namespace Arcatech.Interactions
                 cachedActor = context.ActiveGameUnitComponent;
                 if (stateSuccess != null)
                 {
-                    _successState = stateSuccess.ProduceAction(cachedActor, cachedTransform);
+                    _successState = stateSuccess.DeserializeState(cachedActor, cachedTransform);
                 }
 
                 if (stateFail != null)
                 {
-                    _failState = stateFail.ProduceAction(cachedActor, cachedTransform);
+                    _failState = stateFail.DeserializeState(cachedActor, cachedTransform);
                 }
             }
 

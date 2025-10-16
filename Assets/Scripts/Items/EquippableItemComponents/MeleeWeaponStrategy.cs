@@ -43,7 +43,7 @@ namespace Arcatech.Items
             // case advancing
            if (CurrentState != null && CurrentState.CanAdvance(out var next))
             {
-                state = next.ProduceAction(Owner,GameObjectComponent.Spawner);
+                state = next.DeserializeState(Owner,GameObjectComponent.Spawner);
                 ChargesLogicOnUse();
                 CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
                 CurrentState = state;

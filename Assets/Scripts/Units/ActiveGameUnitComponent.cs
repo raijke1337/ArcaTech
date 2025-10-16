@@ -59,15 +59,15 @@ namespace Arcatech
 
             if (handlers.Length == 0)
             {
-                Debug.Log($"No handlers found {GetMainEntity.GetName}");
+                Debug.Log($"No unit command handlers found {GetMainEntity.GetName}");
             }
             foreach (var handler in handlers)
             {
                 AssignActionsHandler(handler);
             }
             
-            _staggerState = StaggeredState.ProduceAction(this,transform);
-            _deathState = DeadState.ProduceAction(this, transform);
+            _staggerState = StaggeredState.DeserializeState(this,transform);
+            _deathState = DeadState.DeserializeState(this, transform);
 
 
             if (statsUpdateStrategies == null || statsUpdateStrategies.Length == 0)
@@ -246,11 +246,13 @@ namespace Arcatech
 
         #region IKillable
 
-
+        private bool _k;
+        public bool Killed => _k;
         public virtual void Kill()
         {
             Debug.Log($"{GetMainEntity.GetName} died");
             Paused = true;
+            _k = true;
             _deathState?.StartState();
         }
         #endregion

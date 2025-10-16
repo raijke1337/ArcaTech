@@ -125,7 +125,7 @@ namespace Arcatech.Triggers
                 action.BuildActionResult().ProduceResult(null, p, transform);
             }
         }
-
+        public bool Killed => componentKilled;
         public void Kill() => componentKilled = true;
     }
 }

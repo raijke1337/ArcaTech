@@ -15,4 +15,6 @@
     {
         public abstract bool CheckCondition(IInteractor actor, IInteractive item, IInteractionContext context);
     }
+    
+    
 }

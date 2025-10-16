@@ -15,6 +15,7 @@ namespace Arcatech.Units
     public interface IKillableComponent
     {
         public void Kill();
+        public bool Killed { get; }
     }
     /// <summary>
     /// called by active game unit component because it is a statsupdatehanlder for stats component

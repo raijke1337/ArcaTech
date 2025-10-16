@@ -46,7 +46,7 @@ namespace Arcatech.Skills
 
         public bool TryUseUsable(out UnitState state)
         {
-            state = SkillState.ProduceAction(Owner,Spawner);
+            state = SkillState.DeserializeState(Owner,Spawner);
             if (!_internalCdTimer.IsReady) return false;
             else
             {

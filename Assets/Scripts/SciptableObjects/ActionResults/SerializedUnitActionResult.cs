@@ -26,7 +26,7 @@ namespace Arcatech.Actions
             if (user.TryGetComponent<ActiveGameUnitComponent>(out var actor))
             {
 
-                actor.ForceUnitState(act.ProduceAction(actor, place));
+                actor.ForceUnitState(act.DeserializeState(actor, place));
             }
         }
     }

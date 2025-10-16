@@ -58,7 +58,7 @@ namespace Arcatech.Units
 
         public void PlayerJump()
         {
-            ForceUnitState(jumpState.ProduceAction(this, transform));
+            ForceUnitState(jumpState.DeserializeState(this, transform));
         }
 
 

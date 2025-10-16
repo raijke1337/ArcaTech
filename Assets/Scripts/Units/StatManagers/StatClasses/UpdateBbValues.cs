@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.Behavior;
 using UnityEngine;
 
@@ -29,7 +30,10 @@ namespace Arcatech.Stats
 
         public void HandleStats(IDictionary<BaseStatType, StatValueContainer> stats)
         {
-            if (bb == null) return;
+            if (bb == null)
+            {
+                throw new NullReferenceException($"no blackboard reference in {unit}");
+            }
             var hp = stats[BaseStatType.Health];
             if (!hp.Initialized) return;
             bb.SetVariableValue("hpPercent", hp.GetPercent);

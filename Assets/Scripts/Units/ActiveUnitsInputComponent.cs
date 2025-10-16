@@ -29,6 +29,7 @@ namespace Arcatech
         protected abstract void ControllerStartBindings(bool enabling);
 
         protected bool _killed = false;
+        public bool Killed => _killed;
         public bool Paused { get; set; } = false;
         public void Kill()
         {

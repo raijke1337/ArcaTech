@@ -138,9 +138,12 @@ namespace Arcatech.Stats
             _handlers.Clear();
         }
 
+        bool killed = false;
+        public bool Killed => killed;
         public void Kill()
         {
             Paused = true;
+            killed = true;
         }
 
         #region pause

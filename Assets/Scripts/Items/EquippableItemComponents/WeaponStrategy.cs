@@ -23,7 +23,7 @@ namespace Arcatech.Items
             MaxCharges = charges;
             GameObjectComponent = comp;
 
-            InitialState = act.ProduceAction(Owner, comp.Spawner);
+            InitialState = act.DeserializeState(Owner, comp.Spawner);
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);

@@ -18,7 +18,7 @@ namespace Arcatech.Stats
         public float GetCurrent { get => Mathf.RoundToInt(_currentValue); }
         public float GetMax { get => _maxValue; }
         public float GetMin { get => _minValue; }
-        public float GetPercent { get => _currentValue / _maxValue; }
+        public float GetPercent { get => (_currentValue / _maxValue); }
         //public float CachedValue { get => _cachedValue; } // to store changes between updates
         public float GetFrameDeltaValue { get => Mathf.RoundToInt(_currentValue - _cachedValue); }
         public float GetFrameDeltaPercentAbs { get => Mathf.Abs((_currentValue - _cachedValue)/_maxValue); }
