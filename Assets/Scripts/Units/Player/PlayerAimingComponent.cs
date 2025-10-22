@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Arcatech.Units.Inputs
 {
-    public class PlayerAimingComponent : MonoBehaviour
+    public class PlayerAimingComponent : MonoBehaviour, IPausableComponent,IKillableComponent
     {
         #region setup
         private Plane _aimPlane;
@@ -72,7 +72,7 @@ namespace Arcatech.Units.Inputs
 
         void Update()
         {
-            if (!init) return;
+            if (!init || Killed || Paused) return;
             // update aim plane position
             if (transform.position.y != prevY)
             {
@@ -102,6 +102,9 @@ namespace Arcatech.Units.Inputs
 
         #endregion
 
+        
+        public bool Killed { get; set; } = false;
+        public bool Paused { get; set; } = false;
 
 
     }

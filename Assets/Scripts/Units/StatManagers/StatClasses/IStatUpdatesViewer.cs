@@ -2,7 +2,7 @@
 
 namespace Arcatech.Stats
 {
-    public interface IStatUpdatesHandler
+    public interface IStatUpdatesViewer
     {
         public void HandleStatsUpdate (IDictionary <BaseStatType,StatValueContainer> stats);
     }

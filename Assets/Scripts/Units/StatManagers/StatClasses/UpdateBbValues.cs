@@ -8,7 +8,7 @@ namespace Arcatech.Stats
     [CreateAssetMenu(fileName = "New update bb", menuName = "Units/Base Stats/Handle/NPC/Update values in blackboard")]
     public class UpdateBbValues : StatsUpdateStrategy
     {
-        public override IOnStatsChangeStrategy BuildStrategy(ActiveGameUnitComponent unit)
+        public override IOnStatsChangeStrategy BuildStrategy(EntityStatsComponent unit)
         {
             return new UpdateValuesHandle(unit);
         }
@@ -16,10 +16,10 @@ namespace Arcatech.Stats
 
     public class UpdateValuesHandle : IOnStatsChangeStrategy
     {
-        ActiveGameUnitComponent unit;
+        EntityStatsComponent unit;
         private BlackboardReference bb;
 
-        public UpdateValuesHandle(ActiveGameUnitComponent unit)
+        public UpdateValuesHandle(EntityStatsComponent unit)
         { 
             this.unit = unit;
             if (unit.TryGetComponent<BehaviorGraphAgent>(out BehaviorGraphAgent agent))

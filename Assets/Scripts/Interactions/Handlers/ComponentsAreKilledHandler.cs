@@ -20,8 +20,7 @@ namespace Arcatech.Interactions
         {
             foreach (var component in toKill)
             {
-                component.Kill();   
-                
+                component.Killed = true;   
             }
 
             foreach (var component in disableOnKill)

@@ -6,7 +6,7 @@ namespace Arcatech.Stats
     [CreateAssetMenu(fileName = "New stun", menuName = "Units/Base Stats/Handle/Stun stunnables")]
     public class StunStunnables : StatsUpdateStrategy
     {
-        public override IOnStatsChangeStrategy BuildStrategy(ActiveGameUnitComponent unit)
+        public override IOnStatsChangeStrategy BuildStrategy(EntityStatsComponent unit)
         {
             return new IStunnablesTrigger(unit);
         }
@@ -14,7 +14,7 @@ namespace Arcatech.Stats
 
     public class IStunnablesTrigger : StatsChangeHandle
     {
-        public IStunnablesTrigger(ActiveGameUnitComponent component) : base(component)
+        public IStunnablesTrigger(EntityStatsComponent component) : base(component)
         {
         }
 

@@ -3,26 +3,25 @@
 namespace Arcatech.Units
 {
     /// <summary>
-    /// called by active game unit component because it is a statsupdatehanlder for stats component
+    /// called in stat update strategy by statsComp and maybe more
     /// </summary>
     public interface IDamageableComponent
     {
-        public void Damage(int damage, BaseStatType stat);
+        public void Damage(float damage, BaseStatType stat);
     }
     /// <summary>
-    /// called by active game unit component because it is a statsupdatehanlder for stats component
+    /// called in stat update strategy by statsComp and maybe more
     /// </summary>
     public interface IKillableComponent
     {
-        public void Kill();
-        public bool Killed { get; }
+        public bool Killed { get; set; }
     }
     /// <summary>
-    /// called by active game unit component because it is a statsupdatehanlder for stats component
+    /// called in stat update strategy by statsComp and maybe more
     /// </summary>
     public interface IStunnableComponent
     {
-        public void Stun();
+        public bool Stunned { get; set; }
     }
 /// <summary>
 /// called by the pause helper on base entity
@@ -32,6 +31,9 @@ namespace Arcatech.Units
         public bool Paused { get; set; }
     }
 
+/// <summary>
+/// used by base entity  mainly
+/// </summary>
     public interface IEffectsTakerComponent
     {
         public void ApplyEffect(StatsEffect effect,BaseGameEntityComponent source);

@@ -22,15 +22,12 @@ namespace Arcatech.Units
                 bbref.GetVariableValue("IsInCombat", out bool result);
                 return result;  
             }
-            set
-            {
-                combatEventChannel.SendEventMessage(value);
-            }
+            set => combatEventChannel.SendEventMessage(value);
         }
 
          
         
-        override protected void Start()
+        protected override void Start()
         {
             base.Start();
             bbref = behavior.BlackboardReference;
@@ -39,23 +36,25 @@ namespace Arcatech.Units
         
         protected override void OnActionLock(bool locking)
         {
+            base.OnActionLock(locking);
             agent.isStopped = locking;
         }
 
         protected override void OnPause(bool paused)
         {
+            base.OnPause(paused);   
             agent.isStopped = paused;
             behavior.enabled = !paused;
         }
 
-        public override void Kill()
+        protected override void OnKill(bool kill)
         {
-            
-            Debug.Log($"{GetMainEntity.GetName} died");
-            base.Kill();
+            base.OnKill(kill);
             agent.isStopped = true;
             behavior.End();
         }
+
+
 
         public void ApplyEffect(StatsEffect effect,BaseGameEntityComponent source)
         {

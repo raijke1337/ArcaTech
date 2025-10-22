@@ -11,11 +11,11 @@ using UnityEngine.Events;
 namespace Arcatech
 {
     /// <summary>
-    /// new component to define a unit that has stats (can be damaged and killed)
+    /// new component to define a unit that has some state (e.g. idle, attacking, stunned...)
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent),typeof(EntityStatsComponent))]
 
-    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IStatUpdatesHandler, IPausableComponent,IKillableComponent
+    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IPausableComponent,IKillableComponent
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Child] protected Animator animator;
@@ -28,58 +28,29 @@ namespace Arcatech
 
         UnitState _staggerState;
         UnitState _deathState;
+        UnitState _stunnedState;
         
         SimpleEntityShadowComponent _entityShadowComponent;
 
         public BaseGameEntityComponent GetMainEntity { get => gameEntity; }
-        //public Animator GetAnimatorReference => animator;
 
-        [Space, Header("Stats changes handlers")]
-        [SerializeField] StatsUpdateStrategy[] statsUpdateStrategies;
-        IOnStatsChangeStrategy[] _statsStrats;
 
         protected virtual void Start()
         {
-            // removed because inventory now finds attached views automatically
             
-            // if (TryGetComponent<EntityInventoryComponent>(out var inv))
-            // {
-            //     AssignActionsHandler(inv.GetUnitActionsCasterComponent);
-            //     inv.SetModelView(_stats);
-            // }
-            // else
-            // {
-            //     Debug.LogWarning($"{GetMainEntity.GetName} has no actions handler assigned at startup because it has no inventory");
-            // }
-            
-            
-            _stats.RegisterStatChangesHandler(this);
-
-            var handlers = GetComponentsInChildren<IUnitCommandHandler>();
-
-            if (handlers.Length == 0)
+            var commandHandlers = GetComponentsInChildren<IUnitCommandHandler>();
+            if (commandHandlers.Length == 0)
             {
                 Debug.Log($"No unit command handlers found {GetMainEntity.GetName}");
             }
-            foreach (var handler in handlers)
+            foreach (var handler in commandHandlers)
             {
                 AssignActionsHandler(handler);
             }
             
-            _staggerState = StaggeredState.DeserializeState(this,transform);
-            _deathState = DeadState.DeserializeState(this, transform);
-
-
-            if (statsUpdateStrategies == null || statsUpdateStrategies.Length == 0)
-            {
-                Debug.LogWarning($"{gameEntity.GetName} has no stats update strategies assigned");
-                return;
-            }
-            _statsStrats = new IOnStatsChangeStrategy[statsUpdateStrategies.Length];
-            for (int i = 0; i < statsUpdateStrategies.Length; i++)
-            {
-                _statsStrats[i] = statsUpdateStrategies[i].BuildStrategy(this);
-            }
+            if (StaggeredState) _staggerState = StaggeredState.DeserializeState(this,transform);
+            if (DeadState) _deathState = DeadState.DeserializeState(this, transform);
+            if (StunnedState) _stunnedState = StunnedState.DeserializeState(this,transform);
 
         }
 
@@ -226,35 +197,27 @@ namespace Arcatech
         }
         
         #endregion
-
-        #region on stat change
-
-        public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
-        {
-            if (_statsStrats == null || _statsStrats.Length == 0)
-            {
-                return;
-            }
-            foreach (var st in _statsStrats)
-            {
-                st.HandleStats(stats);
-            }
-        }
-
-
-        #endregion
+        
 
         #region IKillable
 
         private bool _k;
-        public bool Killed => _k;
-        public virtual void Kill()
+
+        public bool Killed
+        {
+            get => _k;
+            set => OnKill(value);
+        }
+
+        protected virtual void OnKill(bool kill)
         {
             Debug.Log($"{GetMainEntity.GetName} died");
-            Paused = true;
-            _k = true;
-            _deathState?.StartState();
+            Paused = kill;
+            _k = kill;
+            _deathState?.StartState(); 
+            if (!_k) Debug.Log($"Trying to resurrect {this} and its NYI. You can't bring back the dead...");
         }
+
         #endregion
     }
 }

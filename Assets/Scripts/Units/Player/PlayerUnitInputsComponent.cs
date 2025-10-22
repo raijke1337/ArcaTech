@@ -90,7 +90,7 @@ namespace Arcatech.Units.Inputs
 
         private void OnUseButton()
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             _interaction.DoInteraction((InteractionContext.Create(_player,transform)));
         }
         private void OnPauseButton()
@@ -100,24 +100,24 @@ namespace Arcatech.Units.Inputs
 
         private void OnShieldSkill()
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             RequestCombatAction(UnitActionType.ShieldSkill);
         }
         private void OnRangedSkill()
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             RequestCombatAction(UnitActionType.RangedSkill);
         }
 
         private void OnMeleeSkill()
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             RequestCombatAction(UnitActionType.MeleeSkill);
         }
 
         private void OnJumpAction()
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             transform.parent = null;
             _movement.DoJump();
             _player.PlayerJump();
@@ -125,13 +125,13 @@ namespace Arcatech.Units.Inputs
 
         private void OnDodgeSkill()
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             RequestCombatAction(UnitActionType.DodgeSkill);
         }
 
         private void OnMovementAction(Vector2 dir)
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             
             Vector3 AD = _adj.Isoright * _playerInputReader.InputDirection.x;
             Vector3 WS = _adj.Isoforward * _playerInputReader.InputDirection.z;
@@ -141,19 +141,19 @@ namespace Arcatech.Units.Inputs
 
         private void OnAimAction(Vector2 point)
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             _lookVector = _aim.GetDirectionToTarget;
         }
 
         private void OnRangedAction()
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             RequestCombatAction(UnitActionType.Ranged);
         }
 
         private void OnMeleeAction()
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
             RequestCombatAction(UnitActionType.Melee);
         }
 

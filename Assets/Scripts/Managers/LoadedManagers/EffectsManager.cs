@@ -1,8 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using Arcatech.Actions;
 using Arcatech.Effects;
 using Arcatech.EventBus;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using Random = UnityEngine.Random;

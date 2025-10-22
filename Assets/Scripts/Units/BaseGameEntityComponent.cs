@@ -8,26 +8,27 @@ using UnityEngine;
 namespace Arcatech
 {
     /// <summary>
-    /// new component that defines any game enitity that does something
+    /// new component that defines any game entity
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider), typeof(LittlePauseHelperComponent))]
-    public class BaseGameEntityComponent : ValidatedMonoBehaviour
+    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
 
         [Space, SerializeField] string _name;
         [SerializeField] Side entitySide;
         [Space, SerializeField] protected bool _showDebugs = false;
+        
+        
         List<IEffectsTakerComponent> _effectsTakerComponents;
-
-        public string GetName
-        {
-            get => _name;
-        }
-
+        #if UNITY_EDITOR
+        public IReadOnlyList<IEffectsTakerComponent> GetEffectsTakersForEditor=> _effectsTakerComponents;
+        #endif
+        
+        public string GetName =>  _name;
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
-        public Collider Collider { get; protected set; }
+        private Collider Collider { get; set; }
 
         [Space, Header("Rigidbody override"), SerializeField, Self]
         Rigidbody _rigidbody;
@@ -48,15 +49,31 @@ namespace Arcatech
             _rigidbody.useGravity = gravity;
             _rigidbody.isKinematic = !usePhysics;
             _effectsTakerComponents = new List<IEffectsTakerComponent>(GetComponents<IEffectsTakerComponent>());
+            
         }
 
         public void ApplyStatsEffect(StatsEffect effect,BaseGameEntityComponent source)
         {
+            if (_showDebugs) Debug.Log($"ApplyStatsEffect {effect}: {this}");
             foreach (var handler in _effectsTakerComponents)
             {
                 handler.ApplyEffect(effect,source);
             }
         }
         
+        bool _killed = false;
+
+        public bool Killed
+        {
+            get => _killed;
+            set
+            {
+                _killed = value;
+                _rigidbody.isKinematic = !value;
+                Collider.isTrigger = value;
+            }
+        }
+
+        public bool Paused { get; set; }
     }
 }

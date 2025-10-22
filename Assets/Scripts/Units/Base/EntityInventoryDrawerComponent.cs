@@ -58,7 +58,14 @@ namespace Arcatech.Units
                         e.OnUnequip();
                         break;
                     default:
-                        e.SetItemEmpty(itemEmpties.ItemPositions[strat.GetPlaces[e.Type]]);
+                        try
+                        {
+                            e.SetItemEmpty(itemEmpties.ItemPositions[strat.GetPlaces[e.Type]]);
+                        }
+                        catch (Exception exception)
+                        {
+                            Console.WriteLine($"No empties set in {this}");
+                        }
                         e.OnEquip();
                         break;
                 }
@@ -77,7 +84,8 @@ namespace Arcatech.Units
         private void Start()
         {
             currentDrawStrategy = defaultItemsDrawStrat;
-            inventoryComponent?.SetModelView(this);
+           // inventoryComponent?.SetModelView(this);
+           // now handled by inventory
             drawItemsStrategyProvider = GetComponentInChildren<IDrawItemsStrategyProvider>();
             if (drawItemsStrategyProvider == null) Debug.Log("No DrawItemsStrategy Provider");
         }

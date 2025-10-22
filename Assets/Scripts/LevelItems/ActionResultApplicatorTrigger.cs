@@ -9,7 +9,7 @@ namespace Arcatech.Triggers
 {
 
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class ActionResultApplicatorTrigger : BaseTrigger,IKillableComponent
+    public class ActionResultApplicatorTrigger : BaseTrigger,IKillableComponent, IPausableComponent
     {
         [Header("Action result applicator")]
         [SerializeField] protected TargetingType targetType;
@@ -23,9 +23,7 @@ namespace Arcatech.Triggers
 
         Timer reapplyTimer;
         [SerializeField,Self] BaseGameEntityComponent baseComp;
-
-        private bool componentKilled = false;
-
+        
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -34,7 +32,7 @@ namespace Arcatech.Triggers
 
         private void Update()
         {
-            if (componentKilled) return;
+            if (Killed||Paused) return;
             if (reapplyTimer != null && reapplyTimer.IsRunning)
             {
                 reapplyTimer.Tick(Time.deltaTime);
@@ -52,7 +50,7 @@ namespace Arcatech.Triggers
         }
         protected override void OnTriggerEnter(Collider other)
         {
-            if (componentKilled) return;
+            if (Killed) return;
           //  Debug.Log(other.name);
 
             if (other.gameObject.TryGetComponent(out ActiveGameUnitComponent p))
@@ -90,7 +88,7 @@ namespace Arcatech.Triggers
 
         protected override void OnTriggerExit(Collider other)
         {
-            if (componentKilled) return;
+            if (Killed) return;
             if (other.gameObject.TryGetComponent(out ActiveGameUnitComponent p))
             {
                 switch (targetType)
@@ -125,7 +123,8 @@ namespace Arcatech.Triggers
                 action.BuildActionResult().ProduceResult(null, p, transform);
             }
         }
-        public bool Killed => componentKilled;
-        public void Kill() => componentKilled = true;
+
+        public bool Killed { get; set; } = false;
+        public bool Paused { get; set; } = false;
     }
 }

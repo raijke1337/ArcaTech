@@ -1,8 +1,8 @@
 
+using System.Collections.Generic;
 using Arcatech.EventBus;
 using Arcatech.Stats;
 using Arcatech.Triggers;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 namespace Arcatech.Managers

@@ -13,7 +13,7 @@ namespace Arcatech
         [SerializeField,Self] ActiveGameUnitComponent gameUnitComponent;
         protected virtual void RequestCombatAction(UnitActionType type)
         {
-            if (Paused || _killed) return;
+            if (Paused || Killed) return;
              gameUnitComponent.Command(type);
         }
         private void OnEnable()
@@ -28,12 +28,9 @@ namespace Arcatech
 
         protected abstract void ControllerStartBindings(bool enabling);
 
-        protected bool _killed = false;
-        public bool Killed => _killed;
+
+        public bool Killed { get; set; } = false;
         public bool Paused { get; set; } = false;
-        public void Kill()
-        {
-            _killed = true;
-        }
+
     }
 }

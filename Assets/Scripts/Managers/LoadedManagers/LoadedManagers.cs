@@ -1,8 +1,8 @@
 
+using System.Collections.Generic;
 using Arcatech.Effects;
 using Arcatech.EventBus;
 using Arcatech.Scenes.Cameras;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 

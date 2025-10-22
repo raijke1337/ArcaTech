@@ -23,9 +23,9 @@ namespace Arcatech.EventBus
 
     public struct DrawDamageEvent : IEvent
     {
-        public BaseGameEntityComponent Unit { get; }
+        public EntityStatsComponent Unit { get; }
         public float Damage { get; }
-        public DrawDamageEvent (BaseGameEntityComponent unit, float damage)
+        public DrawDamageEvent (EntityStatsComponent unit, float damage)
         {
             Unit = unit; this.Damage = damage;
         }

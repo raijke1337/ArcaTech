@@ -12,11 +12,10 @@ namespace Arcatech.Triggers
         {
             if (!_collider.isTrigger)
             {
-
                 _collider.isTrigger = true;
             }
         }
-
+        
 
 
         protected virtual void OnTriggerEnter(Collider other) { }

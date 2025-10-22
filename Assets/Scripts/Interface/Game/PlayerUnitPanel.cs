@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace Arcatech.UI
 {
-    public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitCommandHandler, IUnitInventoryView, IStatUpdatesHandler
+    public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitCommandHandler, IUnitInventoryView, IStatUpdatesViewer
     {
         [SerializeField,Child] protected PlayerBarUsablesIconsContainerManager usablesIcons;
         [SerializeField, Child] protected BarsContainersManager _bars;

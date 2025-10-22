@@ -10,7 +10,7 @@ using UnityEngine;
 namespace Arcatech.UI
 {
 
-    public class BarsContainersManager : MonoBehaviour, IStatUpdatesHandler
+    public class BarsContainersManager : MonoBehaviour, IStatUpdatesViewer
     {
         [SerializeField] StatBarContainerUIScript _barPrefab;
         [Space,SerializeField] SerializedDictionary<BaseStatType,ColorSet> _statColors;

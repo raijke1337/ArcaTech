@@ -121,6 +121,12 @@ namespace Arcatech.Managers
             _pause.SetActive(isPause.Value);
         }
 
+        public void ClickResume()
+        {
+            EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(false));
+        }
+
+        
         public void GameOver()
         {
             _ded.SetActive(true);
@@ -136,10 +142,6 @@ namespace Arcatech.Managers
             SceneManager.LoadScene(ndex);
 
             //GameManager.Instance.RequestLoadSceneFromContainer(GameManager.Instance.GetCurrentLevelData);
-        }
-        public void ClickResume()
-        {
-            EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(false));
         }
 
         #endregion
