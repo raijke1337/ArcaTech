@@ -324,7 +324,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'handlers.Array.data[2]'
       value: 
-      objectReference: {fileID: 83306766}
+      objectReference: {fileID: 0}
     - target: {fileID: 6697370360441882179, guid: 0354a87b4ebab564e8e0eabe7df9cbfd,
         type: 3}
       propertyPath: handlersOnThisItem.Array.size
@@ -378,18 +378,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 6990900511385626591}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &83306766 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4044714424362003849, guid: eb0f4ae6e3747e44c8d39ea10d36dab9,
-    type: 3}
-  m_PrefabInstance: {fileID: 6990900511385626591}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 83306760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c41720c1437978c4ab8930678f8e544d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!33 &83306767
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1209,6 +1197,9 @@ MonoBehaviour:
   _pauser: {fileID: 396566525}
   _name: 
   entitySide: 0
+  _spawnPoint: {fileID: 396566518}
+  destroyOnDeath: 0
+  timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 396566526}
   gravity: 0
@@ -3804,6 +3795,9 @@ MonoBehaviour:
   _pauser: {fileID: 1406576300}
   _name: 
   entitySide: 0
+  _spawnPoint: {fileID: 1406576297}
+  destroyOnDeath: 0
+  timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 1406576301}
   gravity: 0
@@ -3946,7 +3940,10 @@ GameObject:
   - component: {fileID: 1444166341}
   - component: {fileID: 1444166343}
   - component: {fileID: 1444166342}
-  m_Layer: 3
+  - component: {fileID: 1444166346}
+  - component: {fileID: 1444166345}
+  - component: {fileID: 1444166344}
+  m_Layer: 6
   m_Name: eventTrigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3980,7 +3977,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _collider: {fileID: 1444166343}
+  collider: {fileID: 1444166343}
+  entity: {fileID: 1444166344}
 --- !u!65 &1444166343
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4002,6 +4000,67 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 0.89, z: 0.3}
   m_Center: {x: 0, y: 0.06, z: 0.05}
+--- !u!114 &1444166344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1444166340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pauser: {fileID: 1444166345}
+  _name: 
+  entitySide: 0
+  _spawnPoint: {fileID: 1444166341}
+  destroyOnDeath: 0
+  timerToDestroy: 2
+  _showDebugs: 0
+  _rigidbody: {fileID: 1444166346}
+  gravity: 0
+  usePhysics: 0
+--- !u!114 &1444166345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1444166340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!54 &1444166346
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1444166340}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1445077461 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1432308929438291855, guid: ae60300560e85c8408cb18db862dee17,
@@ -4064,6 +4123,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1508620340}
     m_Modifications:
+    - target: {fileID: 5866666021909216657, guid: 6a6f489b277cdff4887ad23f82195d94,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 05c390d23ba0bdf4dbc1ba1abe3d4b59, type: 2}
     - target: {fileID: -8679921383154817045, guid: d74727c499660094985341de39e5bc8c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4124,11 +4188,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5866666021909216657, guid: 6a6f489b277cdff4887ad23f82195d94,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 05c390d23ba0bdf4dbc1ba1abe3d4b59, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4845,6 +4904,9 @@ MonoBehaviour:
   _pauser: {fileID: 1770558738}
   _name: 
   entitySide: 0
+  _spawnPoint: {fileID: 927350439}
+  destroyOnDeath: 0
+  timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 1770558739}
   gravity: 0
@@ -6708,6 +6770,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: WaterBlock_50m
       objectReference: {fileID: 0}
+    - target: {fileID: 4813563222376232687, guid: d3de68e8f5d70e94691ef826189c0028,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6058843480891990737, guid: d3de68e8f5d70e94691ef826189c0028,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -6726,6 +6793,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 119867440}
     m_Modifications:
+    - target: {fileID: 1848571294491603489, guid: eb0f4ae6e3747e44c8d39ea10d36dab9,
+        type: 3}
+      propertyPath: destroyOnDeath
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4044714424362003849, guid: eb0f4ae6e3747e44c8d39ea10d36dab9,
         type: 3}
       propertyPath: tween

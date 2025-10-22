@@ -6,24 +6,31 @@ using UnityEngine;
 
 namespace Arcatech.Items
 {
-    public class MeleeWeaponStrategy : WeaponStrategy
+    public class MeleeWeaponStrategy : WeaponStrategy, ITriggerNotificationReceiver
     {
         public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, BaseEquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
         {
-            Trigger = (comp as MeleeWeaponBaseEquipmentComponent).Trigger;
-            Trigger.SomeColliderWasHitEvent += HandleColliderHitEvent;
-            
-            OnColliderHit = new IActionResult[onHit.Length];
-
-            for (int i = 0; i < onHit.Length; i++)
+            if (comp is MeleeWeaponBaseEquipmentComponent weapon)
             {
-                OnColliderHit[i] = onHit[i].BuildActionResult();
+                _trigger =
+                    weapon.TriggerTracker;
+                _trigger.Active = false;
+                    _trigger.RegisterReceiver(this);
+                
+                OnColliderHit = new IActionResult[onHit.Length];
+
+                for (int i = 0; i < onHit.Length; i++)
+                {
+                    OnColliderHit[i] = onHit[i].BuildActionResult();
+                }
             }
+            
+
 
         }
-        protected WeaponTriggerComponent Trigger;
-        protected IActionResult[] OnColliderHit { get; }
-        protected UnitState CurrentState;
+        protected TriggerTrackerComponent _trigger;
+        private IActionResult[] OnColliderHit { get; }
+        private UnitState CurrentState;
 
         public override bool TryUseUsable(out UnitState state)
         {
@@ -71,37 +78,42 @@ namespace Arcatech.Items
                 case UnitActionState.None:
                     break;
                 case UnitActionState.Started:
+                    _trigger.Active = true;
                     break;
                 case UnitActionState.ExitTime:
                     break;
                 case UnitActionState.Completed:
+                    _trigger.Active = false;
                     CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
                     break;
             }
         }
 
         List<BaseGameEntityComponent> hitsThisSwing = new();
-        private void HandleColliderHitEvent(Collider target)
-        {
-            if (target == Owner) return;
-            else
-            {
-                if (target.TryGetComponent<BaseGameEntityComponent>(out var e))
-                {
-                    if (!hitsThisSwing.Contains(e))
-                    {
-                        PerformOnHit(Owner, e, GameObjectComponent.Spawner);
-                        hitsThisSwing.Add(e);
-                    }
-                }
-            }
-        }
-        protected void PerformOnHit(ActiveGameUnitComponent user, BaseGameEntityComponent target, Transform place)
+
+        private void PerformOnHit(ActiveGameUnitComponent user, BaseGameEntityComponent target, Transform place)
         {
             foreach (var res in OnColliderHit)
             {
                 res.ProduceResult(user.GetMainEntity, target, place);
             }
+        }
+
+        public void TriggerEntered(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
+        {
+            Debug.Log("Bonk noticed");
+            if (enterComponent == Owner.GetMainEntity) return;
+            if (!hitsThisSwing.Contains(enterComponent))
+            {
+                PerformOnHit(Owner, enterComponent, GameObjectComponent.Spawner);
+                hitsThisSwing.Add(enterComponent);
+            }
+        
+        }
+
+        public void TriggerExited(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
+        {
+            // noop 
         }
     }
 

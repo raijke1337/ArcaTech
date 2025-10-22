@@ -1,28 +1,34 @@
-﻿using Arcatech.Actions;
+﻿using System;
+using Arcatech.Actions;
 using Arcatech.Skills;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System.Linq;
+using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Items
 {
-
-
-    [RequireComponent(typeof(WeaponTriggerComponent))]
-    public class ProjectileComponent : MonoBehaviour, IPausableComponent
+    [RequireComponent(typeof(TriggerTrackerComponent), typeof(BaseGameEntityComponent))]
+    public class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver
     {
-        public ActiveGameUnitComponent Owner { get; set; }
+        
+        
+        public BaseGameEntityComponent Owner { get; set; }
+
+        [SerializeField, Self] private BaseGameEntityComponent entity;
+        
         [HideInInspector] public int RemainingHits;
         [HideInInspector] public float Lifetime;
         [HideInInspector] public float Speed;
         protected bool hasHitUnit = false;
-        WeaponTriggerComponent col;
+        TriggerTrackerComponent col;
         bool isAoe = false; // bandaid but w/e
 
         BaseGameEntityComponent[] hits;
         int index = 0;
         TargetingType targetingType;
+        
 
         //public SerializedEffectsCollection VFX;
        // EffectsCollection _fx;
@@ -49,45 +55,45 @@ namespace Arcatech.Items
         }
         private void Start()
         {
-            col = GetComponent<WeaponTriggerComponent>();
+            col = GetComponent<TriggerTrackerComponent>();
             if (GetComponent<AreaOfEffectSphereScalerComponent>()) isAoe = true;
-            col.SomeColliderWasHitEvent += Col_SomethingHitEvent;
+            col.RegisterReceiver(this);
         }
 
-        protected virtual void Col_SomethingHitEvent(Collider other)
+        private void OnCollisionEnter(Collision other)
         {
-           // Debug.Log($"{this} hit {other}");
-
-            if (other.TryGetComponent<BaseGameEntityComponent>(out var u))
-            {
-                if (Owner.GetMainEntity.ShowingDebugs) { Debug.Log($"{this} hit {u.GetName}"); }
-                switch (targetingType)
-                {
-                    case TargetingType.OnlyUser:
-                        if (u == Owner)
-                        {
-                            OnColliderSuccess(u);
-                        }
-                        break;
-                    case TargetingType.AnyUnit:
-                        OnColliderSuccess(u);
-                        break;
-                    case TargetingType.AnyEnemy:
-                        if (u.GetEntitySide != Owner.GetMainEntity.GetEntitySide)
-                            OnColliderSuccess(u);
-                        break;
-                    case TargetingType.AnyAlly:
-                        if (u.GetEntitySide == Owner.GetMainEntity.GetEntitySide)
-                            OnColliderSuccess(u);
-                        break;
-                }
-            }
-            if (isAoe) return;
-
             if (other.gameObject.isStatic)
             {
+                Debug.Log("Collision Enter static item, should destroy");
                 RemainingHits = 0;
             }
+        }
+
+        public virtual void TriggerEntered(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
+        {
+            
+            switch (targetingType)
+            {
+                case TargetingType.OnlyUser:
+                    if (enterComponent == Owner)
+                    {
+                        OnColliderSuccess(enterComponent);
+                    }
+                    break;
+                case TargetingType.AnyUnit:
+                    OnColliderSuccess(enterComponent);
+                    break;
+                case TargetingType.AnyEnemy:
+                    if (enterComponent.GetEntitySide != Owner.GetEntitySide)
+                        OnColliderSuccess(enterComponent);
+                    break;
+                case TargetingType.AnyAlly:
+                    if (enterComponent.GetEntitySide == Owner.GetEntitySide)
+                        OnColliderSuccess(enterComponent);
+                    break;
+            }
+            
+            if (isAoe) return;
 
             if (RemainingHits == 0)
             {
@@ -95,6 +101,12 @@ namespace Arcatech.Items
                 Destroy(gameObject);
             }
         }
+
+        public void TriggerExited(BaseGameEntityComponent exitComponent, BaseGameEntityComponent trigger)
+        {
+            //NOOP
+        }
+
         void OnColliderSuccess(BaseGameEntityComponent u)
         {
             if (!hits.Contains(u) && RemainingHits > 0) // mightr be slow 
@@ -108,7 +120,7 @@ namespace Arcatech.Items
                 {
                     foreach (var uc in UnitCollisionResult)
                     {
-                        uc.ProduceResult(Owner.GetMainEntity, u, transform);
+                        uc.ProduceResult(Owner, u, transform);
                     }
                 }
             }
@@ -123,23 +135,23 @@ namespace Arcatech.Items
             if (Lifetime < 0)
             {
                 Expiry();
-                Destroy(gameObject);
             }
         }
 
-        protected virtual void Expiry()
+        private void Expiry()
         {
             if (ExpirationCollisionResult.Length > 0 && !hasHitUnit)
             {               
                 foreach (var exp in ExpirationCollisionResult)
                 {
-                    exp.ProduceResult(Owner.GetMainEntity, null, transform);
+                    exp.ProduceResult(Owner, null, transform);
                 }
             }
+            col.UnregisterReceiver(this);
+            entity.Killed = true;
         }
 
         public bool Paused { get; set; } = false;
-
 
     }
 }

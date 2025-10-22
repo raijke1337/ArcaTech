@@ -206,7 +206,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3247927922185012880, guid: 4f80716d319e42a4195da18a576ad748,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4044714424362003849}
+      addedObject: {fileID: 3370623828262285659}
   m_SourcePrefab: {fileID: 100100000, guid: 4f80716d319e42a4195da18a576ad748, type: 3}
 --- !u!4 &4920257993725057096 stripped
 Transform:
@@ -295,6 +295,9 @@ MonoBehaviour:
   _pauser: {fileID: 3496374563219594219}
   _name: Explosive barrel
   entitySide: 2
+  _spawnPoint: {fileID: 0}
+  destroyOnDeath: 0
+  timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 698705102817722262}
   gravity: 0
@@ -311,7 +314,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4576d274f70943841aa5bd731b925574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _collider: {fileID: 1440700092249998929}
   targetType: 3
   ReapplyWhileActorInsideTimer: 0
   ResultOnEntry:
@@ -322,7 +324,8 @@ MonoBehaviour:
   ResultOnExit: []
   DestroyOnExit: 0
   baseComp: {fileID: 1848571294491603489}
---- !u!114 &4044714424362003849
+  triggerTracker: {fileID: 3370623828262285659}
+--- !u!114 &3370623828262285659
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -331,8 +334,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 5693557352330052338}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c41720c1437978c4ab8930678f8e544d, type: 3}
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runFromEnable: 1
-  tween: {fileID: 11400000, guid: 005db8b790435df4889bdd9fa1d46a3f, type: 2}
+  collider: {fileID: 1440700092249998929}
+  entity: {fileID: 1848571294491603489}

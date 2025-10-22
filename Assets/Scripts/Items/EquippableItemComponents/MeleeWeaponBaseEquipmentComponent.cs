@@ -5,19 +5,19 @@ using KBCore.Refs;
 using UnityEngine;
 namespace Arcatech.Items
 {
-    [RequireComponent(typeof(WeaponTriggerComponent),typeof(MeleeWeaponTrail))]
+    [RequireComponent(typeof(TriggerTrackerComponent),typeof(MeleeWeaponTrail))]
     public class MeleeWeaponBaseEquipmentComponent : BaseEquipmentComponent
     {
 
-        public WeaponTriggerComponent Trigger { get => trigger; }
+        public TriggerTrackerComponent TriggerTracker => triggerTracker;
 
 
-        [Child,SerializeField] WeaponTriggerComponent trigger;
+        [Child,SerializeField] TriggerTrackerComponent triggerTracker;
         [Child,SerializeField] MeleeWeaponTrail trail;
 
         private void Start()
         {
-            trigger.ToggleCollider(false);
+            triggerTracker.enabled = false;
             trail.Emit = false;
         }
 
@@ -29,13 +29,13 @@ namespace Arcatech.Items
                 case UnitActionState.None:
                     break;
                 case UnitActionState.Started:
-                    trigger.ToggleCollider(true);
+                    triggerTracker.enabled = true;
                     trail.Emit = true;
                     break;
                 case UnitActionState.ExitTime:
                     break;
                 case UnitActionState.Completed:
-                    trigger.ToggleCollider(false);
+                    triggerTracker.enabled = false;
                     trail.Emit = false;
                     break;
             }

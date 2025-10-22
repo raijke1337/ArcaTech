@@ -5,6 +5,8 @@ namespace Arcatech.Items
 {
     public class HomingProjectileComponent : ProjectileComponent
     {
+        // TODO move this to targeting strategy (new) because this is buggy AF.
+        
         BaseGameEntityComponent target;
 
         float scanTimer = 0;
@@ -31,7 +33,7 @@ namespace Arcatech.Items
                 foreach (Collider col in scanResults)
                 {
                     if (col == null) return;
-                    if (col.TryGetComponent<BaseGameEntityComponent>(out var e) && e.GetEntitySide!= Owner.GetMainEntity.GetEntitySide&& !hitTarget.Contains(e))
+                    if (col.TryGetComponent<BaseGameEntityComponent>(out var e) && e.GetEntitySide!= Owner.GetEntitySide&& !hitTarget.Contains(e))
                     { 
                         target = e;                      
                         break;
@@ -50,14 +52,16 @@ namespace Arcatech.Items
                 Destroy(gameObject);
             }
         }
-        protected override void Col_SomethingHitEvent(Collider other)
+
+        public override void TriggerEntered(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
         {
-            base.Col_SomethingHitEvent(other);
-            if (other.transform.Equals(target))
+            base.TriggerEntered(enterComponent, trigger);
+            if (enterComponent.transform.Equals(target.transform))
             {
                 hitTarget.Add(target);
             }
         }
+
 
     }
 }

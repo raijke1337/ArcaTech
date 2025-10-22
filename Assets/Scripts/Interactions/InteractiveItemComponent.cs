@@ -6,7 +6,7 @@ using Arcatech.Triggers;
 
 namespace Arcatech.Interactions
 {
-    [RequireComponent(typeof(BaseGameEntityComponent),typeof(BaseTrigger))]
+    [RequireComponent(typeof(BaseGameEntityComponent),typeof(TriggerTrackerComponent))]
     [RequireComponent(typeof(EntityMouseOverGlowComponent))]
     public class InteractiveItemComponent : ValidatedMonoBehaviour, IInteractive
     {

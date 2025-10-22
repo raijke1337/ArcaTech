@@ -43,12 +43,13 @@ GameObject:
   - component: {fileID: 7735375437322742739}
   - component: {fileID: 5529687724404481817}
   - component: {fileID: 5536766282102649797}
-  - component: {fileID: 4720651839685502755}
   - component: {fileID: 6655731621570367998}
   - component: {fileID: 3003212133603909935}
   - component: {fileID: -1713724320455612394}
   - component: {fileID: 1293404516765955585}
   - component: {fileID: 4936519804115430375}
+  - component: {fileID: 794857245962018783}
+  - component: {fileID: 7233061210246175286}
   m_Layer: 6
   m_Name: arca_hammer
   m_TagString: Untagged
@@ -146,19 +147,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 0.3, z: 0.2}
   m_Center: {x: -0.000043973327, y: 0.8562425, z: 0.0000013113022}
---- !u!114 &4720651839685502755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6322378502437355212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53cc5452177305e4287558b216bd3933, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _collider: {fileID: 5536766282102649797}
 --- !u!114 &6655731621570367998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,7 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawner: {fileID: 7723848632631454567}
-  trigger: {fileID: 4720651839685502755}
+  triggerTracker: {fileID: 794857245962018783}
   trail: {fileID: 6655731621570367998}
 --- !u!95 &-1713724320455612394
 Animator:
@@ -234,8 +222,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pauser: {fileID: 7233061210246175286}
   _name: Hammer
   entitySide: 0
+  _spawnPoint: {fileID: 7723848632631454567}
+  destroyOnDeath: 0
+  timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 4936519804115430375}
   gravity: 0
@@ -267,3 +259,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &794857245962018783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322378502437355212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collider: {fileID: 5536766282102649797}
+  entity: {fileID: 1293404516765955585}
+--- !u!114 &7233061210246175286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322378502437355212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -17,9 +17,14 @@ namespace Arcatech
 
         [Space, SerializeField] string _name;
         [SerializeField] Side entitySide;
+        [SerializeField] Transform _spawnPoint;
+        [SerializeField] private bool destroyOnDeath = false;
+        [SerializeField, Range(0.1f, 10)] private float timerToDestroy = 2f;
+        
         [Space, SerializeField] protected bool _showDebugs = false;
-        
-        
+        public Transform SpawnPoint => _spawnPoint;
+
+
         List<IEffectsTakerComponent> _effectsTakerComponents;
         #if UNITY_EDITOR
         public IReadOnlyList<IEffectsTakerComponent> GetEffectsTakersForEditor=> _effectsTakerComponents;
@@ -41,11 +46,15 @@ namespace Arcatech
         {
             base.OnValidate();
             gameObject.layer = LayerMask.NameToLayer("Entities");
-            Collider = GetComponent<Collider>();
+            if (_spawnPoint == null)
+            {
+                _spawnPoint = transform;
+            }
         }
 
         private void OnEnable()
         {
+            Collider = GetComponent<Collider>();
             _rigidbody.useGravity = gravity;
             _rigidbody.isKinematic = !usePhysics;
             _effectsTakerComponents = new List<IEffectsTakerComponent>(GetComponents<IEffectsTakerComponent>());
@@ -71,6 +80,10 @@ namespace Arcatech
                 _killed = value;
                 _rigidbody.isKinematic = !value;
                 Collider.isTrigger = value;
+                if (_killed && destroyOnDeath)
+                {
+                    Destroy(gameObject, timerToDestroy);
+                }
             }
         }
 

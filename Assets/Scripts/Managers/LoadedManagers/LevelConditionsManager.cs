@@ -52,7 +52,7 @@ namespace Arcatech.Level
             {
                 yield return new WaitForSeconds(eventsRefreshTimer);
         
-                Debug.Log("Refresh events");
+                //Debug.Log("Refresh events");
                 DoRefresh();
             }
         }

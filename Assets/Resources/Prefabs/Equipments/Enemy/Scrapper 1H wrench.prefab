@@ -41,10 +41,13 @@ GameObject:
   m_Component:
   - component: {fileID: 1741816280062167682}
   - component: {fileID: 4888000909201319563}
-  - component: {fileID: 9094059620628346678}
   - component: {fileID: 5988594881624052529}
   - component: {fileID: 304770472721361815}
-  m_Layer: 0
+  - component: {fileID: 7596229660754730870}
+  - component: {fileID: 5533030148008433540}
+  - component: {fileID: 2771169429206226787}
+  - component: {fileID: 6899858590301785727}
+  m_Layer: 6
   m_Name: Scrapper 1H wrench
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,19 +92,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0.5}
---- !u!114 &9094059620628346678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8844404192588365369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53cc5452177305e4287558b216bd3933, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _collider: {fileID: 4888000909201319563}
 --- !u!114 &5988594881624052529
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,8 +130,83 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawner: {fileID: 3573663244667457277}
-  trigger: {fileID: 9094059620628346678}
+  triggerTracker: {fileID: 6899858590301785727}
   trail: {fileID: 5988594881624052529}
+--- !u!54 &7596229660754730870
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8844404192588365369}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &5533030148008433540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8844404192588365369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2771169429206226787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8844404192588365369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pauser: {fileID: 5533030148008433540}
+  _name: 
+  entitySide: 0
+  _spawnPoint: {fileID: 1741816280062167682}
+  destroyOnDeath: 0
+  timerToDestroy: 2
+  _showDebugs: 0
+  _rigidbody: {fileID: 7596229660754730870}
+  gravity: 0
+  usePhysics: 0
+--- !u!114 &6899858590301785727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8844404192588365369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collider: {fileID: 4888000909201319563}
+  entity: {fileID: 2771169429206226787}
 --- !u!1001 &4106341584517067081
 PrefabInstance:
   m_ObjectHideFlags: 0
