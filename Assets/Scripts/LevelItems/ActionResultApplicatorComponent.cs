@@ -55,7 +55,7 @@ namespace Arcatech.Triggers
             }
         }
 
-        public void TriggerEntered(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
+        public void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
         {
             if (Killed || Paused) return;
             CheckTarget(enterComponent);
@@ -77,7 +77,7 @@ namespace Arcatech.Triggers
             
         }
 
-        public void TriggerExited(BaseGameEntityComponent exitComponent, BaseGameEntityComponent trigger)
+        public void TriggerExited(BaseGameEntityComponent exitComponent, TriggerTrackerComponent trigger)
         {
             if (Killed || Paused) return;
             CheckTarget(exitComponent);

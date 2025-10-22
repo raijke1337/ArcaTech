@@ -99,7 +99,7 @@ namespace Arcatech.Items
             }
         }
 
-        public void TriggerEntered(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
+        public void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
         {
             Debug.Log("Bonk noticed");
             if (enterComponent == Owner.GetMainEntity) return;
@@ -111,7 +111,7 @@ namespace Arcatech.Items
         
         }
 
-        public void TriggerExited(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
+        public void TriggerExited(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
         {
             // noop 
         }

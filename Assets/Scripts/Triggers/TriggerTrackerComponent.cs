@@ -7,12 +7,12 @@ using UnityEngine;
 
 namespace Arcatech.Triggers
 {
-    [RequireComponent(typeof(Collider), typeof(BaseGameEntityComponent))]
+    [RequireComponent(typeof(Collider))]
     public class TriggerTrackerComponent : ValidatedMonoBehaviour
     {
         public Collider Collider => collider;
         [SerializeField, Self] Collider collider;
-        [SerializeField, Self] BaseGameEntityComponent entity;
+       // [SerializeField, Self] BaseGameEntityComponent entity;
         
         private List<ITriggerNotificationReceiver> receivers;
 
@@ -27,6 +27,7 @@ namespace Arcatech.Triggers
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)
         {
+            Debug.Log($"Register {receiver.GetType().Name}");
             receivers ??= new List<ITriggerNotificationReceiver>(GetComponentsInChildren<ITriggerNotificationReceiver>());
             if (receivers.Contains(receiver)) return;
             receivers.Add(receiver);
@@ -62,7 +63,7 @@ namespace Arcatech.Triggers
                 
                 foreach (var receiver in receivers)
                 {
-                    receiver.TriggerEntered(component, entity);
+                    receiver.TriggerEntered(component, this);
                 }
             }
             CleanUpReceivers();
@@ -75,7 +76,7 @@ namespace Arcatech.Triggers
             {
                 foreach (var receiver in receivers)
                 {
-                    receiver.TriggerExited(component, entity);
+                    receiver.TriggerExited(component, this);
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Arcatech.Triggers;
 using UnityEngine;
 
 namespace Arcatech.Items
@@ -53,7 +54,7 @@ namespace Arcatech.Items
             }
         }
 
-        public override void TriggerEntered(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
+        public override void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
         {
             base.TriggerEntered(enterComponent, trigger);
             if (enterComponent.transform.Equals(target.transform))

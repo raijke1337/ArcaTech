@@ -69,7 +69,7 @@ namespace Arcatech.Items
             }
         }
 
-        public virtual void TriggerEntered(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger)
+        public virtual void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
         {
             
             switch (targetingType)
@@ -102,7 +102,7 @@ namespace Arcatech.Items
             }
         }
 
-        public void TriggerExited(BaseGameEntityComponent exitComponent, BaseGameEntityComponent trigger)
+        public void TriggerExited(BaseGameEntityComponent exitComponent, TriggerTrackerComponent trigger)
         {
             //NOOP
         }

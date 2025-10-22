@@ -2,7 +2,7 @@
 {
     public interface ITriggerNotificationReceiver
     {
-        void TriggerEntered(BaseGameEntityComponent enterComponent, BaseGameEntityComponent trigger);
-        void TriggerExited(BaseGameEntityComponent exitComponent, BaseGameEntityComponent trigger);
+        void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger);
+        void TriggerExited(BaseGameEntityComponent exitComponent, TriggerTrackerComponent trigger);
     }
 }
