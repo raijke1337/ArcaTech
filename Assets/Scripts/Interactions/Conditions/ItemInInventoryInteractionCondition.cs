@@ -2,6 +2,7 @@
 using Arcatech.Units;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Arcatech.Interactions
 {
@@ -17,11 +18,11 @@ namespace Arcatech.Interactions
           //  Debug.Log(itemNeeded.ID);
         }
 
-        public override bool CheckCondition(IInteractor actor, IInteractive item, IInteractionContext context)
+        public override bool CheckCondition(IInteractor actor, IInteractive item)
         {
-            if (context.ActiveGameUnitComponent.TryGetComponent<EntityInventoryComponent>(out var inv))
+            if (actor.InteractionContext.ActiveGameUnitComponent.TryGetComponent(out EntityInventoryComponent inventory))
             {
-                return inv.TryUseItem(itemNeeded,itemsConsumed);
+                return inventory.TryUseItem(itemNeeded,itemsConsumed);
             }
 
             return false;

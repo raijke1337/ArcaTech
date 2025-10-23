@@ -38,7 +38,7 @@ namespace Arcatech.Items
             DisplayItem.transform.SetParent(pos.transform,false);
         }
 
-        public BaseItemComponent DisplayItem { get; protected set; }
+        public EquipmentComponent DisplayItem { get; protected set; }
         public List<StatsMod> StatMods { get; protected set; }
 
         protected List<IUsable> cachedUsables;

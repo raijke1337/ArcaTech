@@ -6,6 +6,8 @@ using DG.Tweening;
 using KBCore.Refs;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Events;
 namespace Arcatech
@@ -15,20 +17,44 @@ namespace Arcatech
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent),typeof(EntityStatsComponent))]
 
-    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IPausableComponent,IKillableComponent
+    public class ActiveGameUnitComponent : ValidatedMonoBehaviour, IPausableComponent,IKillableComponent,IStunnableComponent
     {
+        private static readonly int ExitStateTrigger = Animator.StringToHash("ExitStateTrigger");
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Child] protected Animator animator;
         [SerializeField, Self] protected EntityStatsComponent _stats;
 
+        [Space, Header("States")] [SerializeField]
+        private string animatorExitStateTrigger = "ExitStateTrigger";
+        [SerializeField] SerializedUnitState StaggeredState;
+        [SerializeField] SerializedUnitState DeadState;
+        [SerializeField] SerializedUnitState StunnedState;
 
-        [Space, SerializeField] protected SerializedUnitState StaggeredState;
-        [SerializeField] protected SerializedUnitState DeadState;
-        [SerializeField] protected SerializedUnitState StunnedState;
 
-        UnitState _staggerState;
-        UnitState _deathState;
-        UnitState _stunnedState;
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            #if UNITY_EDITOR
+            if (animator?.runtimeAnimatorController is AnimatorController controller)
+            {
+                // Check if ExitStateTrigger exists
+                bool hasExitTrigger = controller.parameters.Any(p => 
+                    p.name == "ExitStateTrigger" && 
+                    p.type == AnimatorControllerParameterType.Trigger);
+        
+                if (!hasExitTrigger)
+                {
+                    controller.AddParameter("ExitStateTrigger", AnimatorControllerParameterType.Trigger);
+                    EditorUtility.SetDirty(controller);
+                }
+            }
+            #endif
+        }
+
+        private int exitStateHash;
+        protected UnitState _staggerState;
+        protected UnitState _deathState;
+        protected UnitState _stunnedState;
         
         SimpleEntityShadowComponent _entityShadowComponent;
 
@@ -37,6 +63,8 @@ namespace Arcatech
 
         protected virtual void Start()
         {
+            
+            exitStateHash = Animator.StringToHash(animatorExitStateTrigger);
             
             var commandHandlers = GetComponentsInChildren<IUnitCommandHandler>();
             if (commandHandlers.Length == 0)
@@ -218,6 +246,38 @@ namespace Arcatech
             if (!_k) Debug.Log($"Trying to resurrect {this} and its NYI. You can't bring back the dead...");
         }
 
+        #endregion
+
+        #region stunnable
+
+        private bool _stunned;
+
+        public bool Stunned
+        {
+            get => _stunned;
+            set
+            {
+                _stunned = value;
+                OnStunned(value);
+            }
+        }
+
+        protected virtual void OnStunned(bool stunned)
+        {
+            if (stunned)
+            {
+                if (_stunnedState!=null)  _stunnedState.StartState();
+                else
+                {
+                    Debug.LogWarning($"{GetMainEntity.GetName} was  stunned, but it has no stunned state assigned");
+                }
+            }
+            else
+            {
+                animator.SetTrigger(ExitStateTrigger);
+            }
+        }
+        
         #endregion
     }
 }

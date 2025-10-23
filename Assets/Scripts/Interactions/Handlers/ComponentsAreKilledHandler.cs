@@ -7,8 +7,7 @@ namespace Arcatech.Interactions
     public class ComponentsAreKilledHandler : InteractionHandlerBase
     {
         [SerializeField, ReadOnlyText] private string killedComponents;
-        [SerializeField] private List<Transform> disableOnKill = new List<Transform>();
-        
+
         private List<IKillableComponent> toKill;
         private void Start()
         {
@@ -16,17 +15,13 @@ namespace Arcatech.Interactions
             killedComponents = toKill.ToString()+" components will be killed";
         }
 
-        public override void DoInteraction(IInteractor interactor, IInteractive item, IInteractionContext context)
+        public override void DoInteraction(IInteractor interactor, IInteractive item)
         {
             foreach (var component in toKill)
             {
                 component.Killed = true;   
             }
-
-            foreach (var component in disableOnKill)
-            {
-                component.gameObject.SetActive(false);
-            }
         }
+
     }
 }

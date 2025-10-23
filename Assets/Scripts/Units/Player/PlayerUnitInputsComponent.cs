@@ -91,7 +91,7 @@ namespace Arcatech.Units.Inputs
         private void OnUseButton()
         {
             if (Paused || Killed) return;
-            _interaction.DoInteraction((InteractionContext.Create(_player,transform)));
+            _interaction.InteractCommand();
         }
         private void OnPauseButton()
         {

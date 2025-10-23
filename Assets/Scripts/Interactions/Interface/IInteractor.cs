@@ -5,7 +5,7 @@
     /// </summary>
     public interface IInteractor
     {
-        public void DoInteraction(InteractionContext context);
+        public InteractionContext InteractionContext { get; }
 
     }
 }

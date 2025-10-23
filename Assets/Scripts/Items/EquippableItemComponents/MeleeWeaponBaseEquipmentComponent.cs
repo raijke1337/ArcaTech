@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Arcatech.Items
 {
     [RequireComponent(typeof(TriggerTrackerComponent),typeof(MeleeWeaponTrail))]
-    public class MeleeWeaponBaseEquipmentComponent : BaseEquipmentComponent
+    public class MeleeWeaponBaseEquipmentComponent : EquipmentComponent
     {
 
         public TriggerTrackerComponent TriggerTracker => triggerTracker;
@@ -17,26 +17,24 @@ namespace Arcatech.Items
 
         private void Start()
         {
-            triggerTracker.enabled = false;
-            trail.Emit = false;
+            trail.Use = false;
         }
 
         public override void HandleActionState(UnitActionState s)
         {
-            base.HandleActionState(s);
             switch (s)
             {
                 case UnitActionState.None:
                     break;
                 case UnitActionState.Started:
-                    triggerTracker.enabled = true;
-                    trail.Emit = true;
+                    triggerTracker.Active = true;
+                    trail.Use = true;
                     break;
                 case UnitActionState.ExitTime:
                     break;
                 case UnitActionState.Completed:
-                    triggerTracker.enabled = false;
-                    trail.Emit = false;
+                    triggerTracker.Active = false;
+                    trail.Use = false;
                     break;
             }
         }

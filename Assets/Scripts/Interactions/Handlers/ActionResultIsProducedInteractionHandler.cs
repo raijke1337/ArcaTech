@@ -29,13 +29,34 @@ namespace Arcatech.Interactions
             }
         }
 
-        public override void DoInteraction(IInteractor interactor, IInteractive item, IInteractionContext context)
+        public override void DoInteraction(IInteractor interactor, IInteractive item)
         {
-            foreach (var result in _list)
+
+            if (item == null)
             {
-                result.ProduceResult(context.ActiveGameUnitComponent.GetMainEntity,item.GetBaseComponent,context.ActionTransform);
+                // apply result using only interactor data
+                foreach (var result in _list)
+                {
+                    result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                        null,
+                        interactor.InteractionContext.ActionTransform);
+                }
             }
+
+            else
+            {          
+                // use item as target
+                foreach (var result in _list)
+                {
+                    result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                        item.GetBaseComponent,
+                        item.GetBaseComponent.SpawnPoint);
+                }
+            }
+
         }
+
+
 
         /// <summary>
         /// I use this when instantiating a "dropped item" interactive component.
@@ -52,7 +73,7 @@ namespace Arcatech.Interactions
             _list.Add(result); 
         }
 
-        public void RedrawItem(BaseItemComponent toDraw)
+        public void RedrawItem(EquipmentComponent toDraw)
         {
             Instantiate(toDraw,transform);
         }

@@ -15,7 +15,7 @@ namespace Arcatech.Items
             Assert.IsNotNull(OnColliderHit);
             Assert.IsTrue(OnColliderHit.Length > 0);
         }
-        public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, BaseEquipmentComponent comp)
+        public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, EquipmentComponent comp)
         {
             return new MeleeWeaponStrategy(OnColliderHit, state, unit, cfg, TotalCharges,ChargeRestoreTime,comp);
         }

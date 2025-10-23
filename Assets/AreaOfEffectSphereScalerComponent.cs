@@ -28,10 +28,7 @@ namespace Arcatech.Skills
            
            //start = true;
         }
-
-        private void OnDestroy()
-        {
-        }
+        
 
         private void Update()
         {

@@ -1,12 +1,13 @@
-﻿using Arcatech.Actions;
+﻿using System;
+using Arcatech.Actions;
 using System.Collections.Generic;
+using Arcatech.Units;
 using UnityEngine;
 using KBCore.Refs;
-using Arcatech.Triggers;
 
 namespace Arcatech.Interactions
 {
-    [RequireComponent(typeof(BaseGameEntityComponent),typeof(TriggerTrackerComponent))]
+    [RequireComponent(typeof(BaseGameEntityComponent))]
     [RequireComponent(typeof(EntityMouseOverGlowComponent))]
     public class InteractiveItemComponent : ValidatedMonoBehaviour, IInteractive
     {
@@ -20,11 +21,13 @@ namespace Arcatech.Interactions
         [SerializeField] private List<InteractionHandlerBase> handlers;
         
         public BaseGameEntityComponent GetBaseComponent => baseComp;
-
+        private List<IKillableComponent> killableComponents;
+        
         protected override void OnValidate()
         {
             base.OnValidate();
             handlersOnThisItem = new  List<InteractionHandlerBase>(GetComponentsInChildren<InteractionHandlerBase>());
+            killableComponents =  new  List<IKillableComponent>(GetComponentsInChildren<IKillableComponent>());
         }
 
         #region interaction
@@ -34,21 +37,28 @@ namespace Arcatech.Interactions
         [SerializeField]
         protected InteractionCondition condition;
         
-        public bool OnInteraction(IInteractor interactor,InteractionContext interactionContext)
+        public bool OnInteraction(IInteractor interactor)
         {
-            var result = condition.CheckCondition(interactor, this, interactionContext);
+            var result = condition.CheckCondition(interactor, this);
             if (result)
             {
                 foreach (var handler in handlers)
                 {
-                    handler.DoInteraction(interactor,this,interactionContext);
+                    handler.DoInteraction(interactor,this);
                 }
 
                 foreach (var handler in handlersOnThisItem)
                 {
-                    handler.DoInteraction(interactor,this,interactionContext);
+                    handler.DoInteraction(interactor,this);
                 }
-                if (_itemDisappearsWhenUsed) Destroy(gameObject,0.5f);
+
+                if (_itemDisappearsWhenUsed)
+                {
+                    foreach (var killable in killableComponents)
+                    {
+                        killable.Killed = true;
+                    }
+                }
             }
             return result;
         }

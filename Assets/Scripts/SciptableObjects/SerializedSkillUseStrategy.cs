@@ -14,7 +14,7 @@ namespace Arcatech.Skills
         [Space,Header("Usage")]
         [SerializeField] SerializedUnitState skillState;
 
-        public virtual SkillUsageStrategy ProduceStrategy(ActiveGameUnitComponent owner,SerializedSkill cfg, BaseItemComponent item)
+        public virtual SkillUsageStrategy ProduceStrategy(ActiveGameUnitComponent owner,SerializedSkill cfg, EquipmentComponent item)
         {
             return new SkillUsageStrategy(item, skillState,owner,cfg.Description,Charges,ChargeReload);
         }

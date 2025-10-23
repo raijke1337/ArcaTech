@@ -6,7 +6,7 @@ namespace Arcatech.Level
 {
     [CreateAssetMenu(fileName = "when unit is killed, activate",
         menuName = "Interactions/Level Event Condition/BaseEntity is Kill()")]
-    public class ActivateWhenCheckedIsKilled : LevelEventCondition
+    public class ActivateWhenCheckedIsKilled : CheckedLevelEventCondition
     {
         public override bool CheckCondition(LevelEventPairContainer pair)
         {
@@ -21,4 +21,5 @@ namespace Arcatech.Level
             return true;
         }
     }
+
 }

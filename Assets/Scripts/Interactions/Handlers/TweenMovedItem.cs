@@ -43,10 +43,10 @@ namespace Arcatech.Interactions
                 cached.Play(); 
             }
         }
-        public override void DoInteraction(IInteractor interactor, IInteractive item, IInteractionContext context)
+        public override void DoInteraction(IInteractor interactor, IInteractive item)
         {
             if (!runFromEnable) 
-            cached.Play();
+                cached.Play();
             toggled = true;
         }
 

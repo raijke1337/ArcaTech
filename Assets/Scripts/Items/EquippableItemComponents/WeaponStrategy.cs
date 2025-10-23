@@ -11,10 +11,10 @@ namespace Arcatech.Items
     {
         public ActiveGameUnitComponent Owner { get; }
         public WeaponSO Config { get; }
-        protected BaseEquipmentComponent GameObjectComponent { get; }
+        protected EquipmentComponent GameObjectComponent { get; }
 
 
-        public WeaponStrategy (SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,BaseEquipmentComponent comp)
+        public WeaponStrategy (SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,EquipmentComponent comp)
         {
             Owner = unit.GetComponent<ActiveGameUnitComponent>();
             Config = cfg;

@@ -7,7 +7,8 @@ namespace Arcatech.Interactions
     public class DummyInteractionCondition : InteractionCondition
     {
         [SerializeField] private bool _result;
-        public override bool CheckCondition(IInteractor actor, IInteractive item, IInteractionContext context)
+
+        public override bool CheckCondition(IInteractor actor, IInteractive item)
         {
             return _result; 
         }

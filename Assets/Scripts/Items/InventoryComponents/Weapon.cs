@@ -11,7 +11,6 @@ namespace Arcatech.Items
     {
 
         private SerializedStatsEffectConfig _cost;
-        protected BaseEquipmentComponent _weaponGameobject;
         public StatsEffect GetCost 
             {
                 get
@@ -35,7 +34,6 @@ namespace Arcatech.Items
         }
         public Weapon(WeaponSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
         {
-            _weaponGameobject = DisplayItem as BaseEquipmentComponent;
             UsableName = cfg.Description.Title;
             _cost = cfg.Cost;
            // AnimationSet = cfg.WeaponType;
@@ -49,7 +47,7 @@ namespace Arcatech.Items
                     break;
             }
             DrawStrategy = cfg.DrawStrategy;
-            UseStrategy = cfg.WeaponUseStrategy.ProduceStrategy(Owner, cfg,_weaponGameobject);
+            UseStrategy = cfg.WeaponUseStrategy.ProduceStrategy(Owner, cfg,DisplayItem);
         }
 
         public bool TryUseItem(EntityStatsComponent stats, out UnitState act)

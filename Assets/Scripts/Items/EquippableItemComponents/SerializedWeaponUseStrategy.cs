@@ -19,7 +19,7 @@ namespace Arcatech.Items
             Assert.IsFalse(TotalCharges == 0);
             Assert.IsNotNull(state);
         }
-        public virtual WeaponStrategy ProduceStrategy (BaseGameEntityComponent unit, WeaponSO cfg,BaseEquipmentComponent comp)
+        public virtual WeaponStrategy ProduceStrategy (BaseGameEntityComponent unit, WeaponSO cfg,EquipmentComponent comp)
         {
             return new WeaponStrategy(state, unit, cfg,TotalCharges,ChargeRestoreTime, InternalCooldown,comp);   
         }

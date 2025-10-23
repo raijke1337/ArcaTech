@@ -14,7 +14,11 @@ GameObject:
   - component: {fileID: 9500000}
   - component: {fileID: 533599384589077400}
   - component: {fileID: 227835166143742566}
-  m_Layer: 0
+  - component: {fileID: 1870828691839322335}
+  - component: {fileID: 2638984752327070019}
+  - component: {fileID: 3800285078616719413}
+  - component: {fileID: 5298337204018682119}
+  m_Layer: 6
   m_Name: skill_expShot_a1_proj_prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,6 +66,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -89,7 +96,7 @@ MeshRenderer:
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!95 &9500000
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -103,6 +110,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -120,17 +128,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9346ab8c49e0ee445876426d4fae8bf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity: {fileID: 5298337204018682119}
   RemainingHits: 0
   Lifetime: 0
   Speed: 0
-  VFX:
-    Sounds:
-      _serializedList: []
-    Effects:
-      _serializedList:
-      - Key: 2
-        Value:
-        - {fileID: 2883620193154939874, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
 --- !u!65 &227835166143742566
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -141,7 +142,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -152,6 +153,80 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.231262, y: 0.267038, z: 4.183193}
   m_Center: {x: 0, y: 0, z: 0.16469252}
+--- !u!114 &1870828691839322335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _collider: {fileID: 227835166143742566}
+--- !u!54 &2638984752327070019
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &3800285078616719413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5298337204018682119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pauser: {fileID: 3800285078616719413}
+  _name: 
+  entitySide: 0
+  _spawnPoint: {fileID: 400000}
+  destroyOnDeath: 0
+  timerToDestroy: 2
+  _showDebugs: 0
+  _rigidbody: {fileID: 2638984752327070019}
+  gravity: 0
+  usePhysics: 0
 --- !u!1001 &952171017588857966
 PrefabInstance:
   m_ObjectHideFlags: 0

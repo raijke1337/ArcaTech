@@ -8,27 +8,30 @@ using UnityEngine;
 namespace Arcatech.Triggers
 {
     [RequireComponent(typeof(Collider))]
-    public class TriggerTrackerComponent : ValidatedMonoBehaviour
+    public class TriggerTrackerComponent : ValidatedMonoBehaviour, ITriggerNotificationProvider
     {
-        public Collider Collider => collider;
-        [SerializeField, Self] Collider collider;
-       // [SerializeField, Self] BaseGameEntityComponent entity;
-        
+        [SerializeField, Self] Collider _collider;
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            _collider.includeLayers = LayerMask.GetMask("Entities");
+        }
         private List<ITriggerNotificationReceiver> receivers;
 
-        public bool Active { get; set; } = true;
-        
+
+        public bool Active { get; set; }
         
         private void OnEnable()
         { 
-            collider.isTrigger = true;
-            receivers =  new List<ITriggerNotificationReceiver>(GetComponentsInChildren<ITriggerNotificationReceiver>());
+            _collider.isTrigger = true;
+            var r = GetComponentsInChildren<ITriggerNotificationReceiver>();
+            foreach (var r2 in r) RegisterReceiver(r2);
         }
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)
         {
-            Debug.Log($"Register {receiver.GetType().Name}");
-            receivers ??= new List<ITriggerNotificationReceiver>(GetComponentsInChildren<ITriggerNotificationReceiver>());
+            receivers ??= new List<ITriggerNotificationReceiver>();
+            
             if (receivers.Contains(receiver)) return;
             receivers.Add(receiver);
         }
@@ -41,7 +44,9 @@ namespace Arcatech.Triggers
 
         private void CleanUpReceivers()
         {
-            receivers.Where(t=> toRemove.Contains(t)).ToList().ForEach(t => receivers.Remove(t));
+            if (toRemove.Count <= 0) return;
+            //Debug.Log($"Cleaning up {toRemove.Count} receivers");
+            receivers = receivers.Except(toRemove).ToList();
             toRemove.Clear();
         }
 
@@ -49,9 +54,9 @@ namespace Arcatech.Triggers
 
         private IEnumerator ColliderRefresh()
         {
-            collider.enabled = false;
+            _collider.enabled = false;
             yield return new WaitForEndOfFrame();
-            collider.enabled = true;
+            _collider.enabled = true;
         }
         
         protected void OnTriggerEnter(Collider other)

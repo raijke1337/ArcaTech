@@ -73,7 +73,7 @@ namespace Arcatech.Level
                     
                     foreach (var item in pair.Items)
                     {
-                        item.DoInteraction(_player,null,InteractionContext.Create(_p,transform,"Triggered automatically"));
+                        item.DoInteraction(_player,null);
                     }
                 }
             }
@@ -141,7 +141,7 @@ namespace Arcatech.Level
     [Serializable]
     public class LevelConditionHolder
     {
-        public LevelEventCondition Rule;
+        public CheckedLevelEventCondition Rule;
         public List<LevelEventPairContainer> Pair;
     }
     
@@ -161,7 +161,7 @@ namespace Arcatech.Level
     }
 
 
-    public abstract class LevelEventCondition : ScriptableObject
+    public abstract class CheckedLevelEventCondition : ScriptableObject
     {
         public abstract bool CheckCondition(LevelEventPairContainer pair);
     }

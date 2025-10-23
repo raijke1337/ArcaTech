@@ -6,14 +6,14 @@
     /// </summary>
     public interface IInteractionCondition
     {
-        public bool CheckCondition(IInteractor actor, IInteractive item, IInteractionContext context);
+        public bool CheckCondition(IInteractor actor, IInteractive item);
     }
 
 
 
     public abstract class InteractionCondition : ScriptableObjectID, IInteractionCondition
     {
-        public abstract bool CheckCondition(IInteractor actor, IInteractive item, IInteractionContext context);
+        public abstract bool CheckCondition(IInteractor actor, IInteractive item);
     }
     
     

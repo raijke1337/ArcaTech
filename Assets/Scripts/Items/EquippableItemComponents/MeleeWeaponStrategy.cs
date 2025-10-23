@@ -8,14 +8,13 @@ namespace Arcatech.Items
 {
     public class MeleeWeaponStrategy : WeaponStrategy, ITriggerNotificationReceiver
     {
-        public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, BaseEquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
+        public MeleeWeaponStrategy(SerializedActionResult[] onHit, SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, EquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
         {
+
+            //Debug.Log("Melee strategy OK");
             if (comp is MeleeWeaponBaseEquipmentComponent weapon)
             {
-                _trigger =
-                    weapon.TriggerTracker;
-                _trigger.Active = false;
-                    _trigger.RegisterReceiver(this);
+                weapon.TriggerTracker.RegisterReceiver(this);
                 
                 OnColliderHit = new IActionResult[onHit.Length];
 
@@ -28,7 +27,6 @@ namespace Arcatech.Items
 
 
         }
-        protected TriggerTrackerComponent _trigger;
         private IActionResult[] OnColliderHit { get; }
         private UnitState CurrentState;
 
@@ -46,7 +44,10 @@ namespace Arcatech.Items
                 return false;
             }
             hitsThisSwing.Clear();
-
+            
+            //doing manually because at this point it's not subbed to events
+            GameObjectComponent.HandleActionState(UnitActionState.Started);
+            
             // case advancing
            if (CurrentState != null && CurrentState.CanAdvance(out var next))
             {
@@ -59,15 +60,12 @@ namespace Arcatech.Items
             }
             // case first attack OR previous attack is completed
             
-           else
-            {
-                ChargesLogicOnUse();
-                state = InitialState;
-                CurrentState = state;
-                if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {state}");
-                state.ActionStateChangedEvent += Action_ActionStateChangedEvent;
-                return true;
-            }
+            ChargesLogicOnUse();
+            state = InitialState;
+            CurrentState = state;
+            if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {state}");
+            state.ActionStateChangedEvent += Action_ActionStateChangedEvent;
+            return true;
         }
 
         private void Action_ActionStateChangedEvent(UnitActionState state)
@@ -75,15 +73,7 @@ namespace Arcatech.Items
             GameObjectComponent.HandleActionState(state);
             switch (state)
             {
-                case UnitActionState.None:
-                    break;
-                case UnitActionState.Started:
-                    _trigger.Active = true;
-                    break;
-                case UnitActionState.ExitTime:
-                    break;
                 case UnitActionState.Completed:
-                    _trigger.Active = false;
                     CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
                     break;
             }
@@ -101,7 +91,7 @@ namespace Arcatech.Items
 
         public void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
         {
-            Debug.Log("Bonk noticed");
+            //Debug.Log("Bonk noticed");
             if (enterComponent == Owner.GetMainEntity) return;
             if (!hitsThisSwing.Contains(enterComponent))
             {

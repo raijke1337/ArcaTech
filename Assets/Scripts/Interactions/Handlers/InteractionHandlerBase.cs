@@ -10,8 +10,7 @@ namespace Arcatech.Interactions
     /// </summary>
     public abstract class InteractionHandlerBase : MonoBehaviour, IInteractionHandler
     {
-        
-        public abstract void DoInteraction(IInteractor interactor, IInteractive item, IInteractionContext context);
+        public abstract void DoInteraction(IInteractor interactor, IInteractive item = null);
     }
 }
 

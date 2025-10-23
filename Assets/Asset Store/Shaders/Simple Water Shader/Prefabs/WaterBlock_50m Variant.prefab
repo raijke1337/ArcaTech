@@ -206,6 +206,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6858666473734577872}
+    - targetCorrespondingSourceObject: {fileID: 1507636620937791836, guid: 7097ba7ba649e1f41bba232312bdcbd8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1150173191222767243}
+    - targetCorrespondingSourceObject: {fileID: 1507636620937791836, guid: 7097ba7ba649e1f41bba232312bdcbd8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2589814066914232479}
   m_SourcePrefab: {fileID: 100100000, guid: 7097ba7ba649e1f41bba232312bdcbd8, type: 3}
 --- !u!4 &4813563222376232594 stripped
 Transform:
@@ -229,7 +237,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -252,7 +260,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4576d274f70943841aa5bd731b925574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _collider: {fileID: 1067013418687965686}
   targetType: 2
   ReapplyWhileActorInsideTimer: 0
   ResultOnEntry:
@@ -261,6 +268,7 @@ MonoBehaviour:
   ResultOnExit: []
   DestroyOnExit: 0
   baseComp: {fileID: 4420452992422355927}
+  triggerTracker: {fileID: 1150173191222767243}
 --- !u!114 &4420452992422355927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,8 +281,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pauser: {fileID: 2589814066914232479}
   _name: Deep Water
   entitySide: 0
+  _spawnPoint: {fileID: 4813563222376232594}
+  destroyOnDeath: 0
+  timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 6858666473734577872}
   gravity: 0
@@ -306,3 +318,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1150173191222767243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4813563222376232687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _collider: {fileID: 1067013418687965686}
+--- !u!114 &2589814066914232479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4813563222376232687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -4,7 +4,7 @@ namespace Arcatech.Interactions
 {
     public class InteractionContext : IInteractionContext
     {
-        public string SomeInformation { get; }
+        public string SomeInformation { get; private set; }
         public ActiveGameUnitComponent ActiveGameUnitComponent { get; }
         public Transform ActionTransform { get; }
         
@@ -12,6 +12,7 @@ namespace Arcatech.Interactions
         {
             return new InteractionContext(actor,place,text); 
         }
+        
 
         private InteractionContext(ActiveGameUnitComponent actor, Transform place, string someInformation)
         {

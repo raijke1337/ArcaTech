@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 601409151609506670}
   - component: {fileID: 3430445988532077883}
   - component: {fileID: 2724244418631465909}
+  - component: {fileID: 1052170491945983571}
+  - component: {fileID: 4169357907019997285}
   m_Layer: 6
   m_Name: trap
   m_TagString: Untagged
@@ -45,7 +47,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -68,7 +70,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4576d274f70943841aa5bd731b925574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _collider: {fileID: 5422773838380292817}
   targetType: 3
   ReapplyWhileActorInsideTimer: 0.5
   ResultOnEntry:
@@ -78,6 +79,7 @@ MonoBehaviour:
   ResultOnExit: []
   DestroyOnExit: 0
   baseComp: {fileID: 3430445988532077883}
+  triggerTracker: {fileID: 1052170491945983571}
 --- !u!114 &3430445988532077883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90,8 +92,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pauser: {fileID: 4169357907019997285}
   _name: Fire blast trap
   entitySide: 0
+  _spawnPoint: {fileID: 3375135621056729554}
+  destroyOnDeath: 0
+  timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 2724244418631465909}
   gravity: 0
@@ -123,6 +129,31 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1052170491945983571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1940246954665009695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _collider: {fileID: 5422773838380292817}
+--- !u!114 &4169357907019997285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1940246954665009695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7130150264856469088
 GameObject:
   m_ObjectHideFlags: 0
