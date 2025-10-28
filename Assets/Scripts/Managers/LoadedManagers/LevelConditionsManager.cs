@@ -7,6 +7,7 @@ using Arcatech;
 using Arcatech.EventBus;
 using Arcatech.Interactions;
 using Arcatech.Managers;
+using Arcatech.Triggers;
 using Arcatech.Units;
 using KBCore.Refs;
 using Unity.Collections;
@@ -26,10 +27,18 @@ namespace Arcatech.Level
 
         [SerializeField] private float eventsRefreshTimer = 1;
         [SerializeField] private List<LevelConditionHolder> trackedEvents;
+        [SerializeField] private List<InteractionHandlersActivator> triggerAreas;
+        
         private Coroutine refreshConditionsCor;
 
         private EventBinding<PauseToggleEvent> pauseBind;
-        
+
+        private void OnValidate()
+        {
+            triggerAreas = FindObjectsByType<InteractionHandlersActivator>(FindObjectsSortMode.None).ToList();
+        }
+
+
         private void Start()
         {
 
@@ -85,38 +94,75 @@ namespace Arcatech.Level
         
         private void OnDrawGizmos()
         {
-            if (trackedEvents == null)
-                return;
-
-            foreach (var container in trackedEvents)
+            if (trackedEvents != null)
             {
-                foreach (var pair in container.Pair)
+
+                foreach (var container in trackedEvents)
                 {
-                    if (pair.Check == null || pair.Check.Count == 0 || pair.Check[0] == null)
-                        continue;
-                    
-                    GameObject firstCheck = pair.Check[0];
-                    
-                    // Set color based on completion
-                    Gizmos.color = pair.Completed ? Color.green : Color.cyan;
-        
-                    // Draw wire box around first Check object
-                    Bounds bounds = new Bounds(firstCheck.transform.position, Vector3.one * 2f);
-                    if (firstCheck.TryGetComponent<Renderer>(out Renderer renderer))
+                    foreach (var pair in container.Pair)
                     {
-                        bounds = renderer.bounds;
+                        if (pair.Check == null || pair.Check.Count == 0 || pair.Check[0] == null)
+                            continue;
+
+                        GameObject firstCheck = pair.Check[0];
+
+                        // Set color based on completion
+                        Gizmos.color = pair.Completed ? Color.green : Color.cyan;
+
+                        // Draw wire box around first Check object
+                        Bounds bounds = new Bounds(firstCheck.transform.position, Vector3.one * 2f);
+                        if (firstCheck.TryGetComponent<Renderer>(out Renderer renderer))
+                        {
+                            bounds = renderer.bounds;
+                            bounds.Expand(1f);
+                        }
+
+                        Gizmos.DrawWireCube(bounds.center, bounds.size);
+
+                        // Draw lines to all Items
+                        if (pair.Items != null)
+                        {
+                            Gizmos.color = pair.Completed ? Color.gray : Color.yellow;
+                            Vector3 fromPos = firstCheck.transform.position;
+
+                            foreach (var item in pair.Items)
+                            {
+                                if (item != null)
+                                {
+                                    Gizmos.DrawLine(fromPos, item.transform.position);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (triggerAreas != null)
+            {
+                foreach (var area in triggerAreas)
+                {
+                    GameObject source = area.gameObject;
+
+                    // Set color based on completion
+                    Gizmos.color = area.Completed ? Color.green : Color.cyan;
+
+                    // Draw wire box around first Check object
+                    Bounds bounds = new Bounds(source.transform.position, Vector3.one * 2f);
+                    if (source.TryGetComponent<TriggerTrackerComponent>(out var tracker))
+                    {
+                        bounds = tracker.GetComponent<Collider>().bounds;
                         bounds.Expand(1f);
                     }
-                    
+
                     Gizmos.DrawWireCube(bounds.center, bounds.size);
-        
+
                     // Draw lines to all Items
-                    if (pair.Items != null)
+                    if (area.Handlers != null)
                     {
-                        Gizmos.color = pair.Completed ? Color.gray : Color.yellow;
-                        Vector3 fromPos = firstCheck.transform.position;
-            
-                        foreach (var item in pair.Items)
+                        Gizmos.color = area.Completed ? Color.gray : Color.yellow;
+                        Vector3 fromPos = source.transform.position;
+
+                        foreach (var item in area.Handlers)
                         {
                             if (item != null)
                             {

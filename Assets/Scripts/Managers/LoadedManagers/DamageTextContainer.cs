@@ -7,10 +7,14 @@ namespace Arcatech.Managers
 
     public class DamageTextContainer : ValidatedMonoBehaviour
     {
+        public int Number { get; private set; }
 
+
+        public void PlayNumbers(float value) => PlayNumbers(Mathf.RoundToInt(value));
         public void PlayNumbers(int number)
         {
             if (number == 0) return;
+            Number = number;
 
             int damage = Mathf.Abs(number);
             string text = damage.ToString();

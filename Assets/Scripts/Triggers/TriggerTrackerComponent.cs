@@ -19,7 +19,7 @@ namespace Arcatech.Triggers
         private List<ITriggerNotificationReceiver> receivers;
 
 
-        public bool Active { get; set; }
+        public bool Active { get; set; } = true;
         
         private void OnEnable()
         { 
@@ -64,8 +64,6 @@ namespace Arcatech.Triggers
             if (!Active || receivers == null || !receivers.Any()) return;
             if (other.TryGetComponent<BaseGameEntityComponent>(out var component))
             {
-                Debug.Log($"Bonk {component.GetName}. Notify {receivers.Count} receivers");
-                
                 foreach (var receiver in receivers)
                 {
                     receiver.TriggerEntered(component, this);

@@ -11,6 +11,10 @@ namespace Arcatech.Interactions
         [SerializeField,Self] TriggerTrackerComponent triggerTracker;
         [SerializeField] InteractionCondition condition;
         [SerializeField] private List<InteractionHandlerBase> handlers;
+
+        public bool Completed { get; private set; } = false;
+    
+        public IReadOnlyList<InteractionHandlerBase> Handlers => handlers;
         private void Start()
         {
             triggerTracker.RegisterReceiver(this);
@@ -23,6 +27,7 @@ namespace Arcatech.Interactions
 
         public void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
         {
+            if (Completed) return;
             if (!enterComponent.CompareTag("Player")) return;
             if (!enterComponent.TryGetComponent(out IInteractor interactor)) return;
             if (!condition.CheckCondition(interactor, null)) return;
@@ -31,6 +36,9 @@ namespace Arcatech.Interactions
             {
                 handler.DoInteraction(interactor);
             }
+
+            Completed = true;
+            trigger.Active = false;
         }
 
         public void TriggerExited(BaseGameEntityComponent exitComponent, TriggerTrackerComponent trigger)

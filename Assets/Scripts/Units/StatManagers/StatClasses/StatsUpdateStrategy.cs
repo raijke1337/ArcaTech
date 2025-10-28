@@ -17,4 +17,7 @@ namespace Arcatech.Stats
         protected StatsChangeHandle(EntityStatsComponent component) => unit = component;
         public abstract void HandleStats(IDictionary<BaseStatType, StatValueContainer> stats);
     }
+    
+    
+    
 }

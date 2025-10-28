@@ -57,7 +57,7 @@ namespace Arcatech
             Collider = GetComponent<Collider>();
             _rigidbody.useGravity = gravity;
             _rigidbody.isKinematic = !usePhysics;
-            _effectsTakerComponents = new List<IEffectsTakerComponent>(GetComponents<IEffectsTakerComponent>());
+            _effectsTakerComponents = new List<IEffectsTakerComponent>(GetComponentsInChildren<IEffectsTakerComponent>());
             
         }
 

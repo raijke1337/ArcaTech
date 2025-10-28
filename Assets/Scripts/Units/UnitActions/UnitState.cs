@@ -59,18 +59,18 @@ namespace Arcatech.Units
 
             if (onstart != null && onstart.Length > 0)
             {
-                OnStartAction = new IActionResult[onstart.Length]; 
+                OnEnterState = new ActionResult[onstart.Length]; 
                 for (int i = 0; i < onstart.Length; i++)
                 {
-                    OnStartAction[i] = onstart[i].BuildActionResult();
+                    OnEnterState[i] = onstart[i].BuildActionResult();
                 }
             }
             if (onfinish != null && onfinish.Length > 0)
             {
-                OnCompleteAction = new IActionResult[onfinish.Length];
+                OnExitState = new IActionResult[onfinish.Length];
                 for (int i = 0; i < onfinish.Length; i++)
                 {
-                    OnCompleteAction[i] = onfinish[i].BuildActionResult();
+                    OnExitState[i] = onfinish[i].BuildActionResult();
                 }
             }
             if (onExit != null && onExit.Length > 0)
@@ -104,6 +104,10 @@ namespace Arcatech.Units
         protected Animator animator;
         protected ActiveGameUnitComponent Actor;
         public bool LockMovement { get; protected set; }
+        
+        public IActionResult[] OnEnterState { get; private set;  }
+        public IActionResult[] OnExitState { get; private set; }
+        public IActionResult[] OnExitTime { get;private set; }
         protected NextActionSettings Next { get; }
 
 
@@ -120,9 +124,7 @@ namespace Arcatech.Units
         UnitActionState _actionState = UnitActionState.None;
         public UnitActionState GetActionState => _actionState;
 
-        readonly IActionResult[] OnCompleteAction;
-        readonly IActionResult[] OnStartAction;
-        readonly IActionResult[] OnExitTime;
+
 
         public UnitActionState UpdateAction(float delta)
         {
@@ -184,9 +186,9 @@ namespace Arcatech.Units
             
             animator.CrossFade(stateHash, _crossfadeTime);
             
-            if (OnStartAction != null)
+            if (OnEnterState != null)
             {
-                foreach (var r in OnStartAction)
+                foreach (var r in OnEnterState)
                 {
                     if (r == null)
                     {
@@ -238,9 +240,9 @@ namespace Arcatech.Units
                 return;
             }
             string fin = "";
-            if (OnCompleteAction != null)
+            if (OnExitState != null)
             {
-                foreach (var r in OnCompleteAction)
+                foreach (var r in OnExitState)
                 {
                     if (r == null)
                     {

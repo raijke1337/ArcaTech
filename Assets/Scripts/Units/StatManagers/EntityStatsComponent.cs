@@ -172,10 +172,14 @@ namespace Arcatech.Stats
         public bool Paused { get; set; } = false;
 
         #region effects taker
+        
+        
         public void ApplyEffect(StatsEffect eff, BaseGameEntityComponent s)
         {
             if (Killed || Paused || eff == null || !_started) return;
 
+           // Debug.Log($"{this} took {eff} from {s}");
+            
             if (_stats.ContainsKey(eff.StatType))
             {
                 _stats[eff.StatType].ApplyStatsEffect(eff);

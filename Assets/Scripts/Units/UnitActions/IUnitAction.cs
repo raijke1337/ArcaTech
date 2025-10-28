@@ -7,6 +7,9 @@ namespace Arcatech.Units
         public void StartState();
         public UnitActionState UpdateAction(float delta);
         public bool LockMovement { get; }
+
+        public IActionResult[] OnEnterState { get; }
+        public IActionResult[] OnExitState { get; }
     }
 
 
@@ -17,13 +20,5 @@ namespace Arcatech.Units
         ExitTime,
         Completed
     }
-
-
-
-    public interface IUnitState
-    {
-        public ActionResult[] OnEnterState { get; }
-        public ActionResult[] OnExitState { get; }
-        
-    }
 }
+
