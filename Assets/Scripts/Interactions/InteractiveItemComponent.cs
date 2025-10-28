@@ -37,7 +37,7 @@ namespace Arcatech.Interactions
         [SerializeField]
         protected InteractionCondition condition;
         
-        public bool OnInteraction(IInteractor interactor)
+        public bool TryInteraction(IInteractor interactor)
         {
             var result = condition.CheckCondition(interactor, this);
             if (result)

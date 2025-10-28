@@ -16,5 +16,10 @@ namespace Arcatech.Interactions
         {
             _light.color = _color;  
         }
+
+        public override void EndInteraction(IInteractor interactor, IInteractive item = null)
+        {
+            
+        }
     }
 }

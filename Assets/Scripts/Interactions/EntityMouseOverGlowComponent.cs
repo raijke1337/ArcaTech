@@ -52,9 +52,11 @@ namespace Arcatech.Interactions
     
     void Start()
     {
-        cachedEvent = new BaseEntityMouseOverEvent();
-        cachedEvent.Target = this;
-        
+        cachedEvent = new BaseEntityMouseOverEvent
+        {
+            Target = this
+        };
+
         SetupOutlineSystem();
     }
     

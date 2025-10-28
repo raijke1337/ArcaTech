@@ -50,6 +50,10 @@ namespace Arcatech.Interactions
             toggled = true;
         }
 
+        public override void EndInteraction(IInteractor interactor, IInteractive item = null)
+        {
+            // maybe TODO
+        }
     }
 
 }

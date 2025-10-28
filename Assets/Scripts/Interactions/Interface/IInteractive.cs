@@ -7,6 +7,6 @@
     public interface IInteractive 
     {
         public BaseGameEntityComponent GetBaseComponent { get; }
-        public bool OnInteraction(IInteractor interactor);
+        public bool TryInteraction(IInteractor interactor);
     }
 }

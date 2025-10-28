@@ -23,5 +23,9 @@ namespace Arcatech.Interactions
             }
         }
 
+        public override void EndInteraction(IInteractor interactor, IInteractive item = null)
+        {
+            
+        }
     }
 }

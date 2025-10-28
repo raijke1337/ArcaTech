@@ -56,6 +56,10 @@ namespace Arcatech.Interactions
 
         }
 
+        public override void EndInteraction(IInteractor interactor, IInteractive item = null)
+        {
+            // todo add "OnEndInteraction" results if necessary
+        }
 
 
         /// <summary>

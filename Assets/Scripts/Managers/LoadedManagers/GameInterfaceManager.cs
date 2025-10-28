@@ -21,13 +21,20 @@ namespace Arcatech.Managers
 //unused
         //[SerializeField,Self] private TargetPanel _tgtPan;
         [SerializeField,Child] private PlayerUnitPanel _playerPan;
-     //unused   //[SerializeField,Child] private GameTextWindowComponent _text;
+        [SerializeField,Child] private GameTextWindowComponent _text;
         [SerializeField] private GameObject _ded;
         [SerializeField] private GameObject _pause;
-        [SerializeField,Child] private ItemCardComponent _inspectItemCard;
+        [SerializeField] private ItemCardComponent inspectItemCard;
         
 
+        /// <summary>
+        /// called by inputs and something else.
+        /// </summary>
         EventBinding<PauseToggleEvent> _pauseToggleBind;
+        
+        /// <summary>
+        /// raised by entity mouse over glow comp
+        /// </summary>
         EventBinding<BaseEntityMouseOverEvent> _mouseOverBind;
         
 
@@ -72,27 +79,15 @@ namespace Arcatech.Managers
             _text.DialogueCompleteEvent += OnDialogueCompletedInTextWindow;*/
         }
 
-        public void UpdateGameText(DialoguePart text, bool isShown)
+        public void HandleDialoguePart(DialoguePart text, bool show)
         {
 
-            /*
-            if (isShown)
+            _text.gameObject.SetActive(true);
+            _text.CurrentDialogue = text;
+            if (text.Options.Count > 0)
             {
-                //_playerPan.LoadedDialogue(text, isShown);
-                _text.gameObject.SetActive(isShown);
-                _text.CurrentDialogue = text;
-                if (text.Options.Count > 0)
-                {
-                    EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(isShown));
-                }
-            }    
-            else
-            {
-                //_playerPan.LoadedDialogue(text, isShown);
-                _text.gameObject.SetActive(isShown);
-                EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(isShown));
-            }*/
-
+                EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(true));
+            }
         }
         private void OnDialogueCompletedInTextWindow()
         {

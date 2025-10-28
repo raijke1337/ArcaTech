@@ -31,4 +31,5 @@ namespace Arcatech.Units
             Assert.IsFalse((_onStart == null && _onExit == null && _onFinish == null));
         }
     }
+
 }

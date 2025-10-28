@@ -152,34 +152,7 @@ namespace Arcatech.Units
             }
             return ok;
         }
-
-        public void ForceState(string stateName)
-        {
-            if (animator == null)
-            {
-                Debug.LogWarning($"Animator is null, Cannot force state '{stateName}'.");
-                return;
-            }
         
-            if (string.IsNullOrEmpty(stateName))
-            {
-                Debug.LogWarning($"State name is null or empty on {this}.");
-                return;
-            }
-        
-            // Check if the state exists in the animator
-            if (!HasState(stateName))
-            {
-                Debug.LogWarning($"State '{stateName}' not found in Animator {Actor}.");
-                return;
-            }
-        
-            // Force transition to the state (layer 0, normalized time 0)
-           // animator.Play(stateName, 0, 0f);
-           
-
-            StartState();
-        }
         public void StartState()
         {
             string start = "";

@@ -476,15 +476,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -709,15 +711,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -870,8 +874,8 @@ GameObject:
   - component: {fileID: 5263314192225369765}
   - component: {fileID: 6503287428812012410}
   - component: {fileID: 8890945153108380189}
-  - component: {fileID: 7535276996992584002}
   - component: {fileID: 2709919758529400749}
+  - component: {fileID: 5601303659323149620}
   m_Layer: 5
   m_Name: GameTextFrame
   m_TagString: Untagged
@@ -941,25 +945,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7535276996992584002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7044602367474809756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b1199be812d8bb4fbc6bf1ac003932f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _speakerTitle: {fileID: 1268133170564071834}
-  _speakerPicture: {fileID: 7271627126069924264}
-  _mainText: {fileID: 6619328876978885437}
-  ButtonPrefab: {fileID: -1837153090518613864, guid: ea909a4c0ad0f5742bcebb0b2c23639e,
-    type: 3}
-  ButtonPrefabParent: {fileID: 4507633748397247416}
-  DebugDialogue: {fileID: 11400000, guid: e14676628b0720a47b4bc9bff259ded0, type: 2}
 --- !u!114 &2709919758529400749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -986,6 +971,23 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5601303659323149620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7044602367474809756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61d2c2fedbcb91f4c888dd69f53663ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speakerTitle: {fileID: 1268133170564071834}
+  _mainText: {fileID: 6619328876978885437}
+  ButtonPrefab: {fileID: -1837153090518613864, guid: ea909a4c0ad0f5742bcebb0b2c23639e,
+    type: 3}
+  ButtonPrefabParent: {fileID: 4507633748397247416}
 --- !u!1 &9182465446480285196
 GameObject:
   m_ObjectHideFlags: 0

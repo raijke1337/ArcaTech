@@ -25,7 +25,10 @@ namespace Arcatech.Interactions
 
         private float time = 0f;
 
-
+        private void Start()
+        {
+            if (!cachedActor) cachedActor = GetComponentInChildren<ActiveGameUnitComponent>();
+        }
 
         private void FixedUpdate()
         {
@@ -62,29 +65,40 @@ namespace Arcatech.Interactions
         public InteractionContext InteractionContext => ReadContext();
         public void InteractCommand()
         {
-            if (cachedActor == null)
+            if (stateSuccess != null)
             {
-                if (stateSuccess != null)
-                {
-                    _successState = stateSuccess.DeserializeState(cachedActor, interactionActionTransform);
-                }
-
-                if (stateFail != null)
-                {
-                    _failState = stateFail.DeserializeState(cachedActor, interactionActionTransform);
-                }
+                _successState = stateSuccess.DeserializeState(cachedActor, interactionActionTransform);
             }
 
+            if (stateFail != null)
+            {
+                _failState = stateFail.DeserializeState(cachedActor, interactionActionTransform);
+            }
             if (currentInteractive != null)
             {
-                bool ok = currentInteractive.OnInteraction(this);
+                bool ok = currentInteractive.TryInteraction(this);
                 if (_successState != null && _failState != null)
                     cachedActor.ForceUnitState(ok ? _successState : _failState);
+                currentInteractive = null;
             }
             else
             {
                 Debug.Log($"no interactive item nearby");
             }
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (currentInteractive == null)
+            {
+                Gizmos.color = Color.gray;
+            }
+            else
+            {
+                Gizmos.color = Color.blue;
+            }
+
+            Gizmos.DrawWireSphere(transform.position, interactRange);
         }
     }
 }
