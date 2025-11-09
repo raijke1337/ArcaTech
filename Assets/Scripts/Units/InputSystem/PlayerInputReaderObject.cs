@@ -1,40 +1,28 @@
+
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using static PlayerControls;
+
 [CreateAssetMenu(fileName = "InputReader", menuName = "Inputs/InputReader")]
-public class PlayerInputReaderObject : ScriptableObject, IGameActions
+public class PlayerInputReaderObject : ScriptableObject, PlayerControls.IGameActions
 {
     private PlayerControls _controls;
 
-    public event UnityAction<Vector2> Movement = delegate { };
-    public event UnityAction<Vector2> Aim = delegate { };
-
-    public event UnityAction Jump = delegate { };
-    public event UnityAction Melee = delegate { };
-    public event UnityAction Ranged = delegate { };
-
-    public event UnityAction DodgeSpec = delegate { };
-    public event UnityAction MeleeSpec = delegate { };
-    public event UnityAction RangedSpec = delegate { };
-    public event UnityAction ShieldSpec = delegate { };
-
-
-    public event UnityAction MountAction = delegate { };
-    public event UnityAction PausePressed = delegate { };
-
-
-    public Vector3 InputDirection
-    {get
-        {
-            Vector2 read = _controls.Game.WASD.ReadValue<Vector2>();
-            return new Vector3(read.x,0f,read.y);
-        }
-    }
-    public Vector2 AimPoint => _controls.Game.Aim.ReadValue<Vector2>();
-
-
-
+    public event UnityAction<InputAction.CallbackContext> Movement = delegate { };
+   // public event UnityAction<InputAction.CallbackContext> Aim = delegate { };
+    public event UnityAction<InputAction.CallbackContext> Jump = delegate { };
+    public event UnityAction<InputAction.CallbackContext,UnitActionType> CombatAction = delegate { };
+       // Melee = delegate { };
+    // public event UnityAction<InputAction.CallbackContext> Ranged = delegate { };
+    // public event UnityAction<InputAction.CallbackContext> DodgeSpec = delegate { };
+    // public event UnityAction<InputAction.CallbackContext> MeleeSpec = delegate { };
+    // public event UnityAction<InputAction.CallbackContext> RangedSpec = delegate { };
+    // public event UnityAction<InputAction.CallbackContext> ShieldSpec = delegate { };
+    public event UnityAction<InputAction.CallbackContext> UseAction = delegate { };
+    public event UnityAction<InputAction.CallbackContext> PausePressed = delegate { };
+    public event UnityAction<InputAction.CallbackContext> InspectPressed = delegate { };
+    
+    
     private void OnEnable()
     {
         if (_controls == null)
@@ -42,80 +30,70 @@ public class PlayerInputReaderObject : ScriptableObject, IGameActions
             _controls = new PlayerControls();
             _controls.Game.SetCallbacks(this);
         }
+        _controls.Enable();
     }
     private void OnDisable()
     {
         _controls.Disable();
     }
 
-    public void EnablePlayerInputs()
-    {
-        _controls.Enable();
-    }
-
-
-    #region calls
-
     public void OnWASD(InputAction.CallbackContext context)
     {
-        Movement.Invoke(context.ReadValue<Vector2>());
-    }
-    public void OnAim(InputAction.CallbackContext context)
-    {
-       Aim.Invoke(context.ReadValue<Vector2>());
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.phase == InputActionPhase.Performed)
-            Jump.Invoke();
-    }
-    public void OnMainAttack(InputAction.CallbackContext context)
-    {
-        if (context.phase == InputActionPhase.Performed)
-            Melee.Invoke();
-    }
-
-    public void OnRangedAttack(InputAction.CallbackContext context)
-    {
-        if (context.phase == InputActionPhase.Performed)
-            Ranged.Invoke();
-    }
-
-
-    public void OnPause(InputAction.CallbackContext context)
-    {
-        if (context.phase == InputActionPhase.Performed)
-            PausePressed.Invoke();
+        Movement.Invoke(context);
     }
 
     public void OnUseMeleeSkill(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Performed)
-            MeleeSpec.Invoke();
+        CombatAction.Invoke(context,UnitActionType.MeleeSkill);
     }
 
     public void OnUseRangedSkill(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Performed)
-            RangedSpec.Invoke();
+        CombatAction.Invoke(context,UnitActionType.RangedSkill);
     }
 
     public void OnUseShieldSkill(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Performed)
-            ShieldSpec.Invoke();
+        CombatAction.Invoke(context,UnitActionType.ShieldSkill);
+    }
+
+    public void OnPause(InputAction.CallbackContext context)
+    {
+        PausePressed.Invoke(context);
     }
 
     public void OnUseDodgeSkill(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Performed)
-            DodgeSpec.Invoke();
+        CombatAction.Invoke(context,UnitActionType.DodgeSkill);
     }
-    public void OnMount(InputAction.CallbackContext context)
+
+    public void OnMainAttack(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Performed)
-            MountAction.Invoke();
+        CombatAction.Invoke(context,UnitActionType.Melee);
     }
-    #endregion
+
+    public void OnRangedAttack(InputAction.CallbackContext context)
+    {
+        CombatAction.Invoke(context,UnitActionType.Ranged);
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        Jump.Invoke(context);
+    }
+
+    public void OnAim(InputAction.CallbackContext context)
+    {
+        
+    }
+
+    public void OnUse(InputAction.CallbackContext context)
+    {
+        UseAction.Invoke(context);
+    }
+
+    public void OnInspect(InputAction.CallbackContext context)
+    {
+        InspectPressed.Invoke(context);
+    }
 }

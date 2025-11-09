@@ -172,38 +172,33 @@ namespace ECM.Controllers
         /// to perform custom input code, in this case, click-to-move.
         /// </summary>
 
-        public void SetDesiredMovePoint(Vector3 point)
-        {
-            agent.SetDestination(point);
-        }
-
         protected override void HandleInput()
         {
             // Toggle pause / resume.
-            //// By default, will restore character's velocity on resume (eg: restoreVelocityOnResume = true)
+            // By default, will restore character's velocity on resume (eg: restoreVelocityOnResume = true)
 
-            //if (Input.GetKeyDown(KeyCode.P))
-            //    pause = !pause;
+            if (Input.GetKeyDown(KeyCode.P))
+                pause = !pause;
 
-            //crouch = Input.GetKey(KeyCode.C);
+            crouch = Input.GetKey(KeyCode.C);
 
-            //// Handle mouse input
+            // Handle mouse input
 
-            //if (!Input.GetButton("Fire2"))
-            //    return;
+            if (!Input.GetButton("Fire2"))
+                return;
 
-            //// If mouse right click,
-            //// found click position in the world
+            // If mouse right click,
+            // found click position in the world
 
-            //var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            //RaycastHit hitInfo;
-            //if (!Physics.Raycast(ray, out hitInfo, Mathf.Infinity, groundMask.value))
-            //    return;
+            RaycastHit hitInfo;
+            if (!Physics.Raycast(ray, out hitInfo, Mathf.Infinity, groundMask.value))
+                return;
 
-            //// Set agent destination to ground hit point
+            // Set agent destination to ground hit point
 
-            //agent.SetDestination(hitInfo.point);
+            agent.SetDestination(hitInfo.point);
         }
 
         #endregion

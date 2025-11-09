@@ -4,10 +4,12 @@ using UnityEngine;
 namespace Arcatech.Items
 {
     /// <summary>
-    /// todo maybe create a separate class for USABLE equipment (we can have qeuips that give no skill, cosmetci items )
+    /// todo maybe create a separate class for USABLE equipment (we can have equips that give no skill, cosmetic items )
     /// </summary>
-    public class Equipment : Item, IEquippable, IHasUsable
+    public class Equipment : Item, IEquippable, IHasUsable, IEquipmentStatsProvider
     {
+        
+        
         protected virtual void CollectUsables(EquipSO cfg)
         {
             cachedUsables = new List<IUsable>();
@@ -18,17 +20,13 @@ namespace Arcatech.Items
         }
         public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
         {
-            if (ow.ShowingDebugs) Debug.Log($"Build equipment class {this}");
-            StatMods = new();
-            if (cfg.StatMods != null)
-            {
-                foreach (var m in cfg.StatMods)
-                {
-                    if (m) StatMods.Add(m.BuildMod);
-                }
-            }   
             DisplayItem = GameObject.Instantiate(cfg.itemPrefab,ow.transform);
             DisplayItem.gameObject.SetActive(false);
+
+            mods = new List<StatModifier>(cfg.statModifiers);
+            deltas = new List<PeriodicDelta>(cfg.periodicDeltas);
+            
+
         }          
         
         public void SetItemEmpty(Transform pos)
@@ -39,7 +37,7 @@ namespace Arcatech.Items
         }
 
         public EquipmentComponent DisplayItem { get; protected set; }
-        public List<StatsMod> StatMods { get; protected set; }
+      //  public List<StatsMod> StatMods { get; protected set; }
 
         protected List<IUsable> cachedUsables;
         public List<IUsable> GetUsables
@@ -62,5 +60,12 @@ namespace Arcatech.Items
         {
             DisplayItem.gameObject.SetActive(false);
         }
+
+
+        private IEnumerable<StatModifier> mods;
+        private IEnumerable<PeriodicDelta> deltas;
+        public IEnumerable<StatModifier> GetPersistentModifiers() => mods;
+        public IEnumerable<PeriodicDelta> GetPeriodicDeltas() => deltas;
+        public BaseGameEntityComponent Source => Owner;
     }
 }

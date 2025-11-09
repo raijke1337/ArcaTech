@@ -66,16 +66,6 @@ namespace Arcatech
             
             exitStateHash = Animator.StringToHash(animatorExitStateTrigger);
             
-            var commandHandlers = GetComponentsInChildren<IUnitCommandHandler>();
-            if (commandHandlers.Length == 0)
-            {
-                Debug.Log($"No unit command handlers found {GetMainEntity.GetName}");
-            }
-            foreach (var handler in commandHandlers)
-            {
-                AssignActionsHandler(handler);
-            }
-            
             if (StaggeredState) _staggerState = StaggeredState.DeserializeState(this,transform);
             if (DeadState) _deathState = DeadState.DeserializeState(this, transform);
             if (StunnedState) _stunnedState = StunnedState.DeserializeState(this,transform);
@@ -96,8 +86,6 @@ namespace Arcatech
                         ActionLock = CurrentState.LockMovement;
                         break;
                     case UnitActionState.ExitTime:
-                        ActionLock = false;
-                        break;
                     case UnitActionState.Completed:
                         ActionLock = false;
                         break;
@@ -107,11 +95,12 @@ namespace Arcatech
 
 
         #region locks
+
         bool _lockAction;
         public bool ActionLock
         {
             get => _lockAction;
-            protected set
+            private set
             {
                 OnActionLock(value);
                 _lockAction = value;
@@ -121,52 +110,15 @@ namespace Arcatech
         protected virtual void OnActionLock(bool locking) { } // do something if needed
         #endregion
 
-        /// <summary>
-        /// TODO replace this with states with transitions
-        /// ie Idle state, Movement state, Attacking (UnitAction) state
-        /// </summary>
+
 
         #region actions
-
-        private List<IUnitCommandHandler> _actionsHandlers = new List<IUnitCommandHandler>();
         protected UnitState CurrentState;
-        /// <summary>
-        /// assign some other handler that isn't attached to the gameobject
-        /// </summary>
-        public virtual void AssignActionsHandler(IUnitCommandHandler handler)
-        { 
-            if (!_actionsHandlers.Contains(handler)) _actionsHandlers.Add(handler);
-            else Debug.LogWarning($"Tried to assigned the same handler {handler} twice");
-        }
-
-
-        public virtual bool Command(UnitActionType obj)
-        {
-            bool allSuccess = true;
-            
-            if (_lockAction ||  Paused || !CanAct()) return false;
-
-            foreach (var h in _actionsHandlers)
-            {
-                if (h.TryHandleUnitCommand(obj, _stats, out var a))
-                {
-                    DoActionLogic(a);
-                }
-                else
-                {
-                    allSuccess = false;
-                }
-            }
-            return allSuccess;
-        }
-
-
-        protected virtual bool CanAct()
-        {
-            // extra checks in npc and player
-            return true;
-        }
-
+        
+        // all this is now determined in the inputs component
+        
+        //private List<IUnitCommandHandler> _actionsHandlers = new List<IUnitCommandHandler>();
+        
         public void ForceUnitState(UnitState act)
         {
             if (Paused || act == null) return;
@@ -239,7 +191,7 @@ namespace Arcatech
 
         protected virtual void OnKill(bool kill)
         {
-            Debug.Log($"{GetMainEntity.GetName} died");
+           // Debug.Log($"{GetMainEntity.GetName} died");
             Paused = kill;
             _k = kill;
             _deathState?.StartState(); 
@@ -279,5 +231,6 @@ namespace Arcatech
         }
         
         #endregion
+
     }
 }

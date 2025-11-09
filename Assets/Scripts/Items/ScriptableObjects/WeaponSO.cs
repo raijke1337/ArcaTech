@@ -1,6 +1,7 @@
 ﻿using Arcatech.Triggers;
 using Arcatech.Units;
 using System;
+using Arcatech.Stats;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -11,7 +12,7 @@ namespace Arcatech.Items
     {
         [Header("Use settings")]
         public SerializedWeaponUseStrategy WeaponUseStrategy;
-        public SerializedStatsEffectConfig Cost;
+        public StatsEffect Cost;
 
         public DrawItemsStrategy DrawStrategy;
 
@@ -20,7 +21,7 @@ namespace Arcatech.Items
         protected override void OnValidate()
         {
             base.OnValidate();
-            Assert.IsNotNull(Cost);
+            //Assert.IsNotNull(Cost);
             //Assert.IsFalse(WeaponType == WeaponAnimationsSet.None);
         }
         public override IItem BuildItem(BaseGameEntityComponent owner)

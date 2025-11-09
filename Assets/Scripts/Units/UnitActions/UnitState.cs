@@ -9,29 +9,95 @@ namespace Arcatech.Units
 {
     public class UnitState : IUnitAction
     {
-        public static UnitState Build(ActiveGameUnitComponent u, bool lck, NextActionSettings next, string anim, float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place, float crossfade)
+        public static UnitState Build(ActiveGameUnitComponent u, bool lck, NextActionSettings next, string anim,
+            float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish,
+            SerializedActionResult[] onExit, Transform place, float crossfade)
         {
-            return new UnitState(u, lck, next, anim, exit,onstart, onfinish, onExit,place,crossfade);
+            return new UnitState(u, lck, next, anim, exit, onstart, onfinish, onExit, place, crossfade);
         }
 
-        UnitState(ActiveGameUnitComponent u, bool locks, NextActionSettings next, string animatorSt, float exitTimeMult, SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit, Transform place,float crossfade)
+
+        private Animator animator;
+        private ActiveGameUnitComponent _actor;
+
+        private StopwatchTimer _actionTimer;
+        float _totalActionTime;
+        float _exitActionTime;
+
+        readonly Transform place;
+        private int stateHash;
+        readonly float _crossfadeTime;
+
+        UnitState(ActiveGameUnitComponent u, bool locks, NextActionSettings next, string animatorSt, float exitTimeMult,
+            SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit,
+            Transform place, float crossfade)
         {
-            Actor = u;
+            _actor = u;
             LockMovement = locks;
             Next = next;
-            animatorState = animatorSt;
             _crossfadeTime = crossfade;
-
             this.place = place;
+
             animator = u.GetComponentInChildren<Animator>();
-            
-            if (HasState(animatorState)) stateHash = Animator.StringToHash(animatorSt);
-            
-            
-            if (animatorState != null && animator.runtimeAnimatorController.animationClips.Any(t=>t.name == animatorState))
+
+            if (onstart != null && onstart.Length > 0)
+            {
+                OnEnterState = new ActionResult[onstart.Length];
+                for (int i = 0; i < onstart.Length; i++)
+                {
+                    if (!onstart[i])
+                    {
+                        Debug.LogWarning($"Action {this} start at {onstart[i].name} is null");
+                        continue;
+                    }
+
+                    OnEnterState[i] = onstart[i].BuildActionResult();
+                }
+            }
+
+            if (onfinish != null && onfinish.Length > 0)
+            {
+                OnExitState = new IActionResult[onfinish.Length];
+
+                for (int i = 0; i < onfinish.Length; i++)
+                {
+                    if (!onfinish[i])
+                    {
+                        Debug.LogWarning($"Action {this} start at {onfinish[i].name} is null");
+                        continue;
+                    }
+
+                    OnExitState[i] = onfinish[i].BuildActionResult();
+                }
+            }
+
+            if (onExit != null && onExit.Length > 0)
             {
 
-                var clip = animator.runtimeAnimatorController.animationClips.First(t => t.name == animatorState);
+                OnExitTime = new IActionResult[onExit.Length];
+                for (int i = 0; i < onExit.Length; i++)
+                {
+                    if (!onExit[i])
+                    {
+                        Debug.LogWarning($"Action {this} exit at {onExit[i].name} is null");
+                        continue;
+                    }
+
+                    OnExitTime[i] = onExit[i].BuildActionResult();
+                }
+            }
+            _actionTimer = new StopwatchTimer();
+
+            if (HasState(animatorSt, out stateHash))
+            {
+
+                if (animator.runtimeAnimatorController.animationClips.All(t => t.name != animatorSt))
+                {
+                    Debug.LogWarning($"Couldn't find animation {animatorSt}");
+                    return;
+                }
+
+                var clip = animator.runtimeAnimatorController.animationClips.First(t => t.name == animatorSt);
                 var clipLength = clip.length;
 
                 AnimatorController ac = animator.runtimeAnimatorController as AnimatorController;
@@ -42,89 +108,55 @@ namespace Arcatech.Units
                     var s = layer.stateMachine.states;
                     foreach (var state in s)
                     {
-                        if (state.state.name == animatorState)
+                        if (state.state.name == animatorSt)
                         {
                             var animSpeedMult = state.state.speed;
                             //Debug.Log($"found anim speed {animSpeedMult} for animation {_animationName}");
 
                             _totalActionTime = clipLength / animSpeedMult;
                             _exitActionTime = _totalActionTime * exitTimeMult;
-                            if (u.GetMainEntity.ShowingDebugs) Debug.Log($"Action {this} exit at {_exitActionTime} complete at {_totalActionTime}");
+                            if (u.GetMainEntity.ShowingDebugs)
+                                Debug.Log(
+                                    $"Action {this} exit at {_exitActionTime} complete at {_totalActionTime}");
                             break;
                         }
                     }
                 }
+
+
             }
 
 
-            if (onstart != null && onstart.Length > 0)
-            {
-                OnEnterState = new ActionResult[onstart.Length]; 
-                for (int i = 0; i < onstart.Length; i++)
-                {
-                    OnEnterState[i] = onstart[i].BuildActionResult();
-                }
-            }
-            if (onfinish != null && onfinish.Length > 0)
-            {
-                OnExitState = new IActionResult[onfinish.Length];
-                for (int i = 0; i < onfinish.Length; i++)
-                {
-                    OnExitState[i] = onfinish[i].BuildActionResult();
-                }
-            }
-            if (onExit != null && onExit.Length > 0)
-            {
-
-                OnExitTime = new IActionResult[onExit.Length];
-                for (int i = 0; i < onExit.Length; i++)
-                {
-                    OnExitTime[i] = onExit[i].BuildActionResult();
-                }
-            }
-
-            _actionTimer = new StopwatchTimer();
         }
-        
-        private bool HasState(string stateName, int layer = 0)
+    
+
+    private bool HasState(string stateName, out int hash,int layer = 0)
         {
+            hash = 0;
             if (animator == null || animator.runtimeAnimatorController == null)
                 return false;
         
             // Get the state hash
-            stateHash = Animator.StringToHash(stateName);
+            hash = Animator.StringToHash(stateName);
         
             // Check if the state exists in the specified layer
-            return animator.HasState(layer, stateHash);
+            return animator.HasState(layer, hash);
         }
-
-        private int stateHash;
-       
         
-        protected Animator animator;
-        protected ActiveGameUnitComponent Actor;
+
         public bool LockMovement { get; protected set; }
         
         public IActionResult[] OnEnterState { get; private set;  }
         public IActionResult[] OnExitState { get; private set; }
         public IActionResult[] OnExitTime { get;private set; }
-        protected NextActionSettings Next { get; }
+        private NextActionSettings Next { get; }
 
 
-        StopwatchTimer _actionTimer;
-        readonly float _totalActionTime;
-        readonly float _exitActionTime;
-
-        readonly Transform place;
-        readonly string animatorState;
-        readonly float _crossfadeTime;
 
         public event UnityAction<UnitActionState> ActionStateChangedEvent = delegate { };
 
         UnitActionState _actionState = UnitActionState.None;
         public UnitActionState GetActionState => _actionState;
-
-
 
         public UnitActionState UpdateAction(float delta)
         {
@@ -152,9 +184,12 @@ namespace Arcatech.Units
             }
             return ok;
         }
-        
+
+        private float starttime;
         public void StartState()
         {
+            starttime = Time.time;
+            if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Start state {this} at {starttime}, total time calculated {_totalActionTime}");
             string start = "";
             
             animator.CrossFade(stateHash, _crossfadeTime);
@@ -169,7 +204,7 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor.GetMainEntity, null, place);
+                        r.ProduceResult(_actor.GetMainEntity, null, place);
                         start += (r.ToString() + ' ');
                     }
                 }
@@ -179,11 +214,11 @@ namespace Arcatech.Units
             _actionTimer.Start();
             _actionState = UnitActionState.Started;
 
-           // if (Actor.UnitDebug) { Debug.Log($"{this}, result {start}"); }
 
         }
         void ExitTimeAction()
         {
+            if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Exit time state {this} at {Time.time}, time elapsed {_actionTimer.GetTime}");
             string ex = "";
             if (OnExitTime != null)
             {
@@ -195,18 +230,19 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor.GetMainEntity, null, place);
+                        r.ProduceResult(_actor.GetMainEntity, null, place);
                         ex += (r.ToString() + ' ');
                     }
                 }
             }
             _actionState = UnitActionState.ExitTime;
             ActionStateChangedEvent.Invoke(UnitActionState.ExitTime);
-            if (Actor.GetMainEntity.ShowingDebugs) { Debug.Log($"{this}, result {ex}"); }
+            if (_actor.GetMainEntity.ShowingDebugs) { Debug.Log($"{this}, result {ex}"); }
 
         }
         public void ExitState()
         {
+            if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Exit state {this} at {Time.time}, time elapsed {_actionTimer.GetTime}");
             if (_actionState == UnitActionState.Completed)
             {
                 _actionState = UnitActionState.None;
@@ -223,7 +259,7 @@ namespace Arcatech.Units
                     }// bandaid TODO dunno why it happens
                     else
                     {
-                        r.ProduceResult(Actor.GetMainEntity, null, place);
+                        r.ProduceResult(_actor.GetMainEntity, null, place);
                         fin += (r.ToString() + ' ');
                     }
                 }
@@ -234,10 +270,6 @@ namespace Arcatech.Units
             _actionTimer.Stop();
 
 
-        }
-        public override string ToString()
-        {
-            return animatorState+ " state: "+_actionState;
         }
 
     }

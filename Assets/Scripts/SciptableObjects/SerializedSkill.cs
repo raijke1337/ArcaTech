@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using Arcatech.Items;
+using Arcatech.Stats;
 using Arcatech.Texts;
 using Arcatech.Triggers;
 using Arcatech.UI;
@@ -17,7 +18,7 @@ namespace Arcatech.Skills
 
         [Space, Header("Combat")]
         //public UnitActionType UnitActionType;
-        [SerializeField] public SerializedStatsEffectConfig Cost;
+        [SerializeField] public StatsEffect Cost;
 
 
         public Skill CreateSkill(BaseGameEntityComponent owner, EquipmentComponent item,ItemType type)
@@ -27,7 +28,7 @@ namespace Arcatech.Skills
         private void OnValidate()
         {
             Assert.IsNotNull(UseStrategy);
-            Assert.IsNotNull(Cost);
+            //Assert.IsNotNull(Cost);
             Assert.IsNotNull(DrawItemsStrategy);
             Assert.IsNotNull(Description);
         }

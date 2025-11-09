@@ -104,7 +104,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""UseMeleeSkill"",
                     ""type"": ""Button"",
                     ""id"": ""bfd0dbeb-7ca0-4e47-bd96-58cb6786a09d"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -131,7 +131,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""Pause"",
                     ""type"": ""Button"",
                     ""id"": ""fe54560b-7bd0-45b7-bf9c-f5d72f3ea0eb"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -167,7 +167,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""b5fc2ab7-72da-4da8-b113-26745a684b5a"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -182,10 +182,19 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Mount"",
+                    ""name"": ""Use"",
                     ""type"": ""Button"",
                     ""id"": ""15eca33c-4683-4ad2-a4d6-18b36102cf02"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Inspect"",
+                    ""type"": ""Button"",
+                    ""id"": ""ef689397-bbb1-4f32-aa00-4b38c0f90826"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -353,7 +362,18 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Mount"",
+                    ""action"": ""Use"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""977806a5-3c3a-47a2-b55d-aaafa8ebf8a4"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Inspect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -374,7 +394,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Game_RangedAttack = m_Game.FindAction("RangedAttack", throwIfNotFound: true);
         m_Game_Jump = m_Game.FindAction("Jump", throwIfNotFound: true);
         m_Game_Aim = m_Game.FindAction("Aim", throwIfNotFound: true);
-        m_Game_Mount = m_Game.FindAction("Mount", throwIfNotFound: true);
+        m_Game_Use = m_Game.FindAction("Use", throwIfNotFound: true);
+        m_Game_Inspect = m_Game.FindAction("Inspect", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -465,7 +486,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_RangedAttack;
     private readonly InputAction m_Game_Jump;
     private readonly InputAction m_Game_Aim;
-    private readonly InputAction m_Game_Mount;
+    private readonly InputAction m_Game_Use;
+    private readonly InputAction m_Game_Inspect;
     /// <summary>
     /// Provides access to input actions defined in input action map "Game".
     /// </summary>
@@ -518,9 +540,13 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Aim => m_Wrapper.m_Game_Aim;
         /// <summary>
-        /// Provides access to the underlying input action "Game/Mount".
+        /// Provides access to the underlying input action "Game/Use".
         /// </summary>
-        public InputAction @Mount => m_Wrapper.m_Game_Mount;
+        public InputAction @Use => m_Wrapper.m_Game_Use;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/Inspect".
+        /// </summary>
+        public InputAction @Inspect => m_Wrapper.m_Game_Inspect;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -577,9 +603,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Aim.started += instance.OnAim;
             @Aim.performed += instance.OnAim;
             @Aim.canceled += instance.OnAim;
-            @Mount.started += instance.OnMount;
-            @Mount.performed += instance.OnMount;
-            @Mount.canceled += instance.OnMount;
+            @Use.started += instance.OnUse;
+            @Use.performed += instance.OnUse;
+            @Use.canceled += instance.OnUse;
+            @Inspect.started += instance.OnInspect;
+            @Inspect.performed += instance.OnInspect;
+            @Inspect.canceled += instance.OnInspect;
         }
 
         /// <summary>
@@ -621,9 +650,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Aim.started -= instance.OnAim;
             @Aim.performed -= instance.OnAim;
             @Aim.canceled -= instance.OnAim;
-            @Mount.started -= instance.OnMount;
-            @Mount.performed -= instance.OnMount;
-            @Mount.canceled -= instance.OnMount;
+            @Use.started -= instance.OnUse;
+            @Use.performed -= instance.OnUse;
+            @Use.canceled -= instance.OnUse;
+            @Inspect.started -= instance.OnInspect;
+            @Inspect.performed -= instance.OnInspect;
+            @Inspect.canceled -= instance.OnInspect;
         }
 
         /// <summary>
@@ -735,11 +767,18 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAim(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Mount" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Use" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnMount(InputAction.CallbackContext context);
+        void OnUse(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Inspect" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInspect(InputAction.CallbackContext context);
     }
 }

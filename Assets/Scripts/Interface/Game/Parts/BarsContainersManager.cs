@@ -13,57 +13,51 @@ namespace Arcatech.UI
     public class BarsContainersManager : MonoBehaviour, IStatUpdatesViewer
     {
         [SerializeField] StatBarContainerUIScript _barPrefab;
-        [Space,SerializeField] SerializedDictionary<BaseStatType,ColorSet> _statColors;
+        [Space,SerializeField] SerializedDictionary<ResourceStatType,ColorSet> _statColors;
         [SerializeField] Ease _barsEaseMethod;
         [SerializeField] float _barsEaseTime = 0.3f;
         [SerializeField, Range(0, 1), Tooltip("Delta change for visual effects")] float _barFlashTreschold = 0.2f;
 
-        Dictionary<BaseStatType, StatBarContainerUIScript> _barsDict;
+        Dictionary<ResourceStatType, StatBarContainerUIScript> _barsDict;
 
         bool init = false;
 
-        private BaseStatType[] _typesCached;
-        
-        public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
-        {
-            // initial setup
+        private ResourceStatType[] _typesCached;
 
+        
+        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, object changeSource)
+        {
+            if (!init) InitBars();
+            var bar = _barsDict[stat];
+            if (!bar.gameObject.activeSelf) bar.gameObject.SetActive(true);
+            bar.UpdateValue(statCurrent, statMax, statDelta);
+        }
+        
+        private void InitBars()
+        {
             if (!init)
             {
-                _barsDict = new();
-                _typesCached = Enum.GetValues(typeof(BaseStatType)) as BaseStatType[];
-                
-                foreach (var enumKey in _typesCached)
+                _barsDict = new Dictionary<ResourceStatType, StatBarContainerUIScript>();
+                foreach (var enumKey in (ResourceStatType[])Enum.GetValues(typeof(ResourceStatType)))
                 {
-                    var b = Instantiate(_barPrefab, transform);
-                    _barsDict[enumKey] = b;
-                    b.gameObject.SetActive(false);
-                }
-                init = true;
-            }
-
-            foreach (var stat in _typesCached)
-            {
-                if (!stats.ContainsKey(stat))
-                {
-                    _barsDict[stat].gameObject.SetActive(false);
-                }
-                else
-                {
-                    if (!_barsDict[stat].Setup && stats[stat].Initialized)
-                    {
-                        SetupBar(stat, stats[stat]);  
-                    }
-                    _barsDict[stat].gameObject.SetActive(true);
+                    _barsDict[enumKey] = Instantiate(_barPrefab, transform);
+                    SetupBar(enumKey);
+                    _barsDict[enumKey].gameObject.SetActive(false);
                 }
             }
-        }
-
-        void SetupBar(BaseStatType stat, StatValueContainer cont)
+            init = true;
+        }        
+        void SetupBar(ResourceStatType stat)
         {
-            //Debug.Log($"Setting up bar for {stat} ");
-            _barsDict[stat].LinkContainer(ref cont).SetColors(_statColors[stat]).
+            _barsDict[stat].SetColors(_statColors[stat]).
                 SetEaseMethod(_barsEaseMethod).SetFillTime(_barsEaseTime).SetBrightGlowAT(_barFlashTreschold);
         }
+        
+
+
+
+
+
+
     }
 }

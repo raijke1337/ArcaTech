@@ -9,17 +9,6 @@ namespace Arcatech.EventBus
 
     #region UI events
 
-    public record BaseEntityMouseOverEvent : IEvent
-    {
-        public ITargetable Target { get; set; }
-        public bool IsSelected { get; set; }
-        public override string ToString()
-        {
-            return $"{Target.GetEntity.GetName} {(IsSelected? "selected" : "deselected")}";
-        }
-    }
-
-
 
     public struct DrawDamageEvent : IEvent
     {
@@ -32,25 +21,6 @@ namespace Arcatech.EventBus
     }
 
     #endregion
-    public struct StatsEffectTriggerEvent : IEvent
-    {
-        public StatsEffectTriggerEvent(BaseGameEntityComponent target, StatsEffect toApply, Transform place, BaseGameEntityComponent source)
-        {
-            Target = target;
-            Applied = toApply;
-            Place = place;
-            Source = source;    
-        }
-
-        public BaseGameEntityComponent Target { get; }
-        public StatsEffect Applied { get; }
-        public Transform Place { get; }
-        public BaseGameEntityComponent Source { get; }  
-        public override string ToString()
-        {
-            return string.Concat(Applied," on ", Target?.GetName, " at ", Place.position);
-        }
-    }
 
     public struct PauseToggleEvent : IEvent
     {

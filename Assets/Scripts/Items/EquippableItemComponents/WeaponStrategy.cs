@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Texts;
+using Arcatech.Triggers;
 using UnityEngine;
 
 namespace Arcatech.Items
 {
 
-    public class WeaponStrategy : IWeaponUseStrategy
+    public class WeaponStrategy : IWeaponUseStrategy,ITriggerNotificationReceiver
     {
         public ActiveGameUnitComponent Owner { get; }
         public WeaponSO Config { get; }
         protected EquipmentComponent GameObjectComponent { get; }
-
-
+        
+        protected readonly IWeaponHitSource HitSource;
+        public Transform SpawnPoint => GameObjectComponent.SpawnPoint;
+        
         public WeaponStrategy (SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,EquipmentComponent comp)
         {
             Owner = unit.GetComponent<ActiveGameUnitComponent>();
@@ -22,8 +25,16 @@ namespace Arcatech.Items
             InternalDelay = intcd;
             MaxCharges = charges;
             GameObjectComponent = comp;
+            if (!comp.TryGetComponent(out HitSource))
+            {
+                Debug.LogWarning($"{comp} has no Hit source!");
+            }
+            else
+            {
+                HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
+            }
 
-            InitialState = act.DeserializeState(Owner, comp.Spawner);
+            InitialState = act.DeserializeState(Owner, comp.SpawnPoint);
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);
@@ -59,20 +70,29 @@ namespace Arcatech.Items
 
 
         #endregion
+        #region trigger notification
+        
+        
+        public virtual void TriggerEntered(BaseGameEntityComponent enterComponent, ITriggerNotificationProvider trigger)
+        {
+            Debug.Log("Implement me!");
+        }
+
+        public virtual void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
+        {
+            Debug.Log("Implement me!");
+        }
+        #endregion
+        
+        
         #region usable
 
         protected UnitState InitialState { get; }
 
-        public virtual bool TryUseUsable(out UnitState state)
+        public virtual UnitState UseUsable()
         {
-            state = InitialState;
-            // if there are other actions they will be contained inside that one
-            if (CanUseUsable())
-            {
-                ChargesLogicOnUse();
-                return true;
-            }
-            else return false;
+            ChargesLogicOnUse();
+            return InitialState;
         }
         
         public virtual void UpdateUsable(float delta)
@@ -118,6 +138,14 @@ namespace Arcatech.Items
         #endregion
 
 
+        public void OnInit()
+        {
+        }
+
+        public void OnCleanUp()
+        {
+            HitSource.GetTriggerNotificationProvider.UnregisterReceiver(this);
+        }
     }
 
 

@@ -1,96 +1,116 @@
+using System;
+using System.Collections;
 using Arcatech.Items;
 using Arcatech.Texts;
 using KBCore.Refs;
-
-//using com.cyborgAssets.inspectorButtonPro;
+using DG.Tweening;
 using System.Collections.Generic;
+using com.cyborgAssets.inspectorButtonPro;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Arcatech.UI
 {
-
-    public class GameTextWindowComponent : MonoBehaviour
+    public class GameTextWindowComponent : ValidatedMonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI _speakerTitle;
-        //[SerializeField] private Image _speakerPicture;
 
+        [Space, Header("Text settings"),SerializeField] private TextMeshProUGUI _mainText;
+        [SerializeField] private float letterDelay = 0.1f;
+        [SerializeField] private float fullTextDuration = 1.276f;
+        [SerializeField, Self] private RectTransform rect;
+        [SerializeField] private float textPadding = 10f;
 
-        [Space,SerializeField] private TextMeshProUGUI _mainText;
-        [Space,SerializeField] private DialogueDecisionButtonComp ButtonPrefab;
-        [SerializeField] private Transform ButtonPrefabParent;
+        [Header("Speaker Name Formatting")] [SerializeField]
+        private string nameFormat = "<b>{0}:</b> "; // {0} will be replaced with character name
 
- 
+        [SerializeField] private Color nameColor = Color.black;
+        [SerializeField] private bool useColorForName = true;
 
-        public event SimpleEventsHandler DialogueCompleteEvent;
-        public event UnityAction ViewChangedInventory;
-
+        Vector2 windowSize = Vector2.zero;
+        
+        
         private DialoguePart _currentDialogue;
+        Coroutine _coroutine;
 
-        private List<DialogueDecisionButtonComp> _buttons;
-
-
-
-        public DialoguePart CurrentDialogue
+        private void Start()
         {
-            get { return _currentDialogue; }
-            set
-            {
-                _currentDialogue = value;
-                if (value == null)
-                {
-                    // end dialogue
-                    DialogueCompleteEvent?.Invoke();
-                    return;
-                }
-
-                _speakerTitle.text = value.Character.CharacterName;
-                _mainText.text = value.DialogueContent.Text;
-
-                /*
-                if (CurrentDialogue.Character.Pictures.TryGetValue(CurrentDialogue.Mood, out var p))
-                {
-                   // _speakerPicture.sprite = p;
-                }               
-                */
-
-                if (value.Options.Count > 0)
-                {
-                    foreach (var o in value.Options)
-                    {
-                        if (_buttons == null) _buttons = new List<DialogueDecisionButtonComp>();
-                        var b = Instantiate(ButtonPrefab, ButtonPrefabParent);
-                        _buttons.Add(b);
-                        b.CurrentText = o.Key;
-                        b.OptionClickedEvent += B_OptionClickedEvent;
-                    }
-                }
-                else
-                {
-
-                }
-            }
+            windowSize.x = rect.sizeDelta.x;
         }
 
-        private void B_OptionClickedEvent(Description arg)
+        public void ShowDialogue(DialoguePart dialoguePart)
         {
-            foreach (var b in _buttons.ToArray())
-            {
-                b.OptionClickedEvent -= B_OptionClickedEvent;
-                _buttons.Remove(b);
-                Destroy(b.gameObject);
-            }
-
-            CurrentDialogue = _currentDialogue.Options[arg];
+            gameObject.SetActive(true);
+            _currentDialogue = dialoguePart;
+            _coroutine = StartCoroutine(RevealText(dialoguePart.Dialogue));
         }
 
-        private void OnEnable()
+        private void SetFonts()
         {
-            _speakerTitle.font = GameUIManager.Instance.GetFont(FontType.Title);
             _mainText.font = GameUIManager.Instance.GetFont(FontType.Text);
         }
 
+        private IEnumerator RevealText(string text, float delay = -1f)
+        {
+            if (delay < 0) delay = letterDelay;
 
+            // Get speaker name
+            string speakerName = _currentDialogue?.Character?.CharacterName ?? "Unknown";
+
+            // Format the speaker name
+            string formattedName = string.Format(nameFormat, speakerName);
+
+            // Apply color to name if enabled
+            if (useColorForName)
+            {
+                string colorHex = ColorUtility.ToHtmlStringRGBA(nameColor);
+                formattedName = $"<color=#{colorHex}>{formattedName}</color>";
+            }
+
+            // Show speaker name immediately
+            _mainText.text = formattedName;
+
+            // Small pause after showing name (optional)
+            yield return new WaitForSeconds(0.1f);
+
+            // Reveal dialogue text letter by letter
+            for (int i = 0; i <= text.Length; i++)
+            {
+                _mainText.text = formattedName + text.Substring(0, i);
+                windowSize.y = _mainText.preferredHeight+textPadding;
+                rect.sizeDelta = windowSize;
+
+                if (i < text.Length)
+                    yield return new WaitForSeconds(delay);
+                else
+                {
+                    yield return new WaitForSeconds(fullTextDuration);
+                    AdvanceText();
+                }
+            }
+            
+        }
+    
+        void AdvanceText()
+        {
+            if (_currentDialogue.NextDialogue)
+            {
+                ShowDialogue(_currentDialogue.NextDialogue);
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
+        }
+        
+        
+        #if UNITY_EDITOR
+        [SerializeField] DialoguePart debugDialogue;
+        [ProButton]
+        void LoadDebugText()
+        {
+            ShowDialogue(debugDialogue);
+        }
+        #endif
     }
 }

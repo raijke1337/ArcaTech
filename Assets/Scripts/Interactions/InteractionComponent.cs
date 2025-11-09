@@ -1,25 +1,29 @@
 using System;
 using System.Linq;
 using Arcatech.Units;
+using Arcatech.Units.Control;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Arcatech.Interactions
 {
-    [RequireComponent(typeof(ActiveGameUnitComponent))]
+    [RequireComponent(typeof(ActiveGameUnitComponent), typeof(PlayerAimingComponent))]
     public class InteractionComponent : ValidatedMonoBehaviour, IInteractor
     {
-        [SerializeField, Range(0, 5)] private float interactRange = 3f;
-        [SerializeField, Range(0.016f,1),Tooltip("seconds per 1 scan, min is each frame")] private float scanFrequency = 0.2f;
-        [SerializeField] private SerializedUnitState stateSuccess;
+        [SerializeField, Range(0, 5)] private float interactRange = 1.5f;
+       // [SerializeField, Range(0.016f,1),Tooltip("seconds per 1 scan, min is each frame")] private float scanFrequency = 0.2f;
+       
+       [SerializeField] private SerializedUnitState stateSuccess;
         [SerializeField] private SerializedUnitState stateFail;
         
         
-        private IInteractive currentInteractive;
         [Space,SerializeField,Self] ActiveGameUnitComponent cachedActor;
         [SerializeField,Tooltip("effects spawn here")] private Transform interactionActionTransform;
-
+        
+        
+        private IInteractionTargetPicker _aim;
+        
         private UnitState _successState;
         private UnitState _failState;
 
@@ -28,32 +32,10 @@ namespace Arcatech.Interactions
         private void Start()
         {
             if (!cachedActor) cachedActor = GetComponentInChildren<ActiveGameUnitComponent>();
+            _aim = GetComponentInChildren<IInteractionTargetPicker>();
+            if (_aim == null) Debug.LogError("No IInteractionTargetPicker component found on " + gameObject.name);
         }
 
-        private void FixedUpdate()
-        {
-            time += Time.fixedDeltaTime;
-            if (time >= scanFrequency)
-            {
-                time = 0f;
-                var colliders = Physics.OverlapSphere(transform.position, interactRange);
-                foreach (var collider in colliders)
-                {
-                    if (collider.TryGetComponent(out IInteractive interactive))
-                    {
-                        currentInteractive = interactive;
-                        break;
-                    }
-
-                }
-
-                if (!colliders.Any(t => t.TryGetComponent(out IInteractive interactive)))
-                {
-                    currentInteractive = null;
-                } 
-
-            }
-        }
 
         private InteractionContext context;
         private InteractionContext ReadContext()
@@ -65,6 +47,7 @@ namespace Arcatech.Interactions
         public InteractionContext InteractionContext => ReadContext();
         public void InteractCommand()
         {
+            if (_aim.DesiredInteractiveItem == null || Paused) return;
             if (stateSuccess != null)
             {
                 _successState = stateSuccess.DeserializeState(cachedActor, interactionActionTransform);
@@ -74,22 +57,17 @@ namespace Arcatech.Interactions
             {
                 _failState = stateFail.DeserializeState(cachedActor, interactionActionTransform);
             }
-            if (currentInteractive != null)
+            if (_aim.DesiredInteractiveItem != null && Vector3.Distance(transform.position,_aim.DesiredInteractiveItem.GetBaseComponent.transform.position)<= interactRange)
             {
-                bool ok = currentInteractive.TryInteraction(this);
+                bool ok = _aim.DesiredInteractiveItem.TryInteraction(this);
                 if (_successState != null && _failState != null)
                     cachedActor.ForceUnitState(ok ? _successState : _failState);
-                currentInteractive = null;
-            }
-            else
-            {
-                Debug.Log($"no interactive item nearby");
             }
         }
 
         private void OnDrawGizmos()
         {
-            if (currentInteractive == null)
+            if (_aim?.DesiredInteractiveItem == null)
             {
                 Gizmos.color = Color.gray;
             }
@@ -100,5 +78,7 @@ namespace Arcatech.Interactions
 
             Gizmos.DrawWireSphere(transform.position, interactRange);
         }
+
+        public bool Paused { get; set; }
     }
 }

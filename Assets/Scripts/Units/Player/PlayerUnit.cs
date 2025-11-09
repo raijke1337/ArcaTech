@@ -5,19 +5,16 @@ using UnityEngine;
 
 namespace Arcatech.Units
 {
-    [RequireComponent(typeof(GroundDetection))]
     public class PlayerUnit : ActiveGameUnitComponent
     {
         [Space, Header("Player Unit")]
 
         [SerializeField, Child] protected Camera _faceCam;
-        [SerializeField, Self] protected GroundDetection _ground;
+       // [SerializeField, Self] protected GroundDetection _ground;
 
         [SerializeField] private bool stickToPlatforms = true;
         [SerializeField] private string platfromTag;
         
-        CostumesControllerComponent costumes;
-
         
         [Space,Header("Jump!"),SerializeField] SerializedUnitState jumpState;
 
@@ -28,32 +25,23 @@ namespace Arcatech.Units
             base.Start();
         }
 
-        /*public override void ApplyForceResultToUnit(float speed, float distance)
-        {
-            base.ApplyForceResultToUnit(speed, distance);
-            _movement.DisableGroundingOnUnitImpulse(speed, distance);
-        }*/
-        protected override bool CanAct()
-        {
-            return _ground.isOnGround && _ground.isValidGround;
-        }
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (!stickToPlatforms) return;
-            if (collision.gameObject.CompareTag(platfromTag))
-            {
-                transform.parent = collision.transform;
-            }
+            // if (!stickToPlatforms) return;
+            // if (collision.gameObject.CompareTag(platfromTag))
+            // {
+            //     transform.parent = collision.transform;
+            // }
         }
 
         private void OnCollisionExit(Collision other)
         {
-            if (!stickToPlatforms) return;
-            if (other.gameObject.CompareTag(platfromTag))
-            {
-                transform.parent = null;
-            }
+            // if (!stickToPlatforms) return;
+            // if (other.gameObject.CompareTag(platfromTag))
+            // {
+            //     transform.parent = null;
+            // }
         }
 
         public void PlayerJump()
@@ -62,22 +50,6 @@ namespace Arcatech.Units
         }
 
 
-        #region inventory
-
-        //protected override UnitInventoryItemConfigsContainer SelectSerializedItemsConfig()
-        //{
-
-        //    if (DataManager.Instance.IsNewGame)
-        //    {
-        //        return new UnitInventoryItemConfigsContainer(defaultEquips);
-        //    }
-        //    else
-        //    {
-        //        return DataManager.Instance.GetPlayerSaveEquips;
-        //    }
-
-        //}
-        #endregion
 
     }
 

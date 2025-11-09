@@ -8,8 +8,8 @@ namespace Arcatech
     public interface IUsable : ICosted, IActionTypeItem, IIconContent
     {
         public string UsableName { get; }
-        public bool CanUseItem(EntityStatsComponent stats);
-        public bool TryUseItem(EntityStatsComponent stats, out UnitState state);
+        public bool UsableIsReady();
+        public UnitState Use();
         void DoUpdate(float delta);
     }
 

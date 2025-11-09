@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 3520756074972657999}
   - component: {fileID: 2582706125086365489}
   - component: {fileID: 5586239703572642459}
-  - component: {fileID: 5287220027445504331}
   - component: {fileID: 4010592558988301257}
   - component: {fileID: 8580926204582287619}
   - component: {fileID: 3995338334223388984}
@@ -135,8 +134,8 @@ MonoBehaviour:
   _name: Battery
   entitySide: 0
   _spawnPoint: {fileID: 9025080464861674051}
-  destroyOnDeath: 0
-  timerToDestroy: 2
+  destroyOnDeath: 1
+  timerToDestroy: 0.1
   _showDebugs: 0
   _rigidbody: {fileID: 3520756074972657999}
   gravity: 0
@@ -200,21 +199,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1028b416ce9e4168bc449c533c991a29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializedResults:
+  serializedResultsSuccess:
   - {fileID: 11400000, guid: 21ae1d105a89e9e4b90382f832533b92, type: 2}
---- !u!114 &5287220027445504331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5851101444661264902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _collider: {fileID: 1337123451077350153}
+  serializedResultsFail: []
 --- !u!114 &4010592558988301257
 MonoBehaviour:
   m_ObjectHideFlags: 0

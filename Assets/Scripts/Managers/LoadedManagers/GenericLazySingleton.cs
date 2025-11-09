@@ -27,13 +27,6 @@ namespace Arcatech.Managers
         {
 
         }
-        protected virtual void Init()
-        {
-            if (!Application.isPlaying) return;
-            instance = this as T;
-
-        }
-    
     }
 
 }

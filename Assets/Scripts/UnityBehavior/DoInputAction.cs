@@ -12,7 +12,7 @@ public partial class DoInputAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
     [SerializeReference] public BlackboardVariable<UnitInputAction> InputAction;
 
-    private ActiveGameUnitComponent comp;
+    private UnitInputsComponent comp;
 
     private bool bandaid = false;
     protected override Status OnStart()
@@ -29,15 +29,15 @@ public partial class DoInputAction : Action
         {
 
             case UnitInputAction.MeleeAttack:
-                return comp.Command(UnitActionType.Melee) ? Status.Success : Status.Failure;
+                return comp.RequestCombatAction(UnitActionType.Melee) ? Status.Success : Status.Failure;
             case UnitInputAction.RangedAttack:
-                return comp.Command(UnitActionType.Ranged) ? Status.Success : Status.Failure;
+                return comp.RequestCombatAction(UnitActionType.Ranged) ? Status.Success : Status.Failure;
             case UnitInputAction.MeleeSkill:
-                return comp.Command(UnitActionType.MeleeSkill) ? Status.Success : Status.Failure;
+                return comp.RequestCombatAction(UnitActionType.MeleeSkill) ? Status.Success : Status.Failure;
             case UnitInputAction.RangedSkill:
-                return comp.Command(UnitActionType.RangedSkill) ? Status.Success : Status.Failure;
+                return comp.RequestCombatAction(UnitActionType.RangedSkill) ? Status.Success : Status.Failure;
             case UnitInputAction.DodgeSkill:
-                return comp.Command(UnitActionType.DodgeSkill) ? Status.Success : Status.Failure;
+                return comp.RequestCombatAction(UnitActionType.DodgeSkill) ? Status.Success : Status.Failure;
             default:
                 throw new ArgumentOutOfRangeException();
         }

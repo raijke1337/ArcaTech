@@ -1,3 +1,4 @@
+using System;
 using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Units;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 
 namespace Arcatech.UI
 {
-    public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitCommandHandler, IUnitInventoryView, IStatUpdatesViewer
+    public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitInventoryView, IStatUpdatesViewer
     {
         [SerializeField,Child] protected PlayerBarUsablesIconsContainerManager usablesIcons;
         [SerializeField, Child] protected BarsContainersManager _bars;
@@ -33,8 +34,8 @@ namespace Arcatech.UI
                 var st = _player.GetComponent<EntityStatsComponent>();
                 if (st != null)
                 {
-                    st.RegisterStatChangesHandler(_bars);
-                    st.RegisterStatChangesHandler(this);
+                    st.RegisterStatsViewer(_bars);
+                    st.RegisterStatsViewer(this);
                 }
                 else
                 {
@@ -46,8 +47,7 @@ namespace Arcatech.UI
                 if (inv != null)
                 {
                     inv.SetModelView(this);
-                    _player.AssignActionsHandler(this);
-                    _dmgGlow.color = glowColor;
+
                 }
                 else
                 {
@@ -59,6 +59,7 @@ namespace Arcatech.UI
                 if (_usablesCasterComponent != null)
                 {
                     usablesIcons.LoadIcons(_usablesCasterComponent.GetUsables);
+                    _usablesCasterComponent.ActionAnnounce += AnimateIcons;
                 }
                 else
                 {
@@ -72,13 +73,15 @@ namespace Arcatech.UI
             }
         }
 
-        #region interface
-        public bool TryHandleUnitCommand(UnitActionType type, EntityStatsComponent stats, out UnitState state)
+
+        private void OnDisable()
         {
-            state = null;
-            usablesIcons.HandlePlayerAction(type);
-            return true;
+            _usablesCasterComponent.ActionAnnounce -= AnimateIcons;
         }
+        
+        void AnimateIcons(UnitActionType type, bool success) => usablesIcons.HandlePlayerAction(type,success);
+
+        #region interface
 
         public void RefreshView(UnitInventoryModel model)
         {
@@ -88,20 +91,23 @@ namespace Arcatech.UI
         }
 
         
-        public void HandleStatsUpdate(IDictionary<BaseStatType, StatValueContainer> stats)
-        {
-            var hp = stats[BaseStatType.Health];
-            if (hp.GetFrameDeltaValue < 0 )
-                if(hp.GetFrameDeltaPercentAbs > _shakeAtHealthDelta)
-            {
-                _rect.DOShakePosition(0.2f,5);
 
-                    if (_dmgGlow != null)
-                    {
-                        _dmgGlow.DOFade(1, 0.3f).OnComplete(()=>_dmgGlow.DOFade(0, 0.3f));
-                    }
+        
+
+
+        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, object changeSource)
+        {
+            if (stat != ResourceStatType.Health) return;
+
+            if (statDelta >= 0 || Mathf.Abs(statDelta / statMax) < _shakeAtHealthDelta) return;
+            
+            _rect.DOShakePosition(0.2f,5);
+            if (_dmgGlow != null)
+            {
+                _dmgGlow.DOFade(1, 0.3f).OnComplete(()=>_dmgGlow.DOFade(0, 0.3f));
             }
         }
+        
         #endregion
     }
 

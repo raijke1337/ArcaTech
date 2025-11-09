@@ -36,17 +36,17 @@ namespace Arcatech.Interactions
                    condition.CheckCondition(interactor, null);
         }
 
-        public void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
+        public void TriggerEntered(BaseGameEntityComponent enterComponent, ITriggerNotificationProvider trigger)
         {
             if (Completed) return;
             if (!ValidateComponent(enterComponent, out var interactor)) return;
             foreach (var handler in handlers)
             {
-                handler.DoInteraction(interactor);
+                handler.DoInteraction(true, interactor);
             }
         }
 
-        public void TriggerExited(BaseGameEntityComponent exitComponent, TriggerTrackerComponent trigger)
+        public void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
         {
             
             if (Completed) return;

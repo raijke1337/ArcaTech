@@ -773,20 +773,6 @@ namespace ECM.Components
 
             return ComputeGroundHit(p, q, out hitInfo, scanDistance);
         }
-        /// <summary>
-        /// hopefull rotates the character towards the desired dierection immediately
-        /// </summary>
-        /// <param name="direction">The target direction vector.</param>
-        /// <param name="onlyLateral">Should the y-axis be ignored?</param>
-        public void RotateImmediate(Vector3 direction, bool onlyLateral = true)
-        {
-            if (onlyLateral)
-                direction = Vector3.ProjectOnPlane(direction, transform.up);
-            if (direction.sqrMagnitude < 0.0001f)
-                return;
-            var targetRotation = Quaternion.LookRotation(direction, transform.up);
-            cachedRigidbody.MoveRotation(targetRotation);
-        }
 
         /// <summary>
         /// Rotates the character to face the given direction.
@@ -794,7 +780,6 @@ namespace ECM.Components
         /// <param name="direction">The target direction vector.</param>
         /// <param name="angularSpeed">Maximum turning speed in (deg/s).</param>
         /// <param name="onlyLateral">Should the y-axis be ignored?</param>
-
 
         public void Rotate(Vector3 direction, float angularSpeed, bool onlyLateral = true)
         {
@@ -808,6 +793,7 @@ namespace ECM.Components
             var newRotation = Quaternion.Slerp(cachedRigidbody.rotation, targetRotation,
                 angularSpeed * Mathf.Deg2Rad * Time.deltaTime);
 
+//            Debug.Log("Rotate ok");
             cachedRigidbody.MoveRotation(newRotation);
         }
 
@@ -900,8 +886,6 @@ namespace ECM.Components
         {
             groundDetection.ResetGroundInfo();
 
-          //  transform.parent = null;
-
             isSliding = false;
 
             isOnPlatform = false;
@@ -970,7 +954,6 @@ namespace ECM.Components
                 isOnPlatform = true;
                 platformVelocity = otherRigidbody.GetPointVelocity(groundPoint);
                 platformAngularVelocity = Vector3.Project(otherRigidbody.angularVelocity, up);
-               // transform.SetParent(otherRigidbody.transform);
             }
             else
             {
@@ -1673,7 +1656,7 @@ namespace ECM.Components
                 return;
             }
             
-           // cachedRigidbody.useGravity = false;
+            cachedRigidbody.useGravity = false;
             cachedRigidbody.isKinematic = false;
             cachedRigidbody.freezeRotation = true;
 

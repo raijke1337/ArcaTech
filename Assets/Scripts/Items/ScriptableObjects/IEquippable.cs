@@ -7,7 +7,7 @@ namespace Arcatech.Items
     public interface IEquippable : IItem
     {
         public EquipmentComponent DisplayItem { get; }
-        public List<StatsMod> StatMods { get; }
+        //public List<StatsMod> StatMods { get; }
         public void OnEquip();
         public void OnUnequip();
     

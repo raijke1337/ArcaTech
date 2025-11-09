@@ -10,50 +10,85 @@ namespace Arcatech.Interactions
     public class ActionResultIsProducedInteractionHandler : InteractionHandlerBase
     {
 
-        [SerializeField] private List<SerializedActionResult> serializedResults;
-        private List<IActionResult> _list;
+        [SerializeField] private List<SerializedActionResult> serializedResultsSuccess;
+        [SerializeField] private List<SerializedActionResult> serializedResultsFail;
+        private List<IActionResult> _listS;
+        private List<IActionResult> _listF;
+        
         protected void OnValidate()
         {
-            Assert.IsNotNull(serializedResults);
-            Assert.IsNotEmpty(serializedResults);
+            if (serializedResultsSuccess == null &&  serializedResultsFail == null) Debug.LogWarning($"No results set in {this} on {gameObject.name}");
         }
 
         private void Awake()
         {
-            _list = new List<IActionResult>();
-            if (serializedResults == null) return;
-            foreach (var result in serializedResults)
+            _listS = new List<IActionResult>();
+            if (serializedResultsSuccess == null) return;
+            foreach (var result in serializedResultsSuccess)
             {
                 if (result!= null)
-                _list.Add(result.BuildActionResult());
+                    _listS.Add(result.BuildActionResult());
+            }
+            
+            _listF = new List<IActionResult>();
+            if (serializedResultsFail == null) return;
+            foreach (var result in serializedResultsFail)
+            {
+                if (result!= null)
+                    _listF.Add(result.BuildActionResult());
             }
         }
 
-        public override void DoInteraction(IInteractor interactor, IInteractive item)
+        public override void DoInteraction(bool success, IInteractor interactor, IInteractive item)
         {
-
-            if (item == null)
+            if (success)
             {
-                // apply result using only interactor data
-                foreach (var result in _list)
+                if (item == null)
                 {
-                    result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
-                        null,
-                        interactor.InteractionContext.ActionTransform);
+                    // apply result using only interactor data
+                    foreach (var result in _listS)
+                    {
+                        result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                            null,
+                            interactor.InteractionContext.ActionTransform);
+                    }
+                }
+
+                else
+                {          
+                    // use item as target
+                    foreach (var result in _listS)
+                    {
+                        result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                            item.GetBaseComponent,
+                            item.GetBaseComponent.SpawnPoint);
+                    }
                 }
             }
-
             else
-            {          
-                // use item as target
-                foreach (var result in _list)
+            {
+                if (item == null)
                 {
-                    result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
-                        item.GetBaseComponent,
-                        item.GetBaseComponent.SpawnPoint);
+                    // apply result using only interactor data
+                    foreach (var result in _listF)
+                    {
+                        result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                            null,
+                            interactor.InteractionContext.ActionTransform);
+                    }
+                }
+
+                else
+                {          
+                    // use item as target
+                    foreach (var result in _listF)
+                    {
+                        result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                            item.GetBaseComponent,
+                            item.GetBaseComponent.SpawnPoint);
+                    }
                 }
             }
-
         }
 
         public override void EndInteraction(IInteractor interactor, IInteractive item = null)
@@ -68,13 +103,13 @@ namespace Arcatech.Interactions
         /// <param name="results"></param>
         public void OverrideResults(IEnumerable<IActionResult> results)
         {Debug.Log("OverrideResults");
-            _list = new List<IActionResult>(results);
+            _listS = new List<IActionResult>(results);
         }
 
         public void OverrideResults(IActionResult result)
         {
             Debug.Log("OverrideResults");
-            _list.Add(result); 
+            _listS.Add(result); 
         }
 
         public void RedrawItem(EquipmentComponent toDraw)

@@ -76,13 +76,13 @@ namespace Arcatech.Level
                     if (pair.Completed) continue;
                     
                     var result = rule.CheckCondition(pair);
-                    if (!result) continue;
                     
+                    if (!result) continue;
                     pair.MarkComplete();
                     
                     foreach (var item in pair.Items)
                     {
-                        item.DoInteraction(_player,null);
+                        item.DoInteraction(result,_player,null);
                     }
                 }
             }

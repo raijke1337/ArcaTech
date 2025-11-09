@@ -5,6 +5,6 @@ namespace Arcatech
 {
     public interface IShieldAbsorbStrategy
     {
-        public StatsEffect[] SplitDamage (StatsEffect damage, StatValueContainer shieldCharge);
+      //  public StatsEffect[] SplitDamage (StatsEffect damage, StatValueContainer shieldCharge);
     }
 }

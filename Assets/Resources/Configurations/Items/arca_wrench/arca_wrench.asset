@@ -12,14 +12,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e098c56bd168dfa4281bd9457b00fded, type: 3}
   m_Name: arca_wrench
   m_EditorClassIdentifier: 
-  itemPrefab: {fileID: 5188941293757656330, guid: 020da1c28f5b44d45a571433b6102c93,
+  itemPrefab: {fileID: 5023922883815564929, guid: 020da1c28f5b44d45a571433b6102c93,
     type: 3}
-  description: {fileID: 11400000, guid: d27669bec38c7c34082af72d59ef27cc, type: 2}
+  description: {fileID: 11400000, guid: 9695afe192788744397202541393d160, type: 2}
   type: 1
   MaxStack: 1
-  StatMods:
-  - {fileID: 11400000, guid: fb0d5f59fa1be924cb753ff5fde39a5e, type: 2}
-  Skill: {fileID: 11400000, guid: 71a700f2500fdba4ebe15a5d7b8604e3, type: 2}
+  Skill: {fileID: 0}
+  statModifiers:
+  - stat: 2
+    target: 1
+    op: 0
+    value: 50
+    condition:
+      requireAll: 0
+      invert: 0
+      statConditions: []
+  periodicDeltas:
+  - delta:
+      stat: 2
+      target: 0
+      amount: 5
+    intervalSeconds: 1
+    condition:
+      requireAll: 0
+      invert: 0
+      statConditions:
+      - stat: 2
+        target: 0
+        usePercentOfMax: 1
+        op: 2
+        a: 0.5
+        b: 0
+  - delta:
+      stat: 0
+      target: 0
+      amount: 1
+    intervalSeconds: 0.2
+    condition:
+      requireAll: 0
+      invert: 0
+      statConditions: []
   WeaponUseStrategy: {fileID: 11400000, guid: f8f4da1c699fcfa4299d866668502f8e, type: 2}
-  Cost: {fileID: 11400000, guid: 892685580bd676143aa0e1b84848ae80, type: 2}
+  Cost: {fileID: 11400000, guid: 36cf40889590a5e4383079dfbc0c16bf, type: 2}
   DrawStrategy: {fileID: 11400000, guid: 00c3eeea7d325d1498271fbf5c7cc775, type: 2}

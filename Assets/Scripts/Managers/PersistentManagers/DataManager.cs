@@ -102,7 +102,7 @@ namespace Arcatech.Managers
 
         public IItem MakeItem(ItemSO config, BaseGameEntityComponent owner)
         {
-            if (config is ShieldSO shield) return shield.BuildItem(owner);
+            //if (config is ShieldSO shield) return shield.BuildItem(owner);
             if (config is WeaponSO weapon) return weapon.BuildItem(owner);
             if (config is EquipSO eq) return eq.BuildItem(owner);
             else return config.BuildItem(owner);

@@ -1,25 +1,31 @@
 
 using System.Collections.Generic;
+using System.Linq;
 using Arcatech.EventBus;
+using Arcatech.Interactions;
+using Arcatech.Managers;
+using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using KBCore.Refs;
 using UnityEngine;
+using UnityEngine.EventSystems;
+
 namespace Arcatech
 {
     /// <summary>
     /// new component that defines any game entity
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider), typeof(LittlePauseHelperComponent))]
-    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent
+    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, ISpawnerProvider
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
 
         [Space, SerializeField] string _name;
         [SerializeField] Side entitySide;
         [SerializeField] Transform _spawnPoint;
-        [SerializeField] private bool destroyOnDeath = false;
-        [SerializeField, Range(0.1f, 10)] private float timerToDestroy = 2f;
+        [SerializeField] private bool destroyOnDeath = true;
+        [SerializeField, Range(0, 10)] private float timerToDestroy = 2f;
         
         [Space, SerializeField] protected bool _showDebugs = false;
         public Transform SpawnPoint => _spawnPoint;
@@ -38,8 +44,8 @@ namespace Arcatech
         [Space, Header("Rigidbody override"), SerializeField, Self]
         Rigidbody _rigidbody;
 
-        [SerializeField] bool gravity = false;
-        [SerializeField] bool usePhysics = false;
+        //[SerializeField] bool gravity = false;
+         [SerializeField] bool usePhysics = false;
 
 
         protected override void OnValidate()
@@ -55,20 +61,27 @@ namespace Arcatech
         private void OnEnable()
         {
             Collider = GetComponent<Collider>();
-            _rigidbody.useGravity = gravity;
+         //   _rigidbody.useGravity = gravity;
             _rigidbody.isKinematic = !usePhysics;
             _effectsTakerComponents = new List<IEffectsTakerComponent>(GetComponentsInChildren<IEffectsTakerComponent>());
-            
+
         }
+
+        
+        #region stats effects
+
+
 
         public void ApplyStatsEffect(StatsEffect effect,BaseGameEntityComponent source)
         {
-            if (_showDebugs) Debug.Log($"ApplyStatsEffect {effect}: {this}");
-            foreach (var handler in _effectsTakerComponents)
+            foreach (var v in _effectsTakerComponents)
             {
-                handler.ApplyEffect(effect,source);
+                v.ApplyEffect(effect, source);
             }
         }
+
+        #endregion
+        
         
         bool _killed = false;
 
@@ -78,7 +91,7 @@ namespace Arcatech
             set
             {
                 _killed = value;
-                _rigidbody.isKinematic = !value;
+            //    _rigidbody.isKinematic = !value;
                 Collider.isTrigger = value;
                 if (_killed && destroyOnDeath)
                 {
@@ -88,5 +101,6 @@ namespace Arcatech
         }
 
         public bool Paused { get; set; }
+
     }
 }

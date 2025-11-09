@@ -32,9 +32,9 @@ namespace Arcatech.Managers
         [SerializeField] private MenuPrefabControllerComp _mainMenuPrefab;
 
         [SerializeField] private GameInterfaceManager gameInterfaceManagerPrefab;
-        [SerializeField] private IsoCameraController gameCameraPrefab;        
+        [SerializeField] private CamerasController gameCameraPrefab;        
         public GameInterfaceManager GetGameInterfacePrefab => gameInterfaceManagerPrefab;
-        public IsoCameraController GetGameCameraPrefab => gameCameraPrefab;
+        public CamerasController GetGameCameraPrefab => gameCameraPrefab;
 
         private void OnEnable()
         {

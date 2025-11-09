@@ -13,8 +13,8 @@ namespace Arcatech.Skills
         public ActiveGameUnitComponent Owner { get ; set; }
        // protected SerializedSkill Config { get; }
         public UnitActionType UseActionType { get;  }
-        public StatsEffect GetCost => new(_cost);
-        protected SerializedStatsEffectConfig _cost;
+        public StatsEffect GetCost { get; }
+
         public IDrawItemStrategy DrawStrategy { get; }
 
         #endregion
@@ -49,32 +49,25 @@ namespace Arcatech.Skills
                     break;
             }
 
-            _cost = settings.Cost;
+            GetCost = settings.Cost;
             Strategy = settings.UseStrategy.ProduceStrategy(Owner, settings, item);
             DrawStrategy = s;
             UsableName = settings.Description.Text;
         }
 
-        public bool TryUseItem(EntityStatsComponent stats, out UnitState onUse)
+        public UnitState Use()
         {
-            onUse = null;
-            if (stats.CanApplyCost(GetCost) && Strategy.TryUseUsable(out onUse))
-            {
-                stats.ApplyCost(GetCost);
-                return true;
-            }
-            else return false;
+            return Strategy.UseUsable();
         }
-        public bool CanUseItem(EntityStatsComponent stats)
+        public bool UsableIsReady()
         {
-            return stats.CanApplyCost(GetCost) && Strategy.CanUseUsable();
+            return Strategy.CanUseUsable();
         }
 
 
         public void DoUpdate(float delta)
         {
             Strategy.UpdateUsable(delta);
-         //   EventBus<UpdateIconEvent>.Raise(new UpdateIconEvent(this, Owner));
         }
 
 

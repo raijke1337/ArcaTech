@@ -8,10 +8,12 @@ using UnityEngine.Assertions;
 
 namespace Arcatech.Items
 {
-    public class EquipmentComponent : ValidatedMonoBehaviour,IActionStateItem, IDamageableComponent, IKillableComponent
+    [RequireComponent(typeof(Animator))]
+    public class EquipmentComponent : ValidatedMonoBehaviour,IActionStateItem, IDamageableComponent, IKillableComponent,ISpawnerProvider
     {
         [SerializeField] protected Transform spawner;
-        public Transform Spawner => spawner;
+        [SerializeField,Self] protected Animator animator;
+        public Transform SpawnPoint => spawner;
         
         [SerializeField] SerializedActionResult[] onDamaged;
         [SerializeField] SerializedActionResult[] onKilled;
@@ -19,12 +21,23 @@ namespace Arcatech.Items
         private IActionResult[] _killedRes;
         private IActionResult[] _damagedRes;
 
+        [SerializeField] private string animatorStateStartedTrigger;
+        [SerializeField] private string animatorStateExitTimeTrigger;
+        [SerializeField] private string animatorStateCompletedTrigger;
+
+        private int _startHash;
+        int _exitHash;
+        int _completedHash;
+        
         /// <summary>
-        /// should only get damaged if it has a stats component attached.
-        /// so costume parts. weapons do not get damage.
+        /// should only get damaged if it has a stats component attached (costume parts)
         /// </summary>
         private void Start()
         {
+            _startHash = Animator.StringToHash(animatorStateStartedTrigger);
+            _exitHash = Animator.StringToHash(animatorStateExitTimeTrigger);
+            _completedHash = Animator.StringToHash(animatorStateCompletedTrigger);
+            
             if (onDamaged != null && onDamaged.Length > 0)
             {
                 _damagedRes = new IActionResult[onDamaged.Length];
@@ -46,10 +59,18 @@ namespace Arcatech.Items
 
         public virtual void HandleActionState(UnitActionState s)
         {
-            
+            switch (s)
+            {
+                case UnitActionState.Started: animator.Play(_startHash);
+                    break;
+                case UnitActionState.ExitTime: animator.Play(_exitHash);
+                    break;
+                case UnitActionState.Completed: animator.Play(_completedHash);
+                    break;
+            }
         }
         #region IDamageableComponent
-        public void Damage(float damage, BaseStatType stat)
+        public void Damage(float damage, ResourceStatType stat)
         {
             if (_damagedRes is not { Length: > 0 }) return;
             foreach (var r in _damagedRes)
@@ -79,7 +100,7 @@ namespace Arcatech.Items
         #endregion
 
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             if (spawner == null)
             {
@@ -87,6 +108,7 @@ namespace Arcatech.Items
                 spawner = transform;
             }
         }
+
     }
 
 }

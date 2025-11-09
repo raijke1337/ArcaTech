@@ -6,8 +6,6 @@ namespace Arcatech.Actions
 {
 
 
-
-
     [CreateAssetMenu(fileName = "New instantiate particles result ", menuName = "Actions/Action Result/Produce particle effects")]
     public class SerializedProduceFXResult : SerializedActionResult
     {
@@ -42,6 +40,7 @@ namespace Arcatech.Actions
 
         public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
+            
             if (parent)
             {
                 Transform par = null;

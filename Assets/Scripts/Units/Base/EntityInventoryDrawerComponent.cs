@@ -88,6 +88,9 @@ namespace Arcatech.Units
            // now handled by inventory
             drawItemsStrategyProvider = GetComponentInChildren<IDrawItemsStrategyProvider>();
             if (drawItemsStrategyProvider == null) Debug.Log("No DrawItemsStrategy Provider");
+
+            if (itemEmpties.ItemPositions.TryGetValue(ItemPlaceType.RangedEmpty,out var r)) 
+                r.forward =  transform.forward; // makes sure weapon is pointing forward alongside the player model and mouse
         }
 
         private void Update()

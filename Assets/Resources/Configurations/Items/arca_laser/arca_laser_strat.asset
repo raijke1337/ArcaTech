@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df7fa7956c44272a7d4f823f78927f5, type: 3}
+  m_Name: arca_laser_strat
+  m_EditorClassIdentifier: 
+  state: {fileID: 11400000, guid: f4ef9ab1eb4c5cf4d855b8c314511bbf, type: 2}
+  TotalCharges: 1
+  ChargeRestoreTime: 10
+  InternalCooldown: 0.3
+  _beamSettings:
+    MaxRange: 6
+    BeamWidth: 0.1
+    CollisionMask:
+      serializedVersion: 2
+      m_Bits: 64
+    DefaultDuration: 1.5
+    UseInfiniteDuration: 0
+    BurnIntervals: 0.1
+    LaserMaterial: {fileID: 2100000, guid: 1bc482614afa0fb4fb5ea4d7361010dd, type: 2}
+    LaserColor: {r: 1, g: 0, b: 0, a: 0}
+    IntensityCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    FireSound: {fileID: 0}
+    LoopSound: {fileID: 0}
+    StopSound: {fileID: 0}
+  onBeamHit:
+  - {fileID: 11400000, guid: eaa4c223713660a4ba6b07f6d1d58e12, type: 2}

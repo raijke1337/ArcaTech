@@ -1,3 +1,4 @@
+using Arcatech.Stats;
 using Arcatech.Triggers;
 using KBCore.Refs;
 using Unity.Behavior;
@@ -6,7 +7,7 @@ using UnityEngine.AI;
 
 namespace Arcatech.Units
 {
-    [RequireComponent(typeof(BehaviorGraphAgent),typeof(NavMeshAgent))]
+    [RequireComponent(typeof(BehaviorGraphAgent),typeof(NavMeshAgent),typeof(UnitInputsComponent))]
     public class NPCUnitComponent : ActiveGameUnitComponent, IEffectsTakerComponent
     {
         
@@ -30,6 +31,8 @@ namespace Arcatech.Units
         protected override void Start()
         {
             base.Start();
+            if (!behavior) return;
+            // failsafe for unset units
             bbref = behavior.BlackboardReference;
             bbref.GetVariableValue("PlayerAttackedEvent", out combatEventChannel);
         }
@@ -44,6 +47,8 @@ namespace Arcatech.Units
         {
             base.OnPause(paused);   
             agent.isStopped = paused;
+            
+            if (!behavior) return;
             behavior.enabled = !paused;
         }
 
@@ -51,6 +56,8 @@ namespace Arcatech.Units
         {
             base.OnKill(kill);
             agent.isStopped = true;
+            
+            if (!behavior) return;
             behavior.End();
         }
 
@@ -58,6 +65,7 @@ namespace Arcatech.Units
 
         public void ApplyEffect(StatsEffect effect,BaseGameEntityComponent source)
         {
+            if (source == null) return;
             if (source.GetEntitySide != GetMainEntity.GetEntitySide && GetMainEntity.GetEntitySide != Side.Unassigned)
             {
                 CombatState = true;

@@ -1,5 +1,6 @@
 ﻿using ECM.Components;
 using ECM.Helpers;
+using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -12,9 +13,8 @@ namespace ECM.Controllers
     /// It handles keyboard input, and allows for a variable height jump, however this default behaviour
     /// can easily be modified or completely replaced overriding this related methods in a derived class.
     /// </summary>
-    [RequireComponent(typeof(CharacterMovement))]
-    public class BaseCharacterController : MonoBehaviour
-    {
+
+    public class BaseCharacterController : MonoBehaviour{
         #region EDITOR EXPOSED FIELDS
 
         [Header("Movement")]
@@ -536,16 +536,9 @@ namespace ECM.Controllers
         /// <param name="direction">The target direction</param>
         /// <param name="onlyLateral">Should it be restricted to XZ only?</param>
 
-        public void RotateTowards(Vector3 direction, bool onlyLateral = true,bool immediate = false)
+        public void RotateTowards(Vector3 direction, bool onlyLateral = true)
         {
-            if (!immediate)
-            {
-                movement.Rotate(direction, angularSpeed, onlyLateral);
-            }
-            else
-            {
-                movement.RotateImmediate(direction, onlyLateral);
-            }
+            movement.Rotate(direction, angularSpeed, onlyLateral);
         }
 
         /// <summary>
@@ -621,7 +614,6 @@ namespace ECM.Controllers
             // 'Pause' grounding, allowing character to safely leave the 'ground'
 
             movement.DisableGrounding();
-
         }
 
         /// <summary>
@@ -959,8 +951,7 @@ namespace ECM.Controllers
 
             Animate();
         }
-
+        
         #endregion
     }
-
 }

@@ -19,22 +19,10 @@ namespace Arcatech.UI
         Color _baseBgColor;
         private Ease _ease = Ease.Linear;
         float fillTime = 0.1f;
-        StatValueContainer _valueContainer;
         float deltaTreschold = 1;
-
-        public bool Setup { get; private set; } = false;
-        
         
         #region setup
-        public StatBarContainerUIScript LinkContainer(ref StatValueContainer c)
-        {
-            if (c != _valueContainer)
-            {
-                _valueContainer = c;
-                Setup = true;
-            }
-            return this;    
-        }
+
         public StatBarContainerUIScript SetColors(ColorSet color)
         {
             _baseBgColor = _background.color;
@@ -61,31 +49,19 @@ namespace Arcatech.UI
         }
         #endregion
 
-        private void Update()
-        {            
-            if (_valueContainer != null && _valueContainer.Initialized)
-            {
-                _fill.DOFillAmount(_valueContainer.GetPercent, fillTime).SetEase(_ease).Play();
-                _text.text = _valueContainer.ToString();
 
-                if (_valueContainer.GetFrameDeltaPercentAbs > deltaTreschold)
-                {
-                    var delta = _valueContainer.GetFrameDeltaValue;
-                    if (delta != 0)
-                    {
-                        Color flash = new Color(0, 0, 0, 0);
-                        flash = delta > 0 ? _colors.PositiveColor : _colors.NegativeColor;
-                        _background.DOColor(flash, 0.1f).SetEase(Ease.InQuint).Play().
-                    onComplete += () => _background.DOColor(_baseBgColor, 0.1f).SetEase(Ease.InQuint).Play();
-                    }
-                }           
-            }
-        }
-
-        private void OnDisable()
+        public void UpdateValue(float statCurrent, float statMax, float statDelta)
         {
-           // Debug.Log("On disable bar");
-            Setup = false;
+            _fill.DOFillAmount(statCurrent/statMax, fillTime).SetEase(_ease).Play();
+            _text.text = ($"{Mathf.RoundToInt(statCurrent)}  /  {statMax}");
+
+            if (statDelta!= 0 && statDelta/statMax > deltaTreschold)
+            {
+                Color flash = new Color(0, 0, 0, 0);
+                flash = statDelta > 0 ? _colors.PositiveColor : _colors.NegativeColor;
+                _background.DOColor(flash, 0.1f).SetEase(Ease.InQuint).Play().
+                    onComplete += () => _background.DOColor(_baseBgColor, 0.1f).SetEase(Ease.InQuint).Play();
+            }
         }
     }
 }

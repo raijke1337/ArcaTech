@@ -1,10 +1,15 @@
 ﻿using Arcatech.Stats;
 using System.Collections.Generic;
 using Arcatech;
+using Arcatech.Items;
+using Arcatech.Texts;
 using UnityEngine.EventSystems;
 
-public interface ITargetable : IPointerEnterHandler, IPointerExitHandler
+namespace Arcatech.Interactions
 {
-    public BaseGameEntityComponent GetEntity { get; }
-
+    public interface ITargetable : IPointerEnterHandler, IPointerExitHandler
+    {
+        public Side Side { get; }
+        public string TargetName { get; }
+    }
 }

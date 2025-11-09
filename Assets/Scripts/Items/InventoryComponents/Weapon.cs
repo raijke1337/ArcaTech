@@ -10,15 +10,8 @@ namespace Arcatech.Items
     public class Weapon : Equipment, IWeapon
     {
 
-        private SerializedStatsEffectConfig _cost;
-        public StatsEffect GetCost 
-            {
-                get
-            {
-                if (_cost != null) return new(_cost);
-                else return null;
-            }
-        }
+        private StatsEffect _cost;
+        public StatsEffect GetCost => _cost != null ? _cost : null;
         public IDrawItemStrategy DrawStrategy { get; protected set; }
         public UnitActionType UseActionType { get; protected set; }
         public IWeaponUseStrategy UseStrategy { get; protected set; }
@@ -50,21 +43,13 @@ namespace Arcatech.Items
             UseStrategy = cfg.WeaponUseStrategy.ProduceStrategy(Owner, cfg,DisplayItem);
         }
 
-        public bool TryUseItem(EntityStatsComponent stats, out UnitState act)
+        public UnitState Use()
         {
-            act = null;
-            bool ok = false;
-            if (stats.CanApplyCost(GetCost) && UseStrategy.TryUseUsable(out act))
-            {
-                stats.ApplyCost(GetCost);
-                ok = true;
-            }
-
-            return ok;
+            return UseStrategy.UseUsable();
         }
-        public bool CanUseItem(EntityStatsComponent stats)
+        public bool UsableIsReady()
         {
-            return stats.CanApplyCost(GetCost) && UseStrategy.CanUseUsable();
+            return UseStrategy.CanUseUsable();
         }
         public void DoUpdate(float delta)
         {

@@ -5,6 +5,7 @@ using AYellowpaper.SerializedCollections;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
 using System.Linq;
+using Arcatech.Stats;
 
 namespace Arcatech.Actions
 {
@@ -12,7 +13,7 @@ namespace Arcatech.Actions
     public class SerializedApplyStatChangeResult : SerializedActionResult
     {
 
-        [SerializeField] SerializedDictionary<TargetingType, SerializedStatsEffectConfig[]> StatChanges;
+        [SerializeField] SerializedDictionary<TargetingType, StatsEffect[]> StatChanges;
         public override IActionResult BuildActionResult()
         {
             return new ApplyStatChangeEffectResult(StatChanges);
@@ -34,55 +35,58 @@ namespace Arcatech.Actions
     }
     public class ApplyStatChangeEffectResult : ActionResult
     {
-        Dictionary <TargetingType, SerializedStatsEffectConfig[]> _effs; 
-        public ApplyStatChangeEffectResult(SerializedDictionary<TargetingType, SerializedStatsEffectConfig[]> cfg)
+        Dictionary <TargetingType, StatsEffect[]> _effs; 
+        public ApplyStatChangeEffectResult(SerializedDictionary<TargetingType, StatsEffect[]> cfg)
         {
-            _effs = cfg;
+            _effs = cfg; 
+        }
 
+
+        private bool ValidateEffectTarget(TargetingType targetType, BaseGameEntityComponent source, BaseGameEntityComponent target, out BaseGameEntityComponent finalTarget)
+        {
+            finalTarget = null;
+            switch (targetType)
+            {
+                case TargetingType.AnyUnit:
+                    finalTarget = target; return true;
+                case TargetingType.AnyAlly:
+                    if (source.GetEntitySide == target.GetEntitySide)
+                    {
+                        finalTarget = target; 
+                        return true;
+                    }
+                    break;
+                case TargetingType.AnyEnemy:
+                    if (source.GetEntitySide != target.GetEntitySide)
+                    {
+                        finalTarget = target; 
+                        return true;
+                    }
+
+                    break;
+                case TargetingType.OnlyUser:
+                    if (source == target)
+                    {
+                        finalTarget = source;
+                        return true;
+                    }
+                    break;
+            }
+            return false;
         }
 
         public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place)
         {
             foreach (var type in _effs.Keys)
             {
-                switch (type)
+                if (ValidateEffectTarget(type, user, target, out BaseGameEntityComponent final))
                 {
-                    case TargetingType.None:
-                        foreach (var e in _effs[type])
-                        {
-                            Debug.LogWarning($"Target type not set for effect {e}");
-                        }
-                        break;
-                    case TargetingType.OnlyUser:
-                        foreach (var e in _effs[type])
-                        {
-                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(user, new StatsEffect(e), place,user));
-                        }
-                        break;
-                    case TargetingType.AnyUnit:
-                        if (target.GetEntitySide == Side.Unassigned) return;
-                        foreach (var e in _effs[type])
-                        {
-                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place,user));
-                        }
-                        break;
-                    case TargetingType.AnyEnemy:
-                        if (target.GetEntitySide== user.GetEntitySide && target.GetEntitySide != Side.Unassigned) return;
-                        foreach (var e in _effs[type])
-                        {
-                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place,user));
-                        }
-                        break;
-                    case TargetingType.AnyAlly:
-                        if (target.GetEntitySide != user.GetEntitySide && target.GetEntitySide != Side.Unassigned) return;
-                        foreach (var e in _effs[type])
-                        {
-                            EventBus<StatsEffectTriggerEvent>.Raise(new StatsEffectTriggerEvent(target, new StatsEffect(e), place,user));
-                        }
-                        break;
+                    foreach (var effect in _effs[type])
+                    {
+                        final.ApplyStatsEffect(effect,user);
+                    }
                 }
             }
         }
     }
-
 }

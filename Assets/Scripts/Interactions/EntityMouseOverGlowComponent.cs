@@ -10,13 +10,10 @@ namespace Arcatech.Interactions
 {
     
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class EntityMouseOverGlowComponent : ValidatedMonoBehaviour, ITargetable
+    public class EntityMouseOverGlowComponent : ValidatedMonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [Self,SerializeField] BaseGameEntityComponent entity;
-        private BaseEntityMouseOverEvent cachedEvent;
-        public BaseGameEntityComponent GetEntity => entity;
 
-        
         
 
         [Header("Outline Settings")]
@@ -52,27 +49,18 @@ namespace Arcatech.Interactions
     
     void Start()
     {
-        cachedEvent = new BaseEntityMouseOverEvent
-        {
-            Target = this
-        };
-
         SetupOutlineSystem();
     }
     
     
     public void OnPointerEnter(PointerEventData eventData)
     {
-        cachedEvent.IsSelected = true;
-        EventBus<BaseEntityMouseOverEvent>.Raise(cachedEvent);
         ShowOutline();
     }
     
     public void OnPointerExit(PointerEventData eventData)
     {
         HideOutline();
-        cachedEvent.IsSelected = false;
-        EventBus<BaseEntityMouseOverEvent>.Raise(cachedEvent);
     }
     
     
@@ -376,6 +364,9 @@ namespace Arcatech.Interactions
             SetGlowIntensity(glowIntensity);
         }
     }
+
+    public Side Side => entity.GetEntitySide;
+    public string Label => entity.GetName;
     }
 
     

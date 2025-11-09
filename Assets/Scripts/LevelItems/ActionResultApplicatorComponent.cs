@@ -12,22 +12,27 @@ namespace Arcatech.Triggers
 
     [RequireComponent(typeof(TriggerTrackerComponent),typeof(BaseGameEntityComponent))]
     public class ActionResultApplicatorComponent : ValidatedMonoBehaviour,IKillableComponent, IPausableComponent,ITriggerNotificationReceiver
-    {
+    {   
+        [SerializeField,Self] BaseGameEntityComponent baseComp;
+        [SerializeField,Self] TriggerTrackerComponent triggerTracker;
         [Header("Action result applicator")]
         [SerializeField] protected TargetingType targetType;
         [Header("if 0, apply once. if >0, apply the results every f seconds")]
         [SerializeField, Range(0,3)] protected float ReapplyWhileActorInsideTimer = 0;
+        [SerializeField] protected SerializedActionResult[] resultOnExit;
+        [Space, SerializeField] protected SerializedActionResult[] resultOnEntry;
         [Space]
-        [Space, SerializeField] protected SerializedActionResult[] ResultOnEntry;
-        [SerializeField] protected bool DestroyOnEnter = false;
-        [SerializeField] protected SerializedActionResult[] ResultOnExit;
-        [SerializeField] protected bool DestroyOnExit = false;
 
-        Timer reapplyTimer;
-        [SerializeField,Self] BaseGameEntityComponent baseComp;
-        [SerializeField,Self] TriggerTrackerComponent triggerTracker;
+        [SerializeField] protected bool killEntityOnEnter = false;
 
+        [SerializeField] protected bool killEntityOnExit = false;
         private List<IKillableComponent> killables = new();
+        
+        
+        
+        Timer reapplyTimer;
+
+
         
         
         protected override void OnValidate()
@@ -55,11 +60,11 @@ namespace Arcatech.Triggers
             }
         }
 
-        public void TriggerEntered(BaseGameEntityComponent enterComponent, TriggerTrackerComponent trigger)
+        public void TriggerEntered(BaseGameEntityComponent enterComponent, ITriggerNotificationProvider trigger)
         {
             if (Killed || Paused) return;
             CheckTarget(enterComponent);
-                if (DestroyOnEnter)
+                if (killEntityOnEnter)
                 {
                     foreach (var killable in killables)
                     {
@@ -77,11 +82,11 @@ namespace Arcatech.Triggers
             
         }
 
-        public void TriggerExited(BaseGameEntityComponent exitComponent, TriggerTrackerComponent trigger)
+        public void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
         {
             if (Killed || Paused) return;
             CheckTarget(exitComponent);
-            if (DestroyOnExit)
+            if (killEntityOnExit)
             {
                 foreach (var killable in killables)
                 {
@@ -97,13 +102,13 @@ namespace Arcatech.Triggers
             switch (targetType)
             {
                 case TargetingType.AnyUnit:
-                    ApplyResultsTo(enterComponent,ResultOnEntry);
+                    ApplyResultsTo(enterComponent,resultOnEntry);
                     break;
                 case TargetingType.AnyEnemy:
-                    if (enterComponent.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(enterComponent, ResultOnEntry);
+                    if (enterComponent.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(enterComponent, resultOnEntry);
                     break;
                 case TargetingType.AnyAlly:
-                    if (enterComponent.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(enterComponent, ResultOnEntry);
+                    if (enterComponent.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(enterComponent, resultOnEntry);
                     break;
                 default:
                     Debug.Log($"{enterComponent.GetName} entered {this} and nothing happened because of trigger settings");
@@ -115,20 +120,13 @@ namespace Arcatech.Triggers
         {
             foreach (var action in results)
             {
+//                Debug.Log($"Apply result {action} to {p.GetName}");
                 action.BuildActionResult().ProduceResult(null, p, transform);
             }
         }
 
-        private bool k = false;
-        private bool p = false;
+        public bool Killed { get; set; } = false;
 
-        public bool Killed { get => k;
-            set
-            {
-                k = value;
-                Debug.Log($"Killed {this}");
-            }
-        }
-        public bool Paused { get => p; set { p = value; Debug.Log($"Paused {this}"); } }
+        public bool Paused { get; set; } = false;
     }
 }

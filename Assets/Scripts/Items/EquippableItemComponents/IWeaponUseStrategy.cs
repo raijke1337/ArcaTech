@@ -2,7 +2,7 @@
 
 namespace Arcatech.Items
 {
-    public interface IWeaponUseStrategy : IUsablesStrategy, IIconContent
+    public interface IWeaponUseStrategy : IUsableStrategy, IIconContent
     {
     }
 

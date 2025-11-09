@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 5988594881624052529}
   - component: {fileID: 304770472721361815}
   - component: {fileID: 6899858590301785727}
+  - component: {fileID: 8800914563863559744}
   m_Layer: 6
   m_Name: Scrapper 1H wrench
   m_TagString: Untagged
@@ -127,6 +128,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawner: {fileID: 3573663244667457277}
+  animator: {fileID: 8800914563863559744}
+  onDamaged: []
+  onKilled: []
+  animatorStateStartedTrigger: 
+  animatorStateExitTimeTrigger: 
+  animatorStateCompletedTrigger: 
   triggerTracker: {fileID: 6899858590301785727}
   trail: {fileID: 5988594881624052529}
 --- !u!114 &6899858590301785727
@@ -142,6 +149,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 4888000909201319563}
+--- !u!95 &8800914563863559744
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8844404192588365369}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &4106341584517067081
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -225,7 +254,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pipe_Wrench
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1436653598811302955, guid: 70870a0dc2abff84c9a4587c5beb11d2, type: 3}
+    - {fileID: 1436653598811302953, guid: 70870a0dc2abff84c9a4587c5beb11d2, type: 3}
+    - {fileID: 1436653598811302959, guid: 70870a0dc2abff84c9a4587c5beb11d2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

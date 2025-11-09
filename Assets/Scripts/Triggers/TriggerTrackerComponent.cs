@@ -61,9 +61,11 @@ namespace Arcatech.Triggers
         
         protected void OnTriggerEnter(Collider other)
         {
+
             if (!Active || receivers == null || !receivers.Any()) return;
             if (other.TryGetComponent<BaseGameEntityComponent>(out var component))
             {
+              //  Debug.Log($"Bonk {component}");
                 foreach (var receiver in receivers)
                 {
                     receiver.TriggerEntered(component, this);

@@ -50,14 +50,9 @@ namespace Arcatech.Actions
         {
 
             var actor = user.GetComponent<ActiveGameUnitComponent>(); // placeholder TODO
-            if (cachedEvent.Shooter != actor)
-            {
-                cachedEvent.Shooter = actor;
-            }
-            if (cachedEvent.Place != place)
-            {
-                cachedEvent.Place = place;
-            }
+            cachedEvent.Shooter = actor;
+            cachedEvent.Place = place;
+            
             EventBus<ProjectilePlaceEvent>.Raise(cachedEvent);
         }
     }

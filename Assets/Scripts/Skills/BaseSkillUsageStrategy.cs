@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Arcatech.Skills
 {
-    public  class SkillUsageStrategy : IUsablesStrategy , IIconContent
+    public class SkillUsageStrategy : IUsableStrategy , IIconContent
     {
         public ActiveGameUnitComponent Owner {get;protected set;}
         SerializedUnitState SkillState { get; }
@@ -28,6 +28,7 @@ namespace Arcatech.Skills
 
         public SkillUsageStrategy(EquipmentComponent item, SerializedUnitState useaction, ActiveGameUnitComponent unit, Description desc, int charges, float reload)
         {
+            OnInit();
 
             Owner = unit;
             _desc = desc;
@@ -40,29 +41,22 @@ namespace Arcatech.Skills
             _chargesTimers = new Queue<CountDownTimer>(charges);
             _internalCdTimer = new CountDownTimer(InternalDelay);
             _internalCdTimer.Start();
-            Spawner = item.Spawner;
+            Spawner = item.SpawnPoint;
 
         }
 
-        public bool TryUseUsable(out UnitState state)
+        public UnitState UseUsable()
         {
-            state = SkillState.DeserializeState(Owner,Spawner);
-            if (!_internalCdTimer.IsReady) return false;
-            else
+            if (_remainingCharges > 0)
             {
-                if (_remainingCharges > 0)
-                {
-                    var t = new CountDownTimer(ChargeReload);
-                    _internalCdTimer.Start();
-                    t.Start();
-                    _chargesTimers.Enqueue(t);
-                    _remainingCharges--;
-                    t.OnTimerStopped += OnTimerComplete;
-                   // DoSkillLogic();
-                    return true;
-                }
+                var t = new CountDownTimer(ChargeReload);
+                _internalCdTimer.Start();
+                t.Start();
+                _chargesTimers.Enqueue(t);
+                _remainingCharges--;
+                t.OnTimerStopped += OnTimerComplete;
             }
-            return false;
+            return  SkillState.DeserializeState(Owner,Spawner);
         }
         public virtual void UpdateUsable(float delta)
         {
@@ -115,5 +109,13 @@ namespace Arcatech.Skills
 
         #endregion
 
+        public void OnInit()
+        {
+        }
+
+        public void OnCleanUp()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

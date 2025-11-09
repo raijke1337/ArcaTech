@@ -20,10 +20,11 @@ namespace Arcatech.UI
             _timerFill.fillAmount = iconContent.FillValue;
         }
         
-        public void OnUse()
+        public void OnUse(bool success)
         {
             RectTransform rectTransform = GetComponent<RectTransform>();
-            rectTransform.DOShakePosition(0.5f,3);
+            if (!success) rectTransform.DOShakePosition(0.5f,3);
+            else  rectTransform.DOPunchScale(Vector3.one * 0.2f,0.2f);
         }
 
         private void Update()

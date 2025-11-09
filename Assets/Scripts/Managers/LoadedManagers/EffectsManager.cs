@@ -3,79 +3,162 @@ using System.Collections.Generic;
 using Arcatech.Actions;
 using Arcatech.Effects;
 using Arcatech.EventBus;
+using CartoonFX;
 using UnityEngine;
 using UnityEngine.Pool;
 using Random = UnityEngine.Random;
 
 namespace Arcatech.Managers
 {
-    public partial class EffectsManager : MonoBehaviour
+    public partial class EffectsManager : GenericLazySingleton<EffectsManager>
     {
+        protected override void Awake()
+        {
+            base.Awake();
+            // Prewarm configured prefabs
+            for (int i = 0; i < prewarm.Count; i++)
+            {
+                var entry = prewarm[i];
+                if (entry.prefab == null || entry.initial <= 0) continue;
 
-        [Header("Visaul effects setings")]
-        [SerializeField] private DamageTextContainer _particleTextPrefab;     
+                if (!pools.ContainsKey(entry.prefab))
+                    pools[entry.prefab] = new Queue<PooledEffect>();
 
-        private EventBinding<DrawDamageEvent> _drawDamageEventBind;
-        private EventBinding<VFXRequest> _placeParticleEventBind;
+                maxPerPrefab[entry.prefab] = entry.max > 0 ? entry.max : int.MaxValue;
+
+                for (int j = 0; j < entry.initial; j++)
+                    CreateInstance(entry.prefab);
+            }
+        }
+        
+        #region particles
+        
+        private EventBinding<ParticlesEvent> _placeParticleEventBind;
+        
+        [Header("Optional prewarm")]
+        public List<PrewarmEntry> prewarm = new List<PrewarmEntry>();
+        
+        // Pools keyed by prefab asset
+        readonly Dictionary<CFXR_Effect, Queue<PooledEffect>> pools = new Dictionary<CFXR_Effect, Queue<PooledEffect>>();
+        // Optional caps
+        readonly Dictionary<CFXR_Effect, int> maxPerPrefab = new Dictionary<CFXR_Effect, int>();
+
+        
+        private void HandleEvent(ParticlesEvent request)
+        {
+            Spawn(request.Effect, request.Place, Quaternion.identity, request.Parent); 
+        }
+
+        
+        public PooledEffect Spawn(CFXR_Effect prefab, Vector3 position, Quaternion rotation, Transform parent = null)
+        {
+            if (prefab == null)
+            {
+                Debug.LogWarning("[EffectsManager] Spawn called with null prefab.");
+                return null;
+            }
+
+            if (!pools.TryGetValue(prefab, out var pool))
+            {
+                pool = new Queue<PooledEffect>();
+                pools[prefab] = pool;
+            }
+
+            PooledEffect inst = pool.Count > 0 ? pool.Dequeue() : CreateInstance(prefab);
+
+            // Parent and position
+            var t = inst.transform;
+            if (parent != null)
+            {
+                t.SetParent(parent, false);
+                t.localPosition = Vector3.zero;
+                t.localRotation = Quaternion.identity;
+                t.SetPositionAndRotation(position, rotation); // if position is world-space
+            }
+            else
+            {
+                t.SetParent(transform, false);
+                t.SetPositionAndRotation(position, rotation);
+            }
+
+            // Ensure clean state and play
+            inst.gameObject.SetActive(true);
+            inst.PrepareForPlay();
+            inst.PlayNow();
+
+            return inst;
+        }
+        
+        public void Return(PooledEffect inst)
+        {
+            if (inst == null) return;
+
+            // Clean up
+            inst.gameObject.SetActive(false);
+            inst.transform.SetParent(transform, false);
+
+            var prefab = inst.prefabKey;
+            if (!pools.TryGetValue(prefab, out var pool))
+            {
+                pool = new Queue<PooledEffect>();
+                pools[prefab] = pool;
+            }
+
+            // Optional: enforce max pool size per prefab
+            if (maxPerPrefab.TryGetValue(prefab, out int max) && pool.Count >= max)
+            {
+                Destroy(inst.gameObject);
+                return;
+            }
+
+            pool.Enqueue(inst);
+        }
+        
+        
+        PooledEffect CreateInstance(CFXR_Effect prefab)
+        {
+            var go = Instantiate(prefab.gameObject, transform);
+            go.name = $"{prefab.name} (Pooled)";
+            var pooled = go.GetComponent<PooledEffect>();
+            if (pooled == null) pooled = go.AddComponent<PooledEffect>();
+
+            pooled.owner = this;
+            pooled.prefabKey = prefab;
+            go.SetActive(false);
+            return pooled;
+        }
+
+        #endregion
+        
+        
         private EventBinding<SoundClipRequest> _playSoundEventBind;
         private EventBinding<ProjectilePlaceEvent> _projectilePlaceEventBind;
 
-        #region singleton
-        public static EffectsManager Instance;
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else { Destroy(gameObject); }
-        }
-        #endregion
         private void Start()
         {
 
             InitSoundPool();
 
-            _drawDamageEventBind = new EventBinding<DrawDamageEvent>(PlaceDamageText);
-            _placeParticleEventBind = new EventBinding<VFXRequest>(PlaceParticle);
-            _playSoundEventBind = new EventBinding<SoundClipRequest>(CreateSound);
+            _placeParticleEventBind = new EventBinding<ParticlesEvent>(HandleEvent);
+            //_playSoundEventBind = new EventBinding<SoundClipRequest>(CreateSound);
             _projectilePlaceEventBind = new EventBinding<ProjectilePlaceEvent>(PlaceProjectile);
 
 
-            EventBus<DrawDamageEvent>.Register(_drawDamageEventBind);
-            EventBus<VFXRequest>.Register(_placeParticleEventBind);
-            EventBus<SoundClipRequest>.Register(_playSoundEventBind);
+            EventBus<ParticlesEvent>.Register(_placeParticleEventBind);
+          //  EventBus<SoundClipRequest>.Register(_playSoundEventBind);
             EventBus<ProjectilePlaceEvent>.Register(_projectilePlaceEventBind);
 
         }
         private void OnDisable()
         {
             StopAllCoroutines();
-            EventBus<DrawDamageEvent>.Deregister(_drawDamageEventBind);
-            EventBus<VFXRequest>.Deregister(_placeParticleEventBind);
+            EventBus<ParticlesEvent>.Deregister(_placeParticleEventBind);
             EventBus<SoundClipRequest>.Deregister(_playSoundEventBind);
             EventBus<ProjectilePlaceEvent>.Deregister(_projectilePlaceEventBind);
         }
 
 
 
-        #region VFX
-        private void PlaceParticle(VFXRequest request)
-        {
-            if (request.Effect == null) return;
-            var ef = Instantiate(request.Effect, request.Place.position, request.Place.rotation);
-            if (request.Parent != null) { ef.transform.SetParent(request.Parent.transform, true); }
-        }
-
-        private void PlaceDamageText(DrawDamageEvent @event)
-        {
-            if (@event.Unit == null) return;
-
-            Vector3 dirToCamera = Camera.main.transform.position - @event.Unit.transform.position;
-            Vector3 adjustedPosition = @event.Unit.transform.position + (Vector3.up * 2) + dirToCamera.normalized + Random.insideUnitSphere; // move towards camera 1 an d some random
-
-            var txt = Instantiate(_particleTextPrefab, adjustedPosition, Quaternion.identity);
-
-            txt.PlayNumbers((int)@event.Damage);
-        }
-        #endregion
 
         #region sound fx
 
@@ -173,7 +256,7 @@ namespace Arcatech.Managers
         #endregion
         #endregion
         #region projectiles
-
+//TODO move this somewhere else
 
         private void PlaceProjectile(ProjectilePlaceEvent p)
         {

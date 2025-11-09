@@ -16,7 +16,7 @@ namespace Arcatech.Managers
             Assert.IsNotNull(_gameUIprefab);
         }
 
-        [SerializeField] IsoCameraController _camPrefab;
+        [SerializeField] CamerasController _camPrefab;
         [SerializeField] GameInterfaceManager _gameUIprefab;
 
         //List<IManagedController> _ctrls;

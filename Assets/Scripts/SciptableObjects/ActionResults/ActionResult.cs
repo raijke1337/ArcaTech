@@ -13,7 +13,8 @@ namespace Arcatech.Actions
     // spawn projectile 
     // movement impulse
     // spawn particle effect
-    // play an animation action
+    // enter a state
+    // anything else?
     public abstract class ActionResult : IActionResult
     {
         public abstract void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place);

@@ -7,17 +7,6 @@ public enum Side
     PlayerSide,
     EnemySide
 }
-public enum Comparer
-{
-    Greater,
-    Less
-}
-public enum BaseStatType : byte
-{
-    Health,
-    Stamina,
-    Energy
-}
 
 public enum ItemType
 {
@@ -27,8 +16,6 @@ public enum ItemType
     Shield,
     Booster,
     Costume,
-    Modifier,
-    Other = 255
 }
 
 public enum UnitActionType : byte

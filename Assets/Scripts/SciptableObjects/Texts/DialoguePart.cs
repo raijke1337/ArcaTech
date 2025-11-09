@@ -1,5 +1,8 @@
+using System;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
+using UnityEngine.Assertions;
+using Random = UnityEngine.Random;
 
 namespace Arcatech.Texts
 {
@@ -7,11 +10,14 @@ namespace Arcatech.Texts
     public class DialoguePart : ScriptableObject
     {
         public DialogueCharacter Character;
+        [SerializeField] string[] DialogueContents;
+        public DialoguePart NextDialogue;
 
-    //   public FaceExpression Mood;
-        public Description DialogueContent;
+        private void OnValidate()
+        {
+            Assert.IsNotNull(DialogueContents);
+        }
 
-        public SerializedDictionary<Description, DialoguePart> Options;
-
+        public string Dialogue =>  DialogueContents[Random.Range(0, DialogueContents.Length)];
     }
 }

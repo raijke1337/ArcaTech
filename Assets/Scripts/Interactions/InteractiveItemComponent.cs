@@ -1,9 +1,11 @@
 ﻿using System;
 using Arcatech.Actions;
 using System.Collections.Generic;
+using Arcatech.Managers;
 using Arcatech.Units;
 using UnityEngine;
 using KBCore.Refs;
+using UnityEngine.EventSystems;
 
 namespace Arcatech.Interactions
 {
@@ -32,25 +34,31 @@ namespace Arcatech.Interactions
 
         #region interaction
 
+        [SerializeField] private string interactTooltipText = "Interact";
+
         [Space, Header("Condition checker")]
         //[SerializeField] SerializedDictionary<EventCondition, InteractionHandlerBase[]> _list;
         [SerializeField]
         protected InteractionCondition condition;
         
+        
         public bool TryInteraction(IInteractor interactor)
         {
             var result = condition.CheckCondition(interactor, this);
+            
+            foreach (var handler in handlers)
+            {
+                handler.DoInteraction(result,interactor,this);
+            }
+
+            foreach (var handler in handlersOnThisItem)
+            {
+                handler.DoInteraction(result,interactor,this);
+            }
+
+            
             if (result)
             {
-                foreach (var handler in handlers)
-                {
-                    handler.DoInteraction(interactor,this);
-                }
-
-                foreach (var handler in handlersOnThisItem)
-                {
-                    handler.DoInteraction(interactor,this);
-                }
 
                 if (_itemDisappearsWhenUsed)
                 {
@@ -62,7 +70,23 @@ namespace Arcatech.Interactions
             }
             return result;
         }
+
+        public string InteractionText => interactTooltipText;
+
         #endregion
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            GameInterfaceManager.Instance?.NotifyTargetable(this,true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            GameInterfaceManager.Instance?.NotifyTargetable(this,false);
+        }
+
+        public Side Side => GetBaseComponent.GetEntitySide;
+        public string TargetName =>  GetBaseComponent.GetName;
     }
     
     

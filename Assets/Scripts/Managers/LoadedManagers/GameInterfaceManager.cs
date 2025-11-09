@@ -1,9 +1,13 @@
+using System;
 using Arcatech.EventBus;
+using Arcatech.Interactions;
 using Arcatech.Texts;
 using Arcatech.UI;
 using Arcatech.Units;
+using Arcatech.Units.Control;
 using KBCore.Refs;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace Arcatech.Managers
@@ -24,28 +28,22 @@ namespace Arcatech.Managers
         [SerializeField,Child] private GameTextWindowComponent _text;
         [SerializeField] private GameObject _ded;
         [SerializeField] private GameObject _pause;
-        [SerializeField] private ItemCardComponent inspectItemCard;
+        [SerializeField,Child] private ItemCardComponent inspectItemCard;
+        [SerializeField,Child] private FloatingTooltipComponent aimingTooltip;
+        
         
 
         /// <summary>
-        /// called by inputs and something else.
+        /// called by inputs
         /// </summary>
         EventBinding<PauseToggleEvent> _pauseToggleBind;
-        
-        /// <summary>
-        /// raised by entity mouse over glow comp
-        /// </summary>
-        EventBinding<BaseEntityMouseOverEvent> _mouseOverBind;
-        
 
-        #region managed
+
 
         private void OnEnable()
         {
             _pauseToggleBind = new EventBinding<PauseToggleEvent>(ShowPauseMenu);
-            _mouseOverBind = new EventBinding<BaseEntityMouseOverEvent>(OnMouseOver);
             EventBus<PauseToggleEvent>.Register(_pauseToggleBind);
-            EventBus<BaseEntityMouseOverEvent>.Register(_mouseOverBind);
         }
 
         private void Start()
@@ -61,50 +59,35 @@ namespace Arcatech.Managers
                 _playerPan.gameObject.SetActive(false);
                 _ded.SetActive(false);
             }
+            //_aim = FindFirstObjectByType<PlayerAimingComponent>();
+           // if (_aim == null) Debug.LogWarning("Couldn't find PlayerAimingComponent");
         }
-        private void OnDisable()
-        {
-            EventBus<PauseToggleEvent>.Deregister(_pauseToggleBind);
-            EventBus<BaseEntityMouseOverEvent>.Deregister(_mouseOverBind);
-        }
-
-        #endregion
-
-
+        
         #region game dialogues and texts
-
-        void SetupGameTextWindow()
+        public void HandleDialoguePart(DialoguePart dialogue, bool show)
         {
-            /*_text.gameObject.SetActive(false);
-            _text.DialogueCompleteEvent += OnDialogueCompletedInTextWindow;*/
+            if (!dialogue) return;
+            _text.gameObject.SetActive(show);
+            _text.ShowDialogue(dialogue);
         }
-
-        public void HandleDialoguePart(DialoguePart text, bool show)
-        {
-
-            _text.gameObject.SetActive(true);
-            _text.CurrentDialogue = text;
-            if (text.Options.Count > 0)
-            {
-                EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(true));
-            }
-        }
-        private void OnDialogueCompletedInTextWindow()
-        {
-            EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(false));
-           // _text.gameObject.SetActive(false);
-        }
-
-
         #endregion
-
-        void OnMouseOver(BaseEntityMouseOverEvent info)
+        
+        public void NotifyTargetable(ITargetable targetable, bool show)
         {
-            // TODO: show hotkeys tooltip: use/inspect
+            
+            /*Debug.Log($"NotifyTargetable {targetable} {show}");
+            if (!show)
+            {
+                aimingTooltip.gameObject.SetActive(false);
+                return;
+            }
+            if (!aimingTooltip.gameObject.activeSelf) 
+            {
+                aimingTooltip.gameObject.SetActive(true);
+                aimingTooltip.Set(targetable);
+            }*/
+
         }
-
-
-
 
         #region menus
 

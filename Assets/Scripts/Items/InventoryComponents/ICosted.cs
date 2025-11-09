@@ -1,4 +1,5 @@
-﻿using Arcatech.Triggers;
+﻿using Arcatech.Stats;
+using Arcatech.Triggers;
 
 namespace Arcatech
 {

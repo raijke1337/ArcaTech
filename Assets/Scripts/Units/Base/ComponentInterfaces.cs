@@ -1,4 +1,5 @@
-﻿using Arcatech.Triggers;
+﻿using Arcatech.Stats;
+using Arcatech.Triggers;
 
 namespace Arcatech.Units
 {
@@ -7,7 +8,7 @@ namespace Arcatech.Units
     /// </summary>
     public interface IDamageableComponent
     {
-        public void Damage(float damage, BaseStatType stat);
+        public void Damage(float damage, ResourceStatType stat);
     }
     /// <summary>
     /// called in stat update strategy by statsComp and maybe more
@@ -32,7 +33,7 @@ namespace Arcatech.Units
     }
 
 /// <summary>
-/// used by base entity  mainly
+/// used by entity stats  mainly
 /// </summary>
     public interface IEffectsTakerComponent
     {

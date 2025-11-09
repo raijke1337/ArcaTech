@@ -1,164 +1,106 @@
+using System;
 using Arcatech.EventBus;
 using Arcatech.Interactions;
 using Arcatech.Scenes.Cameras;
 using KBCore.Refs;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-namespace Arcatech.Units.Inputs
+namespace Arcatech.Units.Control
 {
-    [RequireComponent(typeof(PlayerAimingComponent), typeof(DashJumpMovementController),typeof(PlayerUnit))]
+    [RequireComponent(typeof(PlayerAimingComponent),typeof(PlayerUnit))]
     [RequireComponent(typeof(InteractionComponent))]
-    public class PlayerUnitInputsComponent : ActiveUnitsInputComponent
+    public class PlayerUnitInputsComponent : UnitInputsComponent
     {
         [Space,Header("Required components")]
         [SerializeField, Anywhere] PlayerInputReaderObject _playerInputReader;
-        [SerializeField, Self] PlayerAimingComponent _aim;
-        [SerializeField, Self] DashJumpMovementController _movement;
-        [SerializeField, Self] PlayerUnit _player;
         [SerializeField, Self] protected InteractionComponent _interaction;
 
-        private IsoCamAdjust _adj;
+        private IMove _movement;
+        private IJump _jump;
 
-        Vector3 _movementVector;
-        Vector3 _lookVector;
+        private void Start()
+        {
+            _movement = GetComponentInChildren<IMove>();
+            _jump =  GetComponentInChildren<IJump>();
+        }
 
         protected override void ControllerStartBindings(bool enabling)
         {
             _adj ??= new IsoCamAdjust();
-            _playerInputReader.EnablePlayerInputs();
-            if (enabling)
-
-            {
-                _playerInputReader.Aim += OnAimAction;
-                _playerInputReader.Movement += OnMovementAction;
-
-                _playerInputReader.Melee += OnMeleeAction;
-                _playerInputReader.Ranged += OnRangedAction;
-                _playerInputReader.Jump += OnJumpAction;
-
-                _playerInputReader.DodgeSpec += OnDodgeSkill;
-                _playerInputReader.MeleeSpec += OnMeleeSkill;
-                _playerInputReader.RangedSpec += OnRangedSkill;
-                _playerInputReader.ShieldSpec += OnShieldSkill;
-
-                _playerInputReader.PausePressed += OnPauseButton;
-                _playerInputReader.MountAction += OnUseButton;
-            }
-            else
-            {
-
-
-                _playerInputReader.Aim -= OnAimAction;
-                _playerInputReader.Movement -= OnMovementAction;
-
-                _playerInputReader.Melee -= OnMeleeAction;
-                _playerInputReader.Ranged -= OnRangedAction;
-                _playerInputReader.Jump -= OnJumpAction;
-
-                _playerInputReader.DodgeSpec -= OnDodgeSkill;
-                _playerInputReader.MeleeSpec -= OnMeleeSkill;
-                _playerInputReader.RangedSpec -= OnRangedSkill;
-                _playerInputReader.ShieldSpec -= OnShieldSkill;
-                _playerInputReader.PausePressed -= OnPauseButton;
-                _playerInputReader.MountAction -= OnUseButton;
-            }
-        }
-
-        #region inputs section
-
-        private void Update()
-        {
-            if (_player.ActionLock)
-            {
-                _movement.SetDesiredMoveDirection(Vector3.zero);
-            }
-            else
-            {
-                _movement.SetDesiredMoveDirection(_movementVector);
-                _movement.SetDesiredLookDirection(_lookVector);
-            }                
-        }
-        /// <summary>
-        /// called on unit death
-        /// </summary>
-        protected override void OnDisable()
-        {
-            _movement.SetDesiredMoveDirection(Vector3.zero);
-            base.OnDisable();
-        }
-
-
-        private void OnUseButton()
-        {
-            if (Paused || Killed) return;
-            _interaction.InteractCommand();
-        }
-        private void OnPauseButton()
-        {
-            EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(!Paused));
-        }
-
-        private void OnShieldSkill()
-        {
-            if (Paused || Killed) return;
-            RequestCombatAction(UnitActionType.ShieldSkill);
-        }
-        private void OnRangedSkill()
-        {
-            if (Paused || Killed) return;
-            RequestCombatAction(UnitActionType.RangedSkill);
-        }
-
-        private void OnMeleeSkill()
-        {
-            if (Paused || Killed) return;
-            RequestCombatAction(UnitActionType.MeleeSkill);
-        }
-
-        private void OnJumpAction()
-        {
-            if (Paused || Killed) return;
-            transform.parent = null;
-            _movement.DoJump();
-            _player.PlayerJump();
-        }
-
-        private void OnDodgeSkill()
-        {
-            if (Paused || Killed) return;
-            RequestCombatAction(UnitActionType.DodgeSkill);
-        }
-
-        private void OnMovementAction(Vector2 dir)
-        {
-            if (Paused || Killed) return;
             
-            Vector3 AD = _adj.Isoright * _playerInputReader.InputDirection.x;
-            Vector3 WS = _adj.Isoforward * _playerInputReader.InputDirection.z;
-
-            _movementVector = AD + WS;
+            if (enabling)
+            {
+                _playerInputReader.Movement += OnMovement;
+                _playerInputReader.Jump += OnJump;
+                _playerInputReader.PausePressed += OnPause;
+                _playerInputReader.CombatAction += OnCombatAction;
+                _playerInputReader.UseAction += OnUseAction;
+            }
+            else
+            {
+                _playerInputReader.Movement -= OnMovement;
+                _playerInputReader.Jump -= OnJump;
+                _playerInputReader.PausePressed -= OnPause;
+                _playerInputReader.CombatAction -= OnCombatAction;
+                _playerInputReader.UseAction -= OnUseAction;
+            }
         }
 
-        private void OnAimAction(Vector2 point)
+        private void OnUseAction(InputAction.CallbackContext arg0) => _interaction.InteractCommand();
+
+        private void OnCombatAction(InputAction.CallbackContext ctx, UnitActionType type)
         {
-            if (Paused || Killed) return;
-            _lookVector = _aim.GetDirectionToTarget;
+            if (ctx.performed)
+                RequestCombatAction(type);
         }
 
-        private void OnRangedAction()
+        private void OnPause(InputAction.CallbackContext arg0)
         {
-            if (Paused || Killed) return;
-            RequestCombatAction(UnitActionType.Ranged);
+            if (arg0.phase == InputActionPhase.Performed)
+                EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(!Paused));
         }
 
-        private void OnMeleeAction()
+        private void OnJump(InputAction.CallbackContext arg0)
         {
-            if (Paused || Killed) return;
-            RequestCombatAction(UnitActionType.Melee);
+            switch (arg0.phase)
+            {
+                case InputActionPhase.Performed:
+                    _jump.JumpCommand = true;
+                    break;
+                default:
+                    _jump.JumpCommand = false;
+                    break;
+            }
         }
 
-
-        #endregion
-
+        private void OnMovement(InputAction.CallbackContext arg0)
+        {
+            switch (arg0.phase)
+            {
+                case InputActionPhase.Performed:
+                    _feedVector.x =arg0.ReadValue<Vector2>().x;
+                    _feedVector.z =arg0.ReadValue<Vector2>().y;
+                    _movement.MovementVector = RotateInput(_feedVector);
+                    break;
+                default:
+                    Debug.Log("reset movement vector OK");
+                    _movement.MovementVector = Vector3.zero;
+                    _feedVector = Vector3.zero;
+                    break;
+            }
+        }
+        
+        
+        private IsoCamAdjust _adj;
+        Vector3 _feedVector = Vector3.zero;
+        private Vector3 RotateInput(Vector3 input)
+        {
+            var AD = _adj.Isoright * input.x;
+            var WS = _adj.Isoforward * input.z;
+            
+            return AD + WS;
+        }
+        
     }
 }

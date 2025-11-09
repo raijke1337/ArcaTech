@@ -22,7 +22,7 @@ namespace Arcatech.Managers
             float size = Mathf.Lerp(0.3f, 0.5f, intensity);
             Color color1 = Color.Lerp(Color.red, Color.yellow, intensity);
             dynamicParticleText.UpdateText(text, size, color1);
-            particles.Play(true);
+            //particles.Play(true);
         }
 
         [SerializeField, Self] ParticleSystem particles;

@@ -1,5 +1,6 @@
 ﻿using Arcatech.Managers;
 using Arcatech.Texts;
+using Arcatech.Units;
 using UnityEngine;
 
 namespace Arcatech.Interactions
@@ -9,16 +10,17 @@ namespace Arcatech.Interactions
     /// </summary>
     public class DisplayTextInteractionHandler : InteractionHandlerBase
     {
-        [SerializeField] DialoguePart text;
-        //[SerializeField] bool requireInteraction = false;
-        public override void DoInteraction(IInteractor interactor, IInteractive item = null)
+        [SerializeField] DialoguePart textSuccess;
+        [SerializeField] DialoguePart textFailure;
+        public override void DoInteraction(bool success, IInteractor interactor, IInteractive item)
         {
-            GameInterfaceManager.Instance.HandleDialoguePart(text,true);
+            // interactor.InteractionContext.ActiveGameUnitComponent.GetComponent<DashJumpMovementController>().SetDesiredMoveDirection(Vector3.zero);
+
+            GameInterfaceManager.Instance.HandleDialoguePart(success? textSuccess : textFailure,true);
         }
 
         public override void EndInteraction(IInteractor interactor, IInteractive item = null)
         {
-            GameInterfaceManager.Instance.HandleDialoguePart(text,false);
         }
     }
 }

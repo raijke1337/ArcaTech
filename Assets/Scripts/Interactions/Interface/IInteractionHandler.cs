@@ -6,7 +6,7 @@ namespace Arcatech.Interactions
     /// </summary>
     public interface IInteractionHandler
     {
-        public void DoInteraction(IInteractor interactor, IInteractive item);
+        public void DoInteraction(bool success, IInteractor interactor, IInteractive item);
         public void EndInteraction(IInteractor interactor, IInteractive item);
         
     }

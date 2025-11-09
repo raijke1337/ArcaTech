@@ -12,7 +12,7 @@ namespace Arcatech.Items
         [Space,Header("Stats")]
         public int TotalCharges;
         public float ChargeRestoreTime;
-        public float InternalCooldown;
+        public float InternalCooldown = 0.3f;
 
         private void OnValidate()
         {

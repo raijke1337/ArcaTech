@@ -38,24 +38,24 @@ namespace Arcatech.Items
             if (items == null) return;
             
             PickUpItems(items.GetInventory(o));
-            Dictionary<ItemType, List<Equipment>> equipmentDict = new();
+            Dictionary<ItemType, List<Equipment>> temporaryDict = new();
             
 
             foreach (Equipment e in items.GetEquipment(o))
             {
-                if (!equipmentDict.ContainsKey(e.Type))
+                if (!temporaryDict.ContainsKey(e.Type))
                 {
-                    equipmentDict[e.Type] = new List<Equipment>();
+                    temporaryDict[e.Type] = new List<Equipment>();
                 }
-                equipmentDict[e.Type].Add(e);
+                temporaryDict[e.Type].Add(e);
                // EquipItem(e, out _);
             }
             // here is the case if multiple items of the same type are in the "equipment".
             // pick a random and more the rest to inventory
 
-            foreach (var pair in equipmentDict)
+            foreach (var pair in temporaryDict)
             {
-                int randomIndex = Random.Range(0, pair.Value.Count-1);
+                var randomIndex = Random.Range(0, pair.Value.Count-1);
                 for (int i = 0; i < pair.Value.Count; i++)
                 {
                     if (i == randomIndex)
@@ -79,7 +79,8 @@ namespace Arcatech.Items
         public void PickUpItem(Item item)
         {
             inventory.Add(item);
-            if (initialized) ModelUpdatedEvent.Invoke();
+            if (initialized) 
+            {ModelUpdatedEvent.Invoke();}
         }
 
         public void PickUpItems(IEnumerable<IItem> items)
@@ -134,23 +135,22 @@ namespace Arcatech.Items
                 ModelUpdatedEvent.Invoke();
             }
         }
-
-
-        public StatsMod[] GetCurrentMods
+        
+        /// <summary>
+        /// replaces the getcurrentmods
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<IEquipmentStatsProvider> EnumerateProviders()
         {
-            get
+
+            var list =  new List<IEquipmentStatsProvider>();
+            foreach (var equipment in equipments.Values)
             {
-                var list = new List<StatsMod>();
-                foreach (var equip in equipments)
-                {
-                    if (equip.Value.StatMods != null)
-                    {
-                        list.AddRange(equip.Value.StatMods);
-                    }
-                }
-                return list.ToArray();
+                list.Add(equipment);
             }
+            return list;
         }
+
 
     }
 

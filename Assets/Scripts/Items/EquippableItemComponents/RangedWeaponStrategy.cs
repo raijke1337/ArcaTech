@@ -1,13 +1,22 @@
-﻿using Arcatech.Units;
+﻿using Arcatech.Actions;
+using Arcatech.Units;
+using UnityEngine;
 
 namespace Arcatech.Items
 {
-    public class RangedWeaponStrategy : WeaponStrategy
+    public class ShootProjectilesStrategy : WeaponStrategy
     {
-        public RangedWeaponStrategy(SerializedUnitState act,BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd, EquipmentComponent comp) : base(act, unit, cfg, charges, reload, intcd, comp)
-        {
-        }
+        private ProjectilesShooterComponent shooter;
+        private SerializedProduceProjectileResult projectile;
+        
+        
 
-        //// shooting done via extended serialized produce projectiles now
+        public ShootProjectilesStrategy(SerializedProduceProjectileResult p, SerializedUnitState act, 
+            BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd, 
+            EquipmentComponent comp) : base(act, unit, cfg, charges, reload, intcd, comp)
+        {
+            this.projectile = p;
+            HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
+        }
     }
 }
