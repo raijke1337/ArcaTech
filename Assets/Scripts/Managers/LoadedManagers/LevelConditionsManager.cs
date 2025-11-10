@@ -19,9 +19,9 @@ namespace Arcatech.Level
 {
     public class LevelConditionsManager : GenericLazySingleton<LevelConditionsManager>
     {
-        private PlayerUnit _p;
+        private BaseGameEntityComponent _p;
         private IInteractor _player;
-        private List<ActiveGameUnitComponent> allEnemies;
+        private List<EntityStateMachineComponent> allEnemies;
         private List<InteractiveItemComponent> allCollectables;
         private List<Collider> allSecretZones = new List<Collider>(); // NYI
 
@@ -42,12 +42,12 @@ namespace Arcatech.Level
         private void Start()
         {
 
-            allEnemies = FindObjectsByType<ActiveGameUnitComponent>(FindObjectsSortMode.None)
+            allEnemies = FindObjectsByType<EntityStateMachineComponent>(FindObjectsSortMode.None)
                 .Where(t => t.CompareTag("Enemy")).ToList();
             allCollectables = FindObjectsOfType<InteractiveItemComponent>().Where(t => t.CompareTag("Collectable"))
                 .ToList();
 
-            _p = FindAnyObjectByType<PlayerUnit>();
+            _p = GameObject.FindWithTag("Player").GetComponent<BaseGameEntityComponent>();
             _player = _p.GetComponent<IInteractor>();
 
             refreshConditionsCor = StartCoroutine(CheckLevelEvents());

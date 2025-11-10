@@ -12,10 +12,10 @@ namespace Arcatech
     /// <summary>
     /// class that handles inputs from Behavior tree or player commands
     /// </summary>
-    [RequireComponent (typeof(ActiveGameUnitComponent))]
+    [RequireComponent (typeof(EntityStateMachineComponent))]
     public class UnitInputsComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent
     {
-        [SerializeField,Self] ActiveGameUnitComponent gameUnitComponent;
+        [SerializeField,Self] EntityStateMachineComponent gameUnitComponent;
 
 
         private List<IUnitCommandHandler> _commandHandlers;

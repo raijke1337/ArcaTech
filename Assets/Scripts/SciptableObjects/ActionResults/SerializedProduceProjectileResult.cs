@@ -49,7 +49,7 @@ namespace Arcatech.Actions
         public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
 
-            var actor = user.GetComponent<ActiveGameUnitComponent>(); // placeholder TODO
+            var actor = user.GetComponent<BaseGameEntityComponent>(); // placeholder TODO
             cachedEvent.Shooter = actor;
             cachedEvent.Place = place;
             
@@ -76,12 +76,12 @@ namespace Arcatech.Actions
 
     public struct ProjectilePlaceEvent : IEvent
     {
-        public ActiveGameUnitComponent Shooter;
+        public BaseGameEntityComponent Shooter;
         public Transform Place;
         public readonly SerializedProjectileConfiguration Projectile;
         public readonly ShootingConfig ShootingConfig;
 
-        public ProjectilePlaceEvent(ActiveGameUnitComponent shooter, Transform place, SerializedProjectileConfiguration projectile, ShootingConfig shootingConfig)
+        public ProjectilePlaceEvent(BaseGameEntityComponent shooter, Transform place, SerializedProjectileConfiguration projectile, ShootingConfig shootingConfig)
         {
             Shooter = shooter;
             Place = place;

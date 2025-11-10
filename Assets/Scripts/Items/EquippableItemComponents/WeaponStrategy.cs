@@ -10,7 +10,7 @@ namespace Arcatech.Items
 
     public class WeaponStrategy : IWeaponUseStrategy,ITriggerNotificationReceiver
     {
-        public ActiveGameUnitComponent Owner { get; }
+        public EntityStateMachineComponent Owner { get; }
         public WeaponSO Config { get; }
         protected EquipmentComponent GameObjectComponent { get; }
         
@@ -19,7 +19,7 @@ namespace Arcatech.Items
         
         public WeaponStrategy (SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,EquipmentComponent comp)
         {
-            Owner = unit.GetComponent<ActiveGameUnitComponent>();
+            Owner = unit.GetComponent<EntityStateMachineComponent>();
             Config = cfg;
             ChargeReload = reload;
             InternalDelay = intcd;

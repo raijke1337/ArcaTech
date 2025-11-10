@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Arcatech.Units;
+using UnityEngine;
 using UnityEngine.Assertions;
 using static Arcatech.Actions.SerializedApplyForceResult;
 
@@ -37,38 +38,32 @@ namespace Arcatech.Actions
         }
         public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
-            switch (_tgt)
-            {
-                case ForceTarget.User:
-                    if (user == null) break;
-                    if (user.TryGetComponent<ActiveGameUnitComponent>(out var actor))
-                    {
-                        actor.ApplyForceResultToUnit(_s, _d);
-                    }
-                    else
-                    {
-                        Debug.LogError($"Tried to force movement on {user.GetName} which has no active actor component");
-                    }                    
-                    break;
-                case ForceTarget.Target:
-                    if (target == null) break;
-                    if (target.TryGetComponent<ActiveGameUnitComponent>(out actor))
-                    {
-                        actor.ApplyForceResultToUnit(_s, _d);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Tried to force movement on {target.GetName} which has no active actor component");
-                    }
-                    break;
-            }
-
-
-
-
+            Debug.Log("NYI (again)");
+            // switch (_tgt)
+            // {
+            //     case ForceTarget.User:
+            //         if (user == null) break;
+            //         if (user.TryGetComponent<EntityStateMachineComponent>(out var actor))
+            //         {
+            //             actor.ApplyForceResultToUnit(_s, _d);
+            //         }
+            //         else
+            //         {
+            //             Debug.LogError($"Tried to force movement on {user.GetName} which has no active actor component");
+            //         }                    
+            //         break;
+            //     case ForceTarget.Target:
+            //         if (target == null) break;
+            //         if (target.TryGetComponent<EntityStateMachineComponent>(out actor))
+            //         {
+            //             actor.ApplyForceResultToUnit(_s, _d);
+            //         }
+            //         else
+            //         {
+            //             Debug.LogWarning($"Tried to force movement on {target.GetName} which has no active actor component");
+            //         }
+            //         break;
+            // }
         }
-
-        }
-
-
+    }
 }

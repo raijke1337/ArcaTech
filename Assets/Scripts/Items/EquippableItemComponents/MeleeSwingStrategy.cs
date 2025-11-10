@@ -31,6 +31,7 @@ namespace Arcatech.Items
         {
 
             // TODO needs debug
+            // THis is moved into the new states system...
             // add checks to prevent additional triggering
             UnitState state;
 
@@ -59,20 +60,20 @@ namespace Arcatech.Items
             return state;
         }
 
-        private void Action_ActionStateChangedEvent(UnitActionState state)
-        {
-            GameObjectComponent.HandleActionState(state);
-            switch (state)
-            {
-                case UnitActionState.Completed:
-                    CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
-                    break;
-            }
-        }
+        // private void Action_ActionStateChangedEvent(UnitActionState state)
+        // {
+        //     GameObjectComponent.HandleActionState(state);
+        //     switch (state)
+        //     {
+        //         case UnitActionState.Completed:
+        //             CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
+        //             break;
+        //     }
+        // }
 
         List<BaseGameEntityComponent> hitsThisSwing = new();
 
-        private void PerformOnHit(ActiveGameUnitComponent user, BaseGameEntityComponent target, Transform place)
+        private void PerformOnHit(EntityStateMachineComponent user, BaseGameEntityComponent target, Transform place)
         {
             foreach (var res in OnColliderHit)
             {

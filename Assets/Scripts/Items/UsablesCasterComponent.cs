@@ -15,13 +15,13 @@ namespace Arcatech.Items
     /// Because storing an instance inside inventory model
     /// is a bad idea when you need to add functionality
     /// </summary>
-    [RequireComponent(typeof(ActiveGameUnitComponent),typeof(UnitInputsComponent))]
+    [RequireComponent(typeof(EntityStateMachineComponent),typeof(UnitInputsComponent))]
     public class UsablesCasterComponent : ValidatedMonoBehaviour, IUnitCommandHandler, IUnitInventoryView, IDrawItemsStrategyProvider
     {
 
         public event UnityAction ViewChangedInventory;
         [SerializeField,Self] EntityInventoryComponent entityInventory;
-        [SerializeField, Self] private ActiveGameUnitComponent _stateUnit;
+        [SerializeField, Self] private EntityStateMachineComponent _stateUnit;
 
         public event UnityAction<UnitActionType,bool> ActionAnnounce = delegate { };
 

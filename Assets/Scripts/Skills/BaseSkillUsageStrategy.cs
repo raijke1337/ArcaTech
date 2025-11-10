@@ -10,7 +10,7 @@ namespace Arcatech.Skills
 {
     public class SkillUsageStrategy : IUsableStrategy , IIconContent
     {
-        public ActiveGameUnitComponent Owner {get;protected set;}
+        public EntityStateMachineComponent Owner {get;protected set;}
         SerializedUnitState SkillState { get; }
 
         protected Transform Spawner;
@@ -26,7 +26,7 @@ namespace Arcatech.Skills
 
 
 
-        public SkillUsageStrategy(EquipmentComponent item, SerializedUnitState useaction, ActiveGameUnitComponent unit, Description desc, int charges, float reload)
+        public SkillUsageStrategy(EquipmentComponent item, SerializedUnitState useaction, EntityStateMachineComponent unit, Description desc, int charges, float reload)
         {
             OnInit();
 

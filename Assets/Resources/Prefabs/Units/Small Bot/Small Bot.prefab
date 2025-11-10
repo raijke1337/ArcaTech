@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5460728265158417060}
+  m_Father: {fileID: 2079674549334843609}
   m_LocalEulerAnglesHint: {x: -0.488, y: -104.478, z: 86.159}
 --- !u!1 &9155761612785111638
 GameObject:
@@ -53,6 +53,7 @@ GameObject:
   - component: {fileID: 1376333295245354474}
   - component: {fileID: 8598743006618296905}
   - component: {fileID: 2494332768464867219}
+  - component: {fileID: 7178321968876317679}
   m_Layer: 6
   m_Name: Small Bot
   m_TagString: Enemy
@@ -209,7 +210,6 @@ MonoBehaviour:
   timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 5860005500790631614}
-  gravity: 0
   usePhysics: 0
 --- !u!114 &2712598585342110039
 MonoBehaviour:
@@ -240,15 +240,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8683f71a5cfe53439f51db09350de3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameEntity: {fileID: 2276539188783938308}
-  animator: {fileID: 5349238622031444643}
-  _stats: {fileID: 2712598585342110039}
-  animatorExitStateTrigger: ExitStateTrigger
-  StaggeredState: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
-  DeadState: {fileID: 11400000, guid: 0b8a8ee7cdc62a646a39b231248b013b, type: 2}
-  StunnedState: {fileID: 11400000, guid: f2f512d0267193c4692ef39181e44f00, type: 2}
   agent: {fileID: 3350776913292589451}
   behavior: {fileID: 8199590065744028443}
+  stateMachine: {fileID: 7178321968876317679}
+  unitInputs: {fileID: 2494332768464867219}
 --- !u!114 &6017142278139704755
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -323,7 +318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entityInventory: {fileID: 6668240942958006498}
-  _stateUnit: {fileID: 4115950820855998346}
+  _stateUnit: {fileID: 7178321968876317679}
 --- !u!114 &2494332768464867219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,7 +331,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7e4c25029a0828489059e20e24400c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameUnitComponent: {fileID: 4115950820855998346}
+  gameUnitComponent: {fileID: 7178321968876317679}
+--- !u!114 &7178321968876317679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9155761612785111638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed2ea13325d0c8f46894c730f68cb730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEntity: {fileID: 2276539188783938308}
+  animator: {fileID: 5349238622031444643}
+  animatorExitStateTrigger: ExitStateTrigger
+  StaggeredState: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
+  DeadState: {fileID: 11400000, guid: 0b8a8ee7cdc62a646a39b231248b013b, type: 2}
+  StunnedState: {fileID: 11400000, guid: f2f512d0267193c4692ef39181e44f00, type: 2}
 --- !u!1001 &1969979068874704690
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -543,7 +556,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 5809259696813022614, guid: 6616497f90111804f9ed811ea3962a7c,
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6616497f90111804f9ed811ea3962a7c,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 492853373599057877}
@@ -558,12 +571,6 @@ Transform:
 --- !u!95 &5349238622031444643 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 6616497f90111804f9ed811ea3962a7c,
-    type: 3}
-  m_PrefabInstance: {fileID: 1969979068874704690}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &5460728265158417060 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5809259696813022614, guid: 6616497f90111804f9ed811ea3962a7c,
     type: 3}
   m_PrefabInstance: {fileID: 1969979068874704690}
   m_PrefabAsset: {fileID: 0}

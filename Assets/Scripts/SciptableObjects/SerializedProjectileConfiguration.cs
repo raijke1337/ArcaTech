@@ -45,10 +45,10 @@ namespace Arcatech.Items
         //    return ProduceProjectile(owner, place.position, place.rotation, attachToUser, spread);
         //}
 
-        public virtual ProjectileComponent ProduceProjectile (ActiveGameUnitComponent owner, Vector3 pos, Quaternion rot,  float spread = 0f)
+        public virtual ProjectileComponent ProduceProjectile (BaseGameEntityComponent owner, Vector3 pos, Quaternion rot,  float spread = 0f)
         {
             ProjectileComponent proj = Instantiate(ProjectilePrefab, pos, rot);
-            proj.Owner = owner.GetMainEntity;
+            proj.Owner = owner;
             Vector3 dir = owner.transform.forward + new Vector3(UnityEngine.Random.Range(-spread, spread), UnityEngine.Random.Range(-spread, spread), UnityEngine.Random.Range(-spread, spread));
 
             proj.transform.forward = dir;

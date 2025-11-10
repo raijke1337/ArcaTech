@@ -16,18 +16,16 @@ namespace Arcatech.Actions
 
     public class EnterStateActionResult : IActionResult
     {
-        SerializedUnitState serState;
         private UnitState state;
         
         public EnterStateActionResult (SerializedUnitState a)
         {
-            serState = a;
+            state = a.Build();
         }
         public void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
-            if (user.TryGetComponent<ActiveGameUnitComponent>(out var actor))
+            if (user.TryGetComponent<EntityStateMachineComponent>(out var actor))
             {
-                state ??= serState.DeserializeState(actor, place);
                 actor.ForceUnitState(state);
             }
         }

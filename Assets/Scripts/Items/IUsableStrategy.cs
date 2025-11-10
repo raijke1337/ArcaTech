@@ -4,7 +4,7 @@ namespace Arcatech
 {
     public interface IUsableStrategy : IStrategy
     {
-        ActiveGameUnitComponent Owner { get; }
+        EntityStateMachineComponent Owner { get; }
         bool CanUseUsable();
         UnitState UseUsable();
         void UpdateUsable(float delta);

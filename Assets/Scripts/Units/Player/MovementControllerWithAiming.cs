@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Arcatech.Units;
 using Arcatech.Units.Control;
 using ECM.Common;
@@ -10,19 +11,31 @@ using UnityEngine.UI;
 namespace Arcatech.Units.Control
 {
 
-    [RequireComponent(typeof(ActiveGameUnitComponent))]
-    public class MovementControllerWithAiming : BaseCharacterController, IPlayerMovementController,IPausableComponent,IKillableComponent
+    [RequireComponent(typeof(EntityStateMachineComponent))]
+    public class MovementControllerWithAiming : BaseCharacterController, IPlayerMovementController,IPausableComponent,IKillableComponent, IUnitStateProvider
     {
-        public bool CanMove { get; set; } = true;
 
-        private ActiveGameUnitComponent _stateMachine;
+        private EntityStateMachineComponent _stateMachine;
         [SerializeField] private SerializedUnitState JumpState;
         private UnitState _jump;
+
+        public bool CanAim { get; set; }  = true;
+        public bool CanMove { get; set; } = true;
         
         public Vector3 MovementVector
         {
             get => moveDirection;
-            set => moveDirection = value;
+            set
+            {
+                if (!CanMove)
+                {
+                    moveDirection = Vector3.zero;
+                }
+                else
+                {
+                    moveDirection = value;
+                }
+            }
         }
 
         public Vector3 AimPosition { get; set; }
@@ -66,7 +79,7 @@ namespace Arcatech.Units.Control
         private float _minCrossYToRotate = 0.15f;
         private void Start()
         {
-            _stateMachine =  GetComponent<ActiveGameUnitComponent>();
+            _stateMachine =  GetComponent<EntityStateMachineComponent>();
             _jump = JumpState.DeserializeState(_stateMachine,_stateMachine.GetMainEntity.transform);
             fmI = Animator.StringToHash(fm);
             smI = Animator.StringToHash(sm);
@@ -84,6 +97,7 @@ namespace Arcatech.Units.Control
         }
         protected override void UpdateRotation()
         {
+            if (!CanAim) return;
             RotateTowards(AimPosition);
         }
         protected override void Animate()
@@ -182,5 +196,7 @@ namespace Arcatech.Units.Control
             if (Killed) return;
             base.FixedUpdate();
         }
+
+        public IEnumerable<SerializedUnitState> GetStates { get; }
     }
 }

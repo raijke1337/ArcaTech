@@ -88,7 +88,7 @@ namespace Arcatech.UI
             cancelButton.onClick.AddListener(OnCancelButton);
             confirmButton.onClick.AddListener(OnConfirmButton);
 
-            var player = FindAnyObjectByType<PlayerUnit>();
+            var player = GameObject.FindWithTag("Player");
             if (player != null)
             {
                 var inv = player.GetComponent<EntityInventoryComponent>();

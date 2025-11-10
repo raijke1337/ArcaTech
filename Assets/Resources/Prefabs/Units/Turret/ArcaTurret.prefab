@@ -306,6 +306,8 @@ GameObject:
   - component: {fileID: 4283152239809128748}
   - component: {fileID: 2614059766441953852}
   - component: {fileID: 7505728206965309969}
+  - component: {fileID: 780370446386354392}
+  - component: {fileID: 7482101161623872221}
   m_Layer: 6
   m_Name: BaseEnemy
   m_TagString: Untagged
@@ -525,7 +527,6 @@ MonoBehaviour:
   timerToDestroy: 0
   _showDebugs: 0
   _rigidbody: {fileID: 8459466759910677821}
-  gravity: 0
   usePhysics: 0
 --- !u!114 &1144859851172070723
 MonoBehaviour:
@@ -539,9 +540,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4980b1095bba4ba4e9dc04954162be1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingStats: {fileID: 11400000, guid: c9551a180c74d634b9aaaf7c896ec589, type: 2}
-  statsUpdateStrategies: []
-  loadedStats: []
+  startingConfig: {fileID: 0}
+  preserveCurrentRatioOnMaxChange: 1
+  killOn0hp: 1
+  statUpdateStrategies: []
 --- !u!114 &6459247402832524359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,15 +556,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8683f71a5cfe53439f51db09350de3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameEntity: {fileID: 5531511641988798103}
-  animator: {fileID: 7841660306185921412}
-  _stats: {fileID: 1144859851172070723}
-  animatorExitStateTrigger: ExitStateTrigger
-  StaggeredState: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
-  DeadState: {fileID: 11400000, guid: 0b8a8ee7cdc62a646a39b231248b013b, type: 2}
-  StunnedState: {fileID: 11400000, guid: f2f512d0267193c4692ef39181e44f00, type: 2}
   agent: {fileID: 3638772222072402140}
   behavior: {fileID: 6901534526635910893}
+  stateMachine: {fileID: 780370446386354392}
+  unitInputs: {fileID: 7482101161623872221}
 --- !u!95 &7841660306185921412
 Animator:
   serializedVersion: 7
@@ -656,7 +653,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entityInventory: {fileID: 4283152239809128748}
-  _stateUnit: {fileID: 6459247402832524359}
+  _stateUnit: {fileID: 780370446386354392}
+--- !u!114 &780370446386354392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3354679004068212836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed2ea13325d0c8f46894c730f68cb730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEntity: {fileID: 5531511641988798103}
+  animator: {fileID: 7841660306185921412}
+  animatorExitStateTrigger: ExitStateTrigger
+  StaggeredState: {fileID: 0}
+  DeadState: {fileID: 0}
+  StunnedState: {fileID: 0}
+--- !u!114 &7482101161623872221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3354679004068212836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7e4c25029a0828489059e20e24400c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameUnitComponent: {fileID: 780370446386354392}
 --- !u!1 &4995380669111036805
 GameObject:
   m_ObjectHideFlags: 0

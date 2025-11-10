@@ -48,7 +48,7 @@ namespace Arcatech.Interactions
                     // apply result using only interactor data
                     foreach (var result in _listS)
                     {
-                        result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                        result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
                             null,
                             interactor.InteractionContext.ActionTransform);
                     }
@@ -59,7 +59,7 @@ namespace Arcatech.Interactions
                     // use item as target
                     foreach (var result in _listS)
                     {
-                        result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                        result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
                             item.GetBaseComponent,
                             item.GetBaseComponent.SpawnPoint);
                     }
@@ -72,7 +72,7 @@ namespace Arcatech.Interactions
                     // apply result using only interactor data
                     foreach (var result in _listF)
                     {
-                        result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                        result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
                             null,
                             interactor.InteractionContext.ActionTransform);
                     }
@@ -83,7 +83,7 @@ namespace Arcatech.Interactions
                     // use item as target
                     foreach (var result in _listF)
                     {
-                        result.ProduceResult(interactor.InteractionContext.ActiveGameUnitComponent.GetMainEntity,
+                        result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
                             item.GetBaseComponent,
                             item.GetBaseComponent.SpawnPoint);
                     }

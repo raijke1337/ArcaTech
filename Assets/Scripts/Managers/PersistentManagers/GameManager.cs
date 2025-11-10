@@ -28,7 +28,7 @@ namespace Arcatech.Managers
             else Destroy(gameObject);
         }
         #endregion
-        [SerializeField] private PlayerUnit PlayerPrefab;
+       
         [SerializeField] private MenuPrefabControllerComp _mainMenuPrefab;
 
         [SerializeField] private GameInterfaceManager gameInterfaceManagerPrefab;

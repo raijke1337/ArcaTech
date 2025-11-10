@@ -10,7 +10,7 @@ namespace Arcatech.Skills
     public class Skill : IUsable,IAffectsItemDisplay
     {
         #region interface
-        public ActiveGameUnitComponent Owner { get ; set; }
+        public EntityStateMachineComponent Owner { get ; set; }
        // protected SerializedSkill Config { get; }
         public UnitActionType UseActionType { get;  }
         public StatsEffect GetCost { get; }
@@ -25,7 +25,7 @@ namespace Arcatech.Skills
         public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseGameEntityComponent owner, EquipmentComponent item, ItemType type)
         { 
 
-            Owner = owner.GetComponent<ActiveGameUnitComponent>();
+            Owner = owner.GetComponent<EntityStateMachineComponent>();
             if (settings == null) return; // placeholder maybe TODO - for items without skills
 
             switch (type)

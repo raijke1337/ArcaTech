@@ -1,0 +1,172 @@
+Good — there are two common and simple patterns you can use. I recommend the first (intent-driven, state-machine-authoritative) because it keeps the state machine as the single source of truth and avoids timing/desync issues. Below I show both patterns, explain pros/cons, and give concrete, readable code you can drop in and adapt.
+
+Summary
+- Recommended: Movement component sends an “intent” (JumpRequested) to the state machine (or to a central PlayerController). The state machine evaluates transitions; the JumpStart state's OnEnter action calls the movement component to apply the impulse. This keeps order deterministic and prevents desync.
+- Alternative: Movement component applies impulse immediately and the state machine detects the physical change (vertical velocity / isGrounded false) and transitions. This works but can be racy or harder to reason about.
+
+Minimal code (intent-driven approach)
+1) Extend `StateMachineContext` so it carries entity references and request flags:
+
+```csharp
+// StateMachineContext.cs
+public class StateMachineContext
+{
+    public string info = "some context";
+    public UnitState CurrentState;
+
+    // reference to the entity owning the state machine (for actions to call)
+    public GameObject Owner;
+
+    // intent flags (reset after consumed)
+    public bool JumpRequested;
+
+    public void ClearRequests()
+    {
+        JumpRequested = false;
+    }
+}
+```
+
+2) Add a simple public API on your `EntityStateMachineComponent` so other components request actions:
+
+```csharp
+// EntityStateMachineComponent.cs (excerpt)
+public class EntityStateMachineComponent : MonoBehaviour
+{
+    private UnitState CurrentState;
+    private StateMachineContext _ctx = new StateMachineContext();
+
+    void Awake()
+    {
+        _ctx.Owner = gameObject;
+    }
+
+    public void RequestJump()
+    {
+        // Movement system (or input) calls this on jump input
+        _ctx.JumpRequested = true;
+
+        // Optional: evaluate immediately so jump is responsive
+        EvaluateTransitions(); // see below
+    }
+
+    void Update()
+    {
+        if (CurrentState == null) return;
+        CurrentState.Update(_ctx, Time.deltaTime, /*animator*/ null);
+        EvaluateTransitions();
+    }
+
+    // Evaluate available transitions and perform first valid transition
+    void EvaluateTransitions()
+    {
+        if (CurrentState == null) return;
+
+        var transition = CurrentState.ChooseTransition(_ctx, /*animator*/ null);
+        if (transition != null && transition.NextState != null)
+        {
+            // run transition actions
+            if (transition.OnTransition != null)
+            {
+                foreach (var action in transition.OnTransition)
+                    action?.Execute(_ctx);
+            }
+
+            // switch states
+            CurrentState.Exit(_ctx);
+            CurrentState = transition.NextState;
+            _ctx.CurrentState = CurrentState;
+            CurrentState.Enter(_ctx, /*animator*/ null);
+
+            // clear any consumed requests (you can also let specific actions clear)
+            _ctx.ClearRequests();
+        }
+    }
+
+    // Keep your existing ForceUnitState logic too (for forced transitions).
+}
+```
+
+3) Implement a `TransitionConditionSO` that checks the jump request:
+
+```csharp
+// JumpRequestedConditionSO.cs
+using UnityEngine;
+
+[CreateAssetMenu(menuName = "StateMachine/Conditions/JumpRequested")]
+public class JumpRequestedConditionSO : TransitionConditionSO
+{
+    public override bool CanTransition(StateMachineContext ctx)
+    {
+        return ctx != null && ctx.JumpRequested;
+    }
+}
+```
+
+4) Implement an `ActionResultSO` that actually applies the jump impulse when the state enters (or as a transition action):
+
+```csharp
+// ApplyJumpImpulseActionSO.cs
+using UnityEngine;
+
+[CreateAssetMenu(menuName = "StateMachine/Actions/ApplyJumpImpulse")]
+public class ApplyJumpImpulseActionSO : ActionResultSO
+{
+    public float jumpForce = 6f;
+    public Vector3 upward = Vector3.up;
+
+    public override void Execute(StateMachineContext ctx)
+    {
+        if (ctx == null || ctx.Owner == null) return;
+
+        var mover = ctx.Owner.GetComponent<MovementController>();
+        if (mover != null)
+        {
+            mover.ApplyJumpImpulse(upward * jumpForce);
+        }
+
+        // Optionally clear the request here:
+        ctx.ClearRequests();
+    }
+}
+```
+
+5) In your `UnitStateSO`/transitions, use `JumpRequestedConditionSO` on the transition that leads to `JumpStart` and attach `ApplyJumpImpulseActionSO` either to the transition's `OnTransition` or to the `JumpStart` state's `OnEnterActions`.
+
+Behavioral flow
+- Player presses Jump button → MovementController or Input system calls `entityStateMachine.RequestJump()`.
+- `RequestJump()` sets `ctx.JumpRequested = true` (and optionally calls `EvaluateTransitions()` immediately).
+- Next frame (or immediately), the state machine runs `ChooseTransition(...)`. The transition with `JumpRequestedCondition` returns true.
+- Transition actions (if any) run; then `CurrentState.Exit()`, `CurrentState = NextState`, and `CurrentState.Enter()` run.
+- `ApplyJumpImpulseActionSO.Execute()` runs and instructs the `MovementController` to apply the impulse to the Rigidbody.
+- Requests are cleared so the transition won't re-fire.
+
+Why this is good
+- The state machine decides when the jump begins (good for animation timing, locks, etc.).
+- The impulse is applied as part of state lifecycle, so animations and gameplay locks are synchronized.
+- No race between physics and state; request is a single-source intent.
+
+Alternative approach (movement-first)
+- MovementController applies the impulse immediately on input and sets `ctx.IsAirborne = true`.
+- A `Condition` checks `IsAirborne` or vertical velocity > threshold to transition to `JumpStart`.
+- This can work but you risk the state transition lagging a frame behind physics and having inconsistent locks during that frame. Use when state must follow a physics-driven event (e.g., hit by explosion causing knockback).
+
+Extra tips
+- Decide where to clear the request: transition action or state enter is common. Clearing in the movement controller can be brittle.
+- Use `EvaluateTransitions()` both in `Update()` and after `RequestJump()` to keep input responsive.
+- If you have many request types, replace booleans with an enum or command queue on the context:
+  - `public Queue<PlayerCommand> Commands;` and `RequestJump()` enqueues `PlayerCommand.Jump`.
+  - A `CommandConditionSO` dequeues or peeks to test commands.
+- If transitions depend on grounded checks, include `ctx.IsGrounded` or let a `GroundedConditionSO` query the `MovementController` directly (`ctx.Owner.GetComponent<MovementController>().IsGrounded()`).
+
+Short example using a command enum
+```csharp
+public enum PlayerCommand { None, Jump, Dash, Attack }
+public class StateMachineContext { public PlayerCommand PendingCommand = PlayerCommand.None; public void ClearCommand() => PendingCommand = PlayerCommand.None; }
+```
+A `CommandCondition` checks `ctx.PendingCommand == PlayerCommand.Jump`. The `ApplyJumpImpulseActionSO` calls `ctx.ClearCommand()` after executing.
+
+Conclusion
+- Use intent/request pattern: input → request → state machine evaluates → state Enter applies physics/action.
+- Keep the state machine authoritative about gameplay locks and animation sequencing.
+- If you want, I can paste a complete minimal example project: `EntityStateMachineComponent`, `MovementController`, `UnitStateSO` sample, and SO assets wiring exactly how to set jumps up in the Editor. Which would you prefer?

@@ -1,288 +1,236 @@
 ﻿using Arcatech.Actions;
 using System;
 using System.Linq;
+using Unity.AppUI.UI;
 using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Arcatech.Units
 {
-    public class UnitState : IUnitAction
+    public enum UnitActionState
     {
-        public static UnitState Build(ActiveGameUnitComponent u, bool lck, NextActionSettings next, string anim,
-            float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish,
-            SerializedActionResult[] onExit, Transform place, float crossfade)
-        {
-            return new UnitState(u, lck, next, anim, exit, onstart, onfinish, onExit, place, crossfade);
-        }
+        None,
+        Started,
+        ExitTime,
+        Completed
+    }
+
+    public class StateMachineContext
+    {
+        public string info = "some context";
+        public Transform Spawn;
+    }
 
 
-        private Animator animator;
-        private ActiveGameUnitComponent _actor;
 
-        private StopwatchTimer _actionTimer;
-        float _totalActionTime;
-        float _exitActionTime;
-
-        readonly Transform place;
-        private int stateHash;
+    public class UnitState
+    {
+        public string StateName { get; }
+        private EntityStateMachineComponent _actor;
+        public float TimeInState => _stateTimer.GetTime;
+        private readonly StopwatchTimer _stateTimer;
+        public bool AllowsAiming { get; }
+        public bool AllowsMovement { get; }
+        public bool Invulnerable { get; }
+        public StateTransition[] Transitions { get; }
+        public IActionResult[] OnEnterState { get;  }
+        public IActionResult[] OnExitState { get; }
+        
+        private int _animatorHash;
+        private int _animatorLayer;
         readonly float _crossfadeTime;
-
-        UnitState(ActiveGameUnitComponent u, bool locks, NextActionSettings next, string animatorSt, float exitTimeMult,
-            SerializedActionResult[] onstart, SerializedActionResult[] onfinish, SerializedActionResult[] onExit,
-            Transform place, float crossfade)
+        
+        public UnitState(string name,
+            int animatorHash = 0,
+            float crossfadeTime = 0.1f,
+            int animatorLayer = 0,
+            bool allowsMove = true,
+            bool allowsAim = true,
+            bool invulnerable = false,
+            StateTransition[] transitions = null,
+            SerializedActionResult[] onEnter = null,
+            SerializedActionResult[] onExit = null)
         {
-            _actor = u;
-            LockMovement = locks;
-            Next = next;
-            _crossfadeTime = crossfade;
-            this.place = place;
-
-            animator = u.GetComponentInChildren<Animator>();
-
-            if (onstart != null && onstart.Length > 0)
+            StateName = name;
+            _animatorHash = animatorHash;
+            _crossfadeTime = crossfadeTime;
+            _animatorLayer = animatorLayer;
+            AllowsMovement = allowsMove;
+            AllowsAiming = allowsAim;
+            Invulnerable = invulnerable;
+            Transitions = transitions ?? Array.Empty<StateTransition>();
+            if (onEnter != null && onEnter.Length > 0)
             {
-                OnEnterState = new ActionResult[onstart.Length];
-                for (int i = 0; i < onstart.Length; i++)
+                OnEnterState = new IActionResult[onEnter.Length];
+                for (int i = 0; i < onEnter.Length; i++)
                 {
-                    if (!onstart[i])
-                    {
-                        Debug.LogWarning($"Action {this} start at {onstart[i].name} is null");
-                        continue;
-                    }
-
-                    OnEnterState[i] = onstart[i].BuildActionResult();
+                    OnEnterState[i] = onEnter[i].BuildActionResult();
                 }
             }
-
-            if (onfinish != null && onfinish.Length > 0)
-            {
-                OnExitState = new IActionResult[onfinish.Length];
-
-                for (int i = 0; i < onfinish.Length; i++)
-                {
-                    if (!onfinish[i])
-                    {
-                        Debug.LogWarning($"Action {this} start at {onfinish[i].name} is null");
-                        continue;
-                    }
-
-                    OnExitState[i] = onfinish[i].BuildActionResult();
-                }
-            }
-
             if (onExit != null && onExit.Length > 0)
             {
-
-                OnExitTime = new IActionResult[onExit.Length];
+                OnExitState = new IActionResult[onExit.Length];
                 for (int i = 0; i < onExit.Length; i++)
                 {
-                    if (!onExit[i])
-                    {
-                        Debug.LogWarning($"Action {this} exit at {onExit[i].name} is null");
-                        continue;
-                    }
-
-                    OnExitTime[i] = onExit[i].BuildActionResult();
+                    OnExitState[i] = onExit[i].BuildActionResult();
                 }
             }
-            _actionTimer = new StopwatchTimer();
-
-            if (HasState(animatorSt, out stateHash))
-            {
-
-                if (animator.runtimeAnimatorController.animationClips.All(t => t.name != animatorSt))
-                {
-                    Debug.LogWarning($"Couldn't find animation {animatorSt}");
-                    return;
-                }
-
-                var clip = animator.runtimeAnimatorController.animationClips.First(t => t.name == animatorSt);
-                var clipLength = clip.length;
-
-                AnimatorController ac = animator.runtimeAnimatorController as AnimatorController;
-                var l = ac.layers;
-
-                foreach (var layer in l)
-                {
-                    var s = layer.stateMachine.states;
-                    foreach (var state in s)
-                    {
-                        if (state.state.name == animatorSt)
-                        {
-                            var animSpeedMult = state.state.speed;
-                            //Debug.Log($"found anim speed {animSpeedMult} for animation {_animationName}");
-
-                            _totalActionTime = clipLength / animSpeedMult;
-                            _exitActionTime = _totalActionTime * exitTimeMult;
-                            if (u.GetMainEntity.ShowingDebugs)
-                                Debug.Log(
-                                    $"Action {this} exit at {_exitActionTime} complete at {_totalActionTime}");
-                            break;
-                        }
-                    }
-                }
-
-
-            }
-
-
-        }
-    
-
-    private bool HasState(string stateName, out int hash,int layer = 0)
-        {
-            hash = 0;
-            if (animator == null || animator.runtimeAnimatorController == null)
-                return false;
-        
-            // Get the state hash
-            hash = Animator.StringToHash(stateName);
-        
-            // Check if the state exists in the specified layer
-            return animator.HasState(layer, hash);
         }
         
 
-        public bool LockMovement { get; protected set; }
+
         
-        public IActionResult[] OnEnterState { get; private set;  }
-        public IActionResult[] OnExitState { get; private set; }
-        public IActionResult[] OnExitTime { get;private set; }
-        private NextActionSettings Next { get; }
-
-
-
-        public event UnityAction<UnitActionState> ActionStateChangedEvent = delegate { };
-
-        UnitActionState _actionState = UnitActionState.None;
-        public UnitActionState GetActionState => _actionState;
-
-        public UnitActionState UpdateAction(float delta)
+        public void StartState(StateMachineContext context, Animator animator)
         {
-            _actionTimer?.Tick(delta);
+            _stateTimer.Reset();
+            _stateTimer.Start();
             
-            if (_actionTimer.GetTime >= _exitActionTime && _actionState == UnitActionState.Started)
-            {
-                ExitTimeAction();
-            }
-            if (_actionTimer.GetTime >= _totalActionTime && _actionState == UnitActionState.ExitTime)
-            {
-                ExitState();
-            }
-            return _actionState;
-        }
-
-        public bool CanAdvance(out SerializedUnitState next)
-        {
-            next = null;
-
-            bool ok = Next.GetNextState != null && Next.CheckTime(_actionTimer.GetTime / _totalActionTime);
-            if (ok)
-            {
-                next = Next.GetNextState;
-            }
-            return ok;
-        }
-
-        private float starttime;
-        public void StartState()
-        {
-            starttime = Time.time;
-            if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Start state {this} at {starttime}, total time calculated {_totalActionTime}");
-            string start = "";
+            if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Entering state {this}");
             
-            animator.CrossFade(stateHash, _crossfadeTime);
+            // Apply animator crossfade if an animation name/hash was provided
+            if (animator != null && _animatorHash != 0)
+                animator.CrossFadeInFixedTime(_animatorHash, _crossfadeTime, _animatorLayer);
+
+            // Execute on-enter actions
             
             if (OnEnterState != null)
             {
                 foreach (var r in OnEnterState)
                 {
-                    if (r == null)
-                    {
-                        start += "NULL RESULT";
-                    }// bandaid TODO dunno why it happens
-                    else
-                    {
-                        r.ProduceResult(_actor.GetMainEntity, null, place);
-                        start += (r.ToString() + ' ');
-                    }
+                    r.ProduceResult(_actor.GetMainEntity, null,context.Spawn);
                 }
             }
-            ActionStateChangedEvent.Invoke(UnitActionState.Started);
-            _actionTimer.Reset();
-            _actionTimer.Start();
-            _actionState = UnitActionState.Started;
-
-
+           // ActionStateChangedEvent.Invoke(UnitActionState.Started);
+            //_actionState = UnitActionState.Started;
         }
-        void ExitTimeAction()
+        
+        public void UpdateState(float delta)
         {
-            if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Exit time state {this} at {Time.time}, time elapsed {_actionTimer.GetTime}");
-            string ex = "";
-            if (OnExitTime != null)
-            {
-                foreach (var r in OnExitTime)
-                {
-                    if (r == null)
-                    {
-                        ex += "NULL RESULT";
-                    }// bandaid TODO dunno why it happens
-                    else
-                    {
-                        r.ProduceResult(_actor.GetMainEntity, null, place);
-                        ex += (r.ToString() + ' ');
-                    }
-                }
-            }
-            _actionState = UnitActionState.ExitTime;
-            ActionStateChangedEvent.Invoke(UnitActionState.ExitTime);
-            if (_actor.GetMainEntity.ShowingDebugs) { Debug.Log($"{this}, result {ex}"); }
-
+            _stateTimer?.Tick(delta);
         }
-        public void ExitState()
+       
+        
+        public void ExitState(StateMachineContext context, Animator animator)
         {
-            if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Exit state {this} at {Time.time}, time elapsed {_actionTimer.GetTime}");
-            if (_actionState == UnitActionState.Completed)
-            {
-                _actionState = UnitActionState.None;
-                return;
-            }
-            string fin = "";
-            if (OnExitState != null)
-            {
-                foreach (var r in OnExitState)
-                {
-                    if (r == null)
-                    {
-                        fin +=  "NULL RESULT";
-                    }// bandaid TODO dunno why it happens
-                    else
-                    {
-                        r.ProduceResult(_actor.GetMainEntity, null, place);
-                        fin += (r.ToString() + ' ');
-                    }
-                }
-            };
-            
-            ActionStateChangedEvent.Invoke(UnitActionState.Completed);
-            _actionState = UnitActionState.Completed;
-            _actionTimer.Stop();
+            if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Exit state {this} at {Time.time}, " +
+                                                              $"time elapsed {_stateTimer.GetTime}");
 
+            foreach (var a in OnExitState)
+                a?.ProduceResult(_actor.GetMainEntity, null,context.Spawn);
+            _stateTimer.Stop();
 
         }
+        // Choose a valid transition based on conditions and optional exit-time requirement
+        public StateTransition ChooseTransition(StateMachineContext ctx, Animator animator)
+        {
+            // Iterate transitions in the order provided; you can sort by priority if you add such a field
+            foreach (var t in Transitions)
+            {
+                if (t == null) continue;
+
+                // If this transition requires the animation to reach a normalized time before firing, check that
+                if (!HasPassedExitTime(animator, t.ExitNormalizedTime)) continue;
+
+                if (t.CanTransition(ctx)) return t;
+            }
+            return null;
+        }
+
+        private bool HasPassedExitTime(Animator animator, float requiredNormalized)
+        {
+            requiredNormalized = Mathf.Clamp01(requiredNormalized);
+            if (requiredNormalized <= 0f) return true;
+            if (animator == null) return _stateTimer.GetTime > 0.001f; // can't check animator, allow tiny progress
+
+            var info = animator.GetCurrentAnimatorStateInfo(_animatorLayer);
+            // If there's a transition in progress, check next state's normalized time too (helps blends)
+            if (animator.IsInTransition(_animatorLayer))
+            {
+                var next = animator.GetNextAnimatorStateInfo(_animatorLayer);
+                if (next.IsName("") == false)
+                    return next.normalizedTime >= requiredNormalized;
+            }
+            return info.normalizedTime >= requiredNormalized;
+        }
+
+
+        //
+        // float _totalActionTime;
+        // float _exitActionTime;
+
+       /// readonly Transform place;
+
+       // public bool LockMovement { get; protected set; 
+       // public IActionResult[] OnExitTime { get;private set; }
+       
+
+
+
+      //  public event UnityAction<UnitActionState> ActionStateChangedEvent = delegate { };
+
+      //  UnitActionState _actionState = UnitActionState.None;
+    //    public UnitActionState GetActionState => _actionState;
+
+    // public static UnitState Build(EntityStateMachineComponent u, bool lck, NextActionSettings next, string anim,
+    //     float exit, SerializedActionResult[] onstart, SerializedActionResult[] onfinish,
+    //     SerializedActionResult[] onExit, Transform place, float crossfade)
+    // {
+    //     return new UnitState(u, lck, next, anim, exit, onstart, onfinish, onExit, place, crossfade);
+    // }
+
+        // // todo remove (check for transitions)
+        // public bool CanAdvance(out SerializedUnitState next)
+        // {
+        //     next = null;
+        //
+        //     bool ok = Next.GetNextState != null && Next.CheckTime(_stateTimer.GetTime / _totalActionTime);
+        //     if (ok)
+        //     {
+        //         next = Next.GetNextState;
+        //     }
+        //     return ok;
+        // }
+
+     //   private float starttime;
+
+        // void ExitTimeAction()
+        // {
+        //     if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Exit time state {this} at {Time.time}, time elapsed {_stateTimer.GetTime}");
+        //     string ex = "";
+        //     if (OnExitTime != null)
+        //     {
+        //         foreach (var r in OnExitTime)
+        //         {
+        //             if (r == null)
+        //             {
+        //                 ex += "NULL RESULT";
+        //             }// bandaid TODO dunno why it happens
+        //             else
+        //             {
+        //                 r.ProduceResult(_actor.GetMainEntity, null, place);
+        //                 ex += (r.ToString() + ' ');
+        //             }
+        //         }
+        //     }
+        //     _actionState = UnitActionState.ExitTime;
+        //     ActionStateChangedEvent.Invoke(UnitActionState.ExitTime);
+        //     if (_actor.GetMainEntity.ShowingDebugs) { Debug.Log($"{this}, result {ex}"); }
+        //
+        // }
+
 
     }
-
-    [Serializable]
-    public class NextActionSettings
-    {
-        [SerializeField] SerializedUnitState _nextAnim;
-        [SerializeField,Range(0f, 1f)] float _chainWindowEnd;
-        public bool CheckTime(float currentPercent)
-        {
-            return (currentPercent <= _chainWindowEnd);
-        }
-        public SerializedUnitState GetNextState { get => _nextAnim; }
-    }
+   // private NextActionSettings Next { get; }
+    // [Serializable]
+    // public class NextActionSettings
+    // {
+    //     [SerializeField] SerializedUnitState _nextAnim;
+    //     [SerializeField,Range(0f, 1f)] float _chainWindowEnd;
+    //     public bool CheckTime(float currentPercent)
+    //     {
+    //         return (currentPercent <= _chainWindowEnd);
+    //     }
+    //     public SerializedUnitState GetNextState { get => _nextAnim; }
+    // }
 }

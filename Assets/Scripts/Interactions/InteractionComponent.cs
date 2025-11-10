@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 
 namespace Arcatech.Interactions
 {
-    [RequireComponent(typeof(ActiveGameUnitComponent), typeof(PlayerAimingComponent))]
+    [RequireComponent(typeof(EntityStateMachineComponent), typeof(PlayerAimingComponent))]
     public class InteractionComponent : ValidatedMonoBehaviour, IInteractor
     {
         [SerializeField, Range(0, 5)] private float interactRange = 1.5f;
@@ -18,7 +18,7 @@ namespace Arcatech.Interactions
         [SerializeField] private SerializedUnitState stateFail;
         
         
-        [Space,SerializeField,Self] ActiveGameUnitComponent cachedActor;
+        [Space,SerializeField,Self] EntityStateMachineComponent cachedActor;
         [SerializeField,Tooltip("effects spawn here")] private Transform interactionActionTransform;
         
         
@@ -31,7 +31,7 @@ namespace Arcatech.Interactions
 
         private void Start()
         {
-            if (!cachedActor) cachedActor = GetComponentInChildren<ActiveGameUnitComponent>();
+            if (!cachedActor) cachedActor = GetComponentInChildren<EntityStateMachineComponent>();
             _aim = GetComponentInChildren<IInteractionTargetPicker>();
             if (_aim == null) Debug.LogError("No IInteractionTargetPicker component found on " + gameObject.name);
         }

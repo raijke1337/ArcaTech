@@ -7,12 +7,19 @@ using UnityEngine.AI;
 
 namespace Arcatech.Units
 {
+    /// <summary>
+    /// this is now separate from ActiveUnitComp (aka StateMachine)
+    /// </summary>
     [RequireComponent(typeof(BehaviorGraphAgent),typeof(NavMeshAgent),typeof(UnitInputsComponent))]
-    public class NPCUnitComponent : ActiveGameUnitComponent, IEffectsTakerComponent
+    [RequireComponent(typeof(EntityStateMachineComponent))]
+    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IEffectsTakerComponent
     {
         
         [SerializeField,Self]protected NavMeshAgent agent;
         [SerializeField,Self]protected BehaviorGraphAgent behavior;
+        [SerializeField,Self]protected EntityStateMachineComponent stateMachine;
+        [SerializeField,Self]protected UnitInputsComponent unitInputs;
+        
         private BlackboardReference bbref;
         EnterCombatEventChannel combatEventChannel;
 
@@ -28,33 +35,32 @@ namespace Arcatech.Units
 
          
         
-        protected override void Start()
+        protected void Start()
         {
-            base.Start();
             if (!behavior) return;
             // failsafe for unset units
             bbref = behavior.BlackboardReference;
             bbref.GetVariableValue("PlayerAttackedEvent", out combatEventChannel);
         }
         
-        protected override void OnActionLock(bool locking)
+        protected void OnActionLock(bool locking)
         {
-            base.OnActionLock(locking);
+          //  base.OnActionLock(locking);
             agent.isStopped = locking;
         }
 
-        protected override void OnPause(bool paused)
+        protected void OnPause(bool paused)
         {
-            base.OnPause(paused);   
+           // base.OnPause(paused);   
             agent.isStopped = paused;
             
             if (!behavior) return;
             behavior.enabled = !paused;
         }
 
-        protected override void OnKill(bool kill)
+        protected void OnKill(bool kill)
         {
-            base.OnKill(kill);
+           // base.OnKill(kill);
             agent.isStopped = true;
             
             if (!behavior) return;
@@ -66,7 +72,7 @@ namespace Arcatech.Units
         public void ApplyEffect(StatsEffect effect,BaseGameEntityComponent source)
         {
             if (source == null) return;
-            if (source.GetEntitySide != GetMainEntity.GetEntitySide && GetMainEntity.GetEntitySide != Side.Unassigned)
+            if (source.GetEntitySide != stateMachine.GetMainEntity.GetEntitySide && stateMachine.GetMainEntity.GetEntitySide != Side.Unassigned)
             {
                 CombatState = true;
                // Debug.Log($"{GetMainEntity.GetName} received {effect} from {source}, entering combat");

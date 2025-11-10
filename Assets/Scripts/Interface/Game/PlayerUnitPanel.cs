@@ -23,12 +23,12 @@ namespace Arcatech.UI
         /// not called in this component
         /// </summary>
         public event UnityAction ViewChangedInventory;
-        PlayerUnit _player;
+        BaseGameEntityComponent _player;
         UsablesCasterComponent _usablesCasterComponent;
 
         private void Start()
         {
-            _player = FindAnyObjectByType<PlayerUnit>();
+            _player = GameObject.FindWithTag("Player").GetComponent<BaseGameEntityComponent>();
             if ( _player != null )
             {
                 var st = _player.GetComponent<EntityStatsComponent>();

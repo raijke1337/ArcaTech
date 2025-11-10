@@ -4,6 +4,8 @@ namespace Arcatech.Units.Control
 {
     public interface IPlayerMovementController : IAim, IMove, IJump
     {
+        public bool CanMove { get; set;}
+        public bool CanAim { get; set; }
     }
     public interface IAim
     {

@@ -31,7 +31,7 @@ namespace Arcatech.Managers
 
 
 
-        private PlayerUnit _player;
+        private BaseGameEntityComponent _player;
 
         [SerializeField] private EquipmentsMenuContainerScript _menuContainer;
 
@@ -45,7 +45,7 @@ namespace Arcatech.Managers
             Assert.IsNotNull(_menuContainer,"Add menu container component to a child");
 
 
-            _player = FindObjectOfType<PlayerUnit>();
+            _player = GameObject.Find("Player").GetComponent<BaseGameEntityComponent>();
             if (_player == null)
             {
                 Debug.LogError($"Player unit not found!");

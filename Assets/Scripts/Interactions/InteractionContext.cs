@@ -1,23 +1,24 @@
-﻿using UnityEngine;
+﻿using Arcatech.Units;
+using UnityEngine;
 
 namespace Arcatech.Interactions
 {
     public class InteractionContext : IInteractionContext
     {
         public string SomeInformation { get; private set; }
-        public ActiveGameUnitComponent ActiveGameUnitComponent { get; }
+        public EntityStateMachineComponent EntityStateMachineComponent { get; }
         public Transform ActionTransform { get; }
         
-        public static InteractionContext Create(ActiveGameUnitComponent actor, Transform place,string text = "undefined context")
+        public static InteractionContext Create(EntityStateMachineComponent actor, Transform place,string text = "undefined context")
         {
             return new InteractionContext(actor,place,text); 
         }
         
 
-        private InteractionContext(ActiveGameUnitComponent actor, Transform place, string someInformation)
+        private InteractionContext(EntityStateMachineComponent actor, Transform place, string someInformation)
         {
             SomeInformation = someInformation;
-            ActiveGameUnitComponent = actor;
+            EntityStateMachineComponent = actor;
             ActionTransform = place;
         }
 
