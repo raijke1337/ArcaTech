@@ -8,9 +8,9 @@ public class PlayerInputReaderObject : ScriptableObject, PlayerControls.IGameAct
 {
     private PlayerControls _controls;
 
-    public event UnityAction<InputAction.CallbackContext> Movement = delegate { };
+  //  public event UnityAction<InputAction.CallbackContext> Movement = delegate { };
    // public event UnityAction<InputAction.CallbackContext> Aim = delegate { };
-    public event UnityAction<InputAction.CallbackContext> Jump = delegate { };
+   // public event UnityAction<InputAction.CallbackContext> Jump = delegate { };
     public event UnityAction<InputAction.CallbackContext,UnitActionType> CombatAction = delegate { };
        // Melee = delegate { };
     // public event UnityAction<InputAction.CallbackContext> Ranged = delegate { };
@@ -39,7 +39,7 @@ public class PlayerInputReaderObject : ScriptableObject, PlayerControls.IGameAct
 
     public void OnWASD(InputAction.CallbackContext context)
     {
-        Movement.Invoke(context);
+        CombatAction.Invoke(context,UnitActionType.Movement);
     }
 
     public void OnUseMeleeSkill(InputAction.CallbackContext context)
@@ -79,7 +79,7 @@ public class PlayerInputReaderObject : ScriptableObject, PlayerControls.IGameAct
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        Jump.Invoke(context);
+        CombatAction?.Invoke(context,UnitActionType.Jump);
     }
 
     public void OnAim(InputAction.CallbackContext context)

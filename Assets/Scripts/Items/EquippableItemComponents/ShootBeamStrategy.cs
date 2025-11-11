@@ -7,7 +7,7 @@ namespace Arcatech.Items
 {
     public class ShootBeamStrategy : WeaponStrategy
     {
-        IActionResult[] OnColliderHit;
+        ActionResult[] OnColliderHit;
 
         private LaserEmitterComponent laser;
         public BeamSettings BeamSettings {get; private set;}
@@ -18,7 +18,7 @@ namespace Arcatech.Items
             WeaponSO cfg, int charges, float reload, EquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
         {
  
-            OnColliderHit = new IActionResult[onHit.Length];
+            OnColliderHit = new ActionResult[onHit.Length];
             for (int i = 0; i < onHit.Length; i++)
             {
                 OnColliderHit[i] = onHit[i].BuildActionResult();
@@ -39,7 +39,7 @@ namespace Arcatech.Items
         {
             foreach (var res in OnColliderHit)
             {
-                res.ProduceResult(Owner.GetMainEntity, enterComponent, enterComponent.SpawnPoint);
+                res.ProduceResult(Owner.GetMainEntity, enterComponent, enterComponent.EffectSpawn);
             }
         }
 

@@ -30,7 +30,7 @@ namespace Arcatech.Units
     {
         public int TransitionPriority { get; }
         public UnitState NextState { get; }
-        public IActionResult[] OnTransition { get; }
+        public ActionResult[] OnTransition { get; }
         public float ExitNormalizedTime { get; }
         public SerializedStateTransitionCondition[] Conditions { get; }
 
@@ -43,7 +43,7 @@ namespace Arcatech.Units
             NextState = nextState;
             if (onTransition != null && onTransition.Length > 0)
             {
-                OnTransition = new IActionResult[onTransition.Length];
+                OnTransition = new ActionResult[onTransition.Length];
                 for (int i = 0; i < onTransition.Length; i++)
                 {
                     OnTransition[i] = onTransition[i].BuildActionResult();

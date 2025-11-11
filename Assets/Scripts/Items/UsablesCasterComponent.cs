@@ -16,14 +16,13 @@ namespace Arcatech.Items
     /// is a bad idea when you need to add functionality
     /// </summary>
     [RequireComponent(typeof(EntityStateMachineComponent),typeof(UnitInputsComponent))]
-    public class UsablesCasterComponent : ValidatedMonoBehaviour, IUnitCommandHandler, IUnitInventoryView, IDrawItemsStrategyProvider
+    public class UsablesCasterComponent : ValidatedMonoBehaviour, IUnitCommandPerformer, IUnitInventoryView,IUnitCommandValidator
+        , IDrawItemsStrategyProvider
     {
 
         public event UnityAction ViewChangedInventory;
         [SerializeField,Self] EntityInventoryComponent entityInventory;
         [SerializeField, Self] private EntityStateMachineComponent _stateUnit;
-
-        public event UnityAction<UnitActionType,bool> ActionAnnounce = delegate { };
 
         private EntityStatsComponent stats;
         
@@ -40,7 +39,6 @@ namespace Arcatech.Items
         private void Awake()
         {
             _usables = new();
-            _commandValidators = new(GetComponentsInChildren<IUnitCommandValidator>());
             stats =  GetComponent<EntityStatsComponent>();
         }
 
@@ -90,40 +88,24 @@ namespace Arcatech.Items
         #endregion
 
         
-        #region commands handler
-        private List<IUnitCommandValidator> _commandValidators;
-        public void AssignUnitCommandsValidator(IUnitCommandValidator validator)
-        {
-            if (!_commandValidators.Contains(validator)) _commandValidators.Add(validator);
-        }
-        
 
 
         bool ValidateCommand(UnitActionType type)
         {
+            if (type == UnitActionType.Movement || type == UnitActionType.Jump) return true;
             if (!_usables.TryGetValue(type, out var usable)) return false;
-            foreach (var validator in _commandValidators)
-            {
-                if (!validator.CanHandleUnitCommand(type)) return false; // the only validator for now is the grounding component.
-                // stats are a separate component because there is a cost attached to item use.
-            }
 
             return stats == null
                 ? usable.UsableIsReady()
                 : stats.CanApplyCost(usable.GetCost) && usable.UsableIsReady();
         }
-        
-        public bool DoUnitCommand(UnitActionType type)
+        public bool CanDoUnitCommand(UnitActionType type) => ValidateCommand(type);
+        public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
-
-            if (!ValidateCommand(type))
-            {
-                ActionAnnounce.Invoke(type,false);
-                return false;
-            }
+            //var state = _usables[type].Use();
+            //_stateUnit.ForceUnitState(state);
             
-            var state = _usables[type].Use();
-            _stateUnit.ForceUnitState(state);
+            if (type == UnitActionType.Movement || type == UnitActionType.Jump) return true;
             
             if (_usables[type] is IAffectsItemDisplay disp && disp.DrawStrategy != currentDrawItemStrategy)
             {
@@ -131,12 +113,10 @@ namespace Arcatech.Items
                 redraw = true;
             }
             stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
-
-            ActionAnnounce.Invoke(type,true);
             return true;
         }
-        #endregion
-        
+
+
     }
     
 }

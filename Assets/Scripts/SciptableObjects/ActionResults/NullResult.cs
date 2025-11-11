@@ -5,16 +5,17 @@ namespace Arcatech.Actions
     [CreateAssetMenu(fileName = "Null result", menuName = "Actions/Action Result/Dummy null result")]
     public class NullResult : SerializedActionResult
     {
-        public override IActionResult BuildActionResult()
+        public override ActionResult BuildActionResult()
         {
-            return new  NullActionResult();
+            return new NullActionResult();
         }
     }
     
-    public class NullActionResult : IActionResult
+    public class NullActionResult : ActionResult
     {
-        public void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
+            return true;
             // Nothing happens
         }
     }

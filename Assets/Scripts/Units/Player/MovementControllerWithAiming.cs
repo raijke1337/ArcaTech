@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Arcatech.Items;
 using Arcatech.Units;
 using Arcatech.Units.Control;
 using ECM.Common;
@@ -7,40 +8,60 @@ using ECM.Controllers;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 namespace Arcatech.Units.Control
 {
 
     [RequireComponent(typeof(EntityStateMachineComponent))]
-    public class MovementControllerWithAiming : BaseCharacterController, IPlayerMovementController,IPausableComponent,IKillableComponent, IUnitStateProvider
+    public class MovementControllerWithAiming : BaseCharacterController, IPlayerMovementController,IPausableComponent,IKillableComponent
     {
 
-        private EntityStateMachineComponent _stateMachine;
-        [SerializeField] private SerializedUnitState JumpState;
-        private UnitState _jump;
-
+        public bool IsGrounded => movement.isGrounded;
         public bool CanAim { get; set; }  = true;
-        public bool CanMove { get; set; } = true;
-        
+
+        private bool move;
+
+        public bool CanMove
+        {
+            get => move;
+            set
+            {
+                move = value;
+                if (!value) moveDirection =  Vector3.zero;
+            }
+        }
+
         public Vector3 MovementVector
         {
             get => moveDirection;
             set
             {
-                if (!CanMove)
-                {
-                    moveDirection = Vector3.zero;
-                }
-                else
-                {
-                    moveDirection = value;
-                }
+                moveDirection = !CanMove ? Vector3.zero : value;
             }
         }
 
-        public Vector3 AimPosition { get; set; }
+        private Vector3 aim;
 
-        public bool JumpCommand { get; set; } = false;
+        public Vector3 AimPosition
+        {
+            get => aim;
+            set
+            {
+                if (!CanAim) return;
+                aim = value;
+            }
+        }
+
+        public bool JumpCommand
+        {
+            get => _jump;
+            set
+            {
+                _jump = value;
+                if (!value) _canJump = true;
+            }
+        }
 
         public bool Paused
         {
@@ -79,8 +100,8 @@ namespace Arcatech.Units.Control
         private float _minCrossYToRotate = 0.15f;
         private void Start()
         {
-            _stateMachine =  GetComponent<EntityStateMachineComponent>();
-            _jump = JumpState.DeserializeState(_stateMachine,_stateMachine.GetMainEntity.transform);
+           // _stateMachine =  GetComponent<EntityStateMachineComponent>();
+           // _jump = JumpState.Build();
             fmI = Animator.StringToHash(fm);
             smI = Animator.StringToHash(sm);
             vmI = Animator.StringToHash(vm);
@@ -90,61 +111,22 @@ namespace Arcatech.Units.Control
             drI = Animator.StringToHash(dr);
         }
 
-        protected override void HandleInput()
-        {
-            jump = JumpCommand;
-           // referenceMagnitude = movement.velocity.magnitude;
-        }
         protected override void UpdateRotation()
         {
             if (!CanAim) return;
             RotateTowards(AimPosition);
+        }
+        protected override void Move()
+        {
+            if(!CanMove) return;
+            base.Move();
         }
         protected override void Animate()
         {
             // Dot product of two vectors determines how much they are pointing in the same direction.
             // If the vectors are normalized (transform.forward and right are)
             // then the value will be between -1 and +1.
-            
-            SetMovementValuesInAnimator();
-            
-            if (_isJumping && movement.wasGrounded)
-            {
-                _stateMachine.ForceUnitState(_jump);
-            }
-            HandleAirTime();
-            
-            if (!isGrounded)
-            {
-                airTime+=Time.deltaTime;
-                
-            }
-           // animator.SetFloat("Rotation", Vector3.Cross(fwd, AimPosition).y);
-          // set by aiming now 
 
-            if (!movement.isGrounded)
-            {
-                landOK = false;
-                airTime = 0;
-            }
-            if (movement.isGrounded)
-            {
-                if (!movement.wasGrounded || !landOK)
-                {
-                    animator.SetTrigger(triggerI);
-                    landOK = true; 
-                }
-            }
-            animator.SetFloat(atI, airTime);
-        }
-
-        private void HandleAirTime()
-        {
-            
-        }
-        
-        private void SetMovementValuesInAnimator()
-        {
             var fwd = transform.forward;
             var right = transform.right;
 
@@ -185,6 +167,7 @@ namespace Arcatech.Units.Control
             }
             animator.SetFloat(vmI, movement.cachedRigidbody.linearVelocity.y);
         }
+
         public override void Update()
         { // pause is handled internally
             if (Killed) return;
@@ -196,7 +179,9 @@ namespace Arcatech.Units.Control
             if (Killed) return;
             base.FixedUpdate();
         }
-
-        public IEnumerable<SerializedUnitState> GetStates { get; }
+        protected override void HandleInput()
+        {
+        }
+        
     }
 }

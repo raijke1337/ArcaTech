@@ -10,13 +10,13 @@ namespace Arcatech.Actions
     {
         [SerializeField] ItemSO itemToAdd;
         [SerializeField] int amountToAdd = 1;
-        public override IActionResult BuildActionResult()
+        public override ActionResult BuildActionResult()
         {
             return new AddItemToInventoryResult(itemToAdd, amountToAdd);
         }
     }
 
-    public class AddItemToInventoryResult : IActionResult
+    public class AddItemToInventoryResult : ActionResult
     {
         ItemSO itemToAdd;
         int amountToAdd;
@@ -29,12 +29,15 @@ namespace Arcatech.Actions
 
 
 
-        public void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
             if (user.TryGetComponent<EntityInventoryComponent>(out var inv))
             {
                 inv.PickUpItem(DataManager.Instance.MakeItem(itemToAdd,user));
+                return true;
             }
+
+            return false;
         }
     }
 }

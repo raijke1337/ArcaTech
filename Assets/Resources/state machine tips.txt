@@ -1,172 +1,306 @@
-Good — there are two common and simple patterns you can use. I recommend the first (intent-driven, state-machine-authoritative) because it keeps the state machine as the single source of truth and avoids timing/desync issues. Below I show both patterns, explain pros/cons, and give concrete, readable code you can drop in and adapt.
+Good — you already have a working intent-driven FSM; integrating other components that can also trigger states is mostly about (A) defining how those components signal intent/events, (B) ensuring the state machine evaluates transitions continuously and with priorities, and (C) providing safe “forced”/interrupt transitions for high‑priority events (stun, death). Below I give a clear, practical design and copy‑pasteable code snippets that show several patterns you can mix:
 
-Summary
-- Recommended: Movement component sends an “intent” (JumpRequested) to the state machine (or to a central PlayerController). The state machine evaluates transitions; the JumpStart state's OnEnter action calls the movement component to apply the impulse. This keeps order deterministic and prevents desync.
-- Alternative: Movement component applies impulse immediately and the state machine detects the physical change (vertical velocity / isGrounded false) and transitions. This works but can be racy or harder to reason about.
+- global (high priority) transitions evaluated before per‑state transitions,
+- transition conditions that read component state (no tight coupling),
+- components either enqueue intents (preferred) or call ForceUnitState for immediate interrupts,
+- how to wire Interaction/Usables/EntityStats into the FSM,
+- a checklist for migration and tests.
 
-Minimal code (intent-driven approach)
-1) Extend `StateMachineContext` so it carries entity references and request flags:
+Design summary (short)
+- Keep the state machine authoritative: components report intent or state; the state machine decides to transition or perform forced interrupts.
+- Add global transitions (or an interrupt list) that the state machine checks before the current state’s transitions. Use numeric priority so Stunned/Dead outrank other transitions.
+- Implement TransitionCondition SOs that inspect component properties (e.g., `IsStunned`, `IsDead`, `InteractionSucceeded`, `IsDamaged`) rather than making components push states directly.
+- For immediate interrupts (Death absolutely must interrupt), allow components to call `ForceUnitState(...)` on the state machine.
+- For success/failure events that are the result of a component action (e.g., `InteractionComponent` finishes UseSuccess), either:
+  - set a `ctx.PendingCommand`/event and let the FSM evaluate transitions immediately, or
+  - call a `RequestEvent(...)` method on the FSM (which sets the event in the context then runs `EvaluateTransitions()`).
+- Always evaluate transitions in `Update()` (you already do) and check global transitions first.
 
-```csharp
-// StateMachineContext.cs
-public class StateMachineContext
-{
-    public string info = "some context";
-    public UnitState CurrentState;
+Practical additions to your code
 
-    // reference to the entity owning the state machine (for actions to call)
-    public GameObject Owner;
-
-    // intent flags (reset after consumed)
-    public bool JumpRequested;
-
-    public void ClearRequests()
-    {
-        JumpRequested = false;
-    }
-}
-```
-
-2) Add a simple public API on your `EntityStateMachineComponent` so other components request actions:
+1) Add a global/interrupt transition list to `EntityStateMachineComponent`
+- Evaluate these before per‑state transitions every frame.
 
 ```csharp
 // EntityStateMachineComponent.cs (excerpt)
 public class EntityStateMachineComponent : MonoBehaviour
 {
-    private UnitState CurrentState;
-    private StateMachineContext _ctx = new StateMachineContext();
+    // existing fields...
+    private List<StateTransition> _globalTransitions = new List<StateTransition>();
 
-    void Awake()
+    // Public API for systems to register global transitions if desired
+    public void RegisterGlobalTransition(StateTransition t)
     {
-        _ctx.Owner = gameObject;
+        if (t == null) return;
+        if (!_globalTransitions.Contains(t)) _globalTransitions.Add(t);
     }
 
-    public void RequestJump()
+    public void UnregisterGlobalTransition(StateTransition t)
     {
-        // Movement system (or input) calls this on jump input
-        _ctx.JumpRequested = true;
-
-        // Optional: evaluate immediately so jump is responsive
-        EvaluateTransitions(); // see below
+        if (t == null) return;
+        _globalTransitions.Remove(t);
     }
 
     void Update()
     {
         if (CurrentState == null) return;
-        CurrentState.Update(_ctx, Time.deltaTime, /*animator*/ null);
-        EvaluateTransitions();
-    }
+        if (Paused) return;
 
-    // Evaluate available transitions and perform first valid transition
-    void EvaluateTransitions()
-    {
-        if (CurrentState == null) return;
+        CurrentState.Update(_context, Time.deltaTime, animator);
 
-        var transition = CurrentState.ChooseTransition(_ctx, /*animator*/ null);
-        if (transition != null && transition.NextState != null)
+        // Allow chained transitions but protect from infinite loops
+        int iter = 0;
+        const int maxIter = 8;
+        while (iter++ < maxIter)
         {
-            // run transition actions
-            if (transition.OnTransition != null)
-            {
-                foreach (var action in transition.OnTransition)
-                    action?.Execute(_ctx);
-            }
-
-            // switch states
-            CurrentState.Exit(_ctx);
-            CurrentState = transition.NextState;
-            _ctx.CurrentState = CurrentState;
-            CurrentState.Enter(_ctx, /*animator*/ null);
-
-            // clear any consumed requests (you can also let specific actions clear)
-            _ctx.ClearRequests();
+            if (!EvaluateTransitions()) break;
         }
     }
 
-    // Keep your existing ForceUnitState logic too (for forced transitions).
+    // Try to find a transition from globals first, then current state's transitions
+    bool EvaluateTransitions()
+    {
+        // Evaluate global transitions (highest priority)
+        var orderedGlobals = _globalTransitions.OrderByDescending(t => t.Priority);
+        foreach (var g in orderedGlobals)
+        {
+            if (g == null || g.NextState == null) continue;
+            if (!g.CanTransition(_context)) continue;
+            // If this transition requires exit time, check it (pass CurrentState.animator info if needed)
+            // Here we assume StateTransition carries ExitNormalizedTime and we can call helper
+            if (!HasPassedExitTimeForCurrentState(g.ExitNormalizedTime)) continue;
+
+            // Run onTransition actions (performers). Abort on any failure
+            if (!ExecuteTransitionActions(g)) { _context.ClearCommand(); return false; }
+
+            CommitTransition(g);
+            return true;
+        }
+
+        // Evaluate current state's transitions
+        if (CurrentState == null) return false;
+        var candidate = CurrentState.ChooseTransition(_context, animator);
+        if (candidate == null || candidate.NextState == null) return false;
+
+        if (!ExecuteTransitionActions(candidate)) { _context.ClearCommand(); return false; }
+
+        CommitTransition(candidate);
+        return true;
+    }
+
+    bool ExecuteTransitionActions(StateTransition tr)
+    {
+        if (tr.OnTransition == null) return true;
+        foreach (var a in tr.OnTransition)
+        {
+            if (a == null) continue;
+            bool ok = a.ProduceResult(gameObject, _context.PendingCommand, /*spawnPoint*/ null);
+            if (!ok) return false;
+        }
+        return true;
+    }
+
+    void CommitTransition(StateTransition tr)
+    {
+        CurrentState.Exit(_context, animator);
+        CurrentState = tr.NextState;
+        _context.CurrentState = CurrentState;
+        CurrentState.Enter(_context, animator);
+        _context.ClearCommand();
+    }
+
+    bool HasPassedExitTimeForCurrentState(float requiredNormalized)
+    {
+        // Use the UnitState helper HasPassedExitTime (or a dedicated helper).
+        return CurrentState == null || CurrentState.HasPassedExitTime(animator, requiredNormalized);
+    }
+
+    // Forceful immediate switch (bypass transition checks / performers)
+    public void ForceUnitState(UnitState forcedState, bool immediate = true)
+    {
+        if (forcedState == null) return;
+        CurrentState?.Exit(_context, animator);
+        CurrentState = forcedState;
+        _context.CurrentState = CurrentState;
+        CurrentState.Enter(_context, animator);
+        _context.ClearCommand();
+    }
 }
 ```
 
-3) Implement a `TransitionConditionSO` that checks the jump request:
+2) Create component-aware `TransitionCondition` SOs
+- Each component exposes simple properties (e.g., `EntityStatsComponent.IsStunned`, `InteractionComponent.UseSuccessRequested`) and the transition conditions read those.
+
+Example `StunnedCondition`:
 
 ```csharp
-// JumpRequestedConditionSO.cs
+// StunnedConditionSO.cs
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "StateMachine/Conditions/JumpRequested")]
-public class JumpRequestedConditionSO : TransitionConditionSO
+[CreateAssetMenu(menuName = "States/Conditions/IsStunned")]
+public class StunnedConditionSO : SerializedStateTransitionCondition
 {
     public override bool CanTransition(StateMachineContext ctx)
     {
-        return ctx != null && ctx.JumpRequested;
+        if (ctx?.Owner == null) return false;
+        var stats = ctx.Owner.GetComponent<EntityStatsComponent>();
+        return stats != null && stats.IsStunned;
     }
 }
 ```
 
-4) Implement an `ActionResultSO` that actually applies the jump impulse when the state enters (or as a transition action):
+Example `DeadCondition`:
 
 ```csharp
-// ApplyJumpImpulseActionSO.cs
-using UnityEngine;
-
-[CreateAssetMenu(menuName = "StateMachine/Actions/ApplyJumpImpulse")]
-public class ApplyJumpImpulseActionSO : ActionResultSO
+[CreateAssetMenu(menuName = "States/Conditions/IsDead")]
+public class DeadConditionSO : SerializedStateTransitionCondition
 {
-    public float jumpForce = 6f;
-    public Vector3 upward = Vector3.up;
-
-    public override void Execute(StateMachineContext ctx)
+    public override bool CanTransition(StateMachineContext ctx)
     {
-        if (ctx == null || ctx.Owner == null) return;
-
-        var mover = ctx.Owner.GetComponent<MovementController>();
-        if (mover != null)
-        {
-            mover.ApplyJumpImpulse(upward * jumpForce);
-        }
-
-        // Optionally clear the request here:
-        ctx.ClearRequests();
+        if (ctx?.Owner == null) return false;
+        var stats = ctx.Owner.GetComponent<EntityStatsComponent>();
+        return stats != null && stats.IsDead;
     }
 }
 ```
 
-5) In your `UnitStateSO`/transitions, use `JumpRequestedConditionSO` on the transition that leads to `JumpStart` and attach `ApplyJumpImpulseActionSO` either to the transition's `OnTransition` or to the `JumpStart` state's `OnEnterActions`.
+Example `InteractionSuccessCondition`:
 
-Behavioral flow
-- Player presses Jump button → MovementController or Input system calls `entityStateMachine.RequestJump()`.
-- `RequestJump()` sets `ctx.JumpRequested = true` (and optionally calls `EvaluateTransitions()` immediately).
-- Next frame (or immediately), the state machine runs `ChooseTransition(...)`. The transition with `JumpRequestedCondition` returns true.
-- Transition actions (if any) run; then `CurrentState.Exit()`, `CurrentState = NextState`, and `CurrentState.Enter()` run.
-- `ApplyJumpImpulseActionSO.Execute()` runs and instructs the `MovementController` to apply the impulse to the Rigidbody.
-- Requests are cleared so the transition won't re-fire.
-
-Why this is good
-- The state machine decides when the jump begins (good for animation timing, locks, etc.).
-- The impulse is applied as part of state lifecycle, so animations and gameplay locks are synchronized.
-- No race between physics and state; request is a single-source intent.
-
-Alternative approach (movement-first)
-- MovementController applies the impulse immediately on input and sets `ctx.IsAirborne = true`.
-- A `Condition` checks `IsAirborne` or vertical velocity > threshold to transition to `JumpStart`.
-- This can work but you risk the state transition lagging a frame behind physics and having inconsistent locks during that frame. Use when state must follow a physics-driven event (e.g., hit by explosion causing knockback).
-
-Extra tips
-- Decide where to clear the request: transition action or state enter is common. Clearing in the movement controller can be brittle.
-- Use `EvaluateTransitions()` both in `Update()` and after `RequestJump()` to keep input responsive.
-- If you have many request types, replace booleans with an enum or command queue on the context:
-  - `public Queue<PlayerCommand> Commands;` and `RequestJump()` enqueues `PlayerCommand.Jump`.
-  - A `CommandConditionSO` dequeues or peeks to test commands.
-- If transitions depend on grounded checks, include `ctx.IsGrounded` or let a `GroundedConditionSO` query the `MovementController` directly (`ctx.Owner.GetComponent<MovementController>().IsGrounded()`).
-
-Short example using a command enum
 ```csharp
-public enum PlayerCommand { None, Jump, Dash, Attack }
-public class StateMachineContext { public PlayerCommand PendingCommand = PlayerCommand.None; public void ClearCommand() => PendingCommand = PlayerCommand.None; }
+[CreateAssetMenu(menuName = "States/Conditions/InteractionSuccess")]
+public class InteractionSuccessConditionSO : SerializedStateTransitionCondition
+{
+    public override bool CanTransition(StateMachineContext ctx)
+    {
+        if (ctx?.Owner == null) return false;
+        var inter = ctx.Owner.GetComponent<InteractionComponent>();
+        return inter != null && inter.LastUseSucceeded; // or a consumed flag
+    }
+}
 ```
-A `CommandCondition` checks `ctx.PendingCommand == PlayerCommand.Jump`. The `ApplyJumpImpulseActionSO` calls `ctx.ClearCommand()` after executing.
+
+Notes:
+- Prefer the component exposing a clear read-only state or a one-shot event flag (e.g., `LastUseSucceeded` that is set true until read/cleared). The state machine can consume that event by clearing it in the action or after transition.
+
+3) Components should signal via context or events (two patterns)
+
+Pattern A — Components set state flags and the FSM polls conditions
+- Components set booleans (`IsStunned`, `LastUseSucceeded`) or update internal state.
+- FSM has `SerializedStateTransitionCondition` SOs that check those booleans each frame. This is simple and decoupled.
+
+Pattern B — Components push event to FSM (for one-shot, immediate handling)
+- Components call FSM API directly for urgent events: `stateMachine.RequestExternalEvent(EventType)` or `stateMachine.ForceUnitState(...)`.
+- Use this for Death (immediate), or if you need instant responsiveness before next Update.
+
+Example small API on `EntityStateMachineComponent`:
+
+```csharp
+// called by components for one-shot events (e.g., interaction success)
+public void RequestEvent(string eventName)
+{
+    // convert eventName to PendingCommand / or set a named flag on ctx
+    _context.PendingCommand = MapEventToCommand(eventName);
+    // Evaluate immediately for responsiveness
+    EvaluateTransitions();
+}
+```
+
+4) Integrate `UsablesCasterComponent`, `InteractionComponent`, `EntityStatsComponent`
+
+- `UsablesCasterComponent` (executor) remains implementing `IUnitCommandHandler.DoUnitCommand(...)`. It will be invoked by `PerformCommandActionSO` during transition evaluation. It can also set a state on the component (e.g., `LastCastSucceeded`) which conditions can check later.
+
+- `InteractionComponent`:
+  - On success, set `LastUseSucceeded = true` (or call `stateMachine.RequestEvent("UseSuccess")`).
+  - Create a `SerializedStateTransition` that uses `InteractionSuccessConditionSO` to move to `UseSuccessState`.
+  - `UseSuccessState.OnEnterActions` can clear the `LastUseSucceeded` flag or run `ActionResult` to perform logic.
+
+- `EntityStatsComponent`:
+  - When stunned is applied, set `IsStunned = true` and optionally call `stateMachine.RequestEvent("Stunned")` or rely on `StunnedConditionSO` to be true next frame.
+  - For `Dead`, call `stateMachine.ForceUnitState(deathState, immediate:true)` to guarantee immediate transition ignoring other checks.
+
+5) Priority & interrupt rules
+- Use `StateTransition.Priority` (higher executes first). Ensure global transitions have higher priority:
+  - `Dead` transitions: priority = 1000
+  - `Stunned` transitions: priority = 900
+  - Player-initiated transitions (attack, jump): priority = 500
+  - Movement transitions: priority = 100
+- In `EvaluateTransitions`, sort globals and current state transitions by priority.
+
+6) Preventing race conditions and duplicated execution
+- Decide who clears one-shot flags (component or action):
+  - If conditions simply read `LastUseSucceeded`, the FSM should clear it once it consumes it (e.g., inside `ExecuteTransitionActions` or after commit).
+  - Alternatively, the component itself can clear the flag when FSM requests it (less desirable).
+- If `OnTransition` action invokes the component (e.g., `PerformCommandActionSO` calling `UsablesCaster.DoUnitCommand(...)`), let that action return success/fail and clear command only after success.
+
+7) Example sequence for Interaction -> UseSuccess
+- `InteractionComponent` tries to use object; on server/logic success:
+  - Set `interaction.LastUseSucceeded = true` (or call `stateMachine.RequestEvent("UseSuccess")`).
+- FSM Update polls transitions, `InteractionSuccessConditionSO` returns true.
+- FSM picks the `InteractionSuccess -> UseSuccessState` transition (global or state transition).
+- FSM runs `transition.OnTransition` actions (which may call `UsablesCaster` or trigger VFX).
+- If actions succeed, FSM commits the state, runs `UseSuccessState.Enter()`.
+- After committing, FSM clears `ctx.PendingCommand` and/or calls `interaction.ClearLastUse()`.
+
+8) Layered state machines (optional advanced)
+- For clarity you can split locomotion (idle/move/jump/land) and action (attack/use) into separate sub-machines or layers:
+  - Locomotion SM: Idle/Move/Jump/MidAir/Land; controls root motion / movement locks.
+  - Action SM: Idle/Attacking/Using; controls upper body via an Animator layer mask.
+- This reduces coupling and simplifies per-component integration: `UsablesCaster` only interacts with the Action SM; `MovementController` uses Locomotion SM. Interactions between them are still necessary (e.g., attack may disable movement by setting `AllowsMovement` in the action SM and communicating to the locomotion SM).
+
+9) Checklist to implement integration now
+- [ ] Create `SerializedStateTransitionCondition` SOs for `IsDead`, `IsStunned`, `InteractionSuccess`, `UsablesCastSucceeded` if needed.
+- [ ] Add a `_globalTransitions` list to `EntityStateMachineComponent` and evaluate them first in `EvaluateTransitions()`.
+- [ ] Mark Death as a forced immediate event via `ForceUnitState(deathState)`.
+- [ ] Decide whether component events are polled (conditions) or pushed (RequestEvent). Implement both entry points.
+- [ ] Ensure `OnTransition` action results return `bool` and are executed before committing. Let them call your component executors.
+- [ ] Decide who clears one-shot flags; implement clearing in FSM after successful consumption.
+- [ ] Use priorities on transitions: Death > Stun > Player action > Movement.
+- [ ] Add unit tests/Play tests:
+  - Death interrupts any state immediately.
+  - Stun interrupts actions and prevents re-entry until cleared.
+  - Interaction success triggers state even without player input.
+  - Attack and Jump follow the intent-driven flow and call performers.
+
+10) Example: `EntityStatsComponent` calling death
+```csharp
+public class EntityStatsComponent : MonoBehaviour
+{
+    public bool IsDead { get; private set; }
+    public EntityStateMachineComponent stateMachine;
+    public SerializedUnitState deadStateSO; // assigned in inspector
+
+    public void OnHealthDepleted()
+    {
+        IsDead = true;
+        // Build runtime state and force it immediately
+        var deadStateRt = deadStateSO.Build();
+        stateMachine.ForceUnitState(deadStateRt, immediate: true);
+    }
+
+    // Stun application
+    public void ApplyStun(float duration)
+    {
+        IsStunned = true;
+        // Optionally push event
+        stateMachine.RequestEvent("Stunned");
+        // After duration, clear IsStunned (and state machine will transition accordingly)
+        StartCoroutine(ClearStunAfter(duration));
+    }
+}
+```
+
+11) Debugging tips
+- Add a debug UI that lists: current state, time in state, pending command, active global transitions, component flags (IsStunned, IsDead, LastUseSucceeded) — helps track why transitions do/don't fire.
+- When a transition fails to commit, log which `SerializedActionResult` returned false or which condition returned false.
+- Visualize priorities for transitions in the editor (add a Priority field in `SerializedStateTransition` — you already have this).
 
 Conclusion
-- Use intent/request pattern: input → request → state machine evaluates → state Enter applies physics/action.
-- Keep the state machine authoritative about gameplay locks and animation sequencing.
-- If you want, I can paste a complete minimal example project: `EntityStateMachineComponent`, `MovementController`, `UnitStateSO` sample, and SO assets wiring exactly how to set jumps up in the Editor. Which would you prefer?
+- Use global/priority transitions for interrupts like Death & Stun (evaluated each frame before state-specific transitions).
+- Prefer condition SOs that read component properties so each component stays responsible for its own state, and the FSM remains the authority for switching states.
+- For one-shot events, either push events into the FSM (call `RequestEvent`/`ForceUnitState`) or set component flags that the FSM consumes.
+- Keep `OnTransition` actions synchronous and return success/failure so the FSM can commit atomically (your chosen Approach A).
+
+If you want, I can:
+- Produce concrete `SerializedStateTransitionCondition` SO classes for each of your components (`EntityStatsConditionSO`, `InteractionConditionSO`, `UsablesCastConditionSO`) wired to typical property names,
+- Provide a debug overlay MonoBehaviour for your FSM that shows current state, pending command, and active component flags,
+- Or convert `globalTransitions` into a `ScriptableObject` list so designers can author interrupts (e.g., a `StateGraphInterrupts.asset`). Which would you like next?

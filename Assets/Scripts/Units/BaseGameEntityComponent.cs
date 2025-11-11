@@ -17,19 +17,18 @@ namespace Arcatech
     /// new component that defines any game entity
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider), typeof(LittlePauseHelperComponent))]
-    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, ISpawnerProvider
+    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, ISpawnerProvider,IInvulnerability
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
 
         [Space, SerializeField] string _name;
         [SerializeField] Side entitySide;
-        [SerializeField] Transform _spawnPoint;
+        [SerializeField] Transform _effectSpawn;
         [SerializeField] private bool destroyOnDeath = true;
         [SerializeField, Range(0, 10)] private float timerToDestroy = 2f;
         
         [Space, SerializeField] protected bool _showDebugs = false;
-        public Transform SpawnPoint => _spawnPoint;
-
+        public Transform EffectSpawn => _effectSpawn;
 
         List<IEffectsTakerComponent> _effectsTakerComponents;
         #if UNITY_EDITOR
@@ -52,9 +51,9 @@ namespace Arcatech
         {
             base.OnValidate();
             gameObject.layer = LayerMask.NameToLayer("Entities");
-            if (_spawnPoint == null)
+            if (_effectSpawn == null)
             {
-                _spawnPoint = transform;
+                _effectSpawn = transform;
             }
         }
 
@@ -74,6 +73,7 @@ namespace Arcatech
 
         public void ApplyStatsEffect(StatsEffect effect,BaseGameEntityComponent source)
         {
+            if (Invulnerable) return;
             foreach (var v in _effectsTakerComponents)
             {
                 v.ApplyEffect(effect, source);
@@ -82,6 +82,7 @@ namespace Arcatech
 
         #endregion
         
+        public bool Invulnerable { get; set; }
         
         bool _killed = false;
 
@@ -102,5 +103,10 @@ namespace Arcatech
 
         public bool Paused { get; set; }
 
+    }
+
+    public interface IInvulnerability
+    {
+        public bool Invulnerable { get; set; }
     }
 }

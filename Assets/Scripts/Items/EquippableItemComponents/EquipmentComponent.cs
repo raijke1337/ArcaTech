@@ -13,13 +13,13 @@ namespace Arcatech.Items
     {
         [SerializeField] protected Transform spawner;
         [SerializeField,Self] protected Animator animator;
-        public Transform SpawnPoint => spawner;
+        public Transform EffectSpawn => spawner;
         
         [SerializeField] SerializedActionResult[] onDamaged;
         [SerializeField] SerializedActionResult[] onKilled;
 
-        private IActionResult[] _killedRes;
-        private IActionResult[] _damagedRes;
+        private ActionResult[] _killedRes;
+        private ActionResult[] _damagedRes;
 
         [SerializeField] private string animatorStateStartedTrigger;
         [SerializeField] private string animatorStateExitTimeTrigger;
@@ -40,7 +40,7 @@ namespace Arcatech.Items
             
             if (onDamaged != null && onDamaged.Length > 0)
             {
-                _damagedRes = new IActionResult[onDamaged.Length];
+                _damagedRes = new ActionResult[onDamaged.Length];
                 for (int i = 0; i < onDamaged.Length; i++)
                 {
                     _damagedRes[i] = onDamaged[i].BuildActionResult();
@@ -49,7 +49,7 @@ namespace Arcatech.Items
 
             if (onKilled != null && onKilled.Length > 0)
             {
-                _killedRes = new IActionResult[onKilled.Length];
+                _killedRes = new ActionResult[onKilled.Length];
                 for (int i = 0; i < onKilled.Length; i++)
                 {
                     _killedRes[i] = onKilled[i].BuildActionResult();

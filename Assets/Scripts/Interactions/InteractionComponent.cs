@@ -50,18 +50,20 @@ namespace Arcatech.Interactions
             if (_aim.DesiredInteractiveItem == null || Paused) return;
             if (stateSuccess != null)
             {
-                _successState = stateSuccess.DeserializeState(cachedActor, interactionActionTransform);
+                //_successState = stateSuccess.DeserializeState(cachedActor, interactionActionTransform);
             }
 
             if (stateFail != null)
             {
-                _failState = stateFail.DeserializeState(cachedActor, interactionActionTransform);
+                //_failState = stateFail.DeserializeState(cachedActor, interactionActionTransform);
             }
             if (_aim.DesiredInteractiveItem != null && Vector3.Distance(transform.position,_aim.DesiredInteractiveItem.GetBaseComponent.transform.position)<= interactRange)
             {
                 bool ok = _aim.DesiredInteractiveItem.TryInteraction(this);
                 if (_successState != null && _failState != null)
-                    cachedActor.ForceUnitState(ok ? _successState : _failState);
+                {
+                    //cachedActor.ForceUnitState(ok ? _successState : _failState);
+                }
             }
         }
 

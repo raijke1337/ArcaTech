@@ -6,9 +6,6 @@ using UnityEngine.Assertions;
 
 namespace Arcatech.Actions
 {
-
-
-
     [CreateAssetMenu(fileName = "New produce projectile result", menuName = "Actions/Action Result/PlaceProjectile", order = 1)]
     public class SerializedProduceProjectileResult : SerializedActionResult
     {
@@ -24,7 +21,7 @@ namespace Arcatech.Actions
             Assert.IsNotNull(Projectile);
             Assert.IsFalse(numberOfProjectiles == 0);
         }
-        public override IActionResult BuildActionResult()
+        public override ActionResult BuildActionResult()
         {
             return new ProduceProjectileResult(Projectile,numberOfProjectiles,spread,BetweenShotsDelay, shotDelay);
         }
@@ -46,7 +43,7 @@ namespace Arcatech.Actions
             cachedEvent = new ProjectilePlaceEvent(null, null, _p, _cfg);
         }
 
-        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
 
             var actor = user.GetComponent<BaseGameEntityComponent>(); // placeholder TODO
@@ -54,6 +51,7 @@ namespace Arcatech.Actions
             cachedEvent.Place = place;
             
             EventBus<ProjectilePlaceEvent>.Raise(cachedEvent);
+            return true;
         }
     }
 

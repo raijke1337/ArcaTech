@@ -4,6 +4,6 @@ namespace Arcatech
 {
     public interface ISpawnerProvider
     {
-        public Transform SpawnPoint { get; }
+        public Transform EffectSpawn { get; }
     }
 }

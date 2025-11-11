@@ -10,7 +10,7 @@ namespace Arcatech.Actions
        
         [SerializeField] SoundClipData[] sounds;
         [SerializeField] bool RandomPitch = false;
-        public override IActionResult BuildActionResult()
+        public override ActionResult BuildActionResult()
         {
             return new ProduceSoundResult(sounds,RandomPitch);
         }
@@ -27,12 +27,13 @@ namespace Arcatech.Actions
             this.pitch = pitch;
         }
 
-        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
             foreach (var s in sounds)
             {
                 EventBus<SoundClipRequest>.Raise(new SoundClipRequest(s,pitch,place.position));
             }
+            return true;
         }
     }
 

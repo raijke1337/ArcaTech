@@ -12,8 +12,8 @@ namespace Arcatech.Interactions
 
         [SerializeField] private List<SerializedActionResult> serializedResultsSuccess;
         [SerializeField] private List<SerializedActionResult> serializedResultsFail;
-        private List<IActionResult> _listS;
-        private List<IActionResult> _listF;
+        private List<ActionResult> _listS;
+        private List<ActionResult> _listF;
         
         protected void OnValidate()
         {
@@ -22,7 +22,7 @@ namespace Arcatech.Interactions
 
         private void Awake()
         {
-            _listS = new List<IActionResult>();
+            _listS = new List<ActionResult>();
             if (serializedResultsSuccess == null) return;
             foreach (var result in serializedResultsSuccess)
             {
@@ -30,7 +30,7 @@ namespace Arcatech.Interactions
                     _listS.Add(result.BuildActionResult());
             }
             
-            _listF = new List<IActionResult>();
+            _listF = new List<ActionResult>();
             if (serializedResultsFail == null) return;
             foreach (var result in serializedResultsFail)
             {
@@ -61,7 +61,7 @@ namespace Arcatech.Interactions
                     {
                         result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
                             item.GetBaseComponent,
-                            item.GetBaseComponent.SpawnPoint);
+                            item.GetBaseComponent.EffectSpawn);
                     }
                 }
             }
@@ -85,7 +85,7 @@ namespace Arcatech.Interactions
                     {
                         result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
                             item.GetBaseComponent,
-                            item.GetBaseComponent.SpawnPoint);
+                            item.GetBaseComponent.EffectSpawn);
                     }
                 }
             }
@@ -101,12 +101,12 @@ namespace Arcatech.Interactions
         /// I use this when instantiating a "dropped item" interactive component.
         /// </summary>
         /// <param name="results"></param>
-        public void OverrideResults(IEnumerable<IActionResult> results)
+        public void OverrideResults(IEnumerable<ActionResult> results)
         {Debug.Log("OverrideResults");
-            _listS = new List<IActionResult>(results);
+            _listS = new List<ActionResult>(results);
         }
 
-        public void OverrideResults(IActionResult result)
+        public void OverrideResults(ActionResult result)
         {
             Debug.Log("OverrideResults");
             _listS.Add(result); 

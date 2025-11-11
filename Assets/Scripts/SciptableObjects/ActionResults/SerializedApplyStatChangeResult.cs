@@ -14,7 +14,7 @@ namespace Arcatech.Actions
     {
 
         [SerializeField] SerializedDictionary<TargetingType, StatsEffect[]> StatChanges;
-        public override IActionResult BuildActionResult()
+        public override ActionResult BuildActionResult()
         {
             return new ApplyStatChangeEffectResult(StatChanges);
         }
@@ -75,7 +75,7 @@ namespace Arcatech.Actions
             return false;
         }
 
-        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place)
         {
             foreach (var type in _effs.Keys)
             {
@@ -85,8 +85,11 @@ namespace Arcatech.Actions
                     {
                         final.ApplyStatsEffect(effect,user);
                     }
+                    return true;
                 }
             }
+
+            return false;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Arcatech.Actions
     {
         [SerializeField] CFXR_Effect[] Effects;
         [SerializeField] bool ParentParticles;
-        public override IActionResult BuildActionResult()
+        public override ActionResult BuildActionResult()
         {
             return new ProduceFXResult(Effects, ParentParticles);
         }
@@ -38,9 +38,8 @@ namespace Arcatech.Actions
             parent = p;
         }
 
-        public override void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
-            
             if (parent)
             {
                 Transform par = null;
@@ -59,8 +58,7 @@ namespace Arcatech.Actions
                     GameObject.Instantiate(effect, place.position, place.rotation);
                 }
             }
-
-
+            return _effs.Length > 0;
         }
     }
 

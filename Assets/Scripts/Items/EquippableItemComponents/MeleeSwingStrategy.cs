@@ -8,7 +8,7 @@ namespace Arcatech.Items
 {
     public class MeleeSwingStrategy : WeaponStrategy
     {        
-        private IActionResult[] OnColliderHit { get; }
+        private ActionResult[] OnColliderHit { get; }
         private UnitState CurrentState;
             
         public MeleeSwingStrategy(SerializedActionResult[] onHit, SerializedUnitState act, BaseGameEntityComponent unit, 
@@ -17,7 +17,7 @@ namespace Arcatech.Items
 
             HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
             
-            OnColliderHit = new IActionResult[onHit.Length];
+            OnColliderHit = new ActionResult[onHit.Length];
 
             for (int i = 0; i < onHit.Length; i++)
             {
@@ -41,22 +41,21 @@ namespace Arcatech.Items
             GameObjectComponent.HandleActionState(UnitActionState.Started);
             
             // case advancing
-           if (CurrentState != null && CurrentState.CanAdvance(out var next))
-            {
-                state = next.DeserializeState(Owner,GameObjectComponent.SpawnPoint);
-                ChargesLogicOnUse();
-                CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
-                CurrentState = state;
-                if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Advancing weapon combo {next}");
-                return state;
-            }
+           // if (CurrentState != null && CurrentState.CanAdvance(out var next))
+           //  {
+           //      state = next.DeserializeState(Owner,GameObjectComponent.SpawnPoint);
+           //      ChargesLogicOnUse();
+           //      CurrentState = state;
+           //      if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Advancing weapon combo {next}");
+           //      return state;
+           //  }
             // case first attack OR previous attack is completed
             
             ChargesLogicOnUse();
             state = InitialState;
             CurrentState = state;
             if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {state}");
-            state.ActionStateChangedEvent += Action_ActionStateChangedEvent;
+            //state.ActionStateChangedEvent += Action_ActionStateChangedEvent;
             return state;
         }
 
@@ -87,7 +86,7 @@ namespace Arcatech.Items
             if (enterComponent == Owner.GetMainEntity) return;
             if (!hitsThisSwing.Contains(enterComponent))
             {
-                PerformOnHit(Owner, enterComponent, GameObjectComponent.SpawnPoint);
+                PerformOnHit(Owner, enterComponent, GameObjectComponent.EffectSpawn);
                 hitsThisSwing.Add(enterComponent);
             }
         

@@ -30,8 +30,8 @@ namespace Arcatech.Items
         //public SerializedEffectsCollection VFX;
        // EffectsCollection _fx;
 
-        IActionResult[] UnitCollisionResult; // explode (place aoe projectile) or apply effects
-        IActionResult[] ExpirationCollisionResult; // explode (place aoe projectile) or stop moving
+        ActionResult[] UnitCollisionResult; // explode (place aoe projectile) or apply effects
+        ActionResult[] ExpirationCollisionResult; // explode (place aoe projectile) or stop moving
         
 
         public void SetResult(SerializedActionResult[] cfg, SerializedActionResult[] exp, TargetingType t)

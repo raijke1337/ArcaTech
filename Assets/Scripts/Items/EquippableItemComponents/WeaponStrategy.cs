@@ -15,7 +15,7 @@ namespace Arcatech.Items
         protected EquipmentComponent GameObjectComponent { get; }
         
         protected readonly IWeaponHitSource HitSource;
-        public Transform SpawnPoint => GameObjectComponent.SpawnPoint;
+        public Transform SpawnPoint => GameObjectComponent.EffectSpawn;
         
         public WeaponStrategy (SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,EquipmentComponent comp)
         {
@@ -34,7 +34,7 @@ namespace Arcatech.Items
                 HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
             }
 
-            InitialState = act.DeserializeState(Owner, comp.SpawnPoint);
+            InitialState = act.Build();
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);

@@ -4,7 +4,7 @@ namespace Arcatech.Actions
 {
     public abstract class SerializedActionResult : ScriptableObject
     {
-        public abstract IActionResult BuildActionResult();
+        public abstract ActionResult BuildActionResult();
 
     }
 
@@ -15,8 +15,10 @@ namespace Arcatech.Actions
     // spawn particle effect
     // enter a state
     // anything else?
-    public abstract class ActionResult : IActionResult
+    // also do actual input commands now
+    public abstract class ActionResult
     {
-        public abstract void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place);
+        public abstract bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place);
     }
+
 }

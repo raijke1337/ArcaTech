@@ -20,12 +20,17 @@ namespace Arcatech.Stats
 
         [Header("Placeholder for strategies if needed")] [SerializeField]
         private bool killOn0hp = true;
-
         private List<IKillableComponent> killables = new List<IKillableComponent>();
 
-        //public event Action<ResourceStatType, float, float, float, object> OnStatChanged;
-
         private List<ISpawnerProvider> spawners = new List<ISpawnerProvider>();
+        
+        
+        [SerializeField] SerializedUnitState StaggeredState;
+        [SerializeField] SerializedUnitState DeadState;
+        [SerializeField] SerializedUnitState StunnedState;
+        protected UnitState _staggerState;
+        protected UnitState _deathState;
+        protected UnitState _stunnedState;
         
         private class StatRuntime
         {
@@ -407,7 +412,7 @@ namespace Arcatech.Stats
             {
                 if (spawners.Any())
                 {
-                    d.onApply.BuildActionResult().ProduceResult(null,null,spawners[UnityEngine.Random.Range(0, spawners.Count-1)].SpawnPoint);
+                    d.onApply.BuildActionResult().ProduceResult(null,null,spawners[UnityEngine.Random.Range(0, spawners.Count-1)].EffectSpawn);
                 }
             }
         }

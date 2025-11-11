@@ -41,7 +41,7 @@ namespace Arcatech.Skills
             _chargesTimers = new Queue<CountDownTimer>(charges);
             _internalCdTimer = new CountDownTimer(InternalDelay);
             _internalCdTimer.Start();
-            Spawner = item.SpawnPoint;
+            Spawner = item.EffectSpawn;
 
         }
 
@@ -56,7 +56,8 @@ namespace Arcatech.Skills
                 _remainingCharges--;
                 t.OnTimerStopped += OnTimerComplete;
             }
-            return  SkillState.DeserializeState(Owner,Spawner);
+
+            return SkillState.Build();
         }
         public virtual void UpdateUsable(float delta)
         {

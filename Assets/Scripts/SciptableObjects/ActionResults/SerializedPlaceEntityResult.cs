@@ -9,23 +9,24 @@ namespace Arcatech.Actions
     public class SerializedPlaceEntityResult : SerializedActionResult
     {
         [SerializeField] BaseGameEntityComponent entityToPlace;
-        public override IActionResult BuildActionResult()
+        public override ActionResult BuildActionResult()
         {
             return new PlaceEntityResult(entityToPlace);
         }
     }
 
 
-    public class PlaceEntityResult : IActionResult
+    public class PlaceEntityResult : ActionResult
     {
         BaseGameEntityComponent EntityToPlace;
         public PlaceEntityResult(BaseGameEntityComponent entityToPlace)
         {
             EntityToPlace = entityToPlace;
         }
-        public void ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
         {
             GameObject.Instantiate(EntityToPlace, place.position, place.rotation);
+            return EntityToPlace;
         }
     }
 }
