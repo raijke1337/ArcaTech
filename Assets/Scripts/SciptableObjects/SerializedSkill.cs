@@ -15,15 +15,14 @@ namespace Arcatech.Skills
         [Header("Use strategy"),SerializeField] public SerializedSkillUseStrategy UseStrategy;
         [SerializeField] DrawItemsStrategy DrawItemsStrategy;
         [Header("Text"), SerializeField] Description description;
-
+        
         [Space, Header("Combat")]
-        //public UnitActionType UnitActionType;
         [SerializeField] public StatsEffect Cost;
-
+        public SerializedStateTransition StateTransition;
 
         public Skill CreateSkill(BaseGameEntityComponent owner, EquipmentComponent item,ItemType type)
         {
-            return new Skill(DrawItemsStrategy, this,owner,item,type);
+            return new Skill(StateTransition,DrawItemsStrategy, this,owner,item,type);
         }
         private void OnValidate()
         {

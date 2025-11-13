@@ -8,73 +8,39 @@ namespace Arcatech.Items
 {
     public class MeleeSwingStrategy : WeaponStrategy
     {        
-        private ActionResult[] OnColliderHit { get; }
-        private UnitState CurrentState;
-            
-        public MeleeSwingStrategy(SerializedActionResult[] onHit, SerializedUnitState act, BaseGameEntityComponent unit, 
-            WeaponSO cfg, int charges, float reload, EquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
+        private ActionResult[] OnValidHit { get; }
+        private ActionResult[] OnInvalidHit { get; } // for wall hits etc
+        public MeleeSwingStrategy(SerializedActionResult[] onHit, SerializedActionResult[] onFailHit,BaseGameEntityComponent unit, 
+            WeaponSO cfg, int charges, float reload, EquipmentComponent comp) : base(unit, cfg, charges, reload, 0.05f, comp)
         {
 
             HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
             
-            OnColliderHit = new ActionResult[onHit.Length];
+            OnValidHit = new ActionResult[onHit.Length];
 
             for (int i = 0; i < onHit.Length; i++)
             {
-                OnColliderHit[i] = onHit[i].BuildActionResult();
+                OnValidHit[i] = onHit[i].BuildActionResult();
             }
-
+            
+            OnInvalidHit = new ActionResult[onFailHit.Length];
+            for (int i = 0; i < onHit.Length; i++)
+            {
+                OnInvalidHit[i] = onFailHit[i].BuildActionResult();
+            }
         }
-
-
-        public override UnitState UseUsable()
+        public override bool UseUsable()
         {
-
-            // TODO needs debug
-            // THis is moved into the new states system...
-            // add checks to prevent additional triggering
-            UnitState state;
-
             hitsThisSwing.Clear();
-            
-            //doing manually because at this point it's not subbed to events
             GameObjectComponent.HandleActionState(UnitActionState.Started);
-            
-            // case advancing
-           // if (CurrentState != null && CurrentState.CanAdvance(out var next))
-           //  {
-           //      state = next.DeserializeState(Owner,GameObjectComponent.SpawnPoint);
-           //      ChargesLogicOnUse();
-           //      CurrentState = state;
-           //      if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Advancing weapon combo {next}");
-           //      return state;
-           //  }
-            // case first attack OR previous attack is completed
-            
-            ChargesLogicOnUse();
-            state = InitialState;
-            CurrentState = state;
-            if (Owner.GetMainEntity.ShowingDebugs) Debug.Log($"Starting weapon combo {state}");
-            //state.ActionStateChangedEvent += Action_ActionStateChangedEvent;
-            return state;
+            return base.UseUsable();
         }
-
-        // private void Action_ActionStateChangedEvent(UnitActionState state)
-        // {
-        //     GameObjectComponent.HandleActionState(state);
-        //     switch (state)
-        //     {
-        //         case UnitActionState.Completed:
-        //             CurrentState.ActionStateChangedEvent -= Action_ActionStateChangedEvent;
-        //             break;
-        //     }
-        // }
 
         List<BaseGameEntityComponent> hitsThisSwing = new();
 
         private void PerformOnHit(EntityStateMachineComponent user, BaseGameEntityComponent target, Transform place)
         {
-            foreach (var res in OnColliderHit)
+            foreach (var res in OnValidHit)
             {
                 res.ProduceResult(user.GetMainEntity, target, place);
             }

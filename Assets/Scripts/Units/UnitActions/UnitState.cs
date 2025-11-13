@@ -34,6 +34,11 @@ namespace Arcatech.Units
 
     public class UnitState
     {
+        public override string ToString()
+        {
+            return StateName;
+        }
+
         public string StateName { get; }
         public float TimeInState => _stateTimer.GetTime;
         private readonly StopwatchTimer _stateTimer;
@@ -48,10 +53,16 @@ namespace Arcatech.Units
         private int _animatorLayer;
         readonly float _crossfadeTime;
 
+        /// <summary>
+        /// until this time is reached, state will not exit (no transition is valid)
+        /// </summary>
+        private float _minTimeInState;
+        
         public UnitState(
             string name,
             int animatorHash = 0,
             float crossfadeTime = 0.1f,
+            float minTime = 0f,
             int animatorLayer = 0,
             bool allowsMove = true,
             bool allowsAim = true,
@@ -86,6 +97,7 @@ namespace Arcatech.Units
                 }
             }
 
+            _minTimeInState = minTime;
             _stateTimer = new StopwatchTimer();
         }
 
@@ -96,7 +108,6 @@ namespace Arcatech.Units
 
         public void EnterState(StateMachineContext context, Animator animator)
         {
-            Debug.Log($"EnterState {this.StateName}");
             _stateTimer.Reset();
             _stateTimer.Start();
 
@@ -109,19 +120,16 @@ namespace Arcatech.Units
 
             foreach (var m in context.Movers)
             {
-                Debug.Log($"{m} can move: {AllowsMovement}");
                 m.CanMove = AllowsMovement;
             }
 
             foreach (var m in context.Aimers)
             {
-                Debug.Log($"{m} can aim: {AllowsAiming}");
                 m.CanAim = AllowsAiming;
             }
 
             foreach (var i in context.Invulnerabiles)
             {
-                Debug.Log($"{i} is FUCKING INVINCIBLE: {Invulnerable}");
                 i.Invulnerable = Invulnerable;
             }
 
@@ -140,37 +148,43 @@ namespace Arcatech.Units
 
         public void ExitState(StateMachineContext context, Animator animator)
         {
-            Debug.Log($"Exit {StateName} after {_stateTimer.GetTime}");
             if (OnExitState == null || OnExitState.Length == 0) return;
             foreach (var a in OnExitState)
                 a?.ProduceResult(context.Owner, null, context.Spawn);
             _stateTimer.Stop();
 
         }
-
-        // Choose a valid transition based on conditions and optional exit-time requirement
-        public StateTransition ChooseTransition(StateMachineContext ctx, Animator animator)
+        public bool CanExitState(Animator animator)
         {
-            StateTransition highestPriority = null;
-            // Iterate transitions in the order provided; you can sort by priority if you add such a field
-            foreach (var t in Transitions)
+            // No minimum -> can exit immediately
+            if (_minTimeInState <= 0f) return true;
+
+            // If animator is not available, *fallback* to TimeInState comparing against
+            // MinimumTimeInStateNormalized interpreted as seconds fallback (documented caveat)
+            if (animator == null)
             {
-                if (t == null) continue;
-
-                // If this transition requires the animation to reach a normalized time before firing, check that
-                if (!HasPassedExitTime(animator, t.ExitNormalizedTime)) continue;
-
-                if (!t.CanTransition(ctx)) continue;
-                if (highestPriority == null) highestPriority = t;
-                else
-                {
-                    if (t.TransitionPriority > highestPriority.TransitionPriority) highestPriority = t;
-                }
+                // Fallback heuristic: treat MinimumTimeInStateNormalized as seconds if animator missing.
+                return TimeInState >= _minTimeInState;
             }
 
-            return highestPriority;
-        }
+            // Get the current animator state info for this state's layer/hash if available
+            // assuming UnitState stores animatorHash and animatorLayer fields:
+            var layer = _animatorLayer;
+            var info = animator.GetCurrentAnimatorStateInfo(layer);
 
+            // If we're actually in the intended animator state, use normalizedTime
+            if (info.shortNameHash == _animatorHash) // if you store AnimatorStateHash
+            {
+                // normalizedTime can grow > 1.0 for looping states; we use fraction
+                float normalized = info.normalizedTime % 1.0f;
+                return normalized >= _minTimeInState;
+            }
+
+            // If animator is not in the state's expected animator state, treat it as passed
+            // (we're already in a different anim state, so allow exit)
+            return true;
+        }
+        
         public bool ExitTimePassed (Animator a, float normalizedTime)=> HasPassedExitTime(a,normalizedTime);
         private bool HasPassedExitTime(Animator animator, float requiredNormalized)
         {

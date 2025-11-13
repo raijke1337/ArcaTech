@@ -27,18 +27,22 @@ namespace Arcatech.Units.Control
             get => move;
             set
             {
+               // Debug.Log($"Can move: {value}");
                 move = value;
-                if (!value) moveDirection =  Vector3.zero;
+                if (!value)
+                {
+                    moveDirection = Vector3.zero;
+                    movement.cachedRigidbody.linearVelocity = Vector3.zero;
+                   // Debug.Log($"set move vector to 0");
+                }
             }
         }
+    
 
         public Vector3 MovementVector
         {
             get => moveDirection;
-            set
-            {
-                moveDirection = !CanMove ? Vector3.zero : value;
-            }
+            set => moveDirection = !CanMove ? Vector3.zero : value;
         }
 
         private Vector3 aim;
@@ -81,18 +85,21 @@ namespace Arcatech.Units.Control
         readonly string fm = "ForwardMove";
         readonly string sm = "SideMove";
         private readonly string vm = "VerticalMove";
-        readonly string im ="isMoving";
+       // readonly string im ="isMoving";
         readonly string trigger = "AdvanceState";
         private readonly string at = "AirTime";
         private readonly string dr = "DoStandingRotation";
+        private readonly string fV = "LinearVelocity";
+        
 
         private int fmI;
         int smI;
         private int vmI;
-        int imI;
+       // int imI;
         int triggerI;
         private int atI;
         private int drI;
+        private int vI;
 
         private bool isStandingRotating;
 
@@ -105,10 +112,11 @@ namespace Arcatech.Units.Control
             fmI = Animator.StringToHash(fm);
             smI = Animator.StringToHash(sm);
             vmI = Animator.StringToHash(vm);
-            imI = Animator.StringToHash(im);
+        //    imI = Animator.StringToHash(im);
             triggerI = Animator.StringToHash(trigger);
             atI = Animator.StringToHash(at);
             drI = Animator.StringToHash(dr);
+            vI = Animator.StringToHash(fV);
         }
 
         protected override void UpdateRotation()
@@ -123,6 +131,7 @@ namespace Arcatech.Units.Control
         }
         protected override void Animate()
         {
+            animator.SetFloat(vI,movement.cachedRigidbody.linearVelocity.magnitude);
             // Dot product of two vectors determines how much they are pointing in the same direction.
             // If the vectors are normalized (transform.forward and right are)
             // then the value will be between -1 and +1.
@@ -143,7 +152,7 @@ namespace Arcatech.Units.Control
 
                 animator.SetFloat(fmI, z);
                 animator.SetFloat(smI,x);
-                animator.SetBool(imI,true);
+              //  animator.SetBool(imI,true);
                 isStandingRotating = false;
                 animator.ResetTrigger(drI);
             }
@@ -151,7 +160,7 @@ namespace Arcatech.Units.Control
             {
                 animator.SetFloat(fmI, 0);
                 animator.SetFloat(smI, 0);
-                animator.SetBool(imI, false);
+               // animator.SetBool(imI, false);
 
                 var crossY = (Mathf.Abs(Vector3.Cross(fwd, AimPosition).y));
 

@@ -8,16 +8,13 @@ namespace Arcatech.Items
     public class SerializedMeleeSwingStrategy : SerializedWeaponUseStrategy
     {
 
-        [SerializeField] SerializedActionResult[] OnColliderHit;
+        [SerializeField] private SerializedActionResult[] OnInvalidHit;
+        [SerializeField] SerializedActionResult[] OnValidHit;
 
-        private void OnValidate()
-        {
-            Assert.IsNotNull(OnColliderHit);
-            Assert.IsTrue(OnColliderHit.Length > 0);
-        }
+        
         public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, EquipmentComponent comp)
         {
-            return new MeleeSwingStrategy(OnColliderHit, state, unit, cfg, TotalCharges,ChargeRestoreTime,comp);
+            return new MeleeSwingStrategy(OnValidHit, OnInvalidHit, unit, cfg, TotalCharges,ChargeRestoreTime,comp);
         }
     }
 

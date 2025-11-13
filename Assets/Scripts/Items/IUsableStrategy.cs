@@ -6,7 +6,7 @@ namespace Arcatech
     {
         EntityStateMachineComponent Owner { get; }
         bool CanUseUsable();
-        UnitState UseUsable();
+        bool UseUsable();
         void UpdateUsable(float delta);
     }
 }

@@ -14,8 +14,8 @@ namespace Arcatech.Items
         // Settings from scriptable object
 
 
-        public ShootBeamStrategy(BeamSettings setings, SerializedActionResult[] onHit, SerializedUnitState act, BaseGameEntityComponent unit, 
-            WeaponSO cfg, int charges, float reload, EquipmentComponent comp) : base(act, unit, cfg, charges, reload, 0.05f, comp)
+        public ShootBeamStrategy(BeamSettings setings, SerializedActionResult[] onHit,  BaseGameEntityComponent unit, 
+            WeaponSO cfg, int charges, float reload, EquipmentComponent comp) : base(unit, cfg, charges, reload, 0.05f, comp)
         {
  
             OnColliderHit = new ActionResult[onHit.Length];
@@ -48,11 +48,17 @@ namespace Arcatech.Items
             // noop
         }
 
-        
-        public override UnitState UseUsable()
+        public override bool CanUseUsable()
         {
-            laser.FireLaser();
-            return base.UseUsable();
+            
+            return !laser.Active && base.CanUseUsable();
+        }
+
+        public override bool UseUsable()
+        {
+            bool ok = base.UseUsable();
+            if (ok) laser.FireLaser();
+            return ok;
         }
     }
 }

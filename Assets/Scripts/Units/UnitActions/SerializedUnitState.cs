@@ -18,6 +18,7 @@ namespace Arcatech.Units
 
         public int animatorLayer = 0;
         public float crossfadeTime = 0.1f;
+        [Range(0,1)]public float minTimeInStateNormalized = 0f;
 
         [Header("Gameplay locks")] public bool allowsMovement = true;
         public bool allowsAiming = true;
@@ -36,7 +37,7 @@ namespace Arcatech.Units
             return Build(new Dictionary<SerializedUnitState, UnitState>());
         }
 
-        public UnitState Build(Dictionary<SerializedUnitState, UnitState> cache)
+        UnitState Build(Dictionary<SerializedUnitState, UnitState> cache)
         {
             // Return cached runtime state if already built (prevents recursion)
             if (cache.TryGetValue(this, out var cached)) return cached;
@@ -50,6 +51,7 @@ namespace Arcatech.Units
                 animatorHash: animHash,
                 crossfadeTime: crossfadeTime,
                 animatorLayer: animatorLayer,
+                minTime: minTimeInStateNormalized,
                 allowsMove: allowsMovement,
                 allowsAim: allowsAiming,
                 invulnerable: invulnerable,
@@ -69,6 +71,7 @@ namespace Arcatech.Units
                 // Resolve next state using the SAME cache -> avoids infinite recursion
                 var next = t.nextState != null ? t.nextState.Build(cache) : null;
 
+                var ove = t.overrideMinTime;
                 var onTransitionArray = t.onTransition != null
                     ? t.onTransition.ToArray()
                     : Array.Empty<SerializedActionResult>();
@@ -82,7 +85,8 @@ namespace Arcatech.Units
                     onTransition: onTransitionArray,
                     exitNormalizedTime: t.requireExitNormalizedTime,
                     conditions: conditionsArray,
-                    transitionPriority: t.Priority);
+                    transitionPriority: t.Priority,
+                    ove);
 
                 runtimeTransitions.Add(rt);
             }
@@ -94,64 +98,5 @@ namespace Arcatech.Units
         }
     
 
-
-    // public UnitState Build()
-        // {
-        //     int animHash = string.IsNullOrEmpty(animatorStateName) ? 0 : Animator.StringToHash(animatorStateName);
-        //
-        //     // Convert transitions into runtime StateTransition instances
-        //     var runtimeList = new List<StateTransition>();
-        //     
-        //     var runtimeTransitions = new StateTransition[transitions.Length];
-        //     if (transitions != null)
-        //     {
-        //         
-        //         
-        //         foreach (var t in transitions)
-        //         {
-        //             if (t == null) continue;
-        //
-        //             var nextState = t.nextState != null ? t.nextState.Build() : null;
-        //            // overflow here in cases move-idle-move
-        //             SerializedActionResult[] onTransitionArray;
-        //             if (t.onTransition != null)
-        //                 onTransitionArray = t.onTransition.Select(a => a as SerializedActionResult).ToArray();
-        //             else
-        //                 onTransitionArray = Array.Empty<SerializedActionResult>();
-        //
-        //             var conditionsArray = t.conditions != null
-        //                 ? t.conditions.ToArray()
-        //                 : Array.Empty<SerializedStateTransitionCondition>();
-        //
-        //             var rt = new StateTransition(
-        //                 nextState,
-        //                 onTransitionArray,
-        //                 t.requireExitNormalizedTime,
-        //                 conditionsArray,
-        //                 t.Priority
-        //             );
-        //
-        //             runtimeList.Add(rt);
-        //         }
-        //         runtimeTransitions =  runtimeList.ToArray();
-        //     }
-        //     // Convert actions (we store the SOs and call them via Execute on the SO)
-        //     var enterActions = (onEnterActions ?? Array.Empty<SerializedActionResult>()).Select(a => a).ToArray();
-        //     var exitActions = (onExitActions ?? Array.Empty<SerializedActionResult>()).Select(a => a).ToArray();
-        //
-        //     // Construct the runtime UnitState
-        //     return new UnitState(
-        //         stateDisplayName,
-        //         animatorHash: animHash,
-        //         crossfadeTime: crossfadeTime,
-        //         animatorLayer: animatorLayer,
-        //         allowsMove: allowsMovement,
-        //         allowsAim: allowsAiming,
-        //         invulnerable: invulnerable,
-        //         transitions: runtimeTransitions,
-        //         onEnter: enterActions,
-        //         onExit: exitActions
-        //     );
-        // }
     }
 }

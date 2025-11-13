@@ -25,7 +25,7 @@ namespace Arcatech.Items
             }
             cachedUsables.Add(this);
         }
-        public Weapon(WeaponSO cfg, BaseGameEntityComponent ow) : base(cfg, ow)
+        public Weapon(WeaponSO cfg, BaseGameEntityComponent ow,SerializedStateTransition state) : base(cfg, ow)
         {
             UsableName = cfg.Description.Title;
             _cost = cfg.Cost;
@@ -41,16 +41,21 @@ namespace Arcatech.Items
             }
             DrawStrategy = cfg.DrawStrategy;
             UseStrategy = cfg.WeaponUseStrategy.ProduceStrategy(Owner, cfg,DisplayItem);
+            GetStateTransition = state.Build();
         }
 
-        public UnitState Use()
+        public bool Use()
         {
             return UseStrategy.UseUsable();
         }
+
+        public StateTransition GetStateTransition { get; private set; }
+
         public bool UsableIsReady()
         {
             return UseStrategy.CanUseUsable();
         }
+
         public void DoUpdate(float delta)
         {
             UseStrategy.UpdateUsable(delta);

@@ -9,15 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6285385037620678454}
-  - component: {fileID: 5403480481623698149}
-  - component: {fileID: 6127516095954958753}
   - component: {fileID: 4331061338980575475}
   - component: {fileID: 6750963991051253981}
   - component: {fileID: 3910741263845315262}
-  - component: {fileID: 4897096551265002797}
   - component: {fileID: 2369816014817264701}
   - component: {fileID: 8778643577270051423}
   - component: {fileID: 1270643316596228269}
+  - component: {fileID: 2008683568696353381}
   m_Layer: 6
   m_Name: DebugGolem
   m_TagString: Enemy
@@ -41,71 +39,6 @@ Transform:
   - {fileID: 2709105274148212430}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5403480481623698149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6282177902539391458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Graph: {fileID: 8949138626656987405, guid: 636505c88bcf27542a54289a211c1c5a, type: 2}
-  m_BlackboardVariableOverridesList:
-  - rid: 1050021106537463904
-  - rid: 1050021106931204155
-  m_IsInitialised: 0
-  m_IsStarted: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 1050021106537463904
-      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
-        ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 1
-          m_Value1: 0
-        Name: Self
-        m_Value: {fileID: 6282177902539391458}
-    - rid: 1050021106931204155
-      type: {class: 'BlackboardVariable`1[[System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]], mscorlib]]',
-        ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 9594125107242267013
-          m_Value1: 6022481833851505528
-        Name: PatrolPoints
-        m_Value:
-        - {fileID: 0}
-        - {fileID: 0}
-        - {fileID: 0}
-        - {fileID: 0}
---- !u!195 &6127516095954958753
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6282177902539391458}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!114 &4331061338980575475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,11 +51,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pauser: {fileID: 2008683568696353381}
   _name: Dummy golem
   entitySide: 2
+  _effectSpawn: {fileID: 6285385037620678454}
+  destroyOnDeath: 1
+  timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 8778643577270051423}
-  gravity: 0
   usePhysics: 0
 --- !u!95 &6750963991051253981
 Animator:
@@ -158,27 +94,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4980b1095bba4ba4e9dc04954162be1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingStats: {fileID: 11400000, guid: aa050d370950d914684ca237e9e31ff0, type: 2}
-  statsUpdateFrequency: 0.1
---- !u!114 &4897096551265002797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6282177902539391458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8683f71a5cfe53439f51db09350de3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameEntity: {fileID: 4331061338980575475}
-  _animator: {fileID: 6750963991051253981}
-  _stats: {fileID: 3910741263845315262}
-  ActionOnDamage: {fileID: 11400000, guid: aad65fa8c2bf20747aab7ac2214c7125, type: 2}
-  ActionOnDeath: {fileID: 11400000, guid: 722243b331cd7f448bd2b6c99ddf59e0, type: 2}
-  agent: {fileID: 6127516095954958753}
-  behavior: {fileID: 5403480481623698149}
+  startingConfig: {fileID: 11400000, guid: c9551a180c74d634b9aaaf7c896ec589, type: 2}
+  preserveCurrentRatioOnMaxChange: 1
+  killOn0hp: 1
+  StaggeredState: {fileID: 0}
+  DeadState: {fileID: 0}
+  StunnedState: {fileID: 0}
+  statUpdateStrategies: []
 --- !u!136 &2369816014817264701
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -251,6 +173,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   maxRaycastDistance: 10
+--- !u!114 &2008683568696353381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6282177902539391458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2455048497133562149
 PrefabInstance:
   m_ObjectHideFlags: 0

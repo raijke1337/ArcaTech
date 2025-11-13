@@ -44,6 +44,14 @@ namespace Arcatech.Items
 
         public void RefreshView(UnitInventoryModel model)
         {
+            if (_usables != null)
+            {
+                foreach (var usable in _usables.Values)
+                {
+                    _stateUnit.RemoveTransition(usable.GetStateTransition);
+                }
+            }
+            
             var newEquips = model.ListEquipped;
             List<IUsable> newList = new();
 
@@ -58,6 +66,10 @@ namespace Arcatech.Items
                     // no key or different skill loaded
                     _usables[sk.UseActionType] = sk;
                 }
+            }
+            foreach (var usable in _usables.Values)
+            {
+                _stateUnit.AddTransition(usable.GetStateTransition);
             }
         }
 
@@ -102,16 +114,18 @@ namespace Arcatech.Items
         public bool CanDoUnitCommand(UnitActionType type) => ValidateCommand(type);
         public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
-            //var state = _usables[type].Use();
-            //_stateUnit.ForceUnitState(state);
-            
             if (type == UnitActionType.Movement || type == UnitActionType.Jump) return true;
             
+            if (!_usables.TryGetValue(type, out var usable)) return false;
+            {
+                if (!usable.Use()) return false;
+            }
             if (_usables[type] is IAffectsItemDisplay disp && disp.DrawStrategy != currentDrawItemStrategy)
             {
                 currentDrawItemStrategy = disp.DrawStrategy;
                 redraw = true;
             }
+            
             stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
             return true;
         }

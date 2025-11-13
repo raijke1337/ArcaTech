@@ -22,12 +22,8 @@ namespace Arcatech.Skills
         protected SkillUsageStrategy Strategy { get; }
 
         public string UsableName { get; }
-        public Skill(IDrawItemStrategy s, SerializedSkill settings, BaseGameEntityComponent owner, EquipmentComponent item, ItemType type)
+        public Skill(SerializedStateTransition state, IDrawItemStrategy s, SerializedSkill settings, BaseGameEntityComponent owner, EquipmentComponent item, ItemType type)
         { 
-
-            Owner = owner.GetComponent<EntityStateMachineComponent>();
-            if (settings == null) return; // placeholder maybe TODO - for items without skills
-
             switch (type)
             {
                 case ItemType.None:
@@ -53,16 +49,21 @@ namespace Arcatech.Skills
             Strategy = settings.UseStrategy.ProduceStrategy(Owner, settings, item);
             DrawStrategy = s;
             UsableName = settings.Description.Text;
+            GetStateTransition = state.Build();
         }
 
-        public UnitState Use()
-        {
-            return Strategy.UseUsable();
-        }
+
         public bool UsableIsReady()
         {
             return Strategy.CanUseUsable();
         }
+
+        public bool Use()
+        {
+            return Strategy.UseUsable();
+        }
+
+        public StateTransition GetStateTransition { get; }
 
 
         public void DoUpdate(float delta)

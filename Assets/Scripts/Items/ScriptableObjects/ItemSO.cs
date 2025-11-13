@@ -10,7 +10,7 @@ namespace Arcatech.Items
     [Serializable, CreateAssetMenu(fileName = "New Backpack Item", menuName = "Items/Just Item")]
     public class ItemSO : ScriptableObjectID, IIconContent
     {
-        [SerializeField] public EquipmentComponent itemPrefab;
+
         [SerializeField] Description description;        
         public ItemType type;
 

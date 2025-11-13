@@ -9,7 +9,7 @@ namespace Arcatech.Items
         [SerializeField] private SerializedProduceProjectileResult projectile;
         public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, EquipmentComponent comp)
         {
-            return new ShootProjectilesStrategy(projectile,state,unit,cfg,TotalCharges,ChargeRestoreTime,InternalCooldown,comp);
+            return new ShootProjectilesStrategy(projectile,unit,cfg,TotalCharges,ChargeRestoreTime,InternalCooldown,comp);
         }
     }
 

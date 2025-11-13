@@ -16,7 +16,7 @@ namespace Arcatech.Items
 
         public override WeaponStrategy ProduceStrategy(BaseGameEntityComponent unit, WeaponSO cfg, EquipmentComponent comp)
         {
-            return new ShootBeamStrategy(_beamSettings,onBeamHit,state, unit, cfg, TotalCharges,ChargeRestoreTime,comp);
+            return new ShootBeamStrategy(_beamSettings,onBeamHit,unit, cfg, TotalCharges,ChargeRestoreTime,comp);
         }
     }
 

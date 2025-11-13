@@ -17,7 +17,7 @@ namespace Arcatech.Items
         protected readonly IWeaponHitSource HitSource;
         public Transform SpawnPoint => GameObjectComponent.EffectSpawn;
         
-        public WeaponStrategy (SerializedUnitState act, BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,EquipmentComponent comp)
+        public WeaponStrategy (BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,EquipmentComponent comp)
         {
             Owner = unit.GetComponent<EntityStateMachineComponent>();
             Config = cfg;
@@ -33,8 +33,6 @@ namespace Arcatech.Items
             {
                 HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
             }
-
-            InitialState = act.Build();
 
             _remainingCharges = MaxCharges;
             _chargesTimers = new Queue<CountDownTimer>(charges);
@@ -87,12 +85,12 @@ namespace Arcatech.Items
         
         #region usable
 
-        protected UnitState InitialState { get; }
 
-        public virtual UnitState UseUsable()
+        public virtual bool UseUsable()
         {
+            if (!CanUseUsable()) return false;
             ChargesLogicOnUse();
-            return InitialState;
+            return true;
         }
         
         public virtual void UpdateUsable(float delta)
@@ -104,18 +102,8 @@ namespace Arcatech.Items
             _internalCdTimer?.Tick(delta);
         }
 
-        public bool CanUseUsable()
-        {
-            if (!_internalCdTimer.IsReady) return false;
-            else
-            {
-                if (_remainingCharges > 0)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        public virtual bool CanUseUsable() => _remainingCharges > 0 && _internalCdTimer.IsReady;
+        
         #endregion
         #region UI
 
@@ -126,18 +114,15 @@ namespace Arcatech.Items
             get
             {
                 if (_remainingCharges > 0) return _internalCdTimer.Progress-1;
-                else
-                {
-                    return _chargesTimers.TryPeek(out var p) ? p.Progress : _internalCdTimer.Progress-1;
-                }
+                return _chargesTimers.TryPeek(out var p) ? p.Progress : _internalCdTimer.Progress-1;
             }
         }
 
         public string IconNumber => _remainingCharges.ToString("D");
 
         #endregion
-
-
+        
+        
         public void OnInit()
         {
         }

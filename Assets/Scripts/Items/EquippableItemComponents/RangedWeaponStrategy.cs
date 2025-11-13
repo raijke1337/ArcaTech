@@ -11,12 +11,22 @@ namespace Arcatech.Items
         
         
 
-        public ShootProjectilesStrategy(SerializedProduceProjectileResult p, SerializedUnitState act, 
+        public ShootProjectilesStrategy(SerializedProduceProjectileResult p,  
             BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd, 
-            EquipmentComponent comp) : base(act, unit, cfg, charges, reload, intcd, comp)
+            EquipmentComponent comp) : base(unit, cfg, charges, reload, intcd, comp)
         {
             this.projectile = p;
             HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
+        }
+
+        public override bool UseUsable()
+        {
+            var ok = base.UseUsable();
+            if (ok)
+            {
+                projectile.BuildActionResult().ProduceResult(Owner.GetMainEntity, null, SpawnPoint);
+            }
+            return ok;
         }
     }
 }

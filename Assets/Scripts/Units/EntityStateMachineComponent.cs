@@ -15,29 +15,36 @@ namespace Arcatech.Units
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
 
-    public class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent,IKillableComponent
+    public class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Child] protected Animator animator;
 
         [Space, Header("States")] [SerializeField]
         private SerializedUnitState startingState;
+
         private StateMachineContext _context;
         public BaseGameEntityComponent GetMainEntity => gameEntity;
         private UnitState _currentState;
 
+        readonly string _animatorParameterName = "TimeInState";
+        int _animatorParameter;
+
 
         private List<StateTransition> _addedTransitions = new();
+        private List<StateTransition> _removedTransitions = new();
+
         protected void Start()
         {
-            
+            _animatorParameter = Animator.StringToHash(_animatorParameterName);
+
             _context = new StateMachineContext() { Spawn = gameEntity.transform, Owner = gameEntity };
             _currentState = startingState.Build();
             _context.CurrentState = _currentState;
             _context.Owner = gameEntity;
             _context.Aimers = GetComponentsInChildren<IAim>();
             _context.Movers = GetComponentsInChildren<IMove>();
-            _context.Invulnerabiles= GetComponentsInChildren<IInvulnerability>();
+            _context.Invulnerabiles = GetComponentsInChildren<IInvulnerability>();
             _currentState.EnterState(_context, animator);
 
         }
@@ -46,7 +53,8 @@ namespace Arcatech.Units
         {
             if (Paused || Killed) return;
             _currentState?.UpdateState(Time.deltaTime);
-            
+            animator.SetFloat(_animatorParameter, _currentState?.TimeInState ?? 0);
+
             int safety = 0;
             const int kMaxChain = 8;
             while (safety++ < kMaxChain)
@@ -55,6 +63,7 @@ namespace Arcatech.Units
                 if (!committed) break;
             }
         }
+
         bool ExecuteTransitionActions(StateTransition tr)
         {
             if (tr.OnTransition == null) return true;
@@ -64,75 +73,84 @@ namespace Arcatech.Units
                 bool ok = a.ProduceResult(_context.Owner, null, _context.Spawn);
                 if (!ok) return false;
             }
+
+            return true;
+        }
+
+        // New helper: try to run command performers (if provided), run OnTransition actions and commit.
+        bool TryCommitTransition(StateTransition tr, IEnumerable<IUnitCommandPerformer> commandPerformers)
+        {
+            if (tr == null || tr.NextState == null) return false;
+
+            // Run any command performers (validation / execution).
+            if (commandPerformers != null)
+            {
+                foreach (var handler in commandPerformers)
+                {
+                    bool executed = handler.DoUnitCommand(_context.PendingCommand, true);
+                    if (!executed)
+                    {
+                        Debug.LogWarning(
+                            $"Performer {handler} failed to execute {_context.PendingCommand}; aborting transition.");
+                        _context.ClearCommand();
+                        return false;
+                    }
+                }
+            }
+
+            // Run transition OnTransition actions
+            if (!ExecuteTransitionActions(tr))
+            {
+                Debug.LogWarning($"Transition action failed, aborting transition from {_currentState}");
+                _context.ClearCommand();
+                return false;
+            }
+
+            CommitTransition(tr);
             return true;
         }
 
         private bool UpdateTransitions()
         {
             if (Paused || Killed) return false;
-            // Evaluate global transitions (highest priority)
-            var orderedGlobals = _addedTransitions.OrderByDescending(t => t.TransitionPriority);
-            foreach (var g in orderedGlobals)
-            {
-                if (g == null || g.NextState == null) continue;
-                if (!g.CanTransition(_context)) continue;
-                // If this transition requires exit time, check it (pass CurrentState.animator info if needed)
-                // Here we assume StateTransition carries ExitNormalizedTime and we can call helper
-                if (!_currentState.ExitTimePassed(animator,g.ExitNormalizedTime)) continue;
 
-                // Run onTransition actions (performers). Abort on any failure
-                if (!ExecuteTransitionActions(g)) 
-                { 
-                    _context.ClearCommand();
-                    return false; 
-                }
-
-                CommitTransition(g);
-                return true;
-            }
-            if (_currentState == null) return false;
-            
-            var transition = _currentState.ChooseTransition(_context, animator);
-            if (transition == null || transition.NextState == null)
+            // Pick the best transition among local and global candidates
+            bool wasLocal;
+            var chosen = PickBestTransition(out wasLocal);
+            if (chosen == null || chosen.NextState == null)
             {
-                // No transition right now
                 return false;
             }
 
-            // 1) Execute transition 'performers' (onTransition). Pass PendingCommand as data.
-            if (transition.OnTransition != null)
+            // For runtime updates (Update loop) we want to clear PendingCommand on commit
+            if (!TryCommitTransition(chosen, null))
             {
-                if (!ExecuteTransitionActions(transition))
-                {
-                    // Abort transition if any action failed
-                    Debug.LogWarning($"Transition action failed, aborting transition from {_currentState}");
-                    _context.ClearCommand(); // or keep it if you want to retry
-                    return false; 
-                }
+                // aborted by action/performer
+                return false;
             }
-            CommitTransition(transition);
             return true;
         }
 
+        /// final action
         void CommitTransition(StateTransition tr)
         {
-            // 2) Commit the transition
+            if (tr == null || tr.NextState == null) return;
+
             _currentState.ExitState(_context, animator);
             _currentState = tr.NextState;
             _context.CurrentState = _currentState;
             _currentState.EnterState(_context, animator);
-
-            // 3) Command consumed
             _context.ClearCommand();
         }
-        
-        public bool TryCommandTransition(UnitActionType actionType, IEnumerable<IUnitCommandPerformer> commandPerformers)
+
+        public bool TryCommandTransition(UnitActionType actionType,
+            IEnumerable<IUnitCommandPerformer> commandPerformers)
         {
             if (Paused || Killed) return false;
             _context.PendingCommand = actionType;
             return ValidateCommandTransition(commandPerformers);
         }
-        
+
         bool ValidateCommandTransition(IEnumerable<IUnitCommandPerformer> commandPerformers)
         {
             if (_currentState == null)
@@ -141,30 +159,26 @@ namespace Arcatech.Units
                 return false;
             }
 
-            var transition = _currentState.ChooseTransition(_context,animator);
-            
-            if (transition == null || transition.NextState == null)
+            // Use the same selection logic (local + global), but when committing from a command
+            // we want to preserve the PendingCommand so chained transitions in the new state can consume it.
+            bool wasLocal;
+            var chosen = PickBestTransition(out wasLocal);
+            if (chosen == null || chosen.NextState == null)
             {
                 _context.ClearCommand();
                 return false;
             }
-            
-            if (commandPerformers != null)
+
+            // Try to commit, passing the performers and DO NOT clear pending command (so newly-entered state can read it)
+            if (!TryCommitTransition(chosen, commandPerformers))
             {
-                foreach (var handler in commandPerformers)
-                {
-                    bool executed = handler.DoUnitCommand(_context.PendingCommand, true);
-                    if (!executed)
-                    {
-                        Debug.LogWarning($"Performer {handler} failed to execute {_context.PendingCommand}; aborting transition.");
-                        _context.ClearCommand();
-                        return false;
-                    }
-                }
+                // TryCommitTransition cleared the command on failure
+                return false;
             }
-            CommitTransition(transition);
+
             return true;
         }
+
         public void ForceUnitState(UnitState forcedState, bool immediate = true)
         {
             if (forcedState == null) return;
@@ -174,9 +188,11 @@ namespace Arcatech.Units
             _currentState.EnterState(_context, animator);
             _context.ClearCommand();
         }
+
         public void AddTransition(StateTransition transition)
         {
             if (transition == null || _addedTransitions.Contains(transition)) return;
+            Debug.Log($"added transition {transition}");
             _addedTransitions.Add(transition);
         }
 
@@ -185,7 +201,72 @@ namespace Arcatech.Units
             if (transition == null || !_addedTransitions.Contains(transition)) return;
             _addedTransitions.Remove(transition);
         }
-        
+
+
+        private List<(StateTransition tr, bool isLocal)> CollectCandidates()
+        {
+            var candidates = new List<(StateTransition, bool)>();
+            if (_currentState == null) return candidates;
+
+            bool canExit = _currentState.CanExitState(animator);
+
+            // 1) current state's transitions
+            var localTransitions = _currentState.Transitions ?? Array.Empty<StateTransition>();
+            foreach (var t in localTransitions)
+            {
+                if (t == null || t.NextState == null) continue;
+                if (!t.CanTransition(_context)) continue;
+
+                // If state can't exit yet and transition does not allow during minimum state, skip it.
+                if (!canExit && !t.CanOverrideMinimumStateTime) continue;
+
+                // exitNormalTime is still respected — check it relative to currentState
+                if (!_currentState.ExitTimePassed(animator, t.ExitNormalizedTime)) continue;
+
+                candidates.Add((t, true));
+            }
+
+            // 2) global transitions
+            foreach (var g in _addedTransitions)
+            {
+                if (g == null || g.NextState == null) continue;
+                if (!g.CanTransition(_context)) continue;
+                if (!canExit && !g.CanOverrideMinimumStateTime) continue;
+                if (!_currentState.ExitTimePassed(animator, g.ExitNormalizedTime)) continue;
+                candidates.Add((g, false));
+            }
+
+            return candidates;
+        }
+
+// Choose the best candidate by (priority desc, isLocal preferred)
+// Returns best transition or null if none
+        private StateTransition PickBestTransition(out bool wasLocal)
+        {
+            wasLocal = false;
+            var candidates = CollectCandidates();
+            if (candidates.Count == 0) return null;
+
+            // Order by priority descending, and prefer local when priorities tie
+            var best = candidates
+                .OrderByDescending(c => c.tr.TransitionPriority)
+                .ThenByDescending(c => c.isLocal ? 1 : 0) // local wins ties
+                .FirstOrDefault();
+
+            if (best.tr == null) return null;
+            wasLocal = best.isLocal;
+            
+            var debug = ($"Pick {best.tr.NextState.StateName} from {candidates.Count}:");
+            foreach (var c in candidates)
+            {
+                debug += ($"\n {c.tr}");
+            }
+            Debug.Log(debug);   
+            
+            return best.tr;
+        }
+
+
         public bool Paused { get; set; }
         public bool Killed { get; set; }
     }

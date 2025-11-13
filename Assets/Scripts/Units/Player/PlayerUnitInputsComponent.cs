@@ -17,7 +17,8 @@ namespace Arcatech.Units.Control
 
         [SerializeField, Self] protected InteractionComponent _interaction;
         private IPlayerMovementController _playerMovementController; // just set the vector
-
+        
+        
         protected override void ControllerStartBindings(bool enabling)
         {
             _adj ??= new IsoCamAdjust();
@@ -45,7 +46,8 @@ namespace Arcatech.Units.Control
         {
             if (type == UnitActionType.Movement)
             {
-                OnMovement(ctx);
+                Debug.Log("Move");
+                UpdateCachedInputVector(ctx);
                 RequestCombatAction(type);
             }
             else 
@@ -53,16 +55,20 @@ namespace Arcatech.Units.Control
                 if (ctx.performed) RequestCombatAction(type);
             }
         }
-    
 
-    private void OnPause(InputAction.CallbackContext arg0)
+        private void OnPause(InputAction.CallbackContext arg0)
         {
             if (arg0.phase == InputActionPhase.Performed)
                 EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(!Paused));
         }
 
+        private void Update()
+        {
+            _playerMovementController.MovementVector = InputMovement;
+            // to fix the issue with movement not continuing after using attacks or jump
+        }
 
-        private void OnMovement(InputAction.CallbackContext arg0)
+        private void UpdateCachedInputVector(InputAction.CallbackContext arg0)
         {
             Vector3 direction = Vector3.forward;
             switch (arg0.phase)

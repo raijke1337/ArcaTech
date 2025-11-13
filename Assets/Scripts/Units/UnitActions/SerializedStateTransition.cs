@@ -11,17 +11,21 @@ namespace Arcatech.Units
         public SerializedStateTransitionCondition[] conditions = new SerializedStateTransitionCondition[0];
         public SerializedUnitState nextState;
         public SerializedActionResult[] onTransition = new SerializedActionResult[0];
+        
 
         [Tooltip("If true, require the source state's animation to reach this normalized time (0..1) before allowing the transition.")]
         [Range(0f, 1f)]
         public float requireExitNormalizedTime = 1f;
+
+        public bool overrideMinTime = false;
 
         public StateTransition Build()
         {
             return new StateTransition(nextState.Build(), 
                 onTransition, 
                 requireExitNormalizedTime, 
-                conditions,Priority);
+                conditions,Priority,
+                overrideMinTime);
         }
         
     }
@@ -33,12 +37,14 @@ namespace Arcatech.Units
         public ActionResult[] OnTransition { get; }
         public float ExitNormalizedTime { get; }
         public SerializedStateTransitionCondition[] Conditions { get; }
+        public bool CanOverrideMinimumStateTime { get; }
 
         public StateTransition(UnitState nextState,
             SerializedActionResult[] onTransition,
             float exitNormalizedTime,
             SerializedStateTransitionCondition[] conditions,
-            int transitionPriority)
+            int transitionPriority,
+            bool isOverride)
         {
             NextState = nextState;
             if (onTransition != null && onTransition.Length > 0)
@@ -51,7 +57,8 @@ namespace Arcatech.Units
             }
             ExitNormalizedTime = Mathf.Clamp01(exitNormalizedTime);
             Conditions = conditions ?? Array.Empty<SerializedStateTransitionCondition>();
-            TransitionPriority = transitionPriority;    
+            TransitionPriority = transitionPriority;  
+            CanOverrideMinimumStateTime = isOverride;
         }
 
         public bool CanTransition(StateMachineContext ctx)

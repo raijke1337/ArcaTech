@@ -30,35 +30,23 @@ namespace Arcatech.Units.Control
             InteractionRaycast();
         }
         
-        
-        
-        #region animation
 
-        [Header("Animator settings"), SerializeField]
-        private string aimRotationAngleAnimatorString = "SignedAngle";
-
-        [SerializeField, Self] private Animator animator;
-
-        private int animatorSignedAngleHash;
-
-
-        #endregion
 
         #region aiming
 
         private Vector3 desiredLookDirection;
         private Vector3 _aimPosition;
         [SerializeField] float aimOffset = 0f;
-      
 
         private List<IAim> aimInterfaces = new List<IAim>();
 
-        //bool isDesiredRotationClockwise;
         private Plane groundPlane;
         
         
 
 
+        private string aimRotationAngleAnimatorString = "SignedAngle";
+        private int animatorSignedAngleHash;
 
         private void DoAiming()
         {
@@ -99,7 +87,7 @@ namespace Arcatech.Units.Control
 
             // Calculate signed angle around the up axis (positive = clockwise when viewed from above)
             float signedAngle = Vector3.SignedAngle(currentFlat, desiredFlat, Vector3.up);
-            animator.SetFloat(animatorSignedAngleHash, signedAngle);
+           // animator.SetFloat(animatorSignedAngleHash, signedAngle);
 
 
             foreach (var aim in aimInterfaces)

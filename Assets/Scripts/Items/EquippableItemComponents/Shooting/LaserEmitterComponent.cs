@@ -83,8 +83,6 @@ namespace Arcatech.Items
             ConfigureLineRenderer();
         }
         
-        
-        
         private LineRenderer lineRenderer;
         private AudioSource audioSource;
         private Coroutine laserCoroutine;

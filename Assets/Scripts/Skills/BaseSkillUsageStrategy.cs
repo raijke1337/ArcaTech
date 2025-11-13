@@ -28,8 +28,6 @@ namespace Arcatech.Skills
 
         public SkillUsageStrategy(EquipmentComponent item, SerializedUnitState useaction, EntityStateMachineComponent unit, Description desc, int charges, float reload)
         {
-            OnInit();
-
             Owner = unit;
             _desc = desc;
             ChargeReload = reload;
@@ -45,19 +43,17 @@ namespace Arcatech.Skills
 
         }
 
-        public UnitState UseUsable()
+        public bool UseUsable()
         {
-            if (_remainingCharges > 0)
-            {
-                var t = new CountDownTimer(ChargeReload);
-                _internalCdTimer.Start();
-                t.Start();
-                _chargesTimers.Enqueue(t);
-                _remainingCharges--;
-                t.OnTimerStopped += OnTimerComplete;
-            }
-
-            return SkillState.Build();
+            if (!CanUseUsable()) return false;
+            
+            var t = new CountDownTimer(ChargeReload);
+            _internalCdTimer.Start();
+            t.Start();
+            _chargesTimers.Enqueue(t);
+            _remainingCharges--;
+            t.OnTimerStopped += OnTimerComplete;
+            return true;
         }
         public virtual void UpdateUsable(float delta)
         {
@@ -77,15 +73,7 @@ namespace Arcatech.Skills
 
         public bool CanUseUsable()
         {
-            if (!_internalCdTimer.IsReady) return false;
-            else
-            {
-                if (_remainingCharges > 0)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return _internalCdTimer.IsReady && _remainingCharges > 0;
         }
 
         #region UI
@@ -110,13 +98,5 @@ namespace Arcatech.Skills
 
         #endregion
 
-        public void OnInit()
-        {
-        }
-
-        public void OnCleanUp()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
