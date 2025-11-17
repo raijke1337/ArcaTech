@@ -17,6 +17,7 @@ namespace Arcatech.Units.Control
         public bool CanMove { get; set; }
         public Vector3 MovementVector { get; set; }
         public bool IsGrounded { get; }
+        public bool UseRootMotion { get; set; }
     }
 
     public interface IJump

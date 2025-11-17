@@ -16,8 +16,8 @@ namespace Arcatech.Units.Control
         PlayerInputReaderObject _playerInputReader;
 
         [SerializeField, Self] protected InteractionComponent _interaction;
-        private IPlayerMovementController _playerMovementController; // just set the vector
-        
+        //private IPlayerMovementController _playerMovementController; // just set the vector
+        private IMove mover;
         
         protected override void ControllerStartBindings(bool enabling)
         {
@@ -25,7 +25,7 @@ namespace Arcatech.Units.Control
 
             if (enabling)
             {
-                _playerMovementController = GetComponent<IPlayerMovementController>();
+                mover = GetComponent<IMove>();
                 _playerInputReader.PausePressed += OnPause;
                 _playerInputReader.CombatAction += OnCombatAction;
                 _playerInputReader.UseAction += OnUseAction;
@@ -64,7 +64,8 @@ namespace Arcatech.Units.Control
 
         private void Update()
         {
-            _playerMovementController.MovementVector = InputMovement;
+            if (mover != null) 
+                mover.MovementVector = InputMovement;
             // to fix the issue with movement not continuing after using attacks or jump
         }
 
@@ -85,7 +86,7 @@ namespace Arcatech.Units.Control
                     InputMovement = Vector3.zero;
                     break;
             }
-            _playerMovementController.MovementVector = InputMovement;
+            mover.MovementVector = InputMovement;
         }
         
         private IsoCamAdjust _adj;

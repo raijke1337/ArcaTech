@@ -8,6 +8,8 @@ namespace Arcatech.Units
     {
         public float minTimeInState = 0.0f;
 
+        public override string ConditionName => "Time in state passed: "+minTimeInState;
+
         public override bool CanTransition(StateMachineContext ctx)
         {
             if (ctx?.CurrentState == null) return false;

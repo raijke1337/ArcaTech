@@ -24,6 +24,9 @@ namespace Arcatech.Units
         public bool allowsAiming = true;
         public bool invulnerable = false;
 
+        [Header("Root motion enabled override disables aiming and movement")]
+        public bool rootMotionEnabled = false;
+
         [Header("State data")] public SerializedStateTransition[] transitions = new SerializedStateTransition[0];
         public SerializedActionResult[] onEnterActions = new SerializedActionResult[0];
         public SerializedActionResult[] onExitActions = new SerializedActionResult[0];
@@ -52,6 +55,7 @@ namespace Arcatech.Units
                 crossfadeTime: crossfadeTime,
                 animatorLayer: animatorLayer,
                 minTime: minTimeInStateNormalized,
+                isRootMotionState:rootMotionEnabled,
                 allowsMove: allowsMovement,
                 allowsAim: allowsAiming,
                 invulnerable: invulnerable,

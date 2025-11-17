@@ -1,158 +1,106 @@
-﻿using System;
-using System.Collections.Generic;
-using Arcatech.Items;
-using Arcatech.Units;
-using Arcatech.Units.Control;
-using ECM.Common;
-using ECM.Controllers;
-using KBCore.Refs;
+﻿
+using ECM2;
+using NUnit.Framework.Constraints;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.XR;
 
 namespace Arcatech.Units.Control
 {
 
     [RequireComponent(typeof(EntityStateMachineComponent))]
-    public class MovementControllerWithAiming : BaseCharacterController, IPlayerMovementController,IPausableComponent,IKillableComponent
+    public class MovementControllerWithAiming : Character, IMove, IPausableComponent, IAim//: BaseCharacterController, ,IPausableComponent,IKillableComponent
     {
-
-        public bool IsGrounded => movement.isGrounded;
-        public bool CanAim { get; set; }  = true;
-
-        private bool move;
-
-        public bool CanMove
-        {
-            get => move;
-            set
-            {
-               // Debug.Log($"Can move: {value}");
-                move = value;
-                if (!value)
-                {
-                    moveDirection = Vector3.zero;
-                    movement.cachedRigidbody.linearVelocity = Vector3.zero;
-                   // Debug.Log($"set move vector to 0");
-                }
-            }
-        }
-    
-
+        public bool CanMove { get; set; }
+        public bool UseRootMotion { get => useRootMotion; set => useRootMotion = value; }
         public Vector3 MovementVector
         {
-            get => moveDirection;
-            set => moveDirection = !CanMove ? Vector3.zero : value;
+            get => GetMovementDirection();
+            set => SetMovementDirection(!CanMove ? Vector3.zero : value);
         }
-
-        private Vector3 aim;
-
-        public Vector3 AimPosition
-        {
-            get => aim;
-            set
-            {
-                if (!CanAim) return;
-                aim = value;
-            }
-        }
-
-        public bool JumpCommand
-        {
-            get => _jump;
-            set
-            {
-                _jump = value;
-                if (!value) _canJump = true;
-            }
-        }
-
+        
         public bool Paused
         {
-            get => pause;
-            set => pause = value;
+            get => isPaused;
+            set => Pause(value);
+        }
+        
+        public bool CanAim { get; set; }  = true;
+        
+        public Vector3 AimPosition { get; set; }
+
+        protected override void CustomRotationMode(float deltaTime)
+        {
+            if (CanAim) RotateTowards(AimPosition,deltaTime);
+            base.CustomRotationMode(deltaTime);
         }
 
-        public bool Killed { get; set; } = false;
-        
-        
-        //private float referenceMagnitude;
-        private float airTime;
-        private bool landOK;
-        
-        
-        // for animator hashes
-        readonly string fm = "ForwardMove";
-        readonly string sm = "SideMove";
-        private readonly string vm = "VerticalMove";
-       // readonly string im ="isMoving";
-        readonly string trigger = "AdvanceState";
-        private readonly string at = "AirTime";
-        private readonly string dr = "DoStandingRotation";
-        private readonly string fV = "LinearVelocity";
-        
-
-        private int fmI;
-        int smI;
-        private int vmI;
-       // int imI;
-        int triggerI;
-        private int atI;
-        private int drI;
-        private int vI;
-
-        private bool isStandingRotating;
-
-        [Header("animator setting")] [SerializeField]
-        private float _minCrossYToRotate = 0.15f;
-        private void Start()
+        protected override void OnValidate()
         {
-           // _stateMachine =  GetComponent<EntityStateMachineComponent>();
-           // _jump = JumpState.Build();
+            base.OnValidate();
+            rotationMode = RotationMode.Custom;
+        }
+
+        protected override void OnCharacterMovementUpdated(float deltaTime)
+        {
+            base.OnCharacterMovementUpdated(deltaTime);
+            Animate();
+        }
+        
+        #region Animate
+ 
+         
+         // for animator hashes
+         private readonly string fm = "ForwardMove";
+         private readonly string sm = "SideMove";
+         private readonly string vm = "VerticalMove";
+         private readonly string dr = "DoStandingRotation";
+         private readonly string fV = "LinearVelocity";
+        
+         private int fmI;
+         private int smI;
+         private int vmI;
+         private int drI;
+         private int vI;
+        
+         private bool isStandingRotating;
+        
+         [Header("animator setting")] [SerializeField]
+         private float minCrossYToRotate = 0.15f;
+        protected override void OnEnable()
+        {
+            base.OnEnable();
             fmI = Animator.StringToHash(fm);
             smI = Animator.StringToHash(sm);
             vmI = Animator.StringToHash(vm);
-        //    imI = Animator.StringToHash(im);
-            triggerI = Animator.StringToHash(trigger);
-            atI = Animator.StringToHash(at);
             drI = Animator.StringToHash(dr);
             vI = Animator.StringToHash(fV);
         }
 
-        protected override void UpdateRotation()
+        private void Animate()
         {
-            if (!CanAim) return;
-            RotateTowards(AimPosition);
-        }
-        protected override void Move()
-        {
-            if(!CanMove) return;
-            base.Move();
-        }
-        protected override void Animate()
-        {
-            animator.SetFloat(vI,movement.cachedRigidbody.linearVelocity.magnitude);
+            
+            
+            animator.SetFloat(vI, GetVelocity().magnitude);
             // Dot product of two vectors determines how much they are pointing in the same direction.
             // If the vectors are normalized (transform.forward and right are)
             // then the value will be between -1 and +1.
-
+        
             var fwd = transform.forward;
             var right = transform.right;
-
+        
             if (MovementVector != Vector3.zero)
             {           
-
+        
                 Vector2 dot;
-                var x = Vector3.Dot(right, Vector3.Normalize(movement.cachedRigidbody.linearVelocity));
-                var z = Vector3.Dot(fwd, Vector3.Normalize(movement.cachedRigidbody.linearVelocity));
-               
+                var x = Vector3.Dot(right, Vector3.Normalize(GetVelocity()));
+                var z = Vector3.Dot(fwd, Vector3.Normalize(GetVelocity()));
+           
                 dot.x = x;
                 dot.y = z;
-                
-
+            
+        
                 animator.SetFloat(fmI, z);
                 animator.SetFloat(smI,x);
-              //  animator.SetBool(imI,true);
+                
                 isStandingRotating = false;
                 animator.ResetTrigger(drI);
             }
@@ -160,11 +108,10 @@ namespace Arcatech.Units.Control
             {
                 animator.SetFloat(fmI, 0);
                 animator.SetFloat(smI, 0);
-               // animator.SetBool(imI, false);
-
+        
                 var crossY = (Mathf.Abs(Vector3.Cross(fwd, AimPosition).y));
-
-                if  (crossY > _minCrossYToRotate && movement.isGrounded)
+        
+                if  (crossY > minCrossYToRotate && GetCharacterMovement().isGrounded)
                 {
                     animator.SetTrigger(drI);
                     isStandingRotating = true;
@@ -174,23 +121,11 @@ namespace Arcatech.Units.Control
                     isStandingRotating = false;
                 }
             }
-            animator.SetFloat(vmI, movement.cachedRigidbody.linearVelocity.y);
-        }
+            animator.SetFloat(vmI, GetVelocity().y);
 
-        public override void Update()
-        { // pause is handled internally
-            if (Killed) return;
-            base.Update();
-        }
-
-        public override void FixedUpdate()
-        {
-            if (Killed) return;
-            base.FixedUpdate();
-        }
-        protected override void HandleInput()
-        {
         }
         
+        #endregion
+
     }
 }

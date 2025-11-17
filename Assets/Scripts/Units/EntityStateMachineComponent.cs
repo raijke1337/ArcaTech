@@ -32,7 +32,6 @@ namespace Arcatech.Units
 
 
         private List<StateTransition> _addedTransitions = new();
-        private List<StateTransition> _removedTransitions = new();
 
         protected void Start()
         {
@@ -46,7 +45,6 @@ namespace Arcatech.Units
             _context.Movers = GetComponentsInChildren<IMove>();
             _context.Invulnerabiles = GetComponentsInChildren<IInvulnerability>();
             _currentState.EnterState(_context, animator);
-
         }
 
         private void Update()
@@ -136,11 +134,17 @@ namespace Arcatech.Units
         {
             if (tr == null || tr.NextState == null) return;
 
+            _context.ClearCommand();
+            
             _currentState.ExitState(_context, animator);
+            Debug.Log("Exiting state "+_context.CurrentState);
+            
             _currentState = tr.NextState;
             _context.CurrentState = _currentState;
             _currentState.EnterState(_context, animator);
-            _context.ClearCommand();
+            Debug.Log("Entering state "+_context.CurrentState);
+            
+
         }
 
         public bool TryCommandTransition(UnitActionType actionType,
@@ -185,8 +189,11 @@ namespace Arcatech.Units
             _currentState?.ExitState(_context, animator);
             _currentState = forcedState;
             _context.CurrentState = _currentState;
-            _currentState.EnterState(_context, animator);
+            
             _context.ClearCommand();
+            
+            _currentState.EnterState(_context, animator);
+
         }
 
         public void AddTransition(StateTransition transition)
@@ -259,8 +266,11 @@ namespace Arcatech.Units
             var debug = ($"Pick {best.tr.NextState.StateName} from {candidates.Count}:");
             foreach (var c in candidates)
             {
-                debug += ($"\n {c.tr}");
+                debug += ($"\n {c.tr.NextState.StateName}");
             }
+
+            debug += "\n";
+            debug += best.tr.DebugConditions;
             Debug.Log(debug);   
             
             return best.tr;

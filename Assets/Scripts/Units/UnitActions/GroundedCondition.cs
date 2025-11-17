@@ -8,6 +8,8 @@ namespace Arcatech.Units
     {
         public bool requireGrounded = true;
 
+        public override string ConditionName => "Grounded" +  requireGrounded;
+
         public override bool CanTransition(StateMachineContext ctx)
         {
             if (ctx?.Owner == null) return false;

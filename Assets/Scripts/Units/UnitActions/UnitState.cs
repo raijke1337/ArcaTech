@@ -45,6 +45,7 @@ namespace Arcatech.Units
         public bool AllowsAiming { get; }
         public bool AllowsMovement { get; }
         public bool Invulnerable { get; }
+        public bool IsRootMotionState { get; }
         public StateTransition[] Transitions { get; private set; }
         public ActionResult[] OnEnterState { get; }
         public ActionResult[] OnExitState { get; }
@@ -67,6 +68,7 @@ namespace Arcatech.Units
             bool allowsMove = true,
             bool allowsAim = true,
             bool invulnerable = false,
+            bool isRootMotionState = false,
             StateTransition[] transitions = null,
             SerializedActionResult[] onEnter = null,
             SerializedActionResult[] onExit = null)
@@ -75,8 +77,17 @@ namespace Arcatech.Units
             _animatorHash = animatorHash;
             _crossfadeTime = crossfadeTime;
             _animatorLayer = animatorLayer;
-            AllowsMovement = allowsMove;
-            AllowsAiming = allowsAim;
+            IsRootMotionState = isRootMotionState;
+            if (isRootMotionState)
+            {
+                AllowsMovement = false;
+                AllowsAiming = false;
+            }
+            else
+            {
+                AllowsMovement = allowsAim;
+                AllowsAiming = allowsAim;
+            }
             Invulnerable = invulnerable;
             Transitions = transitions ?? Array.Empty<StateTransition>();
             if (onEnter != null && onEnter.Length > 0)

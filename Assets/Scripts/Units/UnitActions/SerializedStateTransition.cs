@@ -69,5 +69,18 @@ namespace Arcatech.Units
                     return false;
             return true;
         }
+
+        public string DebugConditions
+        {
+            get
+            {
+                string result = string.Empty;
+                foreach (var c in Conditions)
+                {
+                    result += $"{c.ConditionName} \n";
+                }
+                return result;
+            }
+        }
     }
 }
