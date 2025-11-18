@@ -48,7 +48,7 @@ namespace Arcatech.Interactions
                     // apply result using only interactor data
                     foreach (var result in _listS)
                     {
-                        result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
+                        result.ProduceResult(interactor.InteractionContext.EntityComponent,
                             null,
                             interactor.InteractionContext.ActionTransform);
                     }
@@ -59,7 +59,7 @@ namespace Arcatech.Interactions
                     // use item as target
                     foreach (var result in _listS)
                     {
-                        result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
+                        result.ProduceResult(interactor.InteractionContext.EntityComponent,
                             item.GetBaseComponent,
                             item.GetBaseComponent.EffectSpawn);
                     }
@@ -72,7 +72,7 @@ namespace Arcatech.Interactions
                     // apply result using only interactor data
                     foreach (var result in _listF)
                     {
-                        result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
+                        result.ProduceResult(interactor.InteractionContext.EntityComponent,
                             null,
                             interactor.InteractionContext.ActionTransform);
                     }
@@ -83,7 +83,7 @@ namespace Arcatech.Interactions
                     // use item as target
                     foreach (var result in _listF)
                     {
-                        result.ProduceResult(interactor.InteractionContext.EntityStateMachineComponent.GetMainEntity,
+                        result.ProduceResult(interactor.InteractionContext.EntityComponent,
                             item.GetBaseComponent,
                             item.GetBaseComponent.EffectSpawn);
                     }

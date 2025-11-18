@@ -87,7 +87,7 @@ namespace Arcatech.Units
                 var rt = new StateTransition(
                     nextState: next,
                     onTransition: onTransitionArray,
-                    exitNormalizedTime: t.requireExitNormalizedTime,
+                    exitNormalizedTime: t.minTimeInSourceStateNormalized,
                     conditions: conditionsArray,
                     transitionPriority: t.Priority,
                     ove);

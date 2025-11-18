@@ -1,4 +1,5 @@
 ﻿
+using Arcatech.Items;
 using ECM2;
 using NUnit.Framework.Constraints;
 using UnityEngine;
@@ -7,8 +8,9 @@ namespace Arcatech.Units.Control
 {
 
     [RequireComponent(typeof(EntityStateMachineComponent))]
-    public class MovementControllerWithAiming : Character, IMove, IPausableComponent, IAim//: BaseCharacterController, ,IPausableComponent,IKillableComponent
+    public class MovementControllerWithAiming : Character, IMove, IPausableComponent, IJump, IAim, IUnitCommandValidator
     {
+        
         public bool CanMove { get; set; }
         public bool UseRootMotion { get => useRootMotion; set => useRootMotion = value; }
         public Vector3 MovementVector
@@ -16,7 +18,9 @@ namespace Arcatech.Units.Control
             get => GetMovementDirection();
             set => SetMovementDirection(!CanMove ? Vector3.zero : value);
         }
-        
+
+        public float ActualMovementVelocity => GetCharacterMovement().velocity.magnitude;
+
         public bool Paused
         {
             get => isPaused;
@@ -75,10 +79,10 @@ namespace Arcatech.Units.Control
             vI = Animator.StringToHash(fV);
         }
 
+
+        private Vector2 lastDotVector;
         private void Animate()
         {
-            
-            
             animator.SetFloat(vI, GetVelocity().magnitude);
             // Dot product of two vectors determines how much they are pointing in the same direction.
             // If the vectors are normalized (transform.forward and right are)
@@ -90,12 +94,12 @@ namespace Arcatech.Units.Control
             if (MovementVector != Vector3.zero)
             {           
         
-                Vector2 dot;
+                
                 var x = Vector3.Dot(right, Vector3.Normalize(GetVelocity()));
                 var z = Vector3.Dot(fwd, Vector3.Normalize(GetVelocity()));
            
-                dot.x = x;
-                dot.y = z;
+                lastDotVector.x = x;
+                lastDotVector.y = z;
             
         
                 animator.SetFloat(fmI, z);
@@ -106,8 +110,8 @@ namespace Arcatech.Units.Control
             }
             else
             {
-                animator.SetFloat(fmI, 0);
-                animator.SetFloat(smI, 0);
+                animator.SetFloat(fmI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
+                animator.SetFloat(smI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
         
                 var crossY = (Mathf.Abs(Vector3.Cross(fwd, AimPosition).y));
         
@@ -127,5 +131,30 @@ namespace Arcatech.Units.Control
         
         #endregion
 
+        public bool CanDoUnitCommand(UnitActionType type, out string info)
+        {
+            info = "Movement ctrl";
+            switch (type)
+            {
+                case UnitActionType.Jump:
+                    return CanJump(); 
+                default: return true;
+            }
+        }
+
+        protected override void OnLanded(Vector3 landingVelocity)
+        {
+            base.OnLanded(landingVelocity);
+            StopJumping();
+        }
+
+        public bool JumpCommand
+        {
+            get => IsJumping();
+            set
+            {
+                if (value) Jump();
+            }
+        }
     }
 }

@@ -144,7 +144,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!136 &2986430304625558438
 CapsuleCollider:
@@ -298,10 +298,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactRange: 2
-  stateSuccess: {fileID: 11400000, guid: 821d0918054feca41a59a1183644b537, type: 2}
-  stateFail: {fileID: 11400000, guid: 2373aaf38583adc42b4c896adba745a5, type: 2}
-  cachedActor: {fileID: 8493213205866226908}
-  interactionActionTransform: {fileID: 0}
+  stateSuccess: {fileID: 11400000, guid: adb7774d340c77a4f8893753b7e1e4e0, type: 2}
+  stateFail: {fileID: 11400000, guid: 66104a66d7efb6f4e878f2c7e4cf7bee, type: 2}
+  stateMachine: {fileID: 8493213205866226908}
+  interactionActionTransform: {fileID: 240338240392906717}
 --- !u!114 &4461434644115553138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,7 +531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3d53fad3d2d7064b929965572b26d55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rotationMode: 1
+  _rotationMode: 4
   _rotationRate: 540
   _startingMovementMode: 1
   _maxWalkSpeed: 5
@@ -574,6 +574,7 @@ MonoBehaviour:
   _pushForceScale: 1
   _standingDownwardForceScale: 1
   _camera: {fileID: 0}
+  minCrossYToRotate: 0.15
 --- !u!1 &1394105577972376063
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,25 +1,33 @@
-﻿using Arcatech.Units;
+﻿using System;
+using Arcatech.Units;
 using UnityEngine;
 
 namespace Arcatech.Interactions
 {
-    public class InteractionContext : IInteractionContext
+    [Serializable]
+    public class InteractionContext
     {
-        public string SomeInformation { get; private set; }
-        public EntityStateMachineComponent EntityStateMachineComponent { get; }
         public Transform ActionTransform { get; }
-        
-        public static InteractionContext Create(EntityStateMachineComponent actor, Transform place,string text = "undefined context")
-        {
-            return new InteractionContext(actor,place,text); 
-        }
-        
+        public BaseGameEntityComponent EntityComponent { get; }
 
-        private InteractionContext(EntityStateMachineComponent actor, Transform place, string someInformation)
+        public bool LastInteractionWasSuccessful
         {
-            SomeInformation = someInformation;
-            EntityStateMachineComponent = actor;
-            ActionTransform = place;
+            get => success;
+            set
+            {
+                WasUpdated = true;
+                success = value;
+            }
+        }
+        private bool success;
+        public bool WasUpdated { get; private set; }
+
+        public InteractionContext (BaseGameEntityComponent comp, Transform actionTransform)
+        {
+            EntityComponent = comp;
+            ActionTransform = actionTransform;
+            WasUpdated = false;
+            success = false;
         }
 
     }

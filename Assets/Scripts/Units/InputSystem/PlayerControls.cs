@@ -149,7 +149,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""MainAttack"",
                     ""type"": ""Button"",
                     ""id"": ""d45a1719-ff0a-4fa6-8db8-b280e4a19447"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -158,7 +158,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""RangedAttack"",
                     ""type"": ""Button"",
                     ""id"": ""e9c23c4d-a739-4ae0-8b74-c3ffdef73b6d"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -171,15 +171,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Aim"",
-                    ""type"": ""Value"",
-                    ""id"": ""fa67abf7-db6f-4647-92c3-22d959f31839"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Use"",
@@ -315,7 +306,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""aa95f088-fd79-42f1-a62f-715621b94816"",
                     ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
+                    ""interactions"": ""Press,Hold"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MainAttack"",
@@ -326,7 +317,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""6d9e2a57-7241-4427-8dc7-f980ecca1ac2"",
                     ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
+                    ""interactions"": ""Hold,Press"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""RangedAttack"",
@@ -341,17 +332,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Jump"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""6917a357-b112-45e3-ae3b-31c7897b45fe"",
-                    ""path"": ""<Mouse>/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Aim"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -393,7 +373,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Game_MainAttack = m_Game.FindAction("MainAttack", throwIfNotFound: true);
         m_Game_RangedAttack = m_Game.FindAction("RangedAttack", throwIfNotFound: true);
         m_Game_Jump = m_Game.FindAction("Jump", throwIfNotFound: true);
-        m_Game_Aim = m_Game.FindAction("Aim", throwIfNotFound: true);
         m_Game_Use = m_Game.FindAction("Use", throwIfNotFound: true);
         m_Game_Inspect = m_Game.FindAction("Inspect", throwIfNotFound: true);
     }
@@ -485,7 +464,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_MainAttack;
     private readonly InputAction m_Game_RangedAttack;
     private readonly InputAction m_Game_Jump;
-    private readonly InputAction m_Game_Aim;
     private readonly InputAction m_Game_Use;
     private readonly InputAction m_Game_Inspect;
     /// <summary>
@@ -535,10 +513,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Game/Jump".
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_Game_Jump;
-        /// <summary>
-        /// Provides access to the underlying input action "Game/Aim".
-        /// </summary>
-        public InputAction @Aim => m_Wrapper.m_Game_Aim;
         /// <summary>
         /// Provides access to the underlying input action "Game/Use".
         /// </summary>
@@ -600,9 +574,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @Aim.started += instance.OnAim;
-            @Aim.performed += instance.OnAim;
-            @Aim.canceled += instance.OnAim;
             @Use.started += instance.OnUse;
             @Use.performed += instance.OnUse;
             @Use.canceled += instance.OnUse;
@@ -647,9 +618,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @Aim.started -= instance.OnAim;
-            @Aim.performed -= instance.OnAim;
-            @Aim.canceled -= instance.OnAim;
             @Use.started -= instance.OnUse;
             @Use.performed -= instance.OnUse;
             @Use.canceled -= instance.OnUse;
@@ -759,13 +727,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnJump(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Aim" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnAim(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Use" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

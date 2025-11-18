@@ -36,7 +36,7 @@ namespace Arcatech.Units
         protected void Start()
         {
             _animatorParameter = Animator.StringToHash(_animatorParameterName);
-
+            
             _context = new StateMachineContext() { Spawn = gameEntity.transform, Owner = gameEntity };
             _currentState = startingState.Build();
             _context.CurrentState = _currentState;
@@ -142,9 +142,8 @@ namespace Arcatech.Units
             _currentState = tr.NextState;
             _context.CurrentState = _currentState;
             _currentState.EnterState(_context, animator);
-            Debug.Log("Entering state "+_context.CurrentState);
-            
 
+            Debug.Log("Entering state "+_context.CurrentState);
         }
 
         public bool TryCommandTransition(UnitActionType actionType,
@@ -199,7 +198,7 @@ namespace Arcatech.Units
         public void AddTransition(StateTransition transition)
         {
             if (transition == null || _addedTransitions.Contains(transition)) return;
-            Debug.Log($"added transition {transition}");
+            Debug.Log($"added transition to {transition.NextState}");
             _addedTransitions.Add(transition);
         }
 
@@ -228,7 +227,7 @@ namespace Arcatech.Units
                 if (!canExit && !t.CanOverrideMinimumStateTime) continue;
 
                 // exitNormalTime is still respected — check it relative to currentState
-                if (!_currentState.ExitTimePassed(animator, t.ExitNormalizedTime)) continue;
+                if (!_currentState.TransitionMinTimeInStateSatisfied(animator, t.ExitNormalizedTime)) continue;
 
                 candidates.Add((t, true));
             }
@@ -239,7 +238,7 @@ namespace Arcatech.Units
                 if (g == null || g.NextState == null) continue;
                 if (!g.CanTransition(_context)) continue;
                 if (!canExit && !g.CanOverrideMinimumStateTime) continue;
-                if (!_currentState.ExitTimePassed(animator, g.ExitNormalizedTime)) continue;
+                if (!_currentState.TransitionMinTimeInStateSatisfied(animator, g.ExitNormalizedTime)) continue;
                 candidates.Add((g, false));
             }
 

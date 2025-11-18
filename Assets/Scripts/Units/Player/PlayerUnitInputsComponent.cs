@@ -16,7 +16,6 @@ namespace Arcatech.Units.Control
         PlayerInputReaderObject _playerInputReader;
 
         [SerializeField, Self] protected InteractionComponent _interaction;
-        //private IPlayerMovementController _playerMovementController; // just set the vector
         private IMove mover;
         
         protected override void ControllerStartBindings(bool enabling)
@@ -27,26 +26,21 @@ namespace Arcatech.Units.Control
             {
                 mover = GetComponent<IMove>();
                 _playerInputReader.PausePressed += OnPause;
-                _playerInputReader.CombatAction += OnCombatAction;
-                _playerInputReader.UseAction += OnUseAction;
+                _playerInputReader.CombatAction += OnValidatedStateMachineAction;
             }
             else
             {
                 _playerInputReader.PausePressed -= OnPause;
-                _playerInputReader.CombatAction -= OnCombatAction;
-                _playerInputReader.UseAction -= OnUseAction;
+                _playerInputReader.CombatAction -= OnValidatedStateMachineAction;
             }
 
             base.ControllerStartBindings(enabling);
         }
 
-        private void OnUseAction(InputAction.CallbackContext arg0) => _interaction.InteractCommand();
-
-        private void OnCombatAction(InputAction.CallbackContext ctx, UnitActionType type)
+        private void OnValidatedStateMachineAction(InputAction.CallbackContext ctx, UnitActionType type)
         {
             if (type == UnitActionType.Movement)
             {
-                Debug.Log("Move");
                 UpdateCachedInputVector(ctx);
                 RequestCombatAction(type);
             }

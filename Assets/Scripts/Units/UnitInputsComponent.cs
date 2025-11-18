@@ -16,20 +16,22 @@ namespace Arcatech
         [SerializeField,Self] EntityStateMachineComponent stateMachine;
         private List<IUnitCommandPerformer> _commandPerformers;
 
+        
+        
+        
         public bool RequestCombatAction(UnitActionType type)
         {
             if (Paused ||
                 Killed)
             {
-                Debug.Log($"{this} failed command {type} because paused or killed.");
                 return false;
             }
 
             foreach (var v in _commandValidators)
             {
-                if (!v.CanDoUnitCommand(type))
+                if (!v.CanDoUnitCommand(type, out string info))
                 {
-                    Debug.Log($"{this} failed command {type} in {v}.");
+                    Debug.Log($"{this} failed command {type} in {v}.{info}");
                     return false;
                 }
             }

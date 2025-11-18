@@ -122,7 +122,6 @@ namespace Arcatech.Units
             _stateTimer.Reset();
             _stateTimer.Start();
 
-            // if (_actor.GetMainEntity.ShowingDebugs) Debug.Log($"Entering state {this}");
 
             // Apply animator crossfade if an animation name/hash was provided
             if (animator != null && _animatorHash != 0)
@@ -132,6 +131,7 @@ namespace Arcatech.Units
             foreach (var m in context.Movers)
             {
                 m.CanMove = AllowsMovement;
+                m.UseRootMotion = IsRootMotionState;
             }
 
             foreach (var m in context.Aimers)
@@ -195,24 +195,23 @@ namespace Arcatech.Units
             // (we're already in a different anim state, so allow exit)
             return true;
         }
-        
-        public bool ExitTimePassed (Animator a, float normalizedTime)=> HasPassedExitTime(a,normalizedTime);
-        private bool HasPassedExitTime(Animator animator, float requiredNormalized)
-        {
-            requiredNormalized = Mathf.Clamp01(requiredNormalized);
-            if (requiredNormalized <= 0f) return true;
-            if (animator == null) return _stateTimer.GetTime > 0.01f; // can't check animator, allow tiny progress
 
+        public bool TransitionMinTimeInStateSatisfied(Animator animator, float timeNormalized)
+        {
+            timeNormalized = Mathf.Clamp01(timeNormalized);
+            if (timeNormalized <= 0f) return true;
+            if (animator == null) return _stateTimer.GetTime > 0.01f; // can't check animator, allow tiny progress
             var info = animator.GetCurrentAnimatorStateInfo(_animatorLayer);
             // If there's a transition in progress, check next state's normalized time too (helps blends)
             if (animator.IsInTransition(_animatorLayer))
             {
                 var next = animator.GetNextAnimatorStateInfo(_animatorLayer);
                 if (next.IsName("") == false)
-                    return next.normalizedTime >= requiredNormalized;
+                    return next.normalizedTime >= timeNormalized;
             }
 
-            return info.normalizedTime >= requiredNormalized;
+            return info.normalizedTime >= timeNormalized;
+            
         }
     }
 }

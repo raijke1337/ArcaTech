@@ -28,6 +28,7 @@ public enum UnitActionType : byte
     ShieldSkill,
     Jump,
     Movement,
+    Use,
     None = 255
 }
 

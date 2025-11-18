@@ -15,7 +15,7 @@ namespace Arcatech.Units
 
         [Tooltip("If true, require the source state's animation to reach this normalized time (0..1) before allowing the transition.")]
         [Range(0f, 1f)]
-        public float requireExitNormalizedTime = 1f;
+        public float minTimeInSourceStateNormalized = 1f;
 
         public bool overrideMinTime = false;
 
@@ -23,7 +23,7 @@ namespace Arcatech.Units
         {
             return new StateTransition(nextState.Build(), 
                 onTransition, 
-                requireExitNormalizedTime, 
+                minTimeInSourceStateNormalized, 
                 conditions,Priority,
                 overrideMinTime);
         }

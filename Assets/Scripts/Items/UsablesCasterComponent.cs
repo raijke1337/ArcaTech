@@ -102,19 +102,30 @@ namespace Arcatech.Items
         
 
 
-        bool ValidateCommand(UnitActionType type)
+        public bool CanDoUnitCommand(UnitActionType type,out string info)
         {
-            if (type == UnitActionType.Movement || type == UnitActionType.Jump) return true;
+            info = $"No usable for action type {type}";
+            if (type == UnitActionType.Movement || type == UnitActionType.Jump || type == UnitActionType.Use) return true;
             if (!_usables.TryGetValue(type, out var usable)) return false;
+            info = "";
+            
+            bool ok = false;
 
-            return stats == null
-                ? usable.UsableIsReady()
-                : stats.CanApplyCost(usable.GetCost) && usable.UsableIsReady();
+            if (stats)
+            {
+                ok = stats.CanApplyCost(usable.GetCost);
+                if (!ok) info = "Can't apply cost";
+                return false;
+            }
+
+            ok = usable.UsableIsReady();
+            info = ok ? "Ready" : $" {usable.UsableName} Not Ready";
+            return ok;
         }
-        public bool CanDoUnitCommand(UnitActionType type) => ValidateCommand(type);
+        
         public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
-            if (type == UnitActionType.Movement || type == UnitActionType.Jump) return true;
+            if (type == UnitActionType.Movement || type == UnitActionType.Jump || type == UnitActionType.Use) return true;
             
             if (!_usables.TryGetValue(type, out var usable)) return false;
             {

@@ -2,10 +2,6 @@
 
 namespace Arcatech.Units.Control
 {
-    public interface IPlayerMovementController : IAim, IMove, IJump
-    {
- 
-    }
     public interface IAim
     {
         public bool CanAim { get; set; }
@@ -16,6 +12,7 @@ namespace Arcatech.Units.Control
     {
         public bool CanMove { get; set; }
         public Vector3 MovementVector { get; set; }
+        public float ActualMovementVelocity { get; }
         public bool IsGrounded { get; }
         public bool UseRootMotion { get; set; }
     }

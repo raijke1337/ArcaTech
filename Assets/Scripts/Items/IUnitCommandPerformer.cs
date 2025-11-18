@@ -11,7 +11,7 @@ namespace Arcatech.Items
     /// </summary>
     public interface IUnitCommandValidator
     {
-        public bool CanDoUnitCommand(UnitActionType type);
+        public bool CanDoUnitCommand(UnitActionType type, out string info);
     }
     /// <summary>
     /// this interface just does the command, no checks

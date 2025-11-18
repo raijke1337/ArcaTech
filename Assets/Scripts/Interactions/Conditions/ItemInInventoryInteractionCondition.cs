@@ -20,7 +20,7 @@ namespace Arcatech.Interactions
 
         public override bool CheckCondition(IInteractor actor, IInteractive item)
         {
-            if (actor.InteractionContext.EntityStateMachineComponent.TryGetComponent(out EntityInventoryComponent inventory))
+            if (actor.InteractionContext.EntityComponent.TryGetComponent(out EntityInventoryComponent inventory))
             {
                 return inventory.TryUseItem(itemNeeded,itemsConsumed);
             }

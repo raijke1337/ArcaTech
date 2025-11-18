@@ -7,18 +7,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputReaderObject : ScriptableObject, PlayerControls.IGameActions
 {
     private PlayerControls _controls;
-
-  //  public event UnityAction<InputAction.CallbackContext> Movement = delegate { };
-   // public event UnityAction<InputAction.CallbackContext> Aim = delegate { };
-   // public event UnityAction<InputAction.CallbackContext> Jump = delegate { };
     public event UnityAction<InputAction.CallbackContext,UnitActionType> CombatAction = delegate { };
-       // Melee = delegate { };
-    // public event UnityAction<InputAction.CallbackContext> Ranged = delegate { };
-    // public event UnityAction<InputAction.CallbackContext> DodgeSpec = delegate { };
-    // public event UnityAction<InputAction.CallbackContext> MeleeSpec = delegate { };
-    // public event UnityAction<InputAction.CallbackContext> RangedSpec = delegate { };
-    // public event UnityAction<InputAction.CallbackContext> ShieldSpec = delegate { };
-    public event UnityAction<InputAction.CallbackContext> UseAction = delegate { };
     public event UnityAction<InputAction.CallbackContext> PausePressed = delegate { };
     public event UnityAction<InputAction.CallbackContext> InspectPressed = delegate { };
     
@@ -81,15 +70,10 @@ public class PlayerInputReaderObject : ScriptableObject, PlayerControls.IGameAct
     {
         CombatAction?.Invoke(context,UnitActionType.Jump);
     }
-
-    public void OnAim(InputAction.CallbackContext context)
-    {
-        
-    }
-
+    
     public void OnUse(InputAction.CallbackContext context)
     {
-        UseAction.Invoke(context);
+        CombatAction.Invoke(context,UnitActionType.Use);
     }
 
     public void OnInspect(InputAction.CallbackContext context)
