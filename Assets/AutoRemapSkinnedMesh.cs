@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 [RequireComponent(typeof(SkinnedMeshRenderer))]
 public class AutoRemapSkinnedMesh : MonoBehaviour
@@ -15,6 +16,7 @@ public class AutoRemapSkinnedMesh : MonoBehaviour
     void Awake()
     {
         smr = GetComponent<SkinnedMeshRenderer>();
+        targetSkeletonRoot = GetComponentsInChildren<Transform>().First(t=>t.name == "spine");
         // If targetSkeletonRoot is set before Awake (e.g. equip code), auto-remap
         if (targetSkeletonRoot != null)
             RemapBones();

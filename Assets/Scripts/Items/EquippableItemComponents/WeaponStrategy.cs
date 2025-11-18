@@ -31,7 +31,8 @@ namespace Arcatech.Items
             }
             else
             {
-                HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
+                foreach (var pr in HitSource.GetTriggerNotificationProviders)
+                {pr.RegisterReceiver(this);}
             }
 
             _remainingCharges = MaxCharges;
@@ -122,15 +123,6 @@ namespace Arcatech.Items
 
         #endregion
         
-        
-        public void OnInit()
-        {
-        }
-
-        public void OnCleanUp()
-        {
-            HitSource.GetTriggerNotificationProvider.UnregisterReceiver(this);
-        }
     }
 
 

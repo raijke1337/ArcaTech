@@ -14,7 +14,10 @@ namespace Arcatech.Items
             WeaponSO cfg, int charges, float reload, EquipmentComponent comp) : base(unit, cfg, charges, reload, 0.05f, comp)
         {
 
-            HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
+            foreach (var pr in HitSource.GetTriggerNotificationProviders)
+            {
+                pr.RegisterReceiver(this);
+            }
             
             OnValidHit = new ActionResult[onHit.Length];
 

@@ -24,7 +24,8 @@ namespace Arcatech.Items
                 OnColliderHit[i] = onHit[i].BuildActionResult();
             }
 
-            HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
+            foreach (var pr in HitSource.GetTriggerNotificationProviders)
+            {pr.RegisterReceiver(this);}
 
             laser = comp.GetComponentInChildren<LaserEmitterComponent>();
             if (!laser)

@@ -23,13 +23,19 @@ namespace Arcatech.Items
                 case UnitActionState.None:
                     break;
                 case UnitActionState.Started:
-                    GetTriggerNotificationProvider.Active = true;
+                    foreach (var p in GetTriggerNotificationProviders)
+                    {
+                        p.Active = true;
+                    }
                     trail.Use = true;
                     break;
                 case UnitActionState.ExitTime:
                     break;
                 case UnitActionState.Completed:
-                    GetTriggerNotificationProvider.Active = false;
+                    foreach (var p in GetTriggerNotificationProviders)
+                    {
+                        p.Active = false;
+                    }
                     trail.Use = false;
                     break;
             }

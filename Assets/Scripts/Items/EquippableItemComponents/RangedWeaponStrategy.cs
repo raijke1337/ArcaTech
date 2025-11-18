@@ -8,16 +8,20 @@ namespace Arcatech.Items
     {
         private ProjectilesShooterComponent shooter;
         private SerializedProduceProjectileResult projectile;
-        
-        
 
-        public ShootProjectilesStrategy(SerializedProduceProjectileResult p,  
-            BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd, 
+
+
+        public ShootProjectilesStrategy(SerializedProduceProjectileResult p,
+            BaseGameEntityComponent unit, WeaponSO cfg, int charges, float reload, float intcd,
             EquipmentComponent comp) : base(unit, cfg, charges, reload, intcd, comp)
         {
             this.projectile = p;
-            HitSource.GetTriggerNotificationProvider.RegisterReceiver(this);
-        }
+            foreach (var t in HitSource.GetTriggerNotificationProviders)
+            {
+                t.RegisterReceiver(this);
+            }
+        
+    }
 
         public override bool UseUsable()
         {

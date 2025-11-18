@@ -99,23 +99,27 @@ namespace Arcatech.Items
 
         #endregion
 
-        
 
 
-        public bool CanDoUnitCommand(UnitActionType type,out string info)
+
+        public bool CanDoUnitCommand(UnitActionType type, out string info)
         {
             info = $"No usable for action type {type}";
-            if (type == UnitActionType.Movement || type == UnitActionType.Jump || type == UnitActionType.Use) return true;
+            if (type == UnitActionType.Movement || type == UnitActionType.Jump || type == UnitActionType.Use)
+                return true;
             if (!_usables.TryGetValue(type, out var usable)) return false;
             info = "";
-            
+
             bool ok = false;
 
             if (stats)
             {
                 ok = stats.CanApplyCost(usable.GetCost);
-                if (!ok) info = "Can't apply cost";
-                return false;
+                if (!ok)
+                {
+                    info = "Can't apply cost";
+                    return false;
+                }
             }
 
             ok = usable.UsableIsReady();

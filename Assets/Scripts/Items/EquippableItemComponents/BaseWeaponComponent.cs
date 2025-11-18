@@ -6,13 +6,13 @@ namespace Arcatech.Items
 {
     public abstract class BaseWeaponComponent : EquipmentComponent, IWeaponHitSource
     {
-        public ITriggerNotificationProvider GetTriggerNotificationProvider
+        public ITriggerNotificationProvider[] GetTriggerNotificationProviders
         {
             get
             {
                 if (_triggerNotificationProvider == null)
                 {
-                    _triggerNotificationProvider = GetComponentInChildren<ITriggerNotificationProvider>();
+                    _triggerNotificationProvider = GetComponentsInChildren<ITriggerNotificationProvider>(false);
                     if (_triggerNotificationProvider == null)
                     { 
                         Debug.LogWarning($"No trigger notification provider found on {gameObject.name}");
@@ -21,6 +21,6 @@ namespace Arcatech.Items
                 return _triggerNotificationProvider;
             }
         }
-        ITriggerNotificationProvider _triggerNotificationProvider;
+        ITriggerNotificationProvider[] _triggerNotificationProvider;
     }
 }
