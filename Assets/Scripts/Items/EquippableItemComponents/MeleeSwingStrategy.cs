@@ -27,7 +27,7 @@ namespace Arcatech.Items
             }
             
             OnInvalidHit = new ActionResult[onFailHit.Length];
-            for (int i = 0; i < onHit.Length; i++)
+            for (int i = 0; i < onFailHit.Length; i++)
             {
                 OnInvalidHit[i] = onFailHit[i].BuildActionResult();
             }

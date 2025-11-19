@@ -10,23 +10,31 @@ namespace Arcatech.Interactions
         public Transform ActionTransform { get; }
         public BaseGameEntityComponent EntityComponent { get; }
 
-        public bool LastInteractionWasSuccessful
+        public bool NewInteractionWasPerformed(out bool interactionResult)
         {
-            get => success;
-            set
+            interactionResult = success;
+            if (update)
             {
-                WasUpdated = true;
-                success = value;
+                update = false;
+                return true;
             }
+            return false;
         }
+
+        public void UpdateInteractionResult(bool result)
+        {
+            success = result;
+            update = true;
+        }
+        
         private bool success;
-        public bool WasUpdated { get; private set; }
+        private bool update = false;
 
         public InteractionContext (BaseGameEntityComponent comp, Transform actionTransform)
         {
             EntityComponent = comp;
             ActionTransform = actionTransform;
-            WasUpdated = false;
+            update = false;
             success = false;
         }
 

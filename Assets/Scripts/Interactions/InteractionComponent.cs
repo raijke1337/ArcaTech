@@ -4,6 +4,7 @@ using Arcatech.Items;
 using Arcatech.Units;
 using Arcatech.Units.Control;
 using KBCore.Refs;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -51,15 +52,15 @@ namespace Arcatech.Interactions
 
         public bool Paused { get; set; }
 
-        private bool HasInteractiveItemInRange()
+        private bool HasInteractiveItemInRange(IInteractive item)
         {
-            return Vector3.Distance(transform.position,
-                _aim.DesiredInteractiveItem.GetBaseComponent.transform.position) <= interactRange;
+            if (item == null) return false;
+            return Vector3.Distance(transform.position,item.GetBaseComponent.transform.position) <= interactRange;
         }
 
-        private bool HasInteractiveItemSelected()
+        private bool HasInteractiveItemSelected(out IInteractive item)
         {
-            return (_aim.DesiredInteractiveItem != null);
+            return _aim.HasInteractiveSelected(out item);
         }
         
         public bool CanDoUnitCommand(UnitActionType type, out string info)
@@ -70,9 +71,9 @@ namespace Arcatech.Interactions
             switch (type)
             {
                 case UnitActionType.Use:
-                    info = HasInteractiveItemSelected() ? "OK / " : "No interactive selected / ";
-                    info += HasInteractiveItemInRange() ? "OK" : "Interactive not in range";
-                    return HasInteractiveItemInRange() && HasInteractiveItemSelected();
+                    info = HasInteractiveItemSelected(out var item) ? "OK / " : "No interactive selected / ";
+                    info += HasInteractiveItemInRange(item) ? "OK" : "Interactive not in range";
+                    return HasInteractiveItemSelected(out item) && HasInteractiveItemInRange(item);
                     
                     default: return true;
             }
@@ -82,9 +83,15 @@ namespace Arcatech.Interactions
         {
             if (type == UnitActionType.Use && CanDoUnitCommand(type, out _))
             {
-                InteractionContext.LastInteractionWasSuccessful = _aim.DesiredInteractiveItem.TryInteraction(this);
+                InteractionContext.UpdateInteractionResult(_aim.DoInteraction(this));
             }
             return true;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.gray;
+            Gizmos.DrawWireSphere(transform.position, interactRange);
         }
     }
 }

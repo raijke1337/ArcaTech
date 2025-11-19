@@ -2,6 +2,7 @@
 {
     public interface IInteractionTargetPicker
     {
-        public IInteractive DesiredInteractiveItem { get; }
+        public bool HasInteractiveSelected(out IInteractive item);
+        public bool DoInteraction(IInteractor interactor);
     }
 }

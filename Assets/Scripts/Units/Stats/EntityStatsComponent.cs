@@ -3,6 +3,7 @@ using Arcatech.Items;
 using Arcatech.Units;
 using System.Collections.Generic;
 using System.Linq;
+using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,24 +13,25 @@ namespace Arcatech.Stats
     /// new component to handle the current stats and their changes on any game entity
     /// also uses stat change strategies to affect the rest of components
     /// </summary>
-    public partial class EntityStatsComponent : MonoBehaviour, IUnitInventoryView, IPausableComponent,
+    public partial class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
         IKillableComponent, IEffectsTakerComponent
     {
         [Header("Config")] [SerializeField] private BaseStatsConfig startingConfig;
         [SerializeField] private bool preserveCurrentRatioOnMaxChange = true;
 
-        [Header("Placeholder for strategies if needed")] [SerializeField]
-        private bool killOn0hp = true;
-        private List<IKillableComponent> killables = new List<IKillableComponent>();
+        [Header("Stats-related states")] [SerializeField, Self]
+        private EntityStateMachineComponent stateMachine;
+        [SerializeField] ConditionGroup killCondition;
 
+        [SerializeField] private SerializedUnitState killedState;
+        private UnitState _killState;
+        
+        
         private List<ISpawnerProvider> spawners = new List<ISpawnerProvider>();
         
-        
         [SerializeField] SerializedUnitState StaggeredState;
-        [SerializeField] SerializedUnitState DeadState;
         [SerializeField] SerializedUnitState StunnedState;
         protected UnitState _staggerState;
-        protected UnitState _deathState;
         protected UnitState _stunnedState;
         
         private class StatRuntime
@@ -170,8 +172,6 @@ namespace Arcatech.Stats
 
         public void ApplyEffect(StatsEffect eff, BaseGameEntityComponent s)
         {
-            
-
             if (eff == null) return;
 
             var key = new SourceKey(eff, NextId());
@@ -427,13 +427,7 @@ namespace Arcatech.Stats
 
             UpdateViewers(stat, sr.current, sr.max, delta, contributionSource);
             DoStatStrategies(stat, sr.current, sr.max, delta, contributionSource);
-            if (stat == ResourceStatType.Health && sr.current <= 0f && killOn0hp)
-            {
-                foreach (var k in killables)
-                {
-                    k.Killed = true;
-                }
-            }
+
         }
 
         private StatRuntime EnsureStat(ResourceStatType stat)
@@ -530,36 +524,6 @@ namespace Arcatech.Stats
 
         #endregion
 
-        #region statsUpdateStrategy
-
-        [SerializeField] private List<SerializedOnEffectApplyStrategy> statUpdateStrategies;
-        private List<IStatHandlingStrategy> statsStrats;
-        
-        private void DoStatStrategies(ResourceStatType type, float current, float max, float delta,
-            object contributionSource)
-        {
-            
-            //Debug.Log($"Event in {type}, source {contributionSource}");
-            
-            if (statsStrats == null &&  statUpdateStrategies != null)
-            {
-                statsStrats = new List<IStatHandlingStrategy>();
-                foreach (var s in statUpdateStrategies)
-                {
-                    statsStrats.Add(s.Deserialize(this));
-                }
-            }
-
-            if (statsStrats == null) return;
-
-            foreach (var s in statsStrats)
-            {
-                s.StatChanged(type, current, max, delta, contributionSource);
-            }
-                
-        }
-
-        #endregion
 
         // Condition evaluation
         private bool EvaluateConditionGroup(ConditionGroup group)

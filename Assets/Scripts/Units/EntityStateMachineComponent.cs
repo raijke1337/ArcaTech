@@ -137,13 +137,13 @@ namespace Arcatech.Units
             _context.ClearCommand();
             
             _currentState.ExitState(_context, animator);
-            Debug.Log("Exiting state "+_context.CurrentState);
+            if (GetMainEntity.ShowingDebugs) Debug.Log("Exiting state "+_context.CurrentState);
             
             _currentState = tr.NextState;
             _context.CurrentState = _currentState;
             _currentState.EnterState(_context, animator);
 
-            Debug.Log("Entering state "+_context.CurrentState);
+            if (GetMainEntity.ShowingDebugs) Debug.Log("Entering state "+_context.CurrentState);
         }
 
         public bool TryCommandTransition(UnitActionType actionType,
@@ -270,7 +270,7 @@ namespace Arcatech.Units
 
             debug += "\n";
             debug += best.tr.DebugConditions;
-            Debug.Log(debug);   
+            if (GetMainEntity.ShowingDebugs) Debug.Log(debug);   
             
             return best.tr;
         }

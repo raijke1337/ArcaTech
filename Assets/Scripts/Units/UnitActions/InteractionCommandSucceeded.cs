@@ -14,7 +14,8 @@ namespace Arcatech.Units
         {
             if (ctx?.Owner == null) return false;
             var inter = ctx.Owner.GetComponent<IInteractor>();
-            return inter.InteractionContext.WasUpdated && inter.InteractionContext.LastInteractionWasSuccessful ==  resultIs;
+
+            return inter.InteractionContext.NewInteractionWasPerformed(out _);
         }
     }
 }

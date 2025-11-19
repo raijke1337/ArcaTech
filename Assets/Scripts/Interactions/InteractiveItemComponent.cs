@@ -37,7 +37,6 @@ namespace Arcatech.Interactions
         [SerializeField] private string interactTooltipText = "Interact";
 
         [Space, Header("Condition checker")]
-        //[SerializeField] SerializedDictionary<EventCondition, InteractionHandlerBase[]> _list;
         [SerializeField]
         protected InteractionCondition condition;
         
@@ -87,9 +86,23 @@ namespace Arcatech.Interactions
 
         public Side Side => GetBaseComponent.GetEntitySide;
         public string TargetName =>  GetBaseComponent.GetName;
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.yellow;
+            if (handlers != null)
+            {
+                foreach (var handler in handlers)
+                {
+                    Gizmos.DrawLine(transform.position,handler.transform.position);
+                }
+            }
+
+            if (handlersOnThisItem != null)
+            {
+                Gizmos.DrawWireCube(this.transform.position, this.transform.localScale);
+            }
+        }
     }
-    
-    
-    
     
 }

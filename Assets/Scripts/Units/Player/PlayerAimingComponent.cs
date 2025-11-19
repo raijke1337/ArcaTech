@@ -111,10 +111,10 @@ namespace Arcatech.Units.Control
         [Header("Interaction")]
         [SerializeField] LayerMask targetingLayerMask;
         [SerializeField] private readonly float raycastTimer = 0.3f;
-        public IInteractive DesiredInteractiveItem { get; private set; }
 
         private CountDownTimer _interactionRaycastTimer;
         private float timer;
+        private IInteractive selected;
         
         private void InteractionRaycast()
         {
@@ -129,22 +129,29 @@ namespace Arcatech.Units.Control
             {
                 if (hit.collider.TryGetComponent(out IInteractive inter))
                 {
-                    DesiredInteractiveItem = inter;
+                    selected = inter;
                 }
                 else
                 {                
-                    DesiredInteractiveItem = null;
+                    selected = null;
                 }
             }
-            
+        }
+        
+
+
+        public bool HasInteractiveSelected(out IInteractive item)
+        {
+            item = selected;
+            return selected != null;
+        }
+
+        public bool DoInteraction(IInteractor interactor)
+        {
+            if (selected == null) return false;
+            return selected.TryInteraction(interactor);
         }
         
         #endregion
-        
-        
-        
-
-
-
     }
 }

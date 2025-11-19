@@ -45,6 +45,12 @@ namespace CartoonFX
 #if UNITY_EDITOR
         [HideInInspector] [SerializeField] bool autoUpdateEditor = true;
 
+        private ParticleSystem particles;
+        public void Replay()
+        {
+            if (isDynamic) particles.Play();
+        }
+        
         void OnValidate()
         {
             if (text == null || font == null)
@@ -94,7 +100,7 @@ namespace CartoonFX
                 Destroy(this);
                 return;
             }
-
+            particles = GetComponent<ParticleSystem>();
             InitializeFirstParticle();
         }
 
@@ -188,7 +194,7 @@ namespace CartoonFX
             if (newColor2 != null) this.color2 = newColor2.Value;
             if (newBackgroundColor != null) this.backgroundColor = newBackgroundColor.Value;
             if (newLifetimeMultiplier != null) this.lifetimeMultiplier = newLifetimeMultiplier.Value;
-
+            
             if (text == null || font == null || !font.IsValid())
             {
                 return;
@@ -367,6 +373,8 @@ namespace CartoonFX
                 this.GetComponent<ParticleSystem>().Play(true);
             }
 #endif
+            
+            
         }
     }
 

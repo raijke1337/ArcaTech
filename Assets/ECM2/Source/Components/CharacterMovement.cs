@@ -1810,8 +1810,9 @@ namespace ECM2
                         _constraintPlaneNormal = planeNormal;
 
                         if (_rigidbody)
-                            _rigidbody.constraints = RigidbodyConstraints.None;
-
+                        {
+                            _rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+                        }
                         break;
                     }
 
