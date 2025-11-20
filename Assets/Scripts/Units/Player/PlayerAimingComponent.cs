@@ -17,7 +17,6 @@ namespace Arcatech.Units.Control
         
         private void Start()
         {
-            animatorSignedAngleHash =  Animator.StringToHash(aimRotationAngleAnimatorString);
             // Initialize the plane at y=0 initially
             groundPlane = new Plane(Vector3.up, 0f);
             aimInterfaces.AddRange(GetComponents<IAim>());
@@ -43,10 +42,6 @@ namespace Arcatech.Units.Control
         private Plane groundPlane;
         
         
-
-
-        private string aimRotationAngleAnimatorString = "SignedAngle";
-        private int animatorSignedAngleHash;
 
         private void DoAiming()
         {
@@ -86,7 +81,7 @@ namespace Arcatech.Units.Control
             desiredFlat.Normalize();
 
             // Calculate signed angle around the up axis (positive = clockwise when viewed from above)
-            float signedAngle = Vector3.SignedAngle(currentFlat, desiredFlat, Vector3.up);
+           // float signedAngle = Vector3.SignedAngle(currentFlat, desiredFlat, Vector3.up);
            // animator.SetFloat(animatorSignedAngleHash, signedAngle);
 
 
@@ -124,8 +119,9 @@ namespace Arcatech.Units.Control
                 return;
             }
             timer = 0;
-            
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, targetingLayerMask.value))
+
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, 100f,
+                    targetingLayerMask))
             {
                 if (hit.collider.TryGetComponent(out IInteractive inter))
                 {
@@ -137,9 +133,6 @@ namespace Arcatech.Units.Control
                 }
             }
         }
-        
-
-
         public bool HasInteractiveSelected(out IInteractive item)
         {
             item = selected;
@@ -149,7 +142,9 @@ namespace Arcatech.Units.Control
         public bool DoInteraction(IInteractor interactor)
         {
             if (selected == null) return false;
-            return selected.TryInteraction(interactor);
+            var result = selected.TryInteraction(interactor);
+            selected = result ? null : selected;
+            return result;
         }
         
         #endregion

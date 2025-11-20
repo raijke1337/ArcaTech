@@ -1,5 +1,58 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7103627127994304300
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 535068643025303903}
+  - component: {fileID: 5696623800802242230}
+  m_Layer: 6
+  m_Name: activate
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &535068643025303903
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103627127994304300}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.01, y: 1.099, z: 0}
+  m_LocalScale: {x: 1, y: 2.1824, z: 1.7365}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8795362550428976565}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &5696623800802242230
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103627127994304300}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8262341705497536744
 GameObject:
   m_ObjectHideFlags: 0
@@ -27,12 +80,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8262341705497536744}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.6666667, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 8795362550428976565}
+  m_Father: {fileID: 4842352925833935757}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!108 &4180585894868817720
 Light:
@@ -135,7 +188,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _light: {fileID: 4180585894868817720}
-  _color: {r: 0, g: 1, b: 0, a: 1}
+  successColor: {r: 0, g: 1, b: 0, a: 1}
+  failureColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &8301224856059246016
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,12 +221,12 @@ Transform:
   m_GameObject: {fileID: 8301224856059246016}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.5, y: 0, z: -4}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4842352925833935757}
-  - {fileID: 54347715251962291}
+  - {fileID: 535068643025303903}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &2686466728562425309
@@ -250,12 +304,11 @@ MonoBehaviour:
   _pauser: {fileID: 213637709370317643}
   _name: Console
   entitySide: 0
-  _spawnPoint: {fileID: 8795362550428976565}
+  _effectSpawn: {fileID: 8795362550428976565}
   destroyOnDeath: 0
   timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 1291726167058966527}
-  gravity: 0
   usePhysics: 0
 --- !u!114 &1846659786570626030
 MonoBehaviour:
@@ -317,11 +370,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _itemDisappearsWhenUsed: 0
+  useCooldown: 59
+  _useAreaCollider: {fileID: 5696623800802242230}
   baseComp: {fileID: 1846573254879890371}
   entityMouseOver: {fileID: 1846659786570626030}
   handlersOnThisItem:
   - {fileID: 8436048522235525004}
   handlers: []
+  interactTooltipText: Interact
   condition: {fileID: 11400000, guid: af1b740f6150d3847abaae36f70dcb37, type: 2}
 --- !u!1001 &7487946664842576004
 PrefabInstance:
@@ -408,7 +464,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2655427805380410121, guid: 2f621e28be8bd564d81d794abe226540,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 54347715251962291}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3427847524614185395, guid: 2f621e28be8bd564d81d794abe226540,
         type: 3}

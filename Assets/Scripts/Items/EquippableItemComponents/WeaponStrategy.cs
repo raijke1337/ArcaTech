@@ -103,6 +103,10 @@ namespace Arcatech.Items
             _internalCdTimer?.Tick(delta);
         }
 
+        public virtual void StopUsingUsable()
+        {
+        }
+
         public virtual bool CanUseUsable() => _remainingCharges > 0 && _internalCdTimer.IsReady;
         
         #endregion

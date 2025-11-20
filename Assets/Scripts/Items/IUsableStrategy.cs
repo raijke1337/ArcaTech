@@ -8,5 +8,6 @@ namespace Arcatech
         bool CanUseUsable();
         bool UseUsable();
         void UpdateUsable(float delta);
+        void StopUsingUsable();
     }
 }

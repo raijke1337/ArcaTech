@@ -58,7 +58,7 @@ namespace Arcatech.Skills
             return Strategy.CanUseUsable();
         }
 
-        public bool Use()
+        public bool StartUse()
         {
             return Strategy.UseUsable();
         }
@@ -71,7 +71,10 @@ namespace Arcatech.Skills
             Strategy.UpdateUsable(delta);
         }
 
-
+        public void StopUse()
+        {
+            Strategy.StopUsingUsable();
+        }
 
 
         #region UI

@@ -22,9 +22,15 @@ namespace Arcatech.Stats
         [Header("Stats-related states")] [SerializeField, Self]
         private EntityStateMachineComponent stateMachine;
         [SerializeField] ConditionGroup killCondition;
-
         [SerializeField] private SerializedUnitState killedState;
         private UnitState _killState;
+        private List<IKillableComponent> _killables;
+        [Space]
+        [SerializeField] ConditionGroup knockDownCondition;
+        [SerializeField] private SerializedUnitState knockDownState;
+        
+        
+        
         
         
         private List<ISpawnerProvider> spawners = new List<ISpawnerProvider>();
@@ -110,7 +116,7 @@ namespace Arcatech.Stats
 
         private void Start()
         {
-            killables = new(GetComponentsInChildren<IKillableComponent>(true));
+            _killables = new(GetComponentsInChildren<IKillableComponent>(true));
             spawners =  new(GetComponentsInChildren<ISpawnerProvider>(true));
         }
 
@@ -217,6 +223,8 @@ namespace Arcatech.Stats
 
             RecomputeConditionalFlags();
             RecalculateAllMaxAndClampCurrent();
+            
+            StaggerOnDamageCheck(eff);
         }
 
         private void Update()
@@ -276,8 +284,29 @@ namespace Arcatech.Stats
                 // Re-aggregate Max if conditional mods exist (or effects ended, or ticks may have changed conditions)
                 RecalculateAllMaxAndClampCurrent();
             }
+            
+            CheckStates();
+            
+        }
+        /// <summary>
+        /// check the kill and stun states
+        /// </summary>
+        private void CheckStates()
+        {
+            if (!killCondition.IsEmpty && EvaluateConditionGroup(killCondition))
+            {
+                stateMachine.ForceUnitState(killedState.Build());
+                foreach (var k in _killables)
+                {
+                    k.Killed = true;
+                }
+            }
         }
 
+        private void StaggerOnDamageCheck(StatsEffect eff)
+        {
+            
+        }
         private void ApplyEquipmentProvider(IEquipmentStatsProvider provider, SourceKey key)
         {
             // 1) Persistent Max modifiers (null-safe)
@@ -424,10 +453,7 @@ namespace Arcatech.Stats
             float delta = newCurrent - sr.current;  
             if (Mathf.Abs(delta) <= 0.000001f) return;
             sr.current = newCurrent;
-
             UpdateViewers(stat, sr.current, sr.max, delta, contributionSource);
-            DoStatStrategies(stat, sr.current, sr.max, delta, contributionSource);
-
         }
 
         private StatRuntime EnsureStat(ResourceStatType stat)
@@ -600,5 +626,7 @@ namespace Arcatech.Stats
 
         public bool Paused { get; set; }
         public bool Killed { get; set; }
+        
+        public bool CheckStatsConditionGroup(ConditionGroup group) =>  EvaluateConditionGroup(group);
     }
 }

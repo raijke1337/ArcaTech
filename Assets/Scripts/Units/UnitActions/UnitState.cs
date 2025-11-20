@@ -1,7 +1,9 @@
 ﻿using Arcatech.Actions;
 using System;
 using System.Linq;
+using Arcatech.Stats;
 using Arcatech.Units.Control;
+using JetBrains.Annotations;
 using Unity.AppUI.UI;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -23,6 +25,7 @@ namespace Arcatech.Units
         public Transform Spawn;
         public UnitState CurrentState;
         public BaseGameEntityComponent Owner;
+        [CanBeNull] public EntityStatsComponent Stats;
         
         public IMove[] Movers;
         public IAim[] Aimers;
@@ -34,11 +37,7 @@ namespace Arcatech.Units
 
     public class UnitState
     {
-        public override string ToString()
-        {
-            return StateName;
-        }
-
+        public override string ToString() => StateName;
         public string StateName { get; }
         public float TimeInState => _stateTimer.GetTime;
         private readonly StopwatchTimer _stateTimer;
@@ -85,7 +84,7 @@ namespace Arcatech.Units
             }
             else
             {
-                AllowsMovement = allowsAim;
+                AllowsMovement = allowsMove;
                 AllowsAiming = allowsAim;
             }
             Invulnerable = invulnerable;

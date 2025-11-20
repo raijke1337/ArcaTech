@@ -35,7 +35,8 @@ namespace Arcatech.Items
         public override bool UseUsable()
         {
             hitsThisSwing.Clear();
-            GameObjectComponent.HandleActionState(UnitActionState.Started);
+            HitSource.Active = true;
+            GameObjectComponent.StartUse();
             return base.UseUsable();
         }
 
@@ -51,19 +52,23 @@ namespace Arcatech.Items
 
         public override void TriggerEntered(BaseGameEntityComponent enterComponent, ITriggerNotificationProvider trigger)
         {
-          //  Debug.Log("Bonk noticed");
             if (enterComponent == Owner.GetMainEntity) return;
             if (!hitsThisSwing.Contains(enterComponent))
             {
                 PerformOnHit(Owner, enterComponent, GameObjectComponent.EffectSpawn);
                 hitsThisSwing.Add(enterComponent);
             }
-        
         }
-
         public override void TriggerExited(BaseGameEntityComponent enterComponent, ITriggerNotificationProvider trigger)
         {
             // noop 
+        }
+
+        public override void StopUsingUsable()
+        {
+            HitSource.Active = false;
+            hitsThisSwing.Clear();
+            GameObjectComponent.StopUse();
         }
     }
 

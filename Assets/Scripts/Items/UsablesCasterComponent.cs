@@ -17,7 +17,7 @@ namespace Arcatech.Items
     /// </summary>
     [RequireComponent(typeof(EntityStateMachineComponent),typeof(UnitInputsComponent))]
     public class UsablesCasterComponent : ValidatedMonoBehaviour, IUnitCommandPerformer, IUnitInventoryView,IUnitCommandValidator
-        , IDrawItemsStrategyProvider
+        , IDrawItemsStrategyProvider, IStatesAnnounceReceiver
     {
 
         public event UnityAction ViewChangedInventory;
@@ -27,6 +27,7 @@ namespace Arcatech.Items
         private EntityStatsComponent stats;
         
         Dictionary<UnitActionType, IUsable> _usables;
+        private IUsable _currentUsable;
         public List<IUsable> GetUsables
         {
             get
@@ -44,6 +45,7 @@ namespace Arcatech.Items
 
         public void RefreshView(UnitInventoryModel model)
         {
+            _currentUsable = null;
             if (_usables != null)
             {
                 foreach (var usable in _usables.Values)
@@ -132,9 +134,9 @@ namespace Arcatech.Items
             if (type == UnitActionType.Movement || type == UnitActionType.Jump || type == UnitActionType.Use) return true;
             
             if (!_usables.TryGetValue(type, out var usable)) return false;
-            {
-                if (!usable.Use()) return false;
-            }
+            if (!usable.StartUse()) return false;
+            _currentUsable = usable;
+        
             if (_usables[type] is IAffectsItemDisplay disp && disp.DrawStrategy != currentDrawItemStrategy)
             {
                 currentDrawItemStrategy = disp.DrawStrategy;
@@ -146,6 +148,20 @@ namespace Arcatech.Items
         }
 
 
+        public void OnStateEnter()
+        {
+        }
+
+        public void OnStateExit()
+        {
+            _currentUsable?.StopUse();
+            _currentUsable = null;
+        }
     }
-    
+
+    public interface IStatesAnnounceReceiver
+    {
+        public void OnStateEnter();
+        public void OnStateExit();
+    }
 }

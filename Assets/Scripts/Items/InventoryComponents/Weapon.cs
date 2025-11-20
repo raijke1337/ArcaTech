@@ -44,7 +44,7 @@ namespace Arcatech.Items
             GetStateTransition = state.Build();
         }
 
-        public bool Use()
+        public bool StartUse()
         {
             return UseStrategy.UseUsable();
         }
@@ -60,6 +60,11 @@ namespace Arcatech.Items
         {
             UseStrategy.UpdateUsable(delta);
            // EventBus<UpdateIconEvent>.Raise(new UpdateIconEvent(this, Owner));
+        }
+
+        public void StopUse()
+        {
+            UseStrategy.StopUsingUsable();
         }
 
         public string UsableName { get; }

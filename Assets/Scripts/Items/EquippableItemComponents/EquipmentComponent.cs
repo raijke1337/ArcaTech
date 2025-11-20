@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 namespace Arcatech.Items
 {
     [RequireComponent(typeof(Animator))]
-    public class EquipmentComponent : ValidatedMonoBehaviour,IActionStateItem, IDamageableComponent, IKillableComponent,ISpawnerProvider
+    public class EquipmentComponent : ValidatedMonoBehaviour,IDamageableComponent, IKillableComponent,ISpawnerProvider
     {
         [SerializeField] protected Transform spawner;
         [SerializeField,Self] protected Animator animator;
@@ -23,7 +23,6 @@ namespace Arcatech.Items
 
         [SerializeField] private string animatorStateStartedTrigger;
         [SerializeField] private string animatorStateExitTimeTrigger;
-        [SerializeField] private string animatorStateCompletedTrigger;
 
         private int _startHash;
         int _exitHash;
@@ -36,7 +35,6 @@ namespace Arcatech.Items
         {
             _startHash = Animator.StringToHash(animatorStateStartedTrigger);
             _exitHash = Animator.StringToHash(animatorStateExitTimeTrigger);
-            _completedHash = Animator.StringToHash(animatorStateCompletedTrigger);
             
             if (onDamaged != null && onDamaged.Length > 0)
             {
@@ -57,18 +55,6 @@ namespace Arcatech.Items
             }
         }
 
-        public virtual void HandleActionState(UnitActionState s)
-        {
-            switch (s)
-            {
-                case UnitActionState.Started: animator.Play(_startHash);
-                    break;
-                case UnitActionState.ExitTime: animator.Play(_exitHash);
-                    break;
-                case UnitActionState.Completed: animator.Play(_completedHash);
-                    break;
-            }
-        }
         #region IDamageableComponent
         public void Damage(float damage, ResourceStatType stat)
         {
@@ -99,6 +85,16 @@ namespace Arcatech.Items
         }     
         #endregion
 
+
+        public virtual void StartUse()
+        {
+            
+        }
+
+        public virtual void StopUse()
+        {
+            
+        }
 
         protected virtual void OnEnable()
         {

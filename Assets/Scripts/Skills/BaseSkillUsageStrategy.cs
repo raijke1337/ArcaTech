@@ -64,6 +64,11 @@ namespace Arcatech.Skills
             _internalCdTimer?.Tick(delta);
         }
 
+        public void StopUsingUsable()
+        {
+            
+        }
+
         void OnTimerComplete()
         {
             _chargesTimers.Dequeue();

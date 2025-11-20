@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
+using Arcatech.Stats;
 using Arcatech.Units.Control;
 using KBCore.Refs;
 using UnityEditor;
@@ -44,6 +45,8 @@ namespace Arcatech.Units
             _context.Aimers = GetComponentsInChildren<IAim>();
             _context.Movers = GetComponentsInChildren<IMove>();
             _context.Invulnerabiles = GetComponentsInChildren<IInvulnerability>();
+            _context.Stats = GetComponentInChildren<EntityStatsComponent>();
+            
             _currentState.EnterState(_context, animator);
         }
 

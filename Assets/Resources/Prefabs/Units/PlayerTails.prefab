@@ -91,6 +91,7 @@ GameObject:
   - component: {fileID: 6663321973677931682}
   - component: {fileID: 1952258713567295459}
   - component: {fileID: 3726400395190123988}
+  - component: {fileID: 273117544423383615}
   m_Layer: 6
   m_Name: PlayerTails
   m_TagString: Player
@@ -219,11 +220,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingConfig: {fileID: 11400000, guid: e2b47cfeff3595443b82c62e8e54f55e, type: 2}
   preserveCurrentRatioOnMaxChange: 1
-  killOn0hp: 1
+  stateMachine: {fileID: 8493213205866226908}
+  killCondition:
+    requireAll: 0
+    invert: 0
+    statConditions:
+    - stat: 0
+      target: 0
+      usePercentOfMax: 0
+      op: 3
+      a: 0
+      b: 0
+  killedState: {fileID: 11400000, guid: a29799443cd1ce947b8a1073063442f1, type: 2}
   StaggeredState: {fileID: 0}
-  DeadState: {fileID: 0}
   StunnedState: {fileID: 0}
-  statUpdateStrategies: []
 --- !u!114 &7053870004041703321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -575,6 +585,23 @@ MonoBehaviour:
   _standingDownwardForceScale: 1
   _camera: {fileID: 0}
   minCrossYToRotate: 0.15
+--- !u!114 &273117544423383615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142820635933682374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6a9024c18004c448809c70c6a6ed80e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textPrefab: {fileID: 73642442965841364, guid: f3066cbb911306a499662066e2c81dc3,
+    type: 3}
+  poolSize: 12
+  damageOffsetMagnitude: 0.75
+  dotsDisplayInterval: 0.5
 --- !u!1 &1394105577972376063
 GameObject:
   m_ObjectHideFlags: 0

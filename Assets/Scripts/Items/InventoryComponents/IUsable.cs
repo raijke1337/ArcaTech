@@ -10,9 +10,10 @@ namespace Arcatech
     {
         public string UsableName { get; }
         public bool UsableIsReady();
-        public bool Use();
+        public bool StartUse();
         public StateTransition GetStateTransition { get; }
         void DoUpdate(float delta);
+        public void StopUse();
     }
 
    

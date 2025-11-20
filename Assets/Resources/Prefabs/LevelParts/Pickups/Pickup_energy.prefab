@@ -133,12 +133,11 @@ MonoBehaviour:
   _pauser: {fileID: 3995338334223388984}
   _name: Battery
   entitySide: 0
-  _spawnPoint: {fileID: 9025080464861674051}
+  _effectSpawn: {fileID: 9025080464861674051}
   destroyOnDeath: 1
   timerToDestroy: 0.1
   _showDebugs: 0
   _rigidbody: {fileID: 3520756074972657999}
-  gravity: 0
   usePhysics: 0
 --- !u!54 &3520756074972657999
 Rigidbody:
@@ -180,12 +179,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _itemDisappearsWhenUsed: 1
+  useCooldown: 59
+  _useAreaCollider: {fileID: 1337123451077350153}
   baseComp: {fileID: 6707420656619622707}
   entityMouseOver: {fileID: 4010592558988301257}
   handlersOnThisItem:
   - {fileID: 5586239703572642459}
   - {fileID: 5864881822388287943}
   handlers: []
+  interactTooltipText: Interact
   condition: {fileID: 11400000, guid: af1b740f6150d3847abaae36f70dcb37, type: 2}
 --- !u!114 &5586239703572642459
 MonoBehaviour:

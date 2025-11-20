@@ -5,6 +5,7 @@ using Arcatech.Managers;
 using Arcatech.Units;
 using UnityEngine;
 using KBCore.Refs;
+using NUnit.Framework;
 using UnityEngine.EventSystems;
 
 namespace Arcatech.Interactions
@@ -15,6 +16,9 @@ namespace Arcatech.Interactions
     {
 
         [SerializeField] private bool _itemDisappearsWhenUsed;
+        [SerializeField, UnityEngine.Range(0, 59f)] private float useCooldown;
+        private float _cd = 0;
+        [SerializeField] private Collider _useAreaCollider;
         
         [Space,SerializeField, Self] private BaseGameEntityComponent baseComp;
         [SerializeField, Self] private EntityMouseOverGlowComponent entityMouseOver;
@@ -30,7 +34,14 @@ namespace Arcatech.Interactions
             base.OnValidate();
             handlersOnThisItem = new  List<InteractionHandlerBase>(GetComponentsInChildren<InteractionHandlerBase>());
             killableComponents =  new  List<IKillableComponent>(GetComponentsInChildren<IKillableComponent>());
+            Assert.IsNotNull(_useAreaCollider);
         }
+
+        private void Start()
+        {
+            _useAreaCollider.isTrigger = true;
+        }
+
 
         #region interaction
 
@@ -39,8 +50,12 @@ namespace Arcatech.Interactions
         [Space, Header("Condition checker")]
         [SerializeField]
         protected InteractionCondition condition;
-        
-        
+
+        private void Update()
+        {
+            _cd = Mathf.Clamp(_cd-Time.deltaTime, 0, useCooldown);
+        }
+
         public bool TryInteraction(IInteractor interactor)
         {
             var result = condition.CheckCondition(interactor, this);
@@ -66,6 +81,10 @@ namespace Arcatech.Interactions
                         killable.Killed = true;
                     }
                 }
+                else
+                {
+                    _cd =  useCooldown;
+                }
             }
             return result;
         }
@@ -90,6 +109,7 @@ namespace Arcatech.Interactions
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.yellow;
+            if (_cd > 0f) Gizmos.color = Color.red;
             if (handlers != null)
             {
                 foreach (var handler in handlers)
@@ -100,7 +120,8 @@ namespace Arcatech.Interactions
 
             if (handlersOnThisItem != null)
             {
-                Gizmos.DrawWireCube(this.transform.position, this.transform.localScale);
+                var bounds = _useAreaCollider.bounds;
+                Gizmos.DrawWireCube(_useAreaCollider.transform.position, bounds.size);
             }
         }
     }

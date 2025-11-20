@@ -21,6 +21,9 @@ namespace Arcatech.Items
                 return _triggerNotificationProvider;
             }
         }
+
+        public bool Active { get; set; }
+        
         ITriggerNotificationProvider[] _triggerNotificationProvider;
     }
 }
