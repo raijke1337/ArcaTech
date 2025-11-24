@@ -18,7 +18,8 @@ namespace Arcatech.Actions
     // also do actual input commands now
     public abstract class ActionResult
     {
-        public abstract bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place);
+        public abstract bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target
+            ,Vector3 place, Quaternion placeRot);
     }
 
 }

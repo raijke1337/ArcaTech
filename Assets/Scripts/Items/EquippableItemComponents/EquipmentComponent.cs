@@ -61,7 +61,7 @@ namespace Arcatech.Items
             if (_damagedRes is not { Length: > 0 }) return;
             foreach (var r in _damagedRes)
             {
-                r.ProduceResult(null,null,spawner);
+                r.ProduceResult(null,null,spawner.position,spawner.rotation);
             }
         }
     #endregion
@@ -77,7 +77,7 @@ namespace Arcatech.Items
                 if (_killedRes is not { Length: > 0 }) return;
                 foreach (var r in _killedRes)
                 {
-                    r.ProduceResult(null,null,spawner);
+                    r.ProduceResult(null,null,spawner.position,spawner.rotation);
                 }
                 gameObject.SetActive(false);
             }
@@ -85,16 +85,6 @@ namespace Arcatech.Items
         }     
         #endregion
 
-
-        public virtual void StartUse()
-        {
-            
-        }
-
-        public virtual void StopUse()
-        {
-            
-        }
 
         protected virtual void OnEnable()
         {

@@ -1,4 +1,5 @@
-﻿using Arcatech.Triggers;
+﻿using System;
+using Arcatech.Triggers;
 using UnityEngine;
 using Arcatech.EventBus;
 using AYellowpaper.SerializedCollections;
@@ -40,52 +41,48 @@ namespace Arcatech.Actions
         {
             _effs = cfg; 
         }
-
-
-        private bool ValidateEffectTarget(TargetingType targetType, BaseGameEntityComponent source, BaseGameEntityComponent target, out BaseGameEntityComponent finalTarget)
+        private bool TryPickEffectTarget(TargetingType targetType, BaseGameEntityComponent source, BaseGameEntityComponent target, out BaseGameEntityComponent finalTarget)
         {
             finalTarget = null;
             switch (targetType)
             {
-                case TargetingType.AnyUnit:
-                    finalTarget = target; return true;
-                case TargetingType.AnyAlly:
-                    if (source.GetEntitySide == target.GetEntitySide)
-                    {
-                        finalTarget = target; 
-                        return true;
-                    }
+                case TargetingType.None:
                     break;
-                case TargetingType.AnyEnemy:
-                    if (source.GetEntitySide != target.GetEntitySide)
-                    {
-                        finalTarget = target; 
-                        return true;
-                    }
-
+                case TargetingType.ApplyToSource:
+                    finalTarget = source;
+                    return true;
+                case TargetingType.ApplyToEnemyTarget:
+                    if (target == source) return false;
+                    if (target.GetEntitySide != source.GetEntitySide)
+                        finalTarget = target;
+                    return true;
+                case TargetingType.ApplyToAlliedTarget:
+                    if (target == source) return false;
+                    if (target.GetEntitySide == source.GetEntitySide)
+                        finalTarget = target;
                     break;
-                case TargetingType.OnlyUser:
-                    if (source == target)
-                    {
-                        finalTarget = source;
-                        return true;
-                    }
+                case TargetingType.ApplyToAnyTargetExceptSource:
+                    if (target == source) return false;
+                    finalTarget = target;
                     break;
+                case TargetingType.ApplyToAnyTarget:
+                    finalTarget = target;
+                    return true;
             }
             return false;
         }
 
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
+            Quaternion placeRot)
         {
             foreach (var type in _effs.Keys)
             {
-                if (ValidateEffectTarget(type, user, target, out BaseGameEntityComponent final))
+                if (TryPickEffectTarget(type, user, target, out var final))
                 {
                     foreach (var effect in _effs[type])
                     {
                         final.ApplyStatsEffect(effect,user);
                     }
-                    return true;
                 }
             }
 

@@ -11,7 +11,7 @@ namespace Arcatech.UI
         [SerializeField, Space] private Transform usablesParent;
 
         private Dictionary<UnitActionType, IconContainerUIScript> _usablesD;
-        public void LoadIcons(IEnumerable<IUsable> usables)
+        public void LoadIcons(Dictionary<UnitActionType,IUsable> usables)
         {
             if (_usablesD == null)
             {
@@ -20,8 +20,8 @@ namespace Arcatech.UI
                 foreach (var usable in usables)
                 {
                     var icon = Instantiate(_iconPrefab,usablesParent);
-                    _usablesD[usable.UseActionType] = icon;
-                    icon.AssignIcon(usable);
+                    _usablesD[usable.Key] = icon;
+                    icon.AssignIcon(usable.Value);
                 }
             }
             else
@@ -29,7 +29,7 @@ namespace Arcatech.UI
                 // do a check if some icons need to be hidden
                 foreach (var loaded in _usablesD.Keys)
                 {
-                    if (!usables.Any(t => t.UseActionType == loaded))
+                    if (usables.All(t => t.Key != loaded))
                     {
                         _usablesD[loaded].gameObject.SetActive(false);
                     }
@@ -38,17 +38,16 @@ namespace Arcatech.UI
                 foreach (var usable in usables)
                 {
                     // look if this action type already has an icon
-                    if (_usablesD.ContainsKey(usable.UseActionType))
+                    if (_usablesD.TryGetValue(usable.Key, out var icon1))
                     {
-                        var icon = _usablesD[usable.UseActionType];
-                        icon.gameObject.SetActive(true); // in case it was disabled earlier
-                        icon.AssignIcon(usable);
+                        icon1.gameObject.SetActive(true); // in case it was disabled earlier
+                        icon1.AssignIcon(usable.Value);
                     }
                     else
                     {
                         var icon = Instantiate(_iconPrefab,usablesParent);
-                        _usablesD[usable.UseActionType] = icon;
-                        icon.AssignIcon(usable);
+                        _usablesD[usable.Key] = icon;
+                        icon.AssignIcon(usable.Value);
                     }
                 }
             }

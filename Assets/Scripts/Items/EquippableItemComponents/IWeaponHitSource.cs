@@ -1,10 +1,1 @@
-﻿using Arcatech.Triggers;
-
-namespace Arcatech.Items
-{
-    public interface IWeaponHitSource
-    {
-        public ITriggerNotificationProvider[] GetTriggerNotificationProviders { get; }
-        public bool Active { get; set; }
-    }
-}
+﻿

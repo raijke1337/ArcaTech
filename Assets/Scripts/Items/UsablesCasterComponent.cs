@@ -4,6 +4,7 @@ using Arcatech.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Usables;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,30 +18,23 @@ namespace Arcatech.Items
     /// </summary>
     [RequireComponent(typeof(EntityStateMachineComponent),typeof(UnitInputsComponent))]
     public class UsablesCasterComponent : ValidatedMonoBehaviour, IUnitCommandPerformer, IUnitInventoryView,IUnitCommandValidator
-        , IDrawItemsStrategyProvider, IStatesAnnounceReceiver
+        , IDrawItemsStrategyProvider
     {
 
         public event UnityAction ViewChangedInventory;
         [SerializeField,Self] EntityInventoryComponent entityInventory;
         [SerializeField, Self] private EntityStateMachineComponent _stateUnit;
 
-        private EntityStatsComponent stats;
+        private EntityStatsComponent _stats;
         
         Dictionary<UnitActionType, IUsable> _usables;
         private IUsable _currentUsable;
-        public List<IUsable> GetUsables
-        {
-            get
-            {
-                if (_usables == null) return null;
-                else  return _usables.Values.ToList();
-            }
-        }
+        public Dictionary<UnitActionType,IUsable> GetUsables => _usables;
 
         private void Awake()
         {
             _usables = new();
-            stats =  GetComponent<EntityStatsComponent>();
+            _stats =  GetComponent<EntityStatsComponent>();
         }
 
         public void RefreshView(UnitInventoryModel model)
@@ -53,22 +47,21 @@ namespace Arcatech.Items
                     _stateUnit.RemoveTransition(usable.GetStateTransition);
                 }
             }
+
+            _usables = new();
             
             var newEquips = model.ListEquipped;
-            List<IUsable> newList = new();
-
-            foreach (var equipment in newEquips)
+            foreach (var item in newEquips)
             {
-                newList.AddRange(equipment.GetUsables);
-            }
-            foreach (var sk in newList)
-            {
-                if (!_usables.TryGetValue(sk.UseActionType, out IUsable usable) || usable != sk)
+                if (item is UsablesItem usablesItem)
                 {
-                    // no key or different skill loaded
-                    _usables[sk.UseActionType] = sk;
+                    foreach (var u in usablesItem.GetUsables)
+                    {
+                        _usables[u.Key] = u.Value;
+                    }
                 }
             }
+
             foreach (var usable in _usables.Values)
             {
                 _stateUnit.AddTransition(usable.GetStateTransition);
@@ -86,18 +79,18 @@ namespace Arcatech.Items
 
         #region drawstratprovider
 
-        private bool redraw = false;
-        IDrawItemStrategy currentDrawItemStrategy;
+        private bool _redraw = false;
+        IDrawItemStrategy _currentDrawItemStrategy;
 
         public IDrawItemStrategy GetDrawStrategy
         {
             get
             {
-                redraw = false;
-                return currentDrawItemStrategy;
+                _redraw = false;
+                return _currentDrawItemStrategy;
             }
         }
-        public bool NeedsRedraw => redraw;
+        public bool NeedsRedraw => _redraw;
 
         #endregion
 
@@ -114,9 +107,9 @@ namespace Arcatech.Items
 
             bool ok = false;
 
-            if (stats)
+            if (_stats)
             {
-                ok = stats.CanApplyCost(usable.GetCost);
+                ok = _stats.CanApplyCost(usable.GetCost);
                 if (!ok)
                 {
                     info = "Can't apply cost";
@@ -125,38 +118,30 @@ namespace Arcatech.Items
             }
 
             ok = usable.UsableIsReady();
-            info = ok ? "Ready" : $" {usable.UsableName} Not Ready";
+            info = ok ? "Ready" : $" {usable.Description.Title} Not Ready";
             return ok;
         }
         
         public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
+            if (!wasSuccessful) return false;
             if (type == UnitActionType.Movement || type == UnitActionType.Jump || type == UnitActionType.Use) return true;
             
             if (!_usables.TryGetValue(type, out var usable)) return false;
-            if (!usable.StartUse()) return false;
+            
             _currentUsable = usable;
         
-            if (_usables[type] is IAffectsItemDisplay disp && disp.DrawStrategy != currentDrawItemStrategy)
+            if (_usables[type] is IAffectsItemDisplay disp && disp.DrawStrategy != _currentDrawItemStrategy)
             {
-                currentDrawItemStrategy = disp.DrawStrategy;
-                redraw = true;
+                Debug.Log("Set strategy");
+                _currentDrawItemStrategy = disp.DrawStrategy;
+                _redraw = true;
             }
             
-            stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
+            _stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
             return true;
         }
 
-
-        public void OnStateEnter()
-        {
-        }
-
-        public void OnStateExit()
-        {
-            _currentUsable?.StopUse();
-            _currentUsable = null;
-        }
     }
 
     public interface IStatesAnnounceReceiver

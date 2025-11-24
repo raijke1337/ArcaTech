@@ -46,47 +46,47 @@ namespace Arcatech.Managers
         
         private void HandleEvent(ParticlesEvent request)
         {
-            Spawn(request.Effect, request.Place, Quaternion.identity, request.Parent); 
+            Spawn(request.Effects, request.Place, Quaternion.identity, request.Parent); 
         }
 
-        
-        public PooledEffect Spawn(CFXR_Effect prefab, Vector3 position, Quaternion rotation, Transform parent = null)
+
+        private void Spawn(IEnumerable< CFXR_Effect >prefabs, Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            if (prefab == null)
+            if (prefabs == null)
             {
                 Debug.LogWarning("[EffectsManager] Spawn called with null prefab.");
-                return null;
+                return;
             }
 
-            if (!pools.TryGetValue(prefab, out var pool))
+            foreach (var prefab in prefabs)
             {
-                pool = new Queue<PooledEffect>();
-                pools[prefab] = pool;
+                if (!pools.TryGetValue(prefab, out var pool))
+                {
+                    pool = new Queue<PooledEffect>();
+                    pools[prefab] = pool;
+                }
+                
+                PooledEffect inst = pool.Count > 0 ? pool.Dequeue() : CreateInstance(prefab);
+                // Parent and position
+                var t = inst.transform;
+                if (parent != null)
+                {
+                    t.SetParent(parent, false);
+                    t.localPosition = Vector3.zero;
+                    t.localRotation = Quaternion.identity;
+                    t.SetPositionAndRotation(position, rotation); // if position is world-space
+                }
+                else
+                {
+                    t.SetParent(transform, false);
+                    t.SetPositionAndRotation(position, rotation);
+                }
+
+                // Ensure clean state and play
+                inst.gameObject.SetActive(true);
+                inst.PrepareForPlay();
+                inst.PlayNow();
             }
-
-            PooledEffect inst = pool.Count > 0 ? pool.Dequeue() : CreateInstance(prefab);
-
-            // Parent and position
-            var t = inst.transform;
-            if (parent != null)
-            {
-                t.SetParent(parent, false);
-                t.localPosition = Vector3.zero;
-                t.localRotation = Quaternion.identity;
-                t.SetPositionAndRotation(position, rotation); // if position is world-space
-            }
-            else
-            {
-                t.SetParent(transform, false);
-                t.SetPositionAndRotation(position, rotation);
-            }
-
-            // Ensure clean state and play
-            inst.gameObject.SetActive(true);
-            inst.PrepareForPlay();
-            inst.PlayNow();
-
-            return inst;
         }
         
         public void Return(PooledEffect inst)
@@ -132,8 +132,8 @@ namespace Arcatech.Managers
         
         
         private EventBinding<SoundClipRequest> _playSoundEventBind;
-        private EventBinding<ProjectilePlaceEvent> _projectilePlaceEventBind;
-
+       // private EventBinding<ProjectilePlaceEvent> _projectilePlaceEventBind;
+// depreciated
         private void Start()
         {
 
@@ -141,12 +141,13 @@ namespace Arcatech.Managers
 
             _placeParticleEventBind = new EventBinding<ParticlesEvent>(HandleEvent);
             //_playSoundEventBind = new EventBinding<SoundClipRequest>(CreateSound);
-            _projectilePlaceEventBind = new EventBinding<ProjectilePlaceEvent>(PlaceProjectile);
+         //   _projectilePlaceEventBind = new EventBinding<ProjectilePlaceEvent>(PlaceProjectile);
 
 
             EventBus<ParticlesEvent>.Register(_placeParticleEventBind);
           //  EventBus<SoundClipRequest>.Register(_playSoundEventBind);
-            EventBus<ProjectilePlaceEvent>.Register(_projectilePlaceEventBind);
+         //   EventBus<ProjectilePlaceEvent>.Register(_projectilePlaceEventBind);
+         
 
         }
         private void OnDisable()
@@ -154,7 +155,7 @@ namespace Arcatech.Managers
             StopAllCoroutines();
             EventBus<ParticlesEvent>.Deregister(_placeParticleEventBind);
             EventBus<SoundClipRequest>.Deregister(_playSoundEventBind);
-            EventBus<ProjectilePlaceEvent>.Deregister(_projectilePlaceEventBind);
+          //  EventBus<ProjectilePlaceEvent>.Deregister(_projectilePlaceEventBind);
         }
 
 
@@ -255,61 +256,7 @@ namespace Arcatech.Managers
 
         #endregion
         #endregion
-        #region projectiles
-//TODO move this somewhere else
 
-        private void PlaceProjectile(ProjectilePlaceEvent p)
-        {
-            StartCoroutine(ShootingCoroutine(p));
-        }
-
-        IEnumerator ShootingCoroutine(ProjectilePlaceEvent ev)
-        {
-
-            Vector3 place = ev.Place.position;
-            Quaternion rotation = ev.Place.rotation; // bandaid
-
-            // should make the bandaid unnecessary
-            if (ev.ShootingConfig.ShotDelay >0)
-            {
-                yield return new WaitForSeconds(ev.ShootingConfig.ShotDelay);
-            }
-            if (ev.Place == null) // place projectile was called on destroy, ref null, use cached spot bandaid
-            {
-
-            }
-            else
-            {
-                 place = ev.Place.position;
-                 rotation = ev.Place.rotation;
-                // transform ref is not null
-            }
-
-            int done = 0;
-
-            if (ev.Place == null)
-            {
-                while (done < ev.ShootingConfig.Shots)
-                {
-                    done++;
-                    ev.Projectile.ProduceProjectile(ev.Shooter, place, rotation, ev.ShootingConfig.Spread);
-                    yield return new WaitForSeconds(ev.ShootingConfig.BetweenShotsDelay);
-                }
-                yield return null;
-            }
-            else
-            {
-                while (done < ev.ShootingConfig.Shots)
-                {
-                    done++;
-                    ev.Projectile.ProduceProjectile(ev.Shooter, place,rotation, ev.ShootingConfig.Spread);
-                    yield return new WaitForSeconds(ev.ShootingConfig.BetweenShotsDelay);
-                }
-                yield return null;
-            }
-        }
-
-        #endregion
 
     }
 }

@@ -4,6 +4,7 @@ using Arcatech.Managers.Save;
 using Arcatech.Scenes;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Usables;
 using UnityEngine;
 
 namespace Arcatech.Managers
@@ -100,12 +101,15 @@ namespace Arcatech.Managers
 
         #region items
 
-        public IItem MakeItem(ItemSO config, BaseGameEntityComponent owner)
+        public Item MakeItem(ItemSO config, BaseGameEntityComponent owner)
         {
-            //if (config is ShieldSO shield) return shield.BuildItem(owner);
-            if (config is WeaponSO weapon) return weapon.BuildItem(owner);
-            if (config is EquipSO eq) return eq.BuildItem(owner);
-            else return config.BuildItem(owner);
+            return config switch
+            {
+                //if (config is ShieldSO shield) return shield.BuildItem(owner);
+                UsablesSO weapon => weapon.BuildItem(owner),
+                EquipSO eq => eq.BuildItem(owner),
+                _ => config.BuildItem(owner)
+            };
         }
 
         #endregion

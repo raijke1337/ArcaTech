@@ -15,9 +15,6 @@ namespace Arcatech
         private List <IUnitCommandValidator> _commandValidators;
         [SerializeField,Self] EntityStateMachineComponent stateMachine;
         private List<IUnitCommandPerformer> _commandPerformers;
-
-        
-        
         
         public bool RequestCombatAction(UnitActionType type)
         {
@@ -35,16 +32,13 @@ namespace Arcatech
                     return false;
                 }
             }
-
-            var ok = stateMachine.TryCommandTransition(type, _commandPerformers);
-
-            if (!ok)
+            var ok = stateMachine.TryCommandTransition(type);
+            
+            foreach (var v in _commandPerformers)
             {
-                foreach (var v in _commandPerformers)
-                {
-                    v.DoUnitCommand(type, false);
-                }
+                v.DoUnitCommand(type, ok);
             }
+            
             return ok;
         }
 

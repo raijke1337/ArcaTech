@@ -41,10 +41,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1741816280062167682}
   - component: {fileID: 4888000909201319563}
-  - component: {fileID: 5988594881624052529}
-  - component: {fileID: 304770472721361815}
   - component: {fileID: 6899858590301785727}
   - component: {fileID: 8800914563863559744}
+  - component: {fileID: 8638127132728584612}
   m_Layer: 6
   m_Name: Scrapper 1H wrench
   m_TagString: Untagged
@@ -90,52 +89,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0.5}
---- !u!114 &5988594881624052529
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8844404192588365369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5ceb339997c8304e9354d4ce5ddc9da, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _emit: 1
-  _emitTime: 1
-  _material: {fileID: 2100000, guid: 0c705a3bc7b78f542b313e57c16ba83d, type: 2}
-  _lifeTime: 1
-  _colors: []
-  _sizes: []
-  _minVertexDistance: 0.1
-  _maxVertexDistance: 10
-  _maxAngle: 3
-  _autoDestruct: 0
-  subdivisions: 4
-  _base: {fileID: 3573663244667457277}
-  _tip: {fileID: 3573663244667457277}
---- !u!114 &304770472721361815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8844404192588365369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efa24d988ff003c49aa9b3a093f08cab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawner: {fileID: 3573663244667457277}
-  animator: {fileID: 8800914563863559744}
-  onDamaged: []
-  onKilled: []
-  animatorStateStartedTrigger: 
-  animatorStateExitTimeTrigger: 
-  animatorStateCompletedTrigger: 
-  triggerTracker: {fileID: 6899858590301785727}
-  trail: {fileID: 5988594881624052529}
 --- !u!114 &6899858590301785727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,6 +124,24 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8638127132728584612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8844404192588365369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9606e5e840853c24fab8120340d92edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawner: {fileID: 3573663244667457277}
+  animator: {fileID: 8800914563863559744}
+  onDamaged: []
+  onKilled: []
+  animatorStateStartedTrigger: 
+  animatorStateExitTimeTrigger: 
 --- !u!1001 &4106341584517067081
 PrefabInstance:
   m_ObjectHideFlags: 0

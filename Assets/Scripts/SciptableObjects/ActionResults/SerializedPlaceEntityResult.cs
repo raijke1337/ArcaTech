@@ -23,9 +23,10 @@ namespace Arcatech.Actions
         {
             EntityToPlace = entityToPlace;
         }
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
+            Quaternion placeRot)
         {
-            GameObject.Instantiate(EntityToPlace, place.position, place.rotation);
+            GameObject.Instantiate(EntityToPlace, place, placeRot);
             return EntityToPlace;
         }
     }

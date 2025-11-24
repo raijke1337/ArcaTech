@@ -8,7 +8,7 @@ public enum Side
     EnemySide
 }
 
-public enum ItemType
+public enum ItemSlot
 {
     None,
     MeleeWeap,
@@ -35,10 +35,11 @@ public enum UnitActionType : byte
 public enum TargetingType
 {
     None,
-    OnlyUser,
-    AnyUnit,
-    AnyEnemy,
-    AnyAlly
+    ApplyToSource,
+    ApplyToEnemyTarget,
+    ApplyToAlliedTarget,
+    ApplyToAnyTargetExceptSource,
+    ApplyToAnyTarget
 }
 
 

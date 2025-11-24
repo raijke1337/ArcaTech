@@ -10,17 +10,12 @@ namespace Arcatech.Items
     [Serializable, CreateAssetMenu(fileName = "New Backpack Item", menuName = "Items/Just Item")]
     public class ItemSO : ScriptableObjectID, IIconContent
     {
-
+        
         [SerializeField] Description description;        
-        public ItemType type;
-
         [Space] public int MaxStack = 1;
-        protected virtual void OnValidate()
-        {
-            Assert.IsFalse(type==ItemType.None);
-        }
 
-        public virtual IItem BuildItem(BaseGameEntityComponent owner)
+
+        public virtual Item BuildItem(BaseGameEntityComponent owner)
         {
             return new Item(this,owner);
         }

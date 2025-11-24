@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 
 namespace Arcatech.Items
 {
@@ -39,13 +40,13 @@ namespace Arcatech.Items
             // Display each usable item as a row
             for (int i = 0; i < caster.GetUsables.Count; i++)
             {
-                IUsable usable = caster.GetUsables[i];
+                IUsable usable = caster.GetUsables.Values.ToArray()[i];
                 if (usable == null) continue;
             
                 EditorGUILayout.BeginHorizontal();
             
                 // Item name
-                EditorGUILayout.LabelField(usable.UsableName ?? "Unnamed", GUILayout.Width(120));
+                EditorGUILayout.LabelField(usable.Description.Title ?? "Unnamed", GUILayout.Width(120));
             
                 // Charges
                 EditorGUILayout.LabelField(usable.IconNumber, GUILayout.Width(60));

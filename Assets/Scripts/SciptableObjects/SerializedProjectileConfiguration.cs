@@ -1,76 +1,43 @@
+using System;
 using Arcatech.Actions;
 using UnityEngine;
 using UnityEngine.Assertions;
-namespace Arcatech.Items
+namespace Arcatech.Items.Projectiles
 {
-    [CreateAssetMenu(fileName = "New Projectile", menuName = "Items/Projectile")]
+    [CreateAssetMenu(fileName = "New Projectile", menuName = "Projectiles/Projectile")]
     public class SerializedProjectileConfiguration : ScriptableObject
     {
-
-        [SerializeField] ProjectileComponent ProjectilePrefab;
-        [SerializeField] TargetingType AffectedTargets;
-        [Range(1, 10), Tooltip("How many times affected targets will trigger the collision results"), SerializeField] int AffectedTargetsCount;
-        [SerializeField] SerializedActionResult[] UnitCollisionResult;
+        [SerializeField] ProjectileComponent projectilePrefab;
+        [SerializeField] SerializedProjectileBehavior projectileBehavior;
 
 
-        [Space,Header("Projectile")]
-        [SerializeField] float TimeToLive;
-        [SerializeField] float ProjectileSpeed;
-        [SerializeField] bool attachToUser = false;
-
-        [Header("TODO: repalce with homing settings so")]
-        [SerializeField, Tooltip("Placeholder for homing projectiles, range of scanning for tgts")] float HomingRange = 6f;
-
-
-
-        [SerializeField] SerializedActionResult[] ExpirationCollisionResult;
-
-
-
-        private void OnValidate()
+        public ProjectileComponent ProduceProjectile (BaseGameEntityComponent owner, Vector3 pos, Quaternion rot,  float spread = 0f)
         {
-            Assert.IsNotNull(ProjectilePrefab);
-            Assert.IsNotNull(UnitCollisionResult);
-            Assert.IsFalse(AffectedTargets == TargetingType.None);
-        }
-        /// <summary>
-        /// instantiate the prefab and set it
-        /// </summary>
-        /// <param name="owner"></param>
-        /// <param name="place"></param>
-        /// <param name="spread">in euler degrees</param>
-        /// <returns></returns>
-        //public virtual ProjectileComponent ProduceProjectile(BaseEntity owner, Transform place ,float spread = 0f)
-        //{
-        //    return ProduceProjectile(owner, place.position, place.rotation, attachToUser, spread);
-        //}
-
-        public virtual ProjectileComponent ProduceProjectile (BaseGameEntityComponent owner, Vector3 pos, Quaternion rot,  float spread = 0f)
-        {
-            ProjectileComponent proj = Instantiate(ProjectilePrefab, pos, rot);
-            proj.Owner = owner;
+            ProjectileComponent proj = Instantiate(projectilePrefab, pos, rot);
             Vector3 dir = owner.transform.forward + new Vector3(UnityEngine.Random.Range(-spread, spread), UnityEngine.Random.Range(-spread, spread), UnityEngine.Random.Range(-spread, spread));
 
             proj.transform.forward = dir;
-
-            proj.Lifetime = TimeToLive;
-            proj.RemainingHits = AffectedTargetsCount;
-            proj.Speed = ProjectileSpeed;
-
-            proj.SetResult(UnitCollisionResult, ExpirationCollisionResult,AffectedTargets);
-
-            if (proj is HomingProjectileComponent h)
-            {
-                h.WithHoming(HomingRange);
-            }
-
-            if (attachToUser)
-            {
-                proj.Speed = 0;
-                proj.transform.SetParent(owner.transform, true);
-            }
+            
+            proj.Setup(owner,projectileBehavior);
+            
             return proj;
         }
     }
 
+    [Serializable]
+    public struct ShootingConfig
+    {
+        public ShootingConfig(int shots, float spread, float delay, float shotDelay)
+        {
+            Shots = shots;
+            Spread = spread;
+            BetweenShotsDelay = delay;
+            ShotDelay = shotDelay;
+        }
+
+        public int Shots { get; }
+        public float Spread { get; }
+        public float BetweenShotsDelay { get; }
+        public float ShotDelay { get; }
+    }
 }

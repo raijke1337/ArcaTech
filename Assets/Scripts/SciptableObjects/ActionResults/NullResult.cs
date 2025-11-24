@@ -13,7 +13,8 @@ namespace Arcatech.Actions
     
     public class NullActionResult : ActionResult
     {
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
+            Quaternion placeRot)
         {
             return true;
             // Nothing happens

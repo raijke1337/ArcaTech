@@ -19,16 +19,12 @@ namespace Arcatech
     {
         public SerializedDictionary<ItemPlaceType, Transform> ItemPositions;
     }
-    public enum ItemPlaceType : byte
+    public enum ItemPlaceType
     {
         MeleeEmpty,
         RangedEmpty,
-        SheathedEmpty,
-        ShieldEmpty,
-        BoosterEmpty,
         Hidden,
-        OtherEmpty = 254
-
+        ArmatureRoot
     }
 
 

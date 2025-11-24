@@ -13,9 +13,9 @@ namespace Arcatech.Items
         [SerializeField] List<EquipSO> Equipment;
         [SerializeField, Space] List<ItemSO> Inventory;
 
-        public List<IItem> GetEquipment(BaseGameEntityComponent owner)
+        public List<Item> GetEquipment(BaseGameEntityComponent owner)
         {
-            List<IItem> equipList = new List<IItem>();
+            List<Item> equipList = new List<Item>();
 
             foreach (EquipSO equip in Equipment)
             {
@@ -24,9 +24,9 @@ namespace Arcatech.Items
             return equipList;
         }
 
-        public List<IItem> GetInventory(BaseGameEntityComponent owner)
+        public List<Item> GetInventory(BaseGameEntityComponent owner)
         {
-            List<IItem> invList = new List<IItem>();
+            List<Item> invList = new List<Item>();
             foreach (ItemSO item in Inventory)
             {
                 invList.Add(DataManager.Instance.MakeItem(item, owner));
@@ -51,8 +51,8 @@ namespace Arcatech.Items
 
     public interface IEntityItemsList
     {
-        public List<IItem> GetEquipment(BaseGameEntityComponent owner);
-        public List<IItem> GetInventory(BaseGameEntityComponent owner);
+        public List<Item> GetEquipment(BaseGameEntityComponent owner);
+        public List<Item> GetInventory(BaseGameEntityComponent owner);
 
 
     }

@@ -98,7 +98,7 @@ namespace Arcatech.Units
 
         #region used by other components
 
-        public void PickUpItem(IItem item, int amount = 1)
+        public void PickUpItem(Item item, int amount = 1)
         {
             if (item is Equipment e)
             {

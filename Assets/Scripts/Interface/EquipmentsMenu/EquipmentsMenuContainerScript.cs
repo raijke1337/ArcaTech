@@ -13,7 +13,7 @@ namespace Arcatech.UI
     {
         #region display;
 
-        [SerializeField] SerializedDictionary<ItemType, ItemTileComponent> _equipsTiles;
+        [SerializeField] SerializedDictionary<ItemSlot, ItemTileComponent> _equipsTiles;
         [SerializeField] List<ItemTileComponent> _inventoryTiles = new List<ItemTileComponent>();
 
         [Space, SerializeField] private ItemTileComponent _tilePreset; // for items
@@ -68,8 +68,8 @@ namespace Arcatech.UI
             //draw
             foreach (Equipment equip in model.ListEquipped)
             {
-                _equipsTiles[equip.Type].Item = equip;
-                _equipsTiles[equip.Type].IconClickedEvent += IconTileClicked;
+                _equipsTiles[equip.Slot].Item = equip;
+                _equipsTiles[equip.Slot].IconClickedEvent += IconTileClicked;
             }
             var inve = model.ListInventory;
 
@@ -149,7 +149,7 @@ namespace Arcatech.UI
 
             if (item == null) return;
 
-            var desc = item.Config.Description;
+            var desc = item.Description;
             /*
             try
             {

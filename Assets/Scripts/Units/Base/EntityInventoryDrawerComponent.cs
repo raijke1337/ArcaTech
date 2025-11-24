@@ -24,7 +24,6 @@ namespace Arcatech.Units
         public event UnityAction ViewChangedInventory;
         public void RefreshView(UnitInventoryModel model)
         {
-
             if (inventoryModel != null && inventoryModel != model)
             {
                 // model is changed for some reason
@@ -51,23 +50,14 @@ namespace Arcatech.Units
             currentDrawStrategy = strat;
             foreach (var e in inventoryModel.ListEquipped)
             {
-                ItemPlaceType placeType = strat.GetPlaces[e.Type];
-                switch (placeType)
+                ItemPlaceType placeType = strat.GetPlaces[e.Slot];
+                if (placeType == ItemPlaceType.Hidden)
                 {
-                    case ItemPlaceType.Hidden:
-                        e.OnUnequip();
-                        break;
-                    default:
-                        try
-                        {
-                            e.SetItemEmpty(itemEmpties.ItemPositions[strat.GetPlaces[e.Type]]);
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine($"No empties set in {this}");
-                        }
-                        e.OnEquip();
-                        break;
+                    e.OnUnequip(); 
+                }
+                else
+                {
+                    e.SetItemParent(itemEmpties.ItemPositions[strat.GetPlaces[e.Slot]]);
                 }
             }
         }
@@ -87,15 +77,15 @@ namespace Arcatech.Units
             
             drawItemsStrategyProvider = GetComponentInChildren<IDrawItemsStrategyProvider>();
             if (drawItemsStrategyProvider == null) Debug.Log("No DrawItemsStrategy Provider");
-
-            // if (itemEmpties.ItemPositions.TryGetValue(ItemPlaceType.RangedEmpty,out var r)) 
-            //     r.forward =  transform.forward; // makes sure weapon is pointing forward alongside the player model and mouse
+            
+            DrawItems(defaultItemsDrawStrat);
         }
 
         private void Update()
         {
-            if (drawItemsStrategyProvider != null && drawItemsStrategyProvider.NeedsRedraw)
+            if (drawItemsStrategyProvider is { NeedsRedraw: true })
             {
+                Debug.Log($"Update strategy");
                 DrawItems(drawItemsStrategyProvider.GetDrawStrategy);
             }
         }

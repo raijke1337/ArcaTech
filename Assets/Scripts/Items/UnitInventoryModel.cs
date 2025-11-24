@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
@@ -21,7 +22,7 @@ namespace Arcatech.Items
        
         bool initialized = false;
         List<Item> inventory;
-        Dictionary<ItemType, Equipment> equipments;
+        Dictionary<ItemSlot, Equipment> equipments;
 
         public IReadOnlyList<Equipment> ListEquipped => equipments.Values.ToList().AsReadOnly();
         public IReadOnlyList<Item> ListInventory => inventory.AsReadOnly();
@@ -38,16 +39,16 @@ namespace Arcatech.Items
             if (items == null) return;
             
             PickUpItems(items.GetInventory(o));
-            Dictionary<ItemType, List<Equipment>> temporaryDict = new();
+            Dictionary<ItemSlot, List<Equipment>> temporaryDict = new();
             
 
             foreach (Equipment e in items.GetEquipment(o))
             {
-                if (!temporaryDict.ContainsKey(e.Type))
+                if (!temporaryDict.ContainsKey(e.Slot))
                 {
-                    temporaryDict[e.Type] = new List<Equipment>();
+                    temporaryDict[e.Slot] = new List<Equipment>();
                 }
-                temporaryDict[e.Type].Add(e);
+                temporaryDict[e.Slot].Add(e);
                // EquipItem(e, out _);
             }
             // here is the case if multiple items of the same type are in the "equipment".
@@ -83,7 +84,7 @@ namespace Arcatech.Items
             {ModelUpdatedEvent.Invoke();}
         }
 
-        public void PickUpItems(IEnumerable<IItem> items)
+        public void PickUpItems(IEnumerable<Item> items)
         {
             foreach (Item item in items) PickUpItem(item);
         }
@@ -116,24 +117,17 @@ namespace Arcatech.Items
         {
             dropped = null;
 
-            if (equipments.TryGetValue(toEquip.Type, out var drop))
+            if (equipments.TryGetValue(toEquip.Slot, out var drop))
             {
-                dropped = drop.Config as EquipSO;
-                equipments.Remove(toEquip.Type);
+               // dropped = drop.Config as EquipSO;
+                equipments.Remove(toEquip.Slot);
                 drop.OnUnequip();
+                
             }
 
-            equipments[toEquip.Type] =toEquip;
+            equipments[toEquip.Slot] =toEquip;
 
-            if (initialized)
-            {
-                if (toEquip is IWeapon w)
-                {
-                    //DrawStrategyChangedEvent.Invoke(w.DrawStrategy);
-                    // maybe return it but for now only 1 draw strategy provider
-                }
-                ModelUpdatedEvent.Invoke();
-            }
+            if (initialized) ModelUpdatedEvent.Invoke();
         }
         
         /// <summary>

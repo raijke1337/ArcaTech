@@ -42,22 +42,22 @@ namespace Arcatech.UI
         
         void OnSetItem()
         {
-            //TODO fix this display stuff in future item/skill refactoring
-            itemTitle.text = _item.Config.Description.ToString();
-
-            confirmButton.gameObject.SetActive(false);
-
-            if (_item is Equipment equip) // means it might come with a skill...
-            {
-                EquipSO c = equip.Config as EquipSO;
-                var sk = c.Skill;
-                skillIcon.AssignIcon(sk);
-                skillText.text = sk.Description.ToString();
-                confirmButton.gameObject.SetActive(true);
-            }
-
-            itemIcon.AssignIcon(_item);
-            itemText.text = _item.Config.Description.ToString();
+            Debug.Log("On set item. Implement me!");
+            // itemTitle.text = _item.Description.ToString();
+            //
+            // confirmButton.gameObject.SetActive(false);
+            //
+            // if (_item is Equipment equip) // means it might come with a skill...
+            // {
+            //     EquipSO c = equip.Config as EquipSO;
+            //     var sk = c.Skill;
+            //     skillIcon.AssignIcon(sk);
+            //     skillText.text = sk.Description.ToString();
+            //     confirmButton.gameObject.SetActive(true);
+            // }
+            //
+            // itemIcon.AssignIcon(_item);
+            // itemText.text = _item.Config.Description.ToString();
 
         }
         private void OnValidate()

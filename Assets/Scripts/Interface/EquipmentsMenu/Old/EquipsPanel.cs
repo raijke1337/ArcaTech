@@ -7,13 +7,13 @@ namespace Arcatech.UI
 {
     public class EquipsPanel : InventoryItemsHolder
     {
-        [SerializeField] protected SerializedDictionary<ItemType, ItemTileComponent> EquipsTiles;
+        [SerializeField] protected SerializedDictionary<ItemSlot, ItemTileComponent> EquipsTiles;
         public override ItemTileComponent AddTileContent(Item content)
         {
             if (content == null) return null;
             try
             {
-                var tile = EquipsTiles[content.Type];
+                var tile = EquipsTiles[content.Slot];
                 tile.Item = content;
                 return tile;
             }
@@ -30,7 +30,7 @@ namespace Arcatech.UI
             if (content == null) return null;
             try
             {
-                var t = EquipsTiles[content.Type];
+                var t = EquipsTiles[content.Slot];
                 t.Clear();
                 return t;
             }

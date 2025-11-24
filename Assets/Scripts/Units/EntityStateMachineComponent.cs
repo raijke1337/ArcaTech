@@ -60,58 +60,20 @@ namespace Arcatech.Units
             const int kMaxChain = 8;
             while (safety++ < kMaxChain)
             {
-                bool committed = UpdateTransitions();
+                bool committed = TransitionsInUpdate();
                 if (!committed) break;
             }
         }
 
-        bool ExecuteTransitionActions(StateTransition tr)
+        public bool TryCommandTransition(UnitActionType actionType/*,
+            IEnumerable<IUnitCommandPerformer> commandPerformers*/)
         {
-            if (tr.OnTransition == null) return true;
-            foreach (var a in tr.OnTransition)
-            {
-                if (a == null) continue;
-                bool ok = a.ProduceResult(_context.Owner, null, _context.Spawn);
-                if (!ok) return false;
-            }
-
-            return true;
+            if (Paused || Killed) return false;
+            _context.PendingCommand = actionType;
+            return ValidateCommandTransition();
         }
-
-        // New helper: try to run command performers (if provided), run OnTransition actions and commit.
-        bool TryCommitTransition(StateTransition tr, IEnumerable<IUnitCommandPerformer> commandPerformers)
-        {
-            if (tr == null || tr.NextState == null) return false;
-
-            // Run any command performers (validation / execution).
-            if (commandPerformers != null)
-            {
-                foreach (var handler in commandPerformers)
-                {
-                    bool executed = handler.DoUnitCommand(_context.PendingCommand, true);
-                    if (!executed)
-                    {
-                        Debug.LogWarning(
-                            $"Performer {handler} failed to execute {_context.PendingCommand}; aborting transition.");
-                        _context.ClearCommand();
-                        return false;
-                    }
-                }
-            }
-
-            // Run transition OnTransition actions
-            if (!ExecuteTransitionActions(tr))
-            {
-                Debug.LogWarning($"Transition action failed, aborting transition from {_currentState}");
-                _context.ClearCommand();
-                return false;
-            }
-
-            CommitTransition(tr);
-            return true;
-        }
-
-        private bool UpdateTransitions()
+   
+        private bool TransitionsInUpdate()
         {
             if (Paused || Killed) return false;
 
@@ -124,7 +86,7 @@ namespace Arcatech.Units
             }
 
             // For runtime updates (Update loop) we want to clear PendingCommand on commit
-            if (!TryCommitTransition(chosen, null))
+            if (!TryCommitTransition(chosen))
             {
                 // aborted by action/performer
                 return false;
@@ -132,39 +94,58 @@ namespace Arcatech.Units
             return true;
         }
 
+        // New helper: try to run command performers (if provided), run OnTransition actions and commit.
+        bool TryCommitTransition(StateTransition tr/*, IEnumerable<IUnitCommandPerformer> commandPerformers*/)
+        {
+            if (tr == null || tr.NextState == null) return false;
+            if (!ExecuteTransitionActions(tr))
+            {
+                Debug.LogWarning($"Transition action failed, aborting transition from {_currentState}");
+                _context.ClearCommand();
+                return false;
+            }
+
+            CommitTransition(tr);
+            return true;
+        }
+
         /// final action
         void CommitTransition(StateTransition tr)
         {
             if (tr == null || tr.NextState == null) return;
-
             _context.ClearCommand();
             
             _currentState.ExitState(_context, animator);
-            if (GetMainEntity.ShowingDebugs) Debug.Log("Exiting state "+_context.CurrentState);
+         //   if (GetMainEntity.ShowingDebugs) Debug.Log("Exiting state "+_context.CurrentState);
             
             _currentState = tr.NextState;
             _context.CurrentState = _currentState;
             _currentState.EnterState(_context, animator);
 
-            if (GetMainEntity.ShowingDebugs) Debug.Log("Entering state "+_context.CurrentState);
+         //   if (GetMainEntity.ShowingDebugs) Debug.Log("Entering state "+_context.CurrentState);
         }
 
-        public bool TryCommandTransition(UnitActionType actionType,
-            IEnumerable<IUnitCommandPerformer> commandPerformers)
+        
+        bool ExecuteTransitionActions(StateTransition tr)
         {
-            if (Paused || Killed) return false;
-            _context.PendingCommand = actionType;
-            return ValidateCommandTransition(commandPerformers);
-        }
+            if (tr.OnTransition == null) return true;
+            foreach (var a in tr.OnTransition)
+            {
+                if (a == null) continue;
+                bool ok = a.ProduceResult(_context.Owner, null, _context.Spawn.position, _context.Spawn.rotation);
+                if (!ok) return false;
+            }
 
-        bool ValidateCommandTransition(IEnumerable<IUnitCommandPerformer> commandPerformers)
+            return true;
+        }     
+        bool ValidateCommandTransition()
         {
             if (_currentState == null)
             {
                 _context.ClearCommand();
                 return false;
             }
-
+        
             // Use the same selection logic (local + global), but when committing from a command
             // we want to preserve the PendingCommand so chained transitions in the new state can consume it.
             bool wasLocal;
@@ -174,14 +155,14 @@ namespace Arcatech.Units
                 _context.ClearCommand();
                 return false;
             }
-
+        
             // Try to commit, passing the performers and DO NOT clear pending command (so newly-entered state can read it)
-            if (!TryCommitTransition(chosen, commandPerformers))
+            if (!TryCommitTransition(chosen))
             {
                 // TryCommitTransition cleared the command on failure
                 return false;
             }
-
+        
             return true;
         }
 
@@ -201,7 +182,7 @@ namespace Arcatech.Units
         public void AddTransition(StateTransition transition)
         {
             if (transition == null || _addedTransitions.Contains(transition)) return;
-            Debug.Log($"added transition to {transition.NextState}");
+           // Debug.Log($"added transition to {transition.NextState}");
             _addedTransitions.Add(transition);
         }
 
@@ -248,8 +229,6 @@ namespace Arcatech.Units
             return candidates;
         }
 
-// Choose the best candidate by (priority desc, isLocal preferred)
-// Returns best transition or null if none
         private StateTransition PickBestTransition(out bool wasLocal)
         {
             wasLocal = false;
@@ -273,13 +252,16 @@ namespace Arcatech.Units
 
             debug += "\n";
             debug += best.tr.DebugConditions;
-            if (GetMainEntity.ShowingDebugs) Debug.Log(debug);   
+          //  if (GetMainEntity.ShowingDebugs) Debug.Log(debug);   
             
             return best.tr;
         }
-
-
-        public bool Paused { get; set; }
+        
+        public bool Paused
+        {
+            get;
+            set;
+        }
         public bool Killed { get; set; }
     }
 

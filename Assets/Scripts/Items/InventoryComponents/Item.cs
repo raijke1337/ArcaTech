@@ -8,20 +8,18 @@ namespace Arcatech.Items
 {
     // coin, upgrade, key etc..
     [Serializable]
-    public class Item : IItem, IIconContent
+    public class Item : IIconContent
     {
         public BaseGameEntityComponent Owner { get; }
-        public SerializableGuid ID => Config.ID;
-        public ItemSO Config { get; }
+        public SerializableGuid ID { get; }
         public Item(ItemSO cfg, BaseGameEntityComponent ow)
         {
             Owner = ow;
-            Config = cfg;
-            Type = cfg.type;
+            Description = cfg.Description;
+            ID =  cfg.ID;
         }
-        
-        public ItemType Type { get; protected set; }
-        public virtual Description Description =>  Config.Description;
+        public ItemSlot Slot { get; protected set; }
+        public virtual Description Description { get; }
         public virtual float FillValue => 0;
         public virtual string IconNumber => string.Empty;
 

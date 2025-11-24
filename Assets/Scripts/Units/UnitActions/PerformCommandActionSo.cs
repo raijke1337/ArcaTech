@@ -29,7 +29,8 @@ namespace Arcatech.Units
             this.actionType = actionType;
         }
 
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
+            Quaternion placeRot)
         {
             if (user == null) return false;
             if (!c)

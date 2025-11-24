@@ -61,15 +61,13 @@ namespace Arcatech.Triggers
         
         protected void OnTriggerEnter(Collider other)
         {
-
             if (!Active || receivers == null || !receivers.Any()) return;
-            if (other.TryGetComponent<BaseGameEntityComponent>(out var component))
+            Debug.Log($"Hit {other.gameObject.name}");
+            other.TryGetComponent<BaseGameEntityComponent>(out var component);
+            
+            foreach (var receiver in receivers)
             {
-              //  Debug.Log($"Bonk {component}");
-                foreach (var receiver in receivers)
-                {
-                    receiver.TriggerEntered(component, this);
-                }
+                receiver.TriggerEntered(new TriggerHitInfo(this, component,transform.position,Time.time));
             }
             CleanUpReceivers();
         }

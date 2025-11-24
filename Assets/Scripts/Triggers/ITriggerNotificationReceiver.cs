@@ -1,8 +1,10 @@
-﻿namespace Arcatech.Triggers
+﻿using JetBrains.Annotations;
+
+namespace Arcatech.Triggers
 {
     public interface ITriggerNotificationReceiver
     {
-        void TriggerEntered(BaseGameEntityComponent enterComponent, ITriggerNotificationProvider trigger);
-        void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger);
+        void TriggerEntered(TriggerHitInfo triggerHitInfo);
+        void TriggerExited([CanBeNull] BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger);
     }
 }

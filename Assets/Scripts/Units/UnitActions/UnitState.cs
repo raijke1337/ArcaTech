@@ -147,7 +147,7 @@ namespace Arcatech.Units
 
             if (OnEnterState == null || OnEnterState.Length <= 0) return;
             foreach (var a in OnEnterState)
-                a?.ProduceResult(context.Owner, null, context.Spawn);
+                a?.ProduceResult(context.Owner, null, context.Spawn.position, context.Spawn.rotation);
         }
 
         public void UpdateState(float delta)
@@ -160,7 +160,7 @@ namespace Arcatech.Units
         {
             if (OnExitState == null || OnExitState.Length == 0) return;
             foreach (var a in OnExitState)
-                a?.ProduceResult(context.Owner, null, context.Spawn);
+                a?.ProduceResult(context.Owner, null, context.Spawn.position, context.Spawn.rotation);
             _stateTimer.Stop();
 
         }

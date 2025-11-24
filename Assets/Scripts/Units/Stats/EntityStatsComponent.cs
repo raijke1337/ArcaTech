@@ -441,7 +441,9 @@ namespace Arcatech.Stats
             {
                 if (spawners.Any())
                 {
-                    d.onApply.BuildActionResult().ProduceResult(null,null,spawners[UnityEngine.Random.Range(0, spawners.Count-1)].EffectSpawn);
+                    d.onApply.BuildActionResult().ProduceResult(null,null,
+                        spawners[UnityEngine.Random.Range(0, spawners.Count-1)].EffectSpawn.position,
+                        Quaternion.identity);
                 }
             }
         }

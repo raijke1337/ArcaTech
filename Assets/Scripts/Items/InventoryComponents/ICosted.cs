@@ -7,6 +7,4 @@ namespace Arcatech
     {
         public StatsEffect GetCost { get; }
     }
-
-   
 }

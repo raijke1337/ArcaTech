@@ -15,22 +15,18 @@ namespace Arcatech.Items
     public class EquipSO : ItemSO
     {
         [SerializeField] public EquipmentComponent itemPrefab;
-        public SerializedSkill Skill;
+        public ItemSlot slot;
 
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            Assert.IsNotNull(itemPrefab);
-        }
 
-        public override IItem BuildItem(BaseGameEntityComponent owner)
+        public List <StatModifier> statModifiers;
+        public List <PeriodicDelta> periodicDeltas;
+        
+        public override Item BuildItem(BaseGameEntityComponent owner)
         {
             return new Equipment(this, owner);
         }
         
         
-        public List <StatModifier> statModifiers;
-        public List <PeriodicDelta> periodicDeltas;
     }
 
 

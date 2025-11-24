@@ -25,7 +25,7 @@ namespace Arcatech.UI
             {
                 _item = value;
                 if (value == null) Clear();
-                else SetSprite(value.Config.Description.Picture);
+                else SetSprite(value.Description.Picture);
             }
         }
 

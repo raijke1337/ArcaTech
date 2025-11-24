@@ -50,7 +50,7 @@ namespace Arcatech.Interactions
                     {
                         result.ProduceResult(interactor.InteractionContext.EntityComponent,
                             null,
-                            interactor.InteractionContext.ActionTransform);
+                            interactor.InteractionContext.ActionTransform.position, interactor.InteractionContext.ActionTransform.rotation);
                     }
                 }
 
@@ -61,7 +61,7 @@ namespace Arcatech.Interactions
                     {
                         result.ProduceResult(interactor.InteractionContext.EntityComponent,
                             item.GetBaseComponent,
-                            item.GetBaseComponent.EffectSpawn);
+                            item.GetBaseComponent.EffectSpawn.position,  item.GetBaseComponent.EffectSpawn.rotation);
                     }
                 }
             }
@@ -74,7 +74,7 @@ namespace Arcatech.Interactions
                     {
                         result.ProduceResult(interactor.InteractionContext.EntityComponent,
                             null,
-                            interactor.InteractionContext.ActionTransform);
+                            interactor.InteractionContext.ActionTransform.position, interactor.InteractionContext.ActionTransform.rotation);
                     }
                 }
 
@@ -85,7 +85,7 @@ namespace Arcatech.Interactions
                     {
                         result.ProduceResult(interactor.InteractionContext.EntityComponent,
                             item.GetBaseComponent,
-                            item.GetBaseComponent.EffectSpawn);
+                            item.GetBaseComponent.EffectSpawn.position,  item.GetBaseComponent.EffectSpawn.rotation);
                     }
                 }
             }

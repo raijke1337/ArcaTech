@@ -18,7 +18,7 @@ namespace Arcatech.Units
         private IMove _mover;
         private UnitInputsComponent _inputs;
         public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,
-            Transform place)
+            Vector3 place, Quaternion placeRot)
         {
             if (_mover == null)
             {

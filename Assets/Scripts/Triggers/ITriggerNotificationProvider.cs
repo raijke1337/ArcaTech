@@ -5,6 +5,5 @@
         public bool Active { get; set; } 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver);
         public void UnregisterReceiver(ITriggerNotificationReceiver receiver);
-        public void RecheckCollisions();
     }
 }

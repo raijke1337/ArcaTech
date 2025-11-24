@@ -8,9 +8,9 @@ namespace Arcatech.Units
     [CreateAssetMenu(fileName = "New Items placement IStrategy", menuName = "Items/Draw strategy")]
     public class DrawItemsStrategy : ScriptableObject, IDrawItemStrategy
     {
-        public Dictionary<ItemType, ItemPlaceType> GetPlaces => _dict;
+        public Dictionary<ItemSlot, ItemPlaceType> GetPlaces => _dict;
 
-        [SerializeField] SerializedDictionary<ItemType, ItemPlaceType> _dict;
+        [SerializeField] SerializedDictionary<ItemSlot, ItemPlaceType> _dict;
         public void OnInit()
         {
         }

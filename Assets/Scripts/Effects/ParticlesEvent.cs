@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Arcatech.EventBus;
 using CartoonFX;
 using UnityEngine;
@@ -6,15 +8,15 @@ namespace Arcatech.Effects
 {
     public struct ParticlesEvent : IEvent
     {
-        public ParticlesEvent(CFXR_Effect effect, Vector3 place, Transform parent = null)
+        public ParticlesEvent(IEnumerable<CFXR_Effect> particles)
         {
-            Effect = effect;
-            Parent = parent;
-            Place = place;
+            Effects = particles.ToArray();
+            Parent =  null;
+            Place = Vector3.zero;
         }
 
-        public CFXR_Effect Effect { get; }
-        public Transform Parent { get; }
-        public Vector3 Place { get; }
+        public CFXR_Effect[] Effects  { get; }
+        public Transform Parent { get; set; }
+        public Vector3 Place { get; set; }
     }
 }

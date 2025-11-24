@@ -33,14 +33,6 @@ namespace Arcatech.Triggers
         Timer reapplyTimer;
 
 
-        
-        
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            Assert.IsFalse(targetType == TargetingType.None || targetType == TargetingType.OnlyUser,$"Incorrect targeting type set for {this}");
-        }
-
         private void Start()
         {
             killables = new List<IKillableComponent>(GetComponentsInChildren<IKillableComponent>());
@@ -60,10 +52,10 @@ namespace Arcatech.Triggers
             }
         }
 
-        public void TriggerEntered(BaseGameEntityComponent enterComponent, ITriggerNotificationProvider trigger)
+        public void TriggerEntered(TriggerHitInfo info)
         {
             if (Killed || Paused) return;
-            CheckTarget(enterComponent);
+            CheckTarget(info.Target,true);
                 if (killEntityOnEnter)
                 {
                     foreach (var killable in killables)
@@ -85,7 +77,7 @@ namespace Arcatech.Triggers
         public void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
         {
             if (Killed || Paused) return;
-            CheckTarget(exitComponent);
+            CheckTarget(exitComponent,false);
             if (killEntityOnExit)
             {
                 foreach (var killable in killables)
@@ -97,21 +89,21 @@ namespace Arcatech.Triggers
         }
 
 
-        void CheckTarget(BaseGameEntityComponent enterComponent)
+        void CheckTarget(BaseGameEntityComponent enterComponent, bool entering)
         {
             switch (targetType)
             {
-                case TargetingType.AnyUnit:
-                    ApplyResultsTo(enterComponent,resultOnEntry);
+                case TargetingType.ApplyToEnemyTarget:
+                    if (enterComponent.GetEntitySide!=baseComp.GetEntitySide) ApplyResultsTo(enterComponent,entering?resultOnEntry:resultOnExit);
                     break;
-                case TargetingType.AnyEnemy:
-                    if (enterComponent.GetEntitySide != baseComp.GetEntitySide) ApplyResultsTo(enterComponent, resultOnEntry);
+                case TargetingType.ApplyToAlliedTarget:
+                    if (enterComponent.GetEntitySide==baseComp.GetEntitySide) ApplyResultsTo(enterComponent,entering?resultOnEntry:resultOnExit);
                     break;
-                case TargetingType.AnyAlly:
-                    if (enterComponent.GetEntitySide == baseComp.GetEntitySide) ApplyResultsTo(enterComponent, resultOnEntry);
+                case TargetingType.ApplyToAnyTarget:
+                    ApplyResultsTo(enterComponent,entering?resultOnEntry:resultOnExit);
                     break;
                 default:
-                    Debug.Log($"{enterComponent.GetName} entered {this} and nothing happened because of trigger settings");
+                    Debug.Log("Unknown target type");
                     break;
             }
         }
@@ -121,7 +113,7 @@ namespace Arcatech.Triggers
             foreach (var action in results)
             {
 //                Debug.Log($"Apply result {action} to {p.GetName}");
-                action.BuildActionResult().ProduceResult(null, p, transform);
+                action.BuildActionResult().ProduceResult(null, p, transform.position, transform.rotation);
             }
         }
 

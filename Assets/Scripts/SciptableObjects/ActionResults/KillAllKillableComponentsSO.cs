@@ -26,7 +26,8 @@ namespace Arcatech.Actions
         {
             this.interfaceType =  interfaceType;
         }
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
+            Quaternion placeRot)
         {
             return true;
             // Nothing happens

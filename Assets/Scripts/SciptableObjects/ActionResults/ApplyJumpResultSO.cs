@@ -21,7 +21,7 @@ namespace Arcatech.Actions
         public ApplyJumpResult(bool jumpState) =>  this.jumpState = jumpState;
         bool jumpState;
         public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,
-            Transform place)
+            Vector3 place, Quaternion placeRot)
         {
             if (user == null) return false;
             var mover = user.GetComponent<IJump>();

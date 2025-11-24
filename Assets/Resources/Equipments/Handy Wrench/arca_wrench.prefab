@@ -101,10 +101,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6698622227185165430}
   - component: {fileID: 6074824665655175326}
-  - component: {fileID: 7849039679999465125}
   - component: {fileID: 794857245962018783}
-  - component: {fileID: 5023922883815564929}
   - component: {fileID: 7535063657215179178}
+  - component: {fileID: 202728140969831318}
   m_Layer: 0
   m_Name: arca_wrench
   m_TagString: Untagged
@@ -149,32 +148,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &7849039679999465125
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6322378502437355212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5ceb339997c8304e9354d4ce5ddc9da, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _emit: 1
-  _emitTime: 1
-  _material: {fileID: 2100000, guid: 5f402d1520e5fa74fa21e08f85b71370, type: 2}
-  _lifeTime: 1
-  _colors:
-  - {r: 0.13725491, g: 0.2901961, b: 0.42352945, a: 1}
-  _sizes: []
-  _minVertexDistance: 0.1
-  _maxVertexDistance: 10
-  _maxAngle: 3
-  _autoDestruct: 0
-  subdivisions: 4
-  _base: {fileID: 7830985211014382532}
-  _tip: {fileID: 268918968196065016}
 --- !u!114 &794857245962018783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,26 +161,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 6074824665655175326}
---- !u!114 &5023922883815564929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6322378502437355212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efa24d988ff003c49aa9b3a093f08cab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawner: {fileID: 268918968196065016}
-  animator: {fileID: 7535063657215179178}
-  onDamaged: []
-  onKilled: []
-  animatorStateStartedTrigger: 
-  animatorStateExitTimeTrigger: 
-  animatorStateCompletedTrigger: 
-  trail: {fileID: 7849039679999465125}
 --- !u!95 &7535063657215179178
 Animator:
   serializedVersion: 7
@@ -230,6 +183,24 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &202728140969831318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322378502437355212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9606e5e840853c24fab8120340d92edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawner: {fileID: 268918968196065016}
+  animator: {fileID: 7535063657215179178}
+  onDamaged: []
+  onKilled: []
+  animatorStateStartedTrigger: 
+  animatorStateExitTimeTrigger: 
 --- !u!1 &7537295427116061958
 GameObject:
   m_ObjectHideFlags: 0

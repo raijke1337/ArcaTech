@@ -81,6 +81,7 @@ namespace Arcatech.Interactions
 
         public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
+            if (!wasSuccessful) return false;
             if (type == UnitActionType.Use && CanDoUnitCommand(type, out _))
             {
                 InteractionContext.UpdateInteractionResult(_aim.DoInteraction(this));

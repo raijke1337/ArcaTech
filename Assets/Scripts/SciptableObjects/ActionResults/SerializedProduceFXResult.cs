@@ -1,4 +1,7 @@
-﻿using CartoonFX;
+﻿using Arcatech.Effects;
+using Arcatech.EventBus;
+using Arcatech.Managers;
+using CartoonFX;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -30,38 +33,21 @@ namespace Arcatech.Actions
 
     public class ProduceFXResult : ActionResult
     {
-        CFXR_Effect[] _effs;
-        bool parent;
+        ParticlesEvent _event;
+        private bool _p;
         public ProduceFXResult(CFXR_Effect[] effs, bool p)
         {
-            _effs = effs;
-            parent = p;
+            _event = new  ParticlesEvent(effs);
+            _p = p;
         }
 
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
+            Quaternion placeRot)
         {
-            if (parent)
-            {
-                Transform par = null;
-
-                if (target != null) par = target.transform;
-                else par = place; 
-                foreach (var effect in _effs)
-                {
-                    GameObject.Instantiate(effect, place.position, place.rotation, par);
-                }
-            }
-            else
-            {
-                foreach (var effect in _effs)
-                {
-                    GameObject.Instantiate(effect, place.position, place.rotation);
-                }
-            }
-            return _effs.Length > 0;
+            if (_p && !_event.Parent) _event.Parent = user.EffectSpawn.transform;
+            _event.Place = place;
+            EventBus<ParticlesEvent>.Raise(_event);
+            return true;
         }
     }
-
-
-
 }

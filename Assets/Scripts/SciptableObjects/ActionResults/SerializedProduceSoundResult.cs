@@ -27,11 +27,12 @@ namespace Arcatech.Actions
             this.pitch = pitch;
         }
 
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Transform place)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
+            Quaternion placeRot)
         {
             foreach (var s in sounds)
             {
-                EventBus<SoundClipRequest>.Raise(new SoundClipRequest(s,pitch,place.position));
+                EventBus<SoundClipRequest>.Raise(new SoundClipRequest(s,pitch,place));
             }
             return true;
         }
