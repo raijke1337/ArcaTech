@@ -16,8 +16,8 @@ namespace Arcatech.Usables
         public SharedUsablesSettings settings;
         
         [SerializeField] public SerializedStateTransition useStateTransition;
-        
-        [Header("Hit producer")]
+
+        [Header("Hit producer")] 
         public SerializedHitProducer hitProducer;
         
         [Header("Apply effects of hits")]

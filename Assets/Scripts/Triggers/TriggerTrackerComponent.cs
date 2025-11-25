@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using KBCore.Refs;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Arcatech.Triggers
@@ -11,6 +12,7 @@ namespace Arcatech.Triggers
     public class TriggerTrackerComponent : ValidatedMonoBehaviour, ITriggerNotificationProvider
     {
         [SerializeField, Self] Collider _collider;
+
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -27,6 +29,7 @@ namespace Arcatech.Triggers
             var r = GetComponentsInChildren<ITriggerNotificationReceiver>();
             foreach (var r2 in r) RegisterReceiver(r2);
         }
+        
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)
         {
@@ -40,6 +43,18 @@ namespace Arcatech.Triggers
         public void UnregisterReceiver(ITriggerNotificationReceiver receiver)
         {
             if (receivers.Contains(receiver)) toRemove.Add(receiver);
+        }
+
+        private int _index = 0;
+
+        public int LayerMaskIndex
+        {
+            get => _index;
+            set
+            {
+                _index = value;
+                _collider.includeLayers = _index;
+            }
         }
 
         private void CleanUpReceivers()
@@ -62,6 +77,8 @@ namespace Arcatech.Triggers
         protected void OnTriggerEnter(Collider other)
         {
             if (!Active || receivers == null || !receivers.Any()) return;
+
+            
             Debug.Log($"Hit {other.gameObject.name}");
             other.TryGetComponent<BaseGameEntityComponent>(out var component);
             

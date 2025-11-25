@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Arcatech.Usables
 {
-    [CreateAssetMenu(fileName = "New Usables Item", menuName = "Usables/Hit Applier/Single target")]
+    [CreateAssetMenu(fileName = "New single target hit applier", menuName = "Usables/Hit Applier/Single target")]
     public class SerializedSingleTargetEffectApplier : SerializedEffectApplier
     {
         public override IEffectApplier Deserialize()
@@ -20,9 +20,9 @@ namespace Arcatech.Usables
     {
         public void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
         {
-            if (!hit.Target) // "invalid" hit
+            if (!hit.IsValidHit) // "invalid" hit
             {
-                Debug.Log("Invalid hit");
+                Debug.Log("On Invalid Hit[]");
                 return;
             }
 

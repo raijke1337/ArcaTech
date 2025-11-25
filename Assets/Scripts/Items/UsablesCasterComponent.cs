@@ -2,6 +2,7 @@
 using Arcatech.Stats;
 using Arcatech.Units;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Usables;
@@ -137,16 +138,11 @@ namespace Arcatech.Items
                 _currentDrawItemStrategy = disp.DrawStrategy;
                 _redraw = true;
             }
-            
+            _currentUsable.StartUse();
             _stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
             return true;
         }
 
     }
 
-    public interface IStatesAnnounceReceiver
-    {
-        public void OnStateEnter();
-        public void OnStateExit();
-    }
 }

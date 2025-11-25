@@ -26,7 +26,6 @@ namespace Arcatech.Usables
             _maxCharges = config.settings.charges;
             _currentCharges = config.settings.charges;
             _chargeReloadTime = config.settings.chargeReload;
-            
             foreach (var r in config.effects)
             {
                 _results.Add(r.BuildActionResult());
@@ -54,7 +53,6 @@ namespace Arcatech.Usables
         private float _reloadTimer;
         private int _currentCharges;
         
-        
         public bool UsableIsReady()
         {
             return _currentCharges > 0;
@@ -75,14 +73,16 @@ namespace Arcatech.Usables
                 }
             }
         }
+
+        private bool _active = false;
         public void StartUse()
         {
+            Debug.Log($"Starting use {this.Description.Title}");
             _hitProducer.Initialize();
         }
         
         public void StopUse()
         {
-            _hitProducer.Cleanup();
         }
         
         

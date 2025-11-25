@@ -7,6 +7,9 @@ using UnityEngine.Events;
 
 namespace Arcatech.Usables
 {
+    /// <summary>
+    /// delivery 
+    /// </summary>
     public interface IHitProducer : ITriggerNotificationReceiver
     {
         void Initialize();

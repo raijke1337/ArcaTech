@@ -17,6 +17,8 @@ namespace Arcatech
             Position = hitPosition;
             Timestamp = time;
         }
+
+        public bool IsValidHit => Target;
         public ITriggerNotificationProvider Source { get; }
         public BaseGameEntityComponent Target { get; } // The hit target (can be null for environmental effects)
         public Vector3 Position { get; } // Where the hit occurred
