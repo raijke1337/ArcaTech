@@ -16,7 +16,7 @@ namespace Arcatech.Usables
         }
     }
 
-    public class AoeTargetEffectApplier : IEffectApplier
+    public class AoeTargetEffectApplier : EffectApplier
     {
         private readonly float _radius;
         private readonly Collider[] _hits;
@@ -27,17 +27,14 @@ namespace Arcatech.Usables
             _hits = new  Collider[cfg.maxHits];
             _targetLayer = cfg.targetLayer;
         }
-        public void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
+
+
+        protected override void DoApplyLogic(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
         {
-            
-            if (!hit.IsValidHit) // "invalid" hit
-            {
-                Debug.Log("On Invalid Hit[]");
-            }
-            
             if (Physics.OverlapSphereNonAlloc(hit.Position, _radius, _hits, _targetLayer) ==0 ) return;
             foreach (var h in _hits)
             {
+                if (!h) continue;
                 if (!h.TryGetComponent<BaseGameEntityComponent>(out var unit)) continue;
                 foreach (var effect in effects)
                 {

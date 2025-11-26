@@ -13,6 +13,7 @@ namespace Arcatech.Items.Projectiles
     {
         public bool IsExpired { get;protected set; }
         public abstract void UpdatePosition(float delta, Transform projectileTransform);
+        public abstract void NotifyCollision(Collider collider);
         public abstract void Reset();
     }
 }

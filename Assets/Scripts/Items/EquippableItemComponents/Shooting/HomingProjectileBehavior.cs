@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Arcatech.Items.Projectiles
 {
-    [CreateAssetMenu(fileName = "New Homing Projectile Behavior", menuName = "Projectiles/Projectile/Behavior/Homing")]
+    [CreateAssetMenu(fileName = "New Homing Projectile Behavior", menuName = "Projectiles/Behavior/Homing")]
     public class SerializedHomingProjectileBehavior : SerializedBasicProjectileBehavior
     {
         public float maxAngleAdjust = 15f;

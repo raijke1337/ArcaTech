@@ -74,11 +74,17 @@ namespace Arcatech.Usables
             }
         }
 
+        public void Notify(StateMachineNotifyType notifyType)
+        {
+            Debug.Log($"notifyType: {notifyType}");
+        }
+
         private bool _active = false;
         public void StartUse()
         {
             Debug.Log($"Starting use {this.Description.Title}");
             _hitProducer.Initialize();
+            _effectApplier.Rearm();
         }
         
         public void StopUse()

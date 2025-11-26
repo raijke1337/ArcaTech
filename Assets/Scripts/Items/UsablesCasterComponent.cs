@@ -19,7 +19,7 @@ namespace Arcatech.Items
     /// </summary>
     [RequireComponent(typeof(EntityStateMachineComponent),typeof(UnitInputsComponent))]
     public class UsablesCasterComponent : ValidatedMonoBehaviour, IUnitCommandPerformer, IUnitInventoryView,IUnitCommandValidator
-        , IDrawItemsStrategyProvider
+        , IDrawItemsStrategyProvider, IStateMachineNotificationReceiver
     {
 
         public event UnityAction ViewChangedInventory;
@@ -143,6 +143,10 @@ namespace Arcatech.Items
             return true;
         }
 
+        public void StateMachineNotification(StateMachineNotifyType notifyType)
+        {
+            _currentUsable.Notify(notifyType);
+        }
     }
 
 }

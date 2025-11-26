@@ -16,16 +16,10 @@ namespace Arcatech.Usables
     
     
 
-    public class SingleTargetEffectApplier : IEffectApplier
+    public class SingleTargetEffectApplier : EffectApplier
     {
-        public void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
+        protected override void DoApplyLogic(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
         {
-            if (!hit.IsValidHit) // "invalid" hit
-            {
-                Debug.Log("On Invalid Hit[]");
-                return;
-            }
-
             foreach (var effect in effects)
             {
                 effect.ProduceResult(user, hit.Target, hit.Position,hit.Target.transform.rotation);

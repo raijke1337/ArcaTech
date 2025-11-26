@@ -27,7 +27,6 @@ namespace Arcatech.Units
                 conditions,Priority,
                 overrideMinTime);
         }
-        
     }
     
     public class StateTransition

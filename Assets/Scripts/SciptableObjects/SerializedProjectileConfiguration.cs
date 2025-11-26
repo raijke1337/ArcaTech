@@ -27,17 +27,9 @@ namespace Arcatech.Items.Projectiles
     [Serializable]
     public struct ShootingConfig
     {
-        public ShootingConfig(int shots, float spread, float delay, float shotDelay)
-        {
-            Shots = shots;
-            Spread = spread;
-            BetweenShotsDelay = delay;
-            ShotDelay = shotDelay;
-        }
-
-        public int Shots { get; }
-        public float Spread { get; }
-        public float BetweenShotsDelay { get; }
-        public float ShotDelay { get; }
+        public int Shots;
+        public float Spread;
+        public float BetweenShotsDelay;
+        public float ShotDelay;
     }
 }

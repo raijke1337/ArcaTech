@@ -10,10 +10,10 @@ namespace Arcatech
         IUsable : ICosted, IIconContent,IAffectsItemDisplay
     {
         public bool UsableIsReady();
-        public void StartUse();
         public StateTransition GetStateTransition { get; }
         void DoUpdate(float delta);
-        public void StopUse();
+        void Notify(StateMachineNotifyType notifyType);
+        void StartUse();
     }
 
    

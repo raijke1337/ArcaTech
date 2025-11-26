@@ -6,22 +6,28 @@ using Arcatech.Units;
 using System.Linq;
 using KBCore.Refs;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcatech.Items.Projectiles
 {
     [RequireComponent(typeof(TriggerTrackerComponent), typeof(BaseGameEntityComponent))]
-    public class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver
+    public class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver,ITriggerNotificationProvider
     {
 
-        [SerializeField, Self] private BaseGameEntityComponent entity;
+        #region projectilEvents
+        public event UnityAction<ProjectileComponent> ProjectileExpiredEvent = delegate { };
+       
         
-        [HideInInspector] public int RemainingHits;
-        [HideInInspector] public float Lifetime;
-        [HideInInspector] public float Speed;
+        #endregion
+        
+        [SerializeField, Self] private BaseGameEntityComponent entity;
+        public BaseGameEntityComponent Entity => entity;
+        
         
         TriggerTrackerComponent col;
-
         ProjectileBehavior _behavior;
+        
+        ITriggerNotificationReceiver _receiver;
         
         private void Start()
         {
@@ -33,45 +39,25 @@ namespace Arcatech.Items.Projectiles
         {
             _behavior = behavior.Deserialize();
         }
-        
-        private void OnDestroy()
-        {
-            col.UnregisterReceiver(this);
-        }
 
-        private void OnCollisionEnter(Collision other)
-        {
-            if (other.gameObject.isStatic)
-            {
-                Debug.Log("Collision Enter static item, should destroy");
-                RemainingHits = 0;
-            }
-        }
-
-        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
-        {
-
-        }
-
-        public void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
-        {
-            //NOOP
-        }
-        
+        public void TriggerEntered(TriggerHitInfo triggerHitInfo) => _receiver?.TriggerEntered(triggerHitInfo);
+        public void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger) => _receiver?.TriggerExited(exitComponent, trigger);
         protected virtual void Update()
         {
             if (Paused) return;
 
             _behavior.UpdatePosition(Time.deltaTime,transform);
-            if (_behavior.IsExpired) Expiry();
+            if (_behavior.IsExpired) ProjectileExpiredEvent.Invoke(this);
         }
-
-        private void Expiry()
-        {
-            
-        }
-        
         public bool Paused { get; set; } = false;
 
+        public void Reset()
+        {
+            _behavior.Reset();
+        }
+        public bool Active { get; set; }
+        public void RegisterReceiver(ITriggerNotificationReceiver receiver)=> _receiver = receiver;
+        public void UnregisterReceiver(ITriggerNotificationReceiver receiver) => _receiver = null;
+        public int LayerMaskIndex { get; set; }
     }
 }

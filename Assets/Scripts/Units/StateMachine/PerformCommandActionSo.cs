@@ -7,8 +7,7 @@ using UnityEngine;
 
 namespace Arcatech.Units
 {
-
-    [CreateAssetMenu(menuName = "States/Actions/PerformCommand")]
+    [CreateAssetMenu(menuName = "States/Actions/SendCommandToHandlers")]
     public class PerformCommandActionSo : SerializedActionResult
     {
         UnitActionType actionType;
