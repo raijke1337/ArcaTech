@@ -16,16 +16,17 @@ namespace Arcatech.Triggers
         protected override void OnValidate()
         {
             base.OnValidate();
-            _collider.includeLayers = LayerMask.GetMask("Entities");
+          //  _collider.includeLayers = -1;
+            
         }
+        
         private List<ITriggerNotificationReceiver> receivers;
-
-
         public bool Active { get; set; } = true;
         
         private void OnEnable()
         { 
             _collider.isTrigger = true;
+            _collider.includeLayers = LayerMask.GetMask("Entities");
             var r = GetComponentsInChildren<ITriggerNotificationReceiver>();
             foreach (var r2 in r) RegisterReceiver(r2);
         }
@@ -45,18 +46,6 @@ namespace Arcatech.Triggers
             if (receivers.Contains(receiver)) toRemove.Add(receiver);
         }
 
-        private int _index = 0;
-
-        public int LayerMaskIndex
-        {
-            get => _index;
-            set
-            {
-                _index = value;
-                _collider.includeLayers = _index;
-            }
-        }
-
         private void CleanUpReceivers()
         {
             if (toRemove.Count <= 0) return;
@@ -64,22 +53,13 @@ namespace Arcatech.Triggers
             receivers = receivers.Except(toRemove).ToList();
             toRemove.Clear();
         }
-
-        public void RecheckCollisions() => StartCoroutine(ColliderRefresh());
-
-        private IEnumerator ColliderRefresh()
-        {
-            _collider.enabled = false;
-            yield return new WaitForEndOfFrame();
-            _collider.enabled = true;
-        }
         
         protected void OnTriggerEnter(Collider other)
         {
             if (!Active || receivers == null || !receivers.Any()) return;
-
             
-            Debug.Log($"Hit {other.gameObject.name}");
+            Debug.Log($"{gameObject.name} hit {other.gameObject.name} on layer {other.gameObject.layer}");
+            
             other.TryGetComponent<BaseGameEntityComponent>(out var component);
             
             foreach (var receiver in receivers)

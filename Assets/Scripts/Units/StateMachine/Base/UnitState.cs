@@ -56,13 +56,16 @@ namespace Arcatech.Units
         /// <summary>
         /// until this time is reached, state will not exit (no transition is valid)
         /// </summary>
-        private float _minTimeInState;
-        
+        private float _minNormalizedTimeInState;
+
+        private float _currentNormalizedTime;
+        public float NormalizedTime => _currentNormalizedTime;
+        private Animator _animator;
         public UnitState(
             string name,
             int animatorHash = 0,
             float crossfadeTime = 0.1f,
-            float minTime = 0f,
+            float minNormalizedTime = 0f,
             int animatorLayer = 0,
             bool allowsMove = true,
             bool allowsAim = true,
@@ -107,7 +110,7 @@ namespace Arcatech.Units
                 }
             }
 
-            _minTimeInState = minTime;
+            _minNormalizedTimeInState = minNormalizedTime;
             _stateTimer = new StopwatchTimer();
         }
 
@@ -120,7 +123,7 @@ namespace Arcatech.Units
         {
             _stateTimer.Reset();
             _stateTimer.Start();
-
+            _animator =  animator;
 
             // Apply animator crossfade if an animation name/hash was provided
             if (animator != null && _animatorHash != 0)
@@ -153,6 +156,17 @@ namespace Arcatech.Units
         public void UpdateState(float delta)
         {
             _stateTimer?.Tick(delta);
+
+            if (!_animator) return;
+            
+            var info = _animator.GetCurrentAnimatorStateInfo(_animatorLayer);
+            // If we're actually in the intended animator state, use normalizedTime
+            if (info.shortNameHash == _animatorHash) // if you store AnimatorStateHash
+            {
+                // normalizedTime can grow > 1.0 for looping states; we use fraction
+                
+                _currentNormalizedTime = info.normalizedTime % 1.0f;
+            }
         }
 
 
@@ -167,14 +181,14 @@ namespace Arcatech.Units
         public bool CanExitState(Animator animator)
         {
             // No minimum -> can exit immediately
-            if (_minTimeInState <= 0f) return true;
+            if (_minNormalizedTimeInState <= 0f) return true;
 
             // If animator is not available, *fallback* to TimeInState comparing against
             // MinimumTimeInStateNormalized interpreted as seconds fallback (documented caveat)
             if (animator == null)
             {
                 // Fallback heuristic: treat MinimumTimeInStateNormalized as seconds if animator missing.
-                return TimeInState >= _minTimeInState;
+                return TimeInState >= _minNormalizedTimeInState;
             }
 
             // Get the current animator state info for this state's layer/hash if available
@@ -187,7 +201,7 @@ namespace Arcatech.Units
             {
                 // normalizedTime can grow > 1.0 for looping states; we use fraction
                 float normalized = info.normalizedTime % 1.0f;
-                return normalized >= _minTimeInState;
+                return normalized >= _minNormalizedTimeInState;
             }
 
             // If animator is not in the state's expected animator state, treat it as passed

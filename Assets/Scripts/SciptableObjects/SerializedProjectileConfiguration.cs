@@ -11,14 +11,14 @@ namespace Arcatech.Items.Projectiles
         [SerializeField] SerializedProjectileBehavior projectileBehavior;
 
 
-        public ProjectileComponent ProduceProjectile (BaseGameEntityComponent owner, Vector3 pos, Quaternion rot,  float spread = 0f)
+        public ProjectileComponent ProduceProjectile (BaseGameEntityComponent owner,int maxHits, Vector3 pos, Quaternion rot,  float spread = 0f)
         {
             ProjectileComponent proj = Instantiate(projectilePrefab, pos, rot);
             Vector3 dir = owner.transform.forward + new Vector3(UnityEngine.Random.Range(-spread, spread), UnityEngine.Random.Range(-spread, spread), UnityEngine.Random.Range(-spread, spread));
 
             proj.transform.forward = dir;
             
-            proj.Setup(owner,projectileBehavior);
+            proj.Setup(owner,projectileBehavior,maxHits);
             
             return proj;
         }

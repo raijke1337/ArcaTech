@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Arcatech.Actions;
 using Arcatech.Items;
 using Arcatech.Skills;
@@ -32,12 +33,7 @@ namespace Arcatech.Usables
             }
             _hitProducer.Hit += HitProducerOnHit;
         }
-
-        private void HitProducerOnHit(TriggerHitInfo hit)
-        {
-            if (hit.Target == _owner) return;
-            _effectApplier.ApplyEffects(_owner,hit,_results,_equipment.EffectSpawn.transform.position);
-        }
+        
 
         private readonly BaseGameEntityComponent _owner;
         private readonly EquipmentComponent _equipment;
@@ -52,11 +48,13 @@ namespace Arcatech.Usables
         private readonly float _chargeReloadTime;
         private float _reloadTimer;
         private int _currentCharges;
-        
+        public float FillValue => _reloadTimer /  _chargeReloadTime;
+        public string IconNumber => _currentCharges.ToString();
         public bool UsableIsReady()
         {
             return _currentCharges > 0;
         }
+
         public void DoUpdate(float delta)
         {
             if (_currentCharges < _maxCharges)
@@ -68,33 +66,30 @@ namespace Arcatech.Usables
 
                 if (_reloadTimer <= 0)
                 {
-                    _currentCharges = Mathf.Clamp(_currentCharges ++, 0, _maxCharges);
+                    _currentCharges++;
+                    _currentCharges = Mathf.Clamp(_currentCharges, 0, _maxCharges);
                     _reloadTimer = _chargeReloadTime;
+                   // Debug.Log($"Charges: {_currentCharges}/{_maxCharges}");
                 }
             }
         }
 
         public void Notify(StateMachineNotifyType notifyType)
         {
-            Debug.Log($"notifyType: {notifyType}");
+            if (_owner.ShowingDebugs) Debug.Log($"{notifyType} in {_hitProducer}");
+            if (notifyType == StateMachineNotifyType.Use)
+            {
+                _currentCharges--;
+            }
+            _hitProducer.OnChangeState(notifyType);
+        }
+        
+        private void HitProducerOnHit(TriggerHitInfo hit)
+        {
+            _effectApplier.ApplyEffects(_owner,hit,_results,_equipment.EffectSpawn.transform.position);
         }
 
-        private bool _active = false;
-        public void StartUse()
-        {
-            Debug.Log($"Starting use {this.Description.Title}");
-            _hitProducer.Initialize();
-            _effectApplier.Rearm();
-        }
-        
-        public void StopUse()
-        {
-        }
-        
-        
         public Description Description { get; }
-        public float FillValue => _reloadTimer /  _chargeReloadTime;
-        public string IconNumber => _currentCharges.ToString();
         public IDrawItemStrategy DrawStrategy { get; }
     }
 }

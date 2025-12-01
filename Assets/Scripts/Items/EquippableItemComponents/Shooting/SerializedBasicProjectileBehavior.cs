@@ -8,28 +8,31 @@ namespace Arcatech.Items.Projectiles
     public class SerializedBasicProjectileBehavior : SerializedProjectileBehavior
     {
         public BaseProjectileSettings baseProjectileSettings;
-        public override ProjectileBehavior Deserialize()
+
+        public override ProjectileBehavior Deserialize(BaseGameEntityComponent owner)
         {
-            return new BaseProjectileBehavior(baseProjectileSettings);
+            return new BaseProjectileBehavior(baseProjectileSettings,owner);
         }
     }
 
     public class BaseProjectileBehavior : ProjectileBehavior
     {
-        readonly BaseProjectileSettings _settings;
+        protected readonly BaseProjectileSettings _settings;
+        protected float _distanceTraveled;
+        protected Vector3 _startPosition;
+        protected bool init = false;
+        
 
-        private float _distanceTraveled;
-        private Vector3 _startPosition;
-        bool init = false;
-
-        public BaseProjectileBehavior(BaseProjectileSettings settings)
+        public BaseProjectileBehavior(BaseProjectileSettings settings,  BaseGameEntityComponent owner)
         {
             _settings = settings;
+            Owner = owner;
         }
 
-        public override void NotifyCollision(Collider collider)
+        public override void NotifyCollision(TriggerHitInfo hit)
         {
-            //
+            // regular projectile does nothing
+            // it is killed externally
         }
         public override void UpdatePosition(float delta, Transform projectileTransform)
         {
@@ -50,7 +53,7 @@ namespace Arcatech.Items.Projectiles
             // Check if projectile has exceeded max flight distance
             if (_distanceTraveled >= _settings.maxFlightDistance)
             {
-                IsExpired = true;
+                BehaviorCompleted = true;
             }
         }
 
@@ -59,7 +62,7 @@ namespace Arcatech.Items.Projectiles
             _distanceTraveled = 0f;
             _startPosition = Vector3.zero;
             init = false;
-            IsExpired = false;
+            BehaviorCompleted = false;
         }
     }
 

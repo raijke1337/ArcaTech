@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using Arcatech.Units;
 using CartoonFX;
+using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Stats
 {
-    public class DamageDrawerComponent : MonoBehaviour, IEffectsTakerComponent
+    [RequireComponent(typeof(BaseGameEntityComponent))]
+    public class DamageDrawerComponent : ValidatedMonoBehaviour, IEffectsTakerComponent
     {
+
+        [SerializeField, Self] private BaseGameEntityComponent entity;
         [SerializeField] private CFXR_ParticleText textPrefab;
         [SerializeField] private int poolSize = 10; // Initial size of the object pool
         [SerializeField] private float damageOffsetMagnitude = 0.75f; // How far damage numbers can randomly spread
@@ -39,7 +43,6 @@ namespace Arcatech.Stats
         private CFXR_ParticleText CreateNewPooledText()
         {
             CFXR_ParticleText newInstance = Instantiate(textPrefab, transform);
-            newInstance.transform.LookAt(Camera.main.transform);
             newInstance.isDynamic = true;
             newInstance.gameObject.SetActive(false); // Start inactive
             textPool.Enqueue(newInstance);
@@ -185,7 +188,10 @@ namespace Arcatech.Stats
                 Random.Range(0f, damageOffsetMagnitude * 2f), // Slightly more upwards bias
                 0f
             );
-            instance.transform.position = transform.position + randomOffset;
+            instance.transform.position = entity.EffectSpawn.position + randomOffset;
+
+            Vector3 directionToCamera = (mainCamera.transform.position - instance.transform.position).normalized;
+            instance.transform.position += directionToCamera; // Adjust 0.1f as needed
 
             ParticleSystem particles = instance.GetComponent<ParticleSystem>();
             if (particles != null)

@@ -32,13 +32,8 @@ namespace Arcatech
                     return false;
                 }
             }
-            var ok = stateMachine.TryCommandTransition(type);
-            
-            foreach (var v in _commandPerformers)
-            {
-                v.DoUnitCommand(type, ok);
-            }
-            
+            var ok = stateMachine.TryCommandTransition(type,_commandPerformers);
+
             return ok;
         }
 

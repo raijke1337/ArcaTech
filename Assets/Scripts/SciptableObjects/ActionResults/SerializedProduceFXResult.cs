@@ -18,13 +18,7 @@ namespace Arcatech.Actions
         {
             return new ProduceFXResult(Effects, ParentParticles);
         }
-
-        private void OnValidate()
-        {
-            Assert.IsNotNull(Effects);
-            Assert.IsTrue(Effects.Length > 0);
-        }
-
+        
         public override string ToString()
         {
             return $"produce particles result total {Effects.Length}";

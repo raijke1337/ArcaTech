@@ -27,7 +27,10 @@ namespace Arcatech.Managers
                 maxPerPrefab[entry.prefab] = entry.max > 0 ? entry.max : int.MaxValue;
 
                 for (int j = 0; j < entry.initial; j++)
-                    CreateInstance(entry.prefab);
+                {
+                 var ins =   CreateInstance(entry.prefab);
+
+                }
             }
         }
         
@@ -117,14 +120,15 @@ namespace Arcatech.Managers
         
         PooledEffect CreateInstance(CFXR_Effect prefab)
         {
-            var go = Instantiate(prefab.gameObject, transform);
+            var go = Instantiate(prefab, transform);
             go.name = $"{prefab.name} (Pooled)";
+            go.clearBehavior = CFXR_Effect.ClearBehavior.None;
             var pooled = go.GetComponent<PooledEffect>();
-            if (pooled == null) pooled = go.AddComponent<PooledEffect>();
+            if (pooled == null) pooled = go.gameObject.AddComponent<PooledEffect>();
 
             pooled.owner = this;
             pooled.prefabKey = prefab;
-            go.SetActive(false);
+            go.gameObject.SetActive(false);
             return pooled;
         }
 
@@ -132,21 +136,16 @@ namespace Arcatech.Managers
         
         
         private EventBinding<SoundClipRequest> _playSoundEventBind;
-       // private EventBinding<ProjectilePlaceEvent> _projectilePlaceEventBind;
-// depreciated
+
         private void Start()
         {
 
             InitSoundPool();
 
             _placeParticleEventBind = new EventBinding<ParticlesEvent>(HandleEvent);
-            //_playSoundEventBind = new EventBinding<SoundClipRequest>(CreateSound);
-         //   _projectilePlaceEventBind = new EventBinding<ProjectilePlaceEvent>(PlaceProjectile);
 
 
             EventBus<ParticlesEvent>.Register(_placeParticleEventBind);
-          //  EventBus<SoundClipRequest>.Register(_playSoundEventBind);
-         //   EventBus<ProjectilePlaceEvent>.Register(_projectilePlaceEventBind);
          
 
         }
@@ -155,7 +154,6 @@ namespace Arcatech.Managers
             StopAllCoroutines();
             EventBus<ParticlesEvent>.Deregister(_placeParticleEventBind);
             EventBus<SoundClipRequest>.Deregister(_playSoundEventBind);
-          //  EventBus<ProjectilePlaceEvent>.Deregister(_projectilePlaceEventBind);
         }
 
 

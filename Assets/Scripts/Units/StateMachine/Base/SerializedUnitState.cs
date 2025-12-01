@@ -18,6 +18,7 @@ namespace Arcatech.Units
 
         public int animatorLayer = 0;
         public float crossfadeTime = 0.1f;
+        [Header("State will not exit unless the time has passed or the transition overrides this")]
         [Range(0,1)]public float minTimeInStateNormalized = 0f;
 
         [Header("Gameplay locks")] public bool allowsMovement = true;
@@ -54,7 +55,7 @@ namespace Arcatech.Units
                 animatorHash: animHash,
                 crossfadeTime: crossfadeTime,
                 animatorLayer: animatorLayer,
-                minTime: minTimeInStateNormalized,
+                minNormalizedTime: minTimeInStateNormalized,
                 isRootMotionState:rootMotionEnabled,
                 allowsMove: allowsMovement,
                 allowsAim: allowsAiming,

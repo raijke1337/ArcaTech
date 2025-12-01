@@ -1,5 +1,6 @@
 ﻿using System;
 using Arcatech.Actions;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Arcatech.Units
@@ -13,11 +14,12 @@ namespace Arcatech.Units
         public SerializedActionResult[] onTransition = new SerializedActionResult[0];
         
 
-        [Tooltip("If true, require the source state's animation to reach this normalized time (0..1) before allowing the transition.")]
+        [Header("The transition will not be valid unless this time has passed in source state")]
         [Range(0f, 1f)]
         public float minTimeInSourceStateNormalized = 1f;
-
+        [Header("Override source state's minimum required time")]
         public bool overrideMinTime = false;
+
 
         public StateTransition Build()
         {
@@ -78,6 +80,7 @@ namespace Arcatech.Units
                 {
                     result += $"{c.ConditionName} \n";
                 }
+                result += $"Required normalized time in source state was: {ExitNormalizedTime}. Override: {CanOverrideMinimumStateTime}";
                 return result;
             }
         }

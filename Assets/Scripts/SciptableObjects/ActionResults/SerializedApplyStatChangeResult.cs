@@ -69,7 +69,8 @@ namespace Arcatech.Actions
                     finalTarget = target;
                     return true;
             }
-            return false;
+
+            return finalTarget;
         }
 
         public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,

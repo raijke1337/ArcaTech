@@ -46,8 +46,9 @@ namespace Arcatech.Triggers
                 reapplyTimer.Tick(Time.deltaTime);
                 if (!reapplyTimer.IsRunning)
                 {
-                    triggerTracker.RecheckCollisions();
+                    triggerTracker.Active = false;
                     reapplyTimer.Start();
+                    triggerTracker.Active =  true;
                 }
             }
         }

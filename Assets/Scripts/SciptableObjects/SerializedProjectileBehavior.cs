@@ -3,17 +3,19 @@
 namespace Arcatech.Items.Projectiles
 {
     public abstract class SerializedProjectileBehavior : ScriptableObject
-    {
-        // placeholder
-        // homing, direct, bounc, boomerang.... whatever.
-        public abstract ProjectileBehavior Deserialize();
+    { 
+        public abstract ProjectileBehavior Deserialize(BaseGameEntityComponent owner);
     }
     
     public abstract class ProjectileBehavior
     {
-        public bool IsExpired { get;protected set; }
+        protected BaseGameEntityComponent Owner;
+        public bool BehaviorCompleted { get;protected set; }
         public abstract void UpdatePosition(float delta, Transform projectileTransform);
-        public abstract void NotifyCollision(Collider collider);
+        public abstract void NotifyCollision(TriggerHitInfo hit);
         public abstract void Reset();
     }
+    
+    
+    
 }

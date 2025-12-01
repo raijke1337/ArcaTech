@@ -22,16 +22,12 @@ namespace Arcatech.Items
             throw new NotImplementedException();
         }
 
-        public void Initialize()
+        public void OnChangeState(StateMachineNotifyType info)
         {
             throw new NotImplementedException();
         }
 
         public event UnityAction<TriggerHitInfo> Hit;
-        public void Cleanup()
-        {
-            throw new NotImplementedException();
-        }
     }
     
     

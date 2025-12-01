@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
 using Arcatech.Triggers;
+using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,74 +12,61 @@ namespace Arcatech.Usables
     [CreateAssetMenu(fileName = "New Instant Hit Producer", menuName = "Usables/Hit Producer/Instant")]
     public class SerializedInstantHitProducer : SerializedHitProducer
     {
-        [Header("Activate once, then turn off")]
-        
-        public bool activateOnSelfHit = false;
-        public LayerMask layerMask;
         public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
         {
-            return new InstantHitProducer(this, owner, item,activateOnSelfHit);
+            return new InstantHitProducer(owner, item,this);
         }
     }
     
-        public class InstantHitProducer : IHitProducer
+        public class InstantHitProducer : HitProducer
         {
-            private bool _onSelfHitActivates;
-            private BaseGameEntityComponent _owner;
-            private int _layerMask;
-        
-        private ITriggerNotificationProvider provider; // From item (e.g., EquipmentComponent's hitbox)
-
-        public InstantHitProducer(SerializedInstantHitProducer cfg, BaseGameEntityComponent owner, EquipmentComponent item,bool onSelf)
-        {
-            // Find or create a provider on the item (e.g., attach TriggerTrackerComponent to EquipmentComponent if not present)
+            private ITriggerNotificationProvider provider; // From item (e.g., EquipmentComponent's hitbox)
+          
+            public InstantHitProducer(BaseGameEntityComponent owner, EquipmentComponent item, SerializedHitProducer cfg) : base(owner,item,cfg)
+            {
+            
             provider = item
-                .GetComponent<ITriggerNotificationProvider>(); // Assume pre-attached for melee; create if needed
+                .GetComponent<ITriggerNotificationProvider>(); // Assume pre-attached for melee;
             if (provider == null)
             {
                 // Fallback: Add/reuse a component as provider
                 var tracker =
                     item.gameObject
                         .AddComponent<
-                            TriggerTrackerComponent>(); // Your TriggerTrackerComponent implementing ITriggerNotificationProvider
-                tracker.RecheckCollisions(); // Optional: Force recheck
+                            TriggerTrackerComponent>(); 
+
                 provider = tracker;
             }
-            _onSelfHitActivates = onSelf;
-            _owner = owner;
-            _layerMask = cfg.layerMask;
-            provider.LayerMaskIndex = _layerMask;
-            
             provider.Active = false;
             provider.RegisterReceiver(this);
         }
-        
-        public void Initialize()
+
+        public override void OnChangeState(StateMachineNotifyType info)
         {
-            Debug.Log("Initializing Instant Hit Producer");
-            provider.Active = true;
-        }
 
-        public event UnityAction<TriggerHitInfo> Hit;
-
-        public void Cleanup()
-        {
-            Debug.Log("Cleaning up Instant Hit Producer");
-            provider.Active = false;
-        }
-
-
-        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
-        {
-            if (triggerHitInfo.Target == _owner && !_onSelfHitActivates) return;
-            if (triggerHitInfo.IsValidHit)
+            base.OnChangeState(info);
+            switch (info)
             {
-                Cleanup();
+                case StateMachineNotifyType.NoNotify:
+                    provider.Active = false;
+                    break;
+                case StateMachineNotifyType.Starting:
+                    provider.Active = true;
+                    break;
+                case StateMachineNotifyType.Use:
+                    provider.Active = true;
+                    break;
+                case StateMachineNotifyType.EndUse:
+                    provider.Active = false;
+                    break;
+                case StateMachineNotifyType.Cancel:
+                    provider.Active = false;
+                    break;
             }
-            Hit?.Invoke(triggerHitInfo);
         }
 
-        public void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
+
+        public override void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
         {
         }
     }

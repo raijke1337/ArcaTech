@@ -42,9 +42,7 @@ namespace Arcatech
 
         [Space, Header("Rigidbody override"), SerializeField, Self]
         Rigidbody _rigidbody;
-
-        //[SerializeField] bool gravity = false;
-         [SerializeField] bool usePhysics = false;
+         [SerializeField] bool playerOverride = false;
 
 
         protected override void OnValidate()
@@ -60,10 +58,9 @@ namespace Arcatech
         private void OnEnable()
         {
             Collider = GetComponent<Collider>();
-         //   _rigidbody.useGravity = gravity;
-            _rigidbody.isKinematic = !usePhysics;
+            
+            _rigidbody.isKinematic = !playerOverride;
             _effectsTakerComponents = new List<IEffectsTakerComponent>(GetComponentsInChildren<IEffectsTakerComponent>());
-
         }
 
         

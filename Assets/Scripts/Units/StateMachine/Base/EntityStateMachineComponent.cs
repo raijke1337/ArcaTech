@@ -31,6 +31,7 @@ namespace Arcatech.Units
         readonly string _animatorParameterName = "TimeInState";
         int _animatorParameter;
 
+        private List <IStateMachineNotificationReceiver> _notificationReceivers;
 
         private List<StateTransition> _addedTransitions = new();
 
@@ -45,6 +46,8 @@ namespace Arcatech.Units
             _context.Aimers = GetComponentsInChildren<IAim>();
             _context.Movers = GetComponentsInChildren<IMove>();
             _context.Invulnerabiles = GetComponentsInChildren<IInvulnerability>();
+            _notificationReceivers =  new List<IStateMachineNotificationReceiver>(GetComponentsInChildren<IStateMachineNotificationReceiver>());
+            
             _context.Stats = GetComponentInChildren<EntityStatsComponent>();
             
             _currentState.EnterState(_context, animator);
@@ -65,12 +68,21 @@ namespace Arcatech.Units
             }
         }
 
-        public bool TryCommandTransition(UnitActionType actionType/*,
-            IEnumerable<IUnitCommandPerformer> commandPerformers*/)
+        public bool TryCommandTransition(UnitActionType actionType,
+            IEnumerable<IUnitCommandPerformer> commandPerformers)
         {
             if (Paused || Killed) return false;
+
             _context.PendingCommand = actionType;
-            return ValidateCommandTransition();
+            
+            bool validated = ValidateCommandTransition();
+            
+            foreach (var v in commandPerformers)
+            {
+                v.DoUnitCommand(actionType, validated);
+            }
+
+            return validated;
         }
    
         private bool TransitionsInUpdate()
@@ -97,14 +109,13 @@ namespace Arcatech.Units
         // New helper: try to run command performers (if provided), run OnTransition actions and commit.
         bool TryCommitTransition(StateTransition tr/*, IEnumerable<IUnitCommandPerformer> commandPerformers*/)
         {
-            if (tr == null || tr.NextState == null) return false;
+            if (tr?.NextState == null) return false;
             if (!ExecuteTransitionActions(tr))
             {
                 Debug.LogWarning($"Transition action failed, aborting transition from {_currentState}");
                 _context.ClearCommand();
                 return false;
             }
-
             CommitTransition(tr);
             return true;
         }
@@ -113,16 +124,18 @@ namespace Arcatech.Units
         void CommitTransition(StateTransition tr)
         {
             if (tr == null || tr.NextState == null) return;
-            _context.ClearCommand();
+
             
             _currentState.ExitState(_context, animator);
-         //   if (GetMainEntity.ShowingDebugs) Debug.Log("Exiting state "+_context.CurrentState);
+            if (GetMainEntity.ShowingDebugs) Debug.Log("Exiting state "+_context.CurrentState+" at normalized time "+_context.CurrentState.NormalizedTime);
             
             _currentState = tr.NextState;
             _context.CurrentState = _currentState;
             _currentState.EnterState(_context, animator);
-
-         //   if (GetMainEntity.ShowingDebugs) Debug.Log("Entering state "+_context.CurrentState);
+            
+            _context.ClearCommand();
+            
+            if (GetMainEntity.ShowingDebugs) Debug.Log("Entering state "+_context.CurrentState);
         }
 
         
@@ -142,6 +155,7 @@ namespace Arcatech.Units
         {
             if (_currentState == null)
             {
+                Debug.Log("Current State null");
                 _context.ClearCommand();
                 return false;
             }
@@ -152,6 +166,7 @@ namespace Arcatech.Units
             var chosen = PickBestTransition(out wasLocal);
             if (chosen == null || chosen.NextState == null)
             {
+                Debug.Log("No transition to pick");
                 _context.ClearCommand();
                 return false;
             }
@@ -252,7 +267,7 @@ namespace Arcatech.Units
 
             debug += "\n";
             debug += best.tr.DebugConditions;
-          //  if (GetMainEntity.ShowingDebugs) Debug.Log(debug);   
+            if (GetMainEntity.ShowingDebugs) Debug.Log(debug);   
             
             return best.tr;
         }

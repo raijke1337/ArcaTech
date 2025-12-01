@@ -134,18 +134,17 @@ namespace Arcatech.Items
         
             if (_usables[type] is IAffectsItemDisplay disp && disp.DrawStrategy != _currentDrawItemStrategy)
             {
-                Debug.Log("Set strategy");
+               
                 _currentDrawItemStrategy = disp.DrawStrategy;
                 _redraw = true;
             }
-            _currentUsable.StartUse();
             _stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
             return true;
         }
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)
         {
-            _currentUsable.Notify(notifyType);
+            _currentUsable?.Notify(notifyType);
         }
     }
 

@@ -47,6 +47,7 @@ namespace Arcatech.Units
 
         private void DrawItems(IDrawItemStrategy strat)
         {
+            if (strat == currentDrawStrategy) return; // this is probably  checked elsewhere but just in case
             currentDrawStrategy = strat;
             foreach (var e in inventoryModel.ListEquipped)
             {
@@ -57,6 +58,7 @@ namespace Arcatech.Units
                 }
                 else
                 {
+                    e.OnEquip();
                     e.SetItemParent(itemEmpties.ItemPositions[strat.GetPlaces[e.Slot]]);
                 }
             }

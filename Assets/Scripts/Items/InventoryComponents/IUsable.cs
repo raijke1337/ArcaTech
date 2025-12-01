@@ -13,7 +13,7 @@ namespace Arcatech
         public StateTransition GetStateTransition { get; }
         void DoUpdate(float delta);
         void Notify(StateMachineNotifyType notifyType);
-        void StartUse();
+
     }
 
    

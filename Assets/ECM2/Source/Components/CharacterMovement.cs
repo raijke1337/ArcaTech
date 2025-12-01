@@ -1811,7 +1811,8 @@ namespace ECM2
 
                         if (_rigidbody)
                         {
-                            _rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+                            _rigidbody.constraints = RigidbodyConstraints.FreezeRotationX |
+                                                     RigidbodyConstraints.FreezeRotationZ;
                         }
                         break;
                     }

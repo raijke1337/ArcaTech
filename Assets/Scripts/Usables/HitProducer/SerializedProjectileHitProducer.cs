@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Actions;
 using Arcatech.Items;
 using Arcatech.Items.Projectiles;
 using Arcatech.Triggers;
+using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Pool;
@@ -17,34 +19,33 @@ namespace Arcatech.Usables
     [CreateAssetMenu(fileName = "New Projectiles Hit Producer", menuName = "Usables/Hit Producer/Projectile")]
     public class SerializedProjectileHitProducer : SerializedHitProducer
     {
-        [SerializeField] private SerializedProjectileConfiguration projectile;
-        [SerializeField] private ShootingConfig projectileShootingConfig;
+        [SerializeField] public SerializedProjectileConfiguration projectile;
+        [SerializeField] public ShootingConfig projectileShootingConfig;
         [Min(0)] public int projectilePoolSize = 32;
-
         public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
         {
-            return new ProjectileHitProducer(owner, item,projectile,projectileShootingConfig,projectilePoolSize);
+            return new ProjectileHitProducer(owner, item,this);
         }
     }
 
-    public class ProjectileHitProducer : IHitProducer
+
+    public class ProjectileHitProducer : HitProducer
     {
         
         private SerializedProjectileConfiguration _projectile;
         private ShootingConfig _shooting;
-        private EquipmentComponent _item;
-        private BaseGameEntityComponent _owner;
         private Coroutine _shootingCor;
         
         private IObjectPool<ProjectileComponent> _projectilePool;
-        private List<ProjectileComponent> _activeProjectiles = new List<ProjectileComponent>();
+        /// <summary>
+        /// component, current hits
+        /// </summary>
+        private List<ProjectileComponent> _activeProjectiles = new();
         
-        public ProjectileHitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedProjectileConfiguration proj, ShootingConfig shooting, int size)
+        public ProjectileHitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedProjectileHitProducer config) : base(owner,item,config)
         {
-            _projectile = proj;
-            _shooting = shooting;
-            _owner = owner;
-            _item = item;
+            _projectile = config.projectile;
+            _shooting = config.projectileShootingConfig;
             
             _projectilePool = new ObjectPool<ProjectileComponent>(
                 createFunc: CreateProjectile,
@@ -52,28 +53,34 @@ namespace Arcatech.Usables
                 actionOnRelease: OnProjectileRelease,
                 actionOnDestroy: OnProjectileDestroy,
                 collectionCheck: true,
-                defaultCapacity: size,
-                maxSize: size * 2  // Allow pool to grow if needed
+                defaultCapacity: config.projectilePoolSize,
+                maxSize: config.projectilePoolSize * 2  // Allow pool to grow if needed
             );
         }
         private ProjectileComponent CreateProjectile()
         {
             // Create a new projectile instance
-            var projectile = _projectile.ProduceProjectile(_owner, Vector3.zero, Quaternion.identity);
+            var projectile = _projectile.ProduceProjectile(Owner, MaxHits, Vector3.zero, Quaternion.identity);
             return projectile;
         }
         private void OnProjectileGet(ProjectileComponent projectile)
         {
             // Reset projectile state when retrieved from pool
            // projectile.Entity.Killed = false;
-            projectile.gameObject.SetActive(true);
-            _activeProjectiles.Add(projectile);
+           projectile.Reset();
+           projectile.gameObject.SetActive(true);
+           _activeProjectiles.Add(projectile);
+        }
+        private void HandleProjectileExpiry(ProjectileComponent projectile)
+        {
+            // Return projectile to pool instead of destroying
+            _projectilePool.Release(projectile);
         }
         private void OnProjectileRelease(ProjectileComponent projectile)
         {
             // Clean up projectile when returned to pool
             projectile.UnregisterReceiver(this);
-            projectile.ProjectileExpiredEvent -= HandleProjectileExpiry;
+            projectile.ProjectileFinished -= HandleProjectileExpiry;
             projectile.gameObject.SetActive(false);
             _activeProjectiles.Remove(projectile);
         }
@@ -92,7 +99,7 @@ namespace Arcatech.Usables
             {
                 yield return new WaitForSeconds(_shooting.ShotDelay);
             }
-
+            Debug.Log("Shooting");
             int done = 0;
             while (done < _shooting.Shots)
             {
@@ -103,57 +110,45 @@ namespace Arcatech.Usables
                 projectile.Reset();
                 // Position and rotate it
                 
-                Vector3 place = _item.EffectSpawn.position;
-                Quaternion rotation = _item.EffectSpawn.rotation;
+                Vector3 place = Item.EffectSpawn.position;
+                Quaternion rotation = Item.EffectSpawn.rotation;
 
                 projectile.transform.position = place;
                 projectile.transform.rotation = rotation;
         
                 // Register for events
                 projectile.RegisterReceiver(this);
-                projectile.ProjectileExpiredEvent += HandleProjectileExpiry;
+                projectile.ProjectileFinished += HandleProjectileExpiry;
         
                 yield return new WaitForSeconds(_shooting.BetweenShotsDelay);
             }
         }
-
-        private void HandleProjectileExpiry(ProjectileComponent projectile)
+        
+        public override void OnChangeState(StateMachineNotifyType info)
         {
-            // Return projectile to pool instead of destroying
-            _projectilePool.Release(projectile);
+            base.OnChangeState(info);
+            switch (info)
+            {
+                case StateMachineNotifyType.NoNotify:
+                    break;
+                case StateMachineNotifyType.Starting:
+                    Item.gameObject.SetActive(true); // just in case...
+                    break;
+                case StateMachineNotifyType.Use:
+                    Item.gameObject.SetActive(true);
+                    _shootingCor = Item.StartCoroutine(ShootingCoroutine());
+                    break;
+                case StateMachineNotifyType.EndUse:
+                    if (_shootingCor != null) Item.StopCoroutine(_shootingCor);
+                    break;
+                case StateMachineNotifyType.Cancel:
+                    if (_shootingCor != null) Item.StopCoroutine(_shootingCor);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(info), info, null);
+            }
         }
-
-
-        public void Initialize()
-        {
-            _item.gameObject.SetActive(true); //bandaid
-            _shootingCor = _item.StartCoroutine(ShootingCoroutine());
-        }
-
-        public event UnityAction<TriggerHitInfo> Hit;
-
-        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
-        {
-            Hit?.Invoke(triggerHitInfo);
-        }
-
-        public void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
+        public override void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
         { }
-        public void Cleanup()
-        {
-            // Stop the shooting coroutine
-            if (_shootingCor != null)
-            {
-                _item.StopCoroutine(_shootingCor);
-            }
-
-            // Return all active projectiles to the pool
-            foreach (var projectile in _activeProjectiles.ToList())
-            {
-                _projectilePool.Release(projectile);
-            }
-    
-            _activeProjectiles.Clear();
-        }
     }
 }

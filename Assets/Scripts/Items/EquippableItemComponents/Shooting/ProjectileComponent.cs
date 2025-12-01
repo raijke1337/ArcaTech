@@ -11,11 +11,11 @@ using UnityEngine.Events;
 namespace Arcatech.Items.Projectiles
 {
     [RequireComponent(typeof(TriggerTrackerComponent), typeof(BaseGameEntityComponent))]
-    public class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver,ITriggerNotificationProvider
+    public sealed class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver,ITriggerNotificationProvider
     {
 
         #region projectilEvents
-        public event UnityAction<ProjectileComponent> ProjectileExpiredEvent = delegate { };
+        public event UnityAction<ProjectileComponent> ProjectileFinished = delegate { };
        
         
         #endregion
@@ -23,9 +23,11 @@ namespace Arcatech.Items.Projectiles
         [SerializeField, Self] private BaseGameEntityComponent entity;
         public BaseGameEntityComponent Entity => entity;
         
-        
         TriggerTrackerComponent col;
         ProjectileBehavior _behavior;
+        private int _maxHits;
+        int _currentHits = 0;
+        private BaseGameEntityComponent _owner;
         
         ITriggerNotificationReceiver _receiver;
         
@@ -35,29 +37,41 @@ namespace Arcatech.Items.Projectiles
             col.RegisterReceiver(this);
         }
 
-        public void Setup(BaseGameEntityComponent owner, SerializedProjectileBehavior behavior)
+        public void Setup(BaseGameEntityComponent owner, SerializedProjectileBehavior behavior, int maxHits)
         {
-            _behavior = behavior.Deserialize();
+            _behavior = behavior.Deserialize(owner);
+            _maxHits = maxHits;
+            _owner = owner;
         }
 
-        public void TriggerEntered(TriggerHitInfo triggerHitInfo) => _receiver?.TriggerEntered(triggerHitInfo);
+        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
+        {
+            _receiver?.TriggerEntered(triggerHitInfo);
+            if (!triggerHitInfo.IsValidHit || triggerHitInfo.Target== _owner) return;
+            _currentHits++;
+            _behavior.NotifyCollision(triggerHitInfo);
+        }
         public void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger) => _receiver?.TriggerExited(exitComponent, trigger);
-        protected virtual void Update()
+        void Update()
         {
             if (Paused) return;
 
             _behavior.UpdatePosition(Time.deltaTime,transform);
-            if (_behavior.IsExpired) ProjectileExpiredEvent.Invoke(this);
+            if (_behavior.BehaviorCompleted || _currentHits >= _maxHits) ProjectileFinished.Invoke(this);
         }
         public bool Paused { get; set; } = false;
 
         public void Reset()
         {
             _behavior.Reset();
+            _currentHits = 0;
         }
+        /// <summary>
+        /// called by the spawner (hit producer)
+        /// </summary>
         public bool Active { get; set; }
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)=> _receiver = receiver;
         public void UnregisterReceiver(ITriggerNotificationReceiver receiver) => _receiver = null;
-        public int LayerMaskIndex { get; set; }
+
     }
 }

@@ -10,13 +10,13 @@ namespace Arcatech.Units
     public class StateMachineNotificationActionSO : SerializedActionResult
     {
         [FormerlySerializedAs("NotifyType")] public StateMachineNotifyType notifyType;
-
+    
         public override ActionResult BuildActionResult()
         {
             return new StateMachineNotification(notifyType);
         }
     }
-
+    
     public class StateMachineNotification : ActionResult
     {
         public StateMachineNotification(StateMachineNotifyType notifyType)=>_type = notifyType;
@@ -28,7 +28,7 @@ namespace Arcatech.Units
             {
                 _receivers = new List<IStateMachineNotificationReceiver>(user.GetComponentsInChildren<IStateMachineNotificationReceiver>());
             }
-
+    
             foreach (var receiver in _receivers)
             {
                 receiver.StateMachineNotification(_type);
