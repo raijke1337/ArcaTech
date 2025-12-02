@@ -1,9 +1,6 @@
 ﻿using Arcatech.Actions;
 using System;
 using System.Linq;
-using Arcatech.Stats;
-using Arcatech.Units.Control;
-using JetBrains.Annotations;
 using Unity.AppUI.UI;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -11,43 +8,19 @@ using UnityEngine.Events;
 
 namespace Arcatech.Units
 {
-    public enum UnitActionState
-    {
-        None,
-        Started,
-        ExitTime,
-        Completed
-    }
-
-    public class StateMachineContext
-    {
-        public UnitActionType PendingCommand;
-        public Transform Spawn;
-        public UnitState CurrentState;
-        public BaseGameEntityComponent Owner;
-        [CanBeNull] public EntityStatsComponent Stats;
-        
-        public IMove[] Movers;
-        public IAim[] Aimers;
-        public IInvulnerability[] Invulnerabiles;
-        public void ClearCommand ()=> PendingCommand = UnitActionType.None;
-    }
-
-
-
     public class UnitState
     {
         public override string ToString() => StateName;
-        public string StateName { get; }
+        private string StateName { get; }
         public float TimeInState => _stateTimer.GetTime;
         private readonly StopwatchTimer _stateTimer;
-        public bool AllowsAiming { get; }
-        public bool AllowsMovement { get; }
-        public bool Invulnerable { get; }
-        public bool IsRootMotionState { get; }
+        private bool AllowsAiming { get; }
+        private bool AllowsMovement { get; }
+        private bool Invulnerable { get; }
+        private bool IsRootMotionState { get; }
         public StateTransition[] Transitions { get; private set; }
-        public ActionResult[] OnEnterState { get; }
-        public ActionResult[] OnExitState { get; }
+        private ActionResult[] OnEnterState { get; }
+        private ActionResult[] OnExitState { get; }
 
         private int _animatorHash;
         private int _animatorLayer;
@@ -58,8 +31,6 @@ namespace Arcatech.Units
         /// </summary>
         private float _minNormalizedTimeInState;
 
-        private float _currentNormalizedTime;
-        public float NormalizedTime => _currentNormalizedTime;
         private Animator _animator;
         public UnitState(
             string name,
@@ -92,7 +63,8 @@ namespace Arcatech.Units
             }
             Invulnerable = invulnerable;
             Transitions = transitions ?? Array.Empty<StateTransition>();
-            if (onEnter != null && onEnter.Length > 0)
+            
+            if (onEnter is { Length: > 0 })
             {
                 OnEnterState = new ActionResult[onEnter.Length];
                 for (int i = 0; i < onEnter.Length; i++)
@@ -100,14 +72,22 @@ namespace Arcatech.Units
                     OnEnterState[i] = onEnter[i].BuildActionResult();
                 }
             }
+            else
+            {
+                OnEnterState = Array.Empty<ActionResult>();
+            }
 
-            if (onExit != null && onExit.Length > 0)
+            if (onExit is { Length: > 0 })
             {
                 OnExitState = new ActionResult[onExit.Length];
                 for (int i = 0; i < onExit.Length; i++)
                 {
                     OnExitState[i] = onExit[i].BuildActionResult();
                 }
+            }
+            else
+            {
+                OnExitState = Array.Empty<ActionResult>();
             }
 
             _minNormalizedTimeInState = minNormalizedTime;
@@ -121,6 +101,7 @@ namespace Arcatech.Units
 
         public void EnterState(StateMachineContext context, Animator animator)
         {
+            
             _stateTimer.Reset();
             _stateTimer.Start();
             _animator =  animator;
@@ -128,7 +109,6 @@ namespace Arcatech.Units
             // Apply animator crossfade if an animation name/hash was provided
             if (animator != null && _animatorHash != 0)
                 animator.CrossFadeInFixedTime(_animatorHash, _crossfadeTime, _animatorLayer);
-
 
             foreach (var m in context.Movers)
             {
@@ -141,7 +121,7 @@ namespace Arcatech.Units
                 m.CanAim = AllowsAiming;
             }
 
-            foreach (var i in context.Invulnerabiles)
+            foreach (var i in context.Invulnerables)
             {
                 i.Invulnerable = Invulnerable;
             }
@@ -156,17 +136,6 @@ namespace Arcatech.Units
         public void UpdateState(float delta)
         {
             _stateTimer?.Tick(delta);
-
-            if (!_animator) return;
-            
-            var info = _animator.GetCurrentAnimatorStateInfo(_animatorLayer);
-            // If we're actually in the intended animator state, use normalizedTime
-            if (info.shortNameHash == _animatorHash) // if you store AnimatorStateHash
-            {
-                // normalizedTime can grow > 1.0 for looping states; we use fraction
-                
-                _currentNormalizedTime = info.normalizedTime % 1.0f;
-            }
         }
 
 
@@ -180,51 +149,54 @@ namespace Arcatech.Units
         }
         public bool CanExitState(Animator animator)
         {
-            // No minimum -> can exit immediately
             if (_minNormalizedTimeInState <= 0f) return true;
 
-            // If animator is not available, *fallback* to TimeInState comparing against
-            // MinimumTimeInStateNormalized interpreted as seconds fallback (documented caveat)
-            if (animator == null)
-            {
-                // Fallback heuristic: treat MinimumTimeInStateNormalized as seconds if animator missing.
-                return TimeInState >= _minNormalizedTimeInState;
-            }
-
-            // Get the current animator state info for this state's layer/hash if available
-            // assuming UnitState stores animatorHash and animatorLayer fields:
-            var layer = _animatorLayer;
-            var info = animator.GetCurrentAnimatorStateInfo(layer);
-
-            // If we're actually in the intended animator state, use normalizedTime
-            if (info.shortNameHash == _animatorHash) // if you store AnimatorStateHash
-            {
-                // normalizedTime can grow > 1.0 for looping states; we use fraction
-                float normalized = info.normalizedTime % 1.0f;
+            if (TryGetAnimatorProgress(animator, out float normalized))
                 return normalized >= _minNormalizedTimeInState;
-            }
 
-            // If animator is not in the state's expected animator state, treat it as passed
-            // (we're already in a different anim state, so allow exit)
-            return true;
+            // Fallback: use real time since enter so we don't get stuck forever.
+            return _stateTimer.GetTime >= (_minNormalizedTimeInState * 0.1f); // or some small grace
         }
 
         public bool TransitionMinTimeInStateSatisfied(Animator animator, float timeNormalized)
         {
             timeNormalized = Mathf.Clamp01(timeNormalized);
             if (timeNormalized <= 0f) return true;
-            if (animator == null) return _stateTimer.GetTime > 0.01f; // can't check animator, allow tiny progress
-            var info = animator.GetCurrentAnimatorStateInfo(_animatorLayer);
-            // If there's a transition in progress, check next state's normalized time too (helps blends)
-            if (animator.IsInTransition(_animatorLayer))
+
+            if (TryGetAnimatorProgress(animator, out float normalized))
+                return normalized >= timeNormalized;
+
+            // Animator hasn’t entered this state yet, so don’t allow transitions that require time.
+            return false;
+        }
+        
+        private bool TryGetAnimatorProgress(Animator animator, out float normalized)
+        {
+            normalized = 0f;
+            if (animator == null) return false;
+
+            var layer = _animatorLayer;
+
+            // If we're in the intended state, use current info.
+            var current = animator.GetCurrentAnimatorStateInfo(layer);
+            if (current.shortNameHash == _animatorHash)
             {
-                var next = animator.GetNextAnimatorStateInfo(_animatorLayer);
-                if (next.IsName("") == false)
-                    return next.normalizedTime >= timeNormalized;
+                normalized = current.normalizedTime % 1f;
+                return true;
             }
 
-            return info.normalizedTime >= timeNormalized;
-            
+            // If we're blending toward it, use next info.
+            if (animator.IsInTransition(layer))
+            {
+                var next = animator.GetNextAnimatorStateInfo(layer);
+                if (next.shortNameHash == _animatorHash)
+                {
+                    normalized = next.normalizedTime % 1f;
+                    return true;
+                }
+            }
+
+            return false; // Animator isn’t on our clip yet.
         }
     }
 }
