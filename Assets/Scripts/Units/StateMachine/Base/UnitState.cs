@@ -64,31 +64,13 @@ namespace Arcatech.Units
             Invulnerable = invulnerable;
             Transitions = transitions ?? Array.Empty<StateTransition>();
             
-            if (onEnter is { Length: > 0 })
-            {
-                OnEnterState = new ActionResult[onEnter.Length];
-                for (int i = 0; i < onEnter.Length; i++)
-                {
-                    OnEnterState[i] = onEnter[i].BuildActionResult();
-                }
-            }
-            else
-            {
-                OnEnterState = Array.Empty<ActionResult>();
-            }
-
-            if (onExit is { Length: > 0 })
-            {
-                OnExitState = new ActionResult[onExit.Length];
-                for (int i = 0; i < onExit.Length; i++)
-                {
-                    OnExitState[i] = onExit[i].BuildActionResult();
-                }
-            }
-            else
-            {
-                OnExitState = Array.Empty<ActionResult>();
-            }
+            OnEnterState = onEnter?.Length > 0
+                ? onEnter.Select(a => a.BuildActionResult()).ToArray()
+                : Array.Empty<ActionResult>();
+            
+            OnExitState = onExit?.Length > 0
+                ? onExit.Select(a => a.BuildActionResult()).ToArray()
+                : Array.Empty<ActionResult>();
 
             _minNormalizedTimeInState = minNormalizedTime;
             _stateTimer = new StopwatchTimer();

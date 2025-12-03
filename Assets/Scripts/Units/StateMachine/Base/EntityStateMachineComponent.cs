@@ -181,29 +181,29 @@ namespace Arcatech.Units
         private void RefreshCandidates()
         {
             _candidates.Clear();
-            var candidates = new List<(StateTransition, bool)>();
+            
             if (_currentState == null) return;
             
             bool canExit = _currentState.CanExitState(animator);
             
             foreach (var t in _currentState.Transitions ?? Array.Empty<StateTransition>())
             {
-                if (t == null || t.NextState == null) continue;
+                if (t == null) continue;
                 if (!t.CanTransition(_context))continue;
                 if (!canExit && !t.CanOverrideMinimumStateTime) continue;
                 if (!_currentState.TransitionMinTimeInStateSatisfied(animator, t.ExitNormalizedTime)) continue;
 
-                candidates.Add((t, true));
+                _candidates.Add((t, true));
             }
 
             // global transitions
             foreach (var g in _addedTransitions)
             {
-                if (g == null || g.NextState == null) continue;
+                if (g == null) continue;
                 if (!g.CanTransition(_context))continue;
                 if (!canExit && !g.CanOverrideMinimumStateTime)continue;
                 if (!_currentState.TransitionMinTimeInStateSatisfied(animator, g.ExitNormalizedTime)) continue;
-                candidates.Add((g, false));
+                _candidates.Add((g, false));
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Arcatech.Actions;
 using UnityEngine;
 
@@ -22,14 +23,14 @@ namespace Arcatech.Units
             bool isOverride)
         {
             NextState = nextState;
-            if (onTransition != null && onTransition.Length > 0)
+            if (NextState == null)
             {
-                OnTransition = new ActionResult[onTransition.Length];
-                for (int i = 0; i < onTransition.Length; i++)
-                {
-                    OnTransition[i] = onTransition[i].BuildActionResult();
-                }
+                throw new ArgumentNullException(nameof(NextState));
             }
+            OnTransition = onTransition?.Length > 0
+                ? onTransition.Select(a => a.BuildActionResult()).ToArray()
+                : Array.Empty<ActionResult>();
+
             ExitNormalizedTime = Mathf.Clamp01(exitNormalizedTime);
             Conditions = conditions ?? Array.Empty<SerializedStateTransitionCondition>();
             TransitionPriority = transitionPriority;  
