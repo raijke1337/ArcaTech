@@ -11,13 +11,6 @@ namespace Arcatech.Units
         public Dictionary<ItemSlot, ItemPlaceType> GetPlaces => _dict;
 
         [SerializeField] SerializedDictionary<ItemSlot, ItemPlaceType> _dict;
-        public void OnInit()
-        {
-        }
-
-        public void OnCleanUp()
-        {
-        }
     }
 
 

@@ -14,7 +14,7 @@ namespace Arcatech.Actions
     {
         [SerializeField] CFXR_Effect[] Effects;
         [SerializeField] bool ParentParticles;
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new ProduceFXResult(Effects, ParentParticles);
         }

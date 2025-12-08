@@ -105,7 +105,6 @@ namespace Arcatech.Managers
         {
             return config switch
             {
-                //if (config is ShieldSO shield) return shield.BuildItem(owner);
                 UsablesSO weapon => weapon.BuildItem(owner),
                 EquipSO eq => eq.BuildItem(owner),
                 _ => config.BuildItem(owner)
@@ -143,7 +142,7 @@ namespace Arcatech.Managers
 
         private void OnLevelComplete(LevelCompletedEvent lvl)
         {
-            _loadedSave.OpenedLevelsID.Add(lvl.CompletedLevel.ID.ToString());
+           // _loadedSave.OpenedLevelsID.Add(lvl.CompletedLevel.ID.ToString());
         }
 
 

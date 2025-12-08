@@ -133,12 +133,15 @@ namespace Arcatech.Units.Control
 
         public bool CanDoUnitCommand(UnitActionType type, out string info)
         {
-            info = "Movement ctrl";
+            info = "Movement ctrl jump:";
             switch (type)
             {
                 case UnitActionType.Jump:
+                    info += CanJump();
                     return CanJump(); 
-                default: return true;
+                default:
+                    info += "OK";
+                    return true;
             }
         }
 

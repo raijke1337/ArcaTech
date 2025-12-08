@@ -7,7 +7,7 @@ namespace Arcatech.Actions
     {
         public InterfaceType interfaceType;
         private bool applyToUser = true;
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new KillAllKillables(interfaceType);
         }

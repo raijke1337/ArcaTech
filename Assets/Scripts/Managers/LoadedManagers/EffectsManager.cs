@@ -29,7 +29,6 @@ namespace Arcatech.Managers
                 for (int j = 0; j < entry.initial; j++)
                 {
                  var ins =   CreateInstance(entry.prefab);
-
                 }
             }
         }
@@ -96,10 +95,10 @@ namespace Arcatech.Managers
         {
             if (inst == null) return;
 
+            inst.transform.SetParent(transform, false);
+            
             // Clean up
             inst.gameObject.SetActive(false);
-            inst.transform.SetParent(transform, false);
-
             var prefab = inst.prefabKey;
             if (!pools.TryGetValue(prefab, out var pool))
             {
@@ -139,15 +138,10 @@ namespace Arcatech.Managers
 
         private void Start()
         {
-
             InitSoundPool();
-
             _placeParticleEventBind = new EventBinding<ParticlesEvent>(HandleEvent);
-
-
             EventBus<ParticlesEvent>.Register(_placeParticleEventBind);
-         
-
+            
         }
         private void OnDisable()
         {

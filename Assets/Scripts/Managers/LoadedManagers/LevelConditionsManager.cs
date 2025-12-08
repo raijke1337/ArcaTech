@@ -27,7 +27,7 @@ namespace Arcatech.Level
 
         [SerializeField] private float eventsRefreshTimer = 1;
         [SerializeField] private List<LevelConditionHolder> trackedEvents;
-        [SerializeField] private List<InteractionHandlersActivator> triggerAreas;
+        [SerializeField] private List<PassiveInteractionHandlersActivator> triggerAreas;
         
         private Coroutine refreshConditionsCor;
 
@@ -35,7 +35,7 @@ namespace Arcatech.Level
 
         private void OnValidate()
         {
-            triggerAreas = FindObjectsByType<InteractionHandlersActivator>(FindObjectsSortMode.None).ToList();
+            triggerAreas = FindObjectsByType<PassiveInteractionHandlersActivator>(FindObjectsSortMode.None).ToList();
         }
 
 
@@ -76,13 +76,11 @@ namespace Arcatech.Level
                     if (pair.Completed) continue;
                     
                     var result = rule.CheckCondition(pair);
-                    
-                    if (!result) continue;
-                    pair.MarkComplete();
+                    if (result) pair.MarkComplete();
                     
                     foreach (var item in pair.Items)
                     {
-                        item.DoInteraction(result,_player,null);
+                        item.DoInteraction(result,_player);
                     }
                 }
             }

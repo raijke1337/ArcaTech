@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 535068643025303903}
   - component: {fileID: 5696623800802242230}
+  - component: {fileID: 8507211934231587219}
   m_Layer: 6
   m_Name: activate
   m_TagString: Untagged
@@ -47,12 +48,25 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8507211934231587219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103627127994304300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _collider: {fileID: 5696623800802242230}
 --- !u!1 &8262341705497536744
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,8 +262,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.9891748, y: 2.7912102, z: 1}
-  m_Center: {x: -0.49458742, y: 0.8956053, z: 0}
+  m_Size: {x: 0.98, y: 2.45, z: 1.53}
+  m_Center: {x: 0.07438916, y: 1.0835825, z: 0}
 --- !u!54 &1291726167058966527
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -309,7 +323,7 @@ MonoBehaviour:
   timerToDestroy: 2
   _showDebugs: 0
   _rigidbody: {fileID: 1291726167058966527}
-  usePhysics: 0
+  playerOverride: 0
 --- !u!114 &1846659786570626030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,16 +383,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffa2e06f5c72926489bd70a5200d2cef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemDisappearsWhenUsed: 0
-  useCooldown: 59
-  _useAreaCollider: {fileID: 5696623800802242230}
+  itemDisappearsWhenUsed: 0
+  handlersActivationType: 0
+  useCooldown: 10
   baseComp: {fileID: 1846573254879890371}
   entityMouseOver: {fileID: 1846659786570626030}
+  triggerTrackerComponent: {fileID: 8507211934231587219}
   handlersOnThisItem:
   - {fileID: 8436048522235525004}
   handlers: []
   interactTooltipText: Interact
   condition: {fileID: 11400000, guid: af1b740f6150d3847abaae36f70dcb37, type: 2}
+  interactStart: {fileID: 11400000, guid: 4f88d8ba734f89946acb4a26f0d45a7c, type: 2}
+  interactionSuccess: {fileID: 11400000, guid: 1d88dd4e9998f25438b50c1fdd962226, type: 2}
+  interactionFail: {fileID: 11400000, guid: 7130243591e58444dbefd6992373d4ba, type: 2}
 --- !u!1001 &7487946664842576004
 PrefabInstance:
   m_ObjectHideFlags: 0

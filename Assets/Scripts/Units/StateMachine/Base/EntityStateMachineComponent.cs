@@ -1,162 +1,237 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Interactions;
 using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
 using KBCore.Refs;
-using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Arcatech.Units
 {
-    /// <summary>
-    /// new component to define a unit that has some state (e.g. idle, attacking, stunned...)
-    /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
-
-    public class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent
+    public partial class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
-        [SerializeField, Child] protected Animator animator;
-
-        [Space, Header("States")] [SerializeField]
-        private SerializedUnitState startingState;
-
-        private StateMachineContext _context;
         public BaseGameEntityComponent GetMainEntity => gameEntity;
-        private UnitState _currentState;
+        [SerializeField, Self,Child] Animator animator;
+
+        [Space, Header("States")] 
+        [SerializeField] SerializedUnitState startingState;
 
         readonly string _animatorParameterName = "TimeInState";
         int _animatorParameter;
 
-        private List<StateTransition> _addedTransitions = new();
+        [SerializeField] public bool verboseDebugs = false;
 
-        protected void Start()
+        StateMachineContext _context;
+        UnitState _currentState;
+
+        readonly List<StateTransition> _addedTransitions = new();
+        readonly List<(StateTransition tr, bool local)> _candidates = new();
+
+        // --- command context -------------------------------------------------
+        readonly List<IUnitCommandPerformer> _pendingPerformers = new();
+        UnitActionType _pendingAction = UnitActionType.None;
+
+        bool HasPendingCommand => _pendingAction != UnitActionType.None;
+
+        // ----- augmentor system ------------------------------------------------------
+
+        readonly List<IStateAugmentor> _activeAugmentors = new();
+
+        public void RegisterAugmentor(IStateAugmentor augmentor)
+        {
+            if (augmentor == null || _activeAugmentors.Contains(augmentor)) return;
+            _activeAugmentors.Add(augmentor);
+            Debug.Log($"Register {augmentor}");
+            augmentor.Attach(this);
+        }
+
+        public void UnregisterAugmentor(IStateAugmentor augmentor)
+        {
+            if (augmentor == null || !_activeAugmentors.Contains(augmentor)) return;
+            augmentor.Detach(this);
+            Debug.Log($"Deregister {augmentor}");
+            _activeAugmentors.Remove(augmentor);
+        }
+        
+        // --------------------------------------
+        
+        
+        void Start()
         {
             _animatorParameter = Animator.StringToHash(_animatorParameterName);
-            
-            _context = new StateMachineContext() { Spawn = gameEntity.transform, Owner = gameEntity };
+
+            _context = new StateMachineContext
+            {
+                Spawn = gameEntity.transform,
+                Owner = gameEntity,
+                CurrentState = null
+            };
+
             _currentState = startingState.Build();
             _context.CurrentState = _currentState;
             _context.Owner = gameEntity;
             _context.Aimers = GetComponentsInChildren<IAim>();
             _context.Movers = GetComponentsInChildren<IMove>();
             _context.Invulnerables = GetComponentsInChildren<IInvulnerability>();
-                 _candidates = new List<(StateTransition tr, bool local)>();
             _context.Stats = GetComponentInChildren<EntityStatsComponent>();
+            _context.Interactor = GetComponentInChildren<IInteractor>();
+            _activeAugmentors.AddRange(GetComponentsInChildren<IStateAugmentor>());
             
             _currentState.EnterState(_context, animator);
         }
 
-        private void Update()
+        void Update()
         {
             if (Paused || Killed) return;
+
             _currentState?.UpdateState(Time.deltaTime);
-            animator.SetFloat(_animatorParameter, _currentState?.TimeInState ?? 0);
+            animator.SetFloat(_animatorParameter, _currentState?.TimeInState ?? 0f);
 
             int safety = 0;
             const int kMaxChain = 8;
             while (safety++ < kMaxChain)
             {
-                bool committed = TransitionsInUpdate();
-                if (!committed) break;
+                if (!TransitionsInUpdate()) break;
             }
         }
 
+        bool TransitionsInUpdate()
+        {
+            if (Paused || Killed) return false;
+
+            var chosen = PickBestTransition(out _);
+            if (chosen == null || chosen.NextState == null) return false;
+
+            CommitTransition(chosen);
+            return true;
+        }
+
+        // ---------------------------------------------------------------------
+        // command entry point
+        // ---------------------------------------------------------------------
         public bool TryCommandTransition(UnitActionType actionType,
             IEnumerable<IUnitCommandPerformer> commandPerformers)
         {
             if (Paused || Killed) return false;
 
+            CacheCommandContext(actionType, commandPerformers);
             _context.PendingCommand = actionType;
-            bool validated = ValidateCommandTransition();
-            foreach (var v in commandPerformers)
-            {
-                v.DoUnitCommand(actionType, validated);
-            }
-            return validated;
-        }
-   
-        private bool TransitionsInUpdate()
-        {
-            if (Paused || Killed) return false;
 
-            // Pick the best transition among local and global candidates
-            bool wasLocal;
-            var chosen = PickBestTransition(out wasLocal);
-            if (chosen == null || chosen.NextState == null)
-            {
-                return false;
-            }
+            bool committed = ValidateCommandTransition();
 
-            // For runtime updates (Update loop) we want to clear PendingCommand on commit
-            if (!TryCommitTransition(chosen))
-            {
-                // aborted by action/performer
-                return false;
-            }
-            return true;
+            // true = committed immediately; false = buffered for later or invalid.
+            return committed;
         }
 
-        // New helper: try to run command performers (if provided), run OnTransition actions and commit.
-        bool TryCommitTransition(StateTransition tr/*, IEnumerable<IUnitCommandPerformer> commandPerformers*/)
+        void CacheCommandContext(UnitActionType actionType,
+            IEnumerable<IUnitCommandPerformer> performers)
         {
-            if (tr?.NextState == null) return false;
-            if (!ExecuteTransitionActions(tr))
+            // Cancel any previous buffered command before storing a new one.
+            if (HasPendingCommand)
+                CompletePendingCommand(false);
+
+            _pendingAction = actionType;
+            _pendingPerformers.Clear();
+
+            if (performers == null) return;
+            foreach (var p in performers)
             {
-              //  Debug.LogWarning($"Transition action failed, aborting transition from {_currentState}");
-                _context.ClearCommand();
-                return false;
+                if (p == null) continue;
+                if (!_pendingPerformers.Contains(p))
+                    _pendingPerformers.Add(p);
             }
-            CommitTransition(tr);
-            return true;
         }
 
-        /// final action
-        private void CommitTransition(StateTransition tr)
+        void CompletePendingCommand(bool success)
         {
-            if (tr == null || tr.NextState == null) return;
-            
-            _currentState.ExitState(_context, animator);
-            _currentState = tr.NextState;
-            _context.CurrentState = _currentState;
-            _currentState.EnterState(_context, animator);
-            
+            if (!HasPendingCommand) return;
+
+            foreach (var performer in _pendingPerformers)
+                performer?.DoUnitCommand(_pendingAction, success);
+
+            _pendingPerformers.Clear();
+            _pendingAction = UnitActionType.None;
             _context.ClearCommand();
         }
 
-        
-        bool ExecuteTransitionActions(StateTransition tr)
-        {
-            if (tr.OnTransition == null) return true;
-            foreach (var a in tr.OnTransition)
-            {
-                if (a == null) continue;
-                bool ok = a.ProduceResult(_context.Owner, null, _context.Spawn.position, _context.Spawn.rotation);
-                if (!ok) return false;
-            }
-
-            return true;
-        }     
         bool ValidateCommandTransition()
         {
             if (_currentState == null)
             {
-                _context.ClearCommand();
+                CompletePendingCommand(false);
                 return false;
             }
-            bool wasLocal;
-            var chosen = PickBestTransition(out wasLocal);
-            if (chosen is { NextState: not null }) return TryCommitTransition(chosen);
-            _context.ClearCommand();
-            return false;
+
+            var chosen = PickBestTransition(out _);
+            if (chosen == null)
+            {
+                // No transition yet; keep the command buffered so Update() can consume it later.
+                return false;
+            }
+
+            CommitTransition(chosen);
+            return true;
         }
 
+        void CommitTransition(StateTransition tr)
+        {
+            if (tr == null || tr.NextState == null) return;
+
+            bool consumesPending = HasPendingCommand && _context.PendingCommand != UnitActionType.None;
+
+            // 1) Exit current state first. Any EndUse notifications emitted here
+            //    should belong to the *previous* usable.
+            _currentState?.ExitState(_context, animator);
+            
+            foreach (var aug in _activeAugmentors.ToArray())
+                aug.OnStateExited(_currentState, _context);
+
+            // 2) Now we can safely prepare the new usable without it getting cleared.
+            if (consumesPending)
+            {
+                foreach (var performer in _pendingPerformers)
+                    performer?.PrepareCommand(_pendingAction);
+            }
+
+            // 3) Run transition actions (if any).
+            ProduceTransitionResults(tr);
+
+            // 4) Enter the new state.
+            _currentState = tr.NextState;
+            _context.CurrentState = _currentState;
+            _currentState.EnterState(_context, animator);
+            
+            foreach (var aug in _activeAugmentors.ToArray())
+                aug.OnStateEntered(_currentState, _context);
+
+            // 5) Notify performers about success or clear command.
+            if (consumesPending)
+                CompletePendingCommand(true);
+            else
+                _context.ClearCommand();
+        }
+
+        void ProduceTransitionResults(StateTransition tr)
+        {
+            if (tr?.OnTransition == null) return;
+
+            foreach (var a in tr.OnTransition)
+                a?.ProduceResult(_context.Owner, null, _context.Spawn.position, _context.Spawn.rotation);
+        }
+
+        // ---------------------------------------------------------------------
+        // external helpers
+        // ---------------------------------------------------------------------
         public void ForceUnitState(UnitState forcedState, bool immediate = true)
         {
             if (forcedState == null) return;
+
+            CompletePendingCommand(false);
+
             _currentState?.ExitState(_context, animator);
             _currentState = forcedState;
             _context.CurrentState = _currentState;
@@ -167,48 +242,61 @@ namespace Arcatech.Units
         public void AddTransition(StateTransition transition)
         {
             if (transition == null || _addedTransitions.Contains(transition)) return;
-           // Debug.Log($"added transition to {transition.NextState}");
             _addedTransitions.Add(transition);
         }
 
         public void RemoveTransition(StateTransition transition)
         {
-            if (transition == null || !_addedTransitions.Contains(transition)) return;
+            if (transition == null) return;
             _addedTransitions.Remove(transition);
         }
 
-        private List<(StateTransition tr, bool local)> _candidates;
-        private void RefreshCandidates()
+        // ---------------------------------------------------------------------
+        // candidate / picker
+        // ---------------------------------------------------------------------
+        void RefreshCandidates()
         {
             _candidates.Clear();
-            
             if (_currentState == null) return;
-            
+
             bool canExit = _currentState.CanExitState(animator);
-            
+
             foreach (var t in _currentState.Transitions ?? Array.Empty<StateTransition>())
             {
-                if (t == null) continue;
-                if (!t.CanTransition(_context))continue;
+                if (t == null || t.NextState == null) continue;
+                if (!t.CanTransition(_context)) continue;
                 if (!canExit && !t.CanOverrideMinimumStateTime) continue;
                 if (!_currentState.TransitionMinTimeInStateSatisfied(animator, t.ExitNormalizedTime)) continue;
-
                 _candidates.Add((t, true));
             }
 
-            // global transitions
             foreach (var g in _addedTransitions)
             {
-                if (g == null) continue;
-                if (!g.CanTransition(_context))continue;
-                if (!canExit && !g.CanOverrideMinimumStateTime)continue;
+                if (g == null || g.NextState == null) continue;
+                if (!g.CanTransition(_context)) continue;
+                if (!canExit && !g.CanOverrideMinimumStateTime) continue;
                 if (!_currentState.TransitionMinTimeInStateSatisfied(animator, g.ExitNormalizedTime)) continue;
                 _candidates.Add((g, false));
             }
+#if UNITY_EDITOR
+            foreach (var c in _candidates)
+            {
+                _debugCandidates.Insert(0, new CandidateInfo
+                {
+                    Source = "Local",
+                    NextState = c.tr.NextState.StateName,
+                    Priority = c.tr.TransitionPriority,
+                    ExitNormalizedTime = c.tr.ExitNormalizedTime,
+                    OverrideMinTime = c.tr.CanOverrideMinimumStateTime,
+                    CanTransition = true
+                });
+            }
+            if (_debugCandidates.Count > 8)
+                _debugCandidates.RemoveAt(_debugCandidates.Count - 1);
+            #endif
         }
 
-        
-        private StateTransition PickBestTransition(out bool wasLocal)
+        StateTransition PickBestTransition(out bool wasLocal)
         {
             wasLocal = false;
             RefreshCandidates();
@@ -216,17 +304,17 @@ namespace Arcatech.Units
 
             var best = _candidates
                 .OrderByDescending(c => c.tr.TransitionPriority)
-                .ThenByDescending(c => c.local ? 0 : 1) // global wins ties
+                .ThenByDescending(c => c.local ? 0 : 1) // globals win ties
                 .FirstOrDefault();
 
             if (best.tr == null) return null;
-            
+
             wasLocal = best.local;
             return best.tr;
         }
-        
+
+        // ---------------------------------------------------------------------
         public bool Paused { get; set; }
         public bool Killed { get; set; }
     }
-
 }

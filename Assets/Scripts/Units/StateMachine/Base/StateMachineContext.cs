@@ -1,4 +1,5 @@
-﻿using Arcatech.Stats;
+﻿using Arcatech.Interactions;
+using Arcatech.Stats;
 using Arcatech.Units.Control;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -16,6 +17,7 @@ namespace Arcatech.Units
         public IMove[] Movers;
         public IAim[] Aimers;
         public IInvulnerability[] Invulnerables;
+        public IInteractor Interactor;
         public void ClearCommand ()=> PendingCommand = UnitActionType.None;
     }
 }

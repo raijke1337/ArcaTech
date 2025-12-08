@@ -24,7 +24,8 @@ namespace Arcatech
         MeleeEmpty,
         RangedEmpty,
         Hidden,
-        ArmatureRoot
+        ArmatureRoot,
+        ShieldEmpty
     }
 
 

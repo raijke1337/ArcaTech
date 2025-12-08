@@ -2,7 +2,7 @@ using UnityEngine;
 namespace Arcatech.Texts
 {
 
-    [CreateAssetMenu(fileName = "New Simple Description", menuName = "Game/Description/Simple")]
+    [CreateAssetMenu(fileName = "New Description", menuName = "Game/Description")]
     public class Description : ScriptableObject
     {
         public string Title;

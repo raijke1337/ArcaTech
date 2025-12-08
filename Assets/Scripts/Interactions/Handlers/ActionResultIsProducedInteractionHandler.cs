@@ -27,7 +27,7 @@ namespace Arcatech.Interactions
             foreach (var result in serializedResultsSuccess)
             {
                 if (result!= null)
-                    _listS.Add(result.BuildActionResult());
+                    _listS.Add(result.Deserialize());
             }
             
             _listF = new List<ActionResult>();
@@ -35,87 +35,42 @@ namespace Arcatech.Interactions
             foreach (var result in serializedResultsFail)
             {
                 if (result!= null)
-                    _listF.Add(result.BuildActionResult());
+                    _listF.Add(result.Deserialize());
             }
         }
 
-        public override void DoInteraction(bool success, IInteractor interactor, IInteractive item)
+        public override void DoInteraction(bool success, IInteractor interactor) 
         {
             if (success)
             {
-                if (item == null)
+                foreach (var result in _listS)
                 {
-                    // apply result using only interactor data
-                    foreach (var result in _listS)
-                    {
-                        result.ProduceResult(interactor.InteractionContext.EntityComponent,
-                            null,
-                            interactor.InteractionContext.ActionTransform.position, interactor.InteractionContext.ActionTransform.rotation);
-                    }
-                }
-
-                else
-                {          
-                    // use item as target
-                    foreach (var result in _listS)
-                    {
-                        result.ProduceResult(interactor.InteractionContext.EntityComponent,
-                            item.GetBaseComponent,
-                            item.GetBaseComponent.EffectSpawn.position,  item.GetBaseComponent.EffectSpawn.rotation);
-                    }
+                    result.ProduceResult(interactor.InteractionContext.CurrentInteractive.GetBaseComponent,
+                        interactor.InteractionContext.EntityComponent,
+                        interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.position, 
+                        interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.rotation);
                 }
             }
             else
             {
-                if (item == null)
+                foreach (var result in _listF)
                 {
-                    // apply result using only interactor data
-                    foreach (var result in _listF)
-                    {
-                        result.ProduceResult(interactor.InteractionContext.EntityComponent,
-                            null,
-                            interactor.InteractionContext.ActionTransform.position, interactor.InteractionContext.ActionTransform.rotation);
-                    }
-                }
-
-                else
-                {          
-                    // use item as target
-                    foreach (var result in _listF)
-                    {
-                        result.ProduceResult(interactor.InteractionContext.EntityComponent,
-                            item.GetBaseComponent,
-                            item.GetBaseComponent.EffectSpawn.position,  item.GetBaseComponent.EffectSpawn.rotation);
-                    }
+                    result.ProduceResult(interactor.InteractionContext.CurrentInteractive.GetBaseComponent,
+                        interactor.InteractionContext.EntityComponent,
+                        interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.position,
+                        interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.rotation);
                 }
             }
         }
 
-        public override void EndInteraction(IInteractor interactor, IInteractive item = null)
+        public override void OnPlayerEnter()
         {
-            // todo add "OnEndInteraction" results if necessary
+            
         }
 
-
-        /// <summary>
-        /// I use this when instantiating a "dropped item" interactive component.
-        /// </summary>
-        /// <param name="results"></param>
-        public void OverrideResults(IEnumerable<ActionResult> results)
-        {Debug.Log("OverrideResults");
-            _listS = new List<ActionResult>(results);
-        }
-
-        public void OverrideResults(ActionResult result)
+        public override void OnPlayerExit()
         {
-            Debug.Log("OverrideResults");
-            _listS.Add(result); 
+            
         }
-
-        public void RedrawItem(EquipmentComponent toDraw)
-        {
-            Instantiate(toDraw,transform);
-        }
-
     }
 }

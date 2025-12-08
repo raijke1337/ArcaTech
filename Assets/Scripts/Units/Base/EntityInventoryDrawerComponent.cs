@@ -87,7 +87,7 @@ namespace Arcatech.Units
         {
             if (drawItemsStrategyProvider is { NeedsRedraw: true })
             {
-                Debug.Log($"Update strategy");
+                //Debug.Log($"Update strategy");
                 DrawItems(drawItemsStrategyProvider.GetDrawStrategy);
             }
         }

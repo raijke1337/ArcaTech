@@ -11,7 +11,7 @@ namespace Arcatech.Units
     {
         [FormerlySerializedAs("NotifyType")] public StateMachineNotifyType notifyType;
     
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new StateMachineNotification(notifyType);
         }
@@ -27,6 +27,11 @@ namespace Arcatech.Units
             if (_receivers == null)
             {
                 _receivers = new List<IStateMachineNotificationReceiver>(user.GetComponentsInChildren<IStateMachineNotificationReceiver>());
+            }
+
+            if (_receivers.Count == 0)
+            {
+                Debug.LogWarning($"No statement receivers found for {_type} in {nameof(StateMachineNotificationActionSO)}");
             }
     
             foreach (var receiver in _receivers)

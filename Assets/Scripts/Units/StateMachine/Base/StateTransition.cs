@@ -28,7 +28,7 @@ namespace Arcatech.Units
                 throw new ArgumentNullException(nameof(NextState));
             }
             OnTransition = onTransition?.Length > 0
-                ? onTransition.Select(a => a.BuildActionResult()).ToArray()
+                ? onTransition.Select(a => a.Deserialize()).ToArray()
                 : Array.Empty<ActionResult>();
 
             ExitNormalizedTime = Mathf.Clamp01(exitNormalizedTime);

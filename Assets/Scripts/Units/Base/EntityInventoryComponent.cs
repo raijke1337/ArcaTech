@@ -104,14 +104,9 @@ namespace Arcatech.Units
             {
                 // equip new or replace equipped
                 _model.EquipItem(e, out var un);
-                if (un != null) // something was dropped
+                if (un != null) 
                 {
-                    // if (droppedItemPrefab != null)
-                    // {
-                    //     var d = Instantiate(droppedItemPrefab,transform.position,Quaternion.identity);
-                    //     d.OverrideResults(new AddItemToInventoryResult(un,1));
-                    //     d.RedrawItem(un.itemPrefab);                        
-                    // }
+                    // something was dropped
                 }
             }
             else

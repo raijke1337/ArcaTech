@@ -11,16 +11,18 @@ namespace Arcatech.Units
     public class UnitState
     {
         public override string ToString() => StateName;
-        private string StateName { get; }
+        public string StateName { get; }
         public float TimeInState => _stateTimer.GetTime;
         private readonly StopwatchTimer _stateTimer;
-        private bool AllowsAiming { get; }
-        private bool AllowsMovement { get; }
-        private bool Invulnerable { get; }
-        private bool IsRootMotionState { get; }
+        public bool AllowsAiming { get; }
+        public bool AllowsMovement { get; }
+        public bool Invulnerable { get; }
+        public bool IsRootMotionState { get; }
         public StateTransition[] Transitions { get; private set; }
         private ActionResult[] OnEnterState { get; }
         private ActionResult[] OnExitState { get; }
+
+        public int AnimatorLayer => _animatorLayer;
 
         private int _animatorHash;
         private int _animatorLayer;
@@ -65,11 +67,11 @@ namespace Arcatech.Units
             Transitions = transitions ?? Array.Empty<StateTransition>();
             
             OnEnterState = onEnter?.Length > 0
-                ? onEnter.Select(a => a.BuildActionResult()).ToArray()
+                ? onEnter.Select(a => a.Deserialize()).ToArray()
                 : Array.Empty<ActionResult>();
             
             OnExitState = onExit?.Length > 0
-                ? onExit.Select(a => a.BuildActionResult()).ToArray()
+                ? onExit.Select(a => a.Deserialize()).ToArray()
                 : Array.Empty<ActionResult>();
 
             _minNormalizedTimeInState = minNormalizedTime;

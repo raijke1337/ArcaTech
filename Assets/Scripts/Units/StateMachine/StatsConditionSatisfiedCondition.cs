@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Arcatech.Units
 {
-    [CreateAssetMenu(menuName = "States/State Transition Condition/Stats ")]
+    [CreateAssetMenu(menuName = "States/State Transition Condition/Stats")]
     public class StatsConditionSatisfiedCondition : SerializedStateTransitionCondition
     {
         public ConditionGroup conditionsToCheck;

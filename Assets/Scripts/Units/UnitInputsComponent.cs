@@ -18,22 +18,19 @@ namespace Arcatech
         
         public bool RequestCombatAction(UnitActionType type)
         {
-            if (Paused ||
-                Killed)
-            {
-                return false;
-            }
-
+            if (Paused || Killed) { return false; }
+            if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] {Time.time} Request {type} (validators: {_commandValidators.Count})");
             foreach (var v in _commandValidators)
             {
                 if (!v.CanDoUnitCommand(type, out string info))
                 {
-                    Debug.Log($"{this} failed command {type} in {v}.{info}");
+                    if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] failed command {type} in {v}.{info} {Time.time}");
                     return false;
                 }
             }
             var ok = stateMachine.TryCommandTransition(type,_commandPerformers);
-
+            if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) 
+                Debug.Log($"[Input] {Time.time} Request {type} -> {(ok ? "accepted" : "deferred/rejected")}");
             return ok;
         }
 

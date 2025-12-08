@@ -8,7 +8,7 @@ namespace Arcatech.Units
     public class SetMovementSO : SerializedActionResult
     {
         UnitActionType actionType;
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new SetMovementAction();
         }

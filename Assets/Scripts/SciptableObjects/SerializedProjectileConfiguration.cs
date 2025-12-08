@@ -27,9 +27,16 @@ namespace Arcatech.Items.Projectiles
     [Serializable]
     public struct ShootingConfig
     {
+        public SpawningPlaceType placeType;
         public int Shots;
         public float Spread;
         public float BetweenShotsDelay;
-        public float ShotDelay;
+    }
+
+    public enum SpawningPlaceType
+    {
+        WeaponSpawner,
+        WeaponParent,
+        UnitEffectsSpawn,
     }
 }

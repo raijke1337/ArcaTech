@@ -1,7 +1,4 @@
-﻿using System;
-using KBCore.Refs;
-using UnityEngine;
-using UnityEngine.Assertions;
+﻿using UnityEngine;
 
 namespace Arcatech.Interactions
 {
@@ -10,8 +7,9 @@ namespace Arcatech.Interactions
     /// </summary>
     public abstract class InteractionHandlerBase : MonoBehaviour, IInteractionHandler
     {
-        public abstract void DoInteraction(bool success, IInteractor interactor, IInteractive item = null);
-        public abstract void EndInteraction(IInteractor interactor, IInteractive item = null);
+        public abstract void DoInteraction(bool success, IInteractor interactor);
+        public abstract void OnPlayerEnter();
+        public abstract void OnPlayerExit();
     }
 }
 

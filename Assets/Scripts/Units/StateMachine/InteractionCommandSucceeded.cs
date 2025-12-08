@@ -12,10 +12,13 @@ namespace Arcatech.Units
 
         public override bool CanTransition(StateMachineContext ctx)
         {
-            if (ctx?.Owner == null) return false;
-            var inter = ctx.Owner.GetComponent<IInteractor>();
-
-            return inter.InteractionContext.NewInteractionWasPerformed(out _);
+            if (ctx.Interactor == null) return false;
+            
+            bool hasR = ctx.Interactor.InteractionContext.HasInteractionResult(out var result);
+                
+            Debug.Log($"Peek result: available {hasR}, result: {result}");
+            if (!hasR)  return false;
+            return result == resultIs;
         }
     }
 }

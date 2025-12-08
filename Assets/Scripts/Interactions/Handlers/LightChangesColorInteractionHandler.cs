@@ -13,12 +13,17 @@ namespace Arcatech.Interactions
         [SerializeField, Tooltip("The color of the light on fail")]
         private Color failureColor = Color.red;
 
-        public override void DoInteraction(bool success, IInteractor interactor, IInteractive item)
+        public override void DoInteraction(bool success, IInteractor interactor)
         {
             _light.color = success? successColor : failureColor;
         }
 
-        public override void EndInteraction(IInteractor interactor, IInteractive item = null)
-        { }
+        public override void OnPlayerEnter()
+        {
+        }
+
+        public override void OnPlayerExit()
+        {
+        }
     }
 }

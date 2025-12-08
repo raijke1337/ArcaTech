@@ -9,7 +9,7 @@ namespace Arcatech.Actions
     public class SerializedPlaceEntityResult : SerializedActionResult
     {
         [SerializeField] BaseGameEntityComponent entityToPlace;
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new PlaceEntityResult(entityToPlace);
         }

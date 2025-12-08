@@ -12,15 +12,19 @@ namespace Arcatech.Interactions
     {
         [SerializeField] DialoguePart textSuccess;
         [SerializeField] DialoguePart textFailure;
-        public override void DoInteraction(bool success, IInteractor interactor, IInteractive item)
+        public override void DoInteraction(bool success, IInteractor interactor)
         {
-            // interactor.InteractionContext.ActiveGameUnitComponent.GetComponent<DashJumpMovementController>().SetDesiredMoveDirection(Vector3.zero);
-
             GameInterfaceManager.Instance.HandleDialoguePart(success? textSuccess : textFailure,true);
         }
 
-        public override void EndInteraction(IInteractor interactor, IInteractive item = null)
+        public override void OnPlayerEnter()
         {
+            
+        }
+
+        public override void OnPlayerExit()
+        {
+            
         }
     }
 }

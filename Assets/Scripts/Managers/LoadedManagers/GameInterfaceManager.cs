@@ -75,18 +75,17 @@ namespace Arcatech.Managers
         public void NotifyTargetable(ITargetable targetable, bool show)
         {
             
-            /*Debug.Log($"NotifyTargetable {targetable} {show}");
-            if (!show)
-            {
-                aimingTooltip.gameObject.SetActive(false);
-                return;
-            }
-            if (!aimingTooltip.gameObject.activeSelf) 
-            {
-                aimingTooltip.gameObject.SetActive(true);
-                aimingTooltip.Set(targetable);
-            }*/
-
+            Debug.Log($"NotifyTargetable {targetable} {show}");
+            // if (!show)
+            // {
+            //     aimingTooltip.gameObject.SetActive(false);
+            //     return;
+            // }
+            // if (!aimingTooltip.gameObject.activeSelf) 
+            // {
+            //     aimingTooltip.gameObject.SetActive(true);
+            //     aimingTooltip.Set(targetable);
+            // }
         }
 
         #region menus

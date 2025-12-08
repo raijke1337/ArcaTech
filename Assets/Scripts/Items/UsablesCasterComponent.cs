@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Arcatech.Usables;
 using KBCore.Refs;
 using UnityEngine;
@@ -122,30 +123,45 @@ namespace Arcatech.Items
             info = ok ? "Ready" : $" {usable.Description.Title} Not Ready";
             return ok;
         }
-        
+
+        public void PrepareCommand(UnitActionType type)
+        {
+            if (_stateUnit.GetMainEntity.ShowingDebugs && _stateUnit.verboseDebugs)  Debug.Log($"[Usables] {Time.time} Prepare {type}");
+            if (!_usables.TryGetValue(type, out var usable)) return;
+            _currentUsable = usable;
+        }
+
         public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
-            if (!wasSuccessful) return false;
-            if (type == UnitActionType.Movement || type == UnitActionType.Jump || type == UnitActionType.Use) return true;
-            
-            if (!_usables.TryGetValue(type, out var usable)) return false;
-            
-            _currentUsable = usable;
-        
-            if (_usables[type] is IAffectsItemDisplay disp && disp.DrawStrategy != _currentDrawItemStrategy)
+            if (type is UnitActionType.Movement or UnitActionType.Jump or UnitActionType.Use) return true;
+
+
+            if (_stateUnit.GetMainEntity.ShowingDebugs && _stateUnit.verboseDebugs)
             {
-               
-                _currentDrawItemStrategy = disp.DrawStrategy;
+                Debug.Log($"[Usables] {Time.time} Do {type} success={wasSuccessful}, usable={_currentUsable?.Description.Title ?? "null"}");
+            }
+            
+            if (!wasSuccessful)
+            {
+                return false;
+            }
+            if (_usables[type].DrawStrategy != null && _usables[type].DrawStrategy != _currentDrawItemStrategy)
+            {
+                _currentDrawItemStrategy = _usables[type].DrawStrategy;
                 _redraw = true;
             }
             _stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
+      
             return true;
         }
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)
         {
+            if (_stateUnit.GetMainEntity.ShowingDebugs && _stateUnit.verboseDebugs) Debug.Log($"[Usables] {Time.time}Notify {notifyType} in {_currentUsable?.Description.Title}");
             _currentUsable?.Notify(notifyType);
+            if (notifyType == StateMachineNotifyType.EndUse) _currentUsable = null;
         }
+
     }
 
 }

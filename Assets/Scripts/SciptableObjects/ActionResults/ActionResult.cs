@@ -4,7 +4,7 @@ namespace Arcatech.Actions
 {
     public abstract class SerializedActionResult : ScriptableObject
     {
-        public abstract ActionResult BuildActionResult();
+        public abstract ActionResult Deserialize();
 
     }
 

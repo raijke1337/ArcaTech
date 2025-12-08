@@ -29,7 +29,7 @@ namespace Arcatech.Usables
         {
         }
 
-        public override void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
+        public override void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
         }
 

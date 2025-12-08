@@ -15,7 +15,8 @@ namespace Arcatech.Interactions
             killedComponents = toKill.ToString()+" components will be killed";
         }
 
-        public override void DoInteraction(bool success, IInteractor interactor, IInteractive item)
+
+        public override void DoInteraction(bool success, IInteractor interactor)
         {
             if (!success) return;
             foreach (var component in toKill)
@@ -24,9 +25,12 @@ namespace Arcatech.Interactions
             }
         }
 
-        public override void EndInteraction(IInteractor interactor, IInteractive item = null)
+        public override void OnPlayerEnter()
         {
-            
+        }
+
+        public override void OnPlayerExit()
+        {
         }
     }
 }

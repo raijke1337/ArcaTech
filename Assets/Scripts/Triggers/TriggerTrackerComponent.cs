@@ -11,22 +11,15 @@ namespace Arcatech.Triggers
     [RequireComponent(typeof(Collider))]
     public class TriggerTrackerComponent : ValidatedMonoBehaviour, ITriggerNotificationProvider
     {
-        [SerializeField, Self] Collider _collider;
+        [SerializeField, Self] private new Collider collider;
 
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-          //  _collider.includeLayers = -1;
-            
-        }
-        
-        private List<ITriggerNotificationReceiver> receivers;
+        private List<ITriggerNotificationReceiver> _receivers;
         public bool Active { get; set; } = true;
         
         private void OnEnable()
         { 
-            _collider.isTrigger = true;
-            _collider.includeLayers = LayerMask.GetMask("Entities");
+            collider.isTrigger = true;
+            collider.includeLayers = LayerMask.GetMask("Entities");
             var r = GetComponentsInChildren<ITriggerNotificationReceiver>();
             foreach (var r2 in r) RegisterReceiver(r2);
         }
@@ -34,53 +27,98 @@ namespace Arcatech.Triggers
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)
         {
-            receivers ??= new List<ITriggerNotificationReceiver>();
+            _receivers ??= new List<ITriggerNotificationReceiver>();
             
-            if (receivers.Contains(receiver)) return;
-            receivers.Add(receiver);
+            if (_receivers.Contains(receiver)) return;
+            _receivers.Add(receiver);
         }
 
         private List<ITriggerNotificationReceiver> toRemove = new List<ITriggerNotificationReceiver>();
         public void UnregisterReceiver(ITriggerNotificationReceiver receiver)
         {
-            if (receivers.Contains(receiver)) toRemove.Add(receiver);
+            if (_receivers.Contains(receiver)) toRemove.Add(receiver);
         }
 
         private void CleanUpReceivers()
         {
             if (toRemove.Count <= 0) return;
             //Debug.Log($"Cleaning up {toRemove.Count} receivers");
-            receivers = receivers.Except(toRemove).ToList();
+            _receivers = _receivers.Except(toRemove).ToList();
             toRemove.Clear();
         }
         
         protected void OnTriggerEnter(Collider other)
         {
-            if (!Active || receivers == null || !receivers.Any()) return;
-            
-            Debug.Log($"{gameObject.name} hit {other.gameObject.name} on layer {other.gameObject.layer}");
-            
+            if (!Active || _receivers == null || !_receivers.Any()) return;
+            _hitting = true;
             other.TryGetComponent<BaseGameEntityComponent>(out var component);
-            
-            foreach (var receiver in receivers)
+            foreach (var receiver in _receivers)
             {
                 receiver.TriggerEntered(new TriggerHitInfo(this, component,transform.position,Time.time));
+                _hittingColor = component? Color.green :   Color.red;
             }
             CleanUpReceivers();
         }
 
         protected void OnTriggerExit(Collider other)
         {
-            if (!Active || receivers == null || !receivers.Any()) return;
+            if (!Active || _receivers == null || !_receivers.Any()) return;
             if (other.TryGetComponent<BaseGameEntityComponent>(out var component))
             {
-                foreach (var receiver in receivers)
+                foreach (var receiver in _receivers)
                 {
-                    receiver.TriggerExited(component, this);
+                    receiver.TriggerExited(new TriggerHitInfo(this,component,transform.position,Time.time));
                 }
             }
 
+            _hitting = false;
             CleanUpReceivers();
+        }
+
+
+        private bool _hitting = false;
+        private Color _hittingColor = Color.red;
+        
+        private void OnDrawGizmos()
+        {
+            if (_receivers == null || !_receivers.Any())
+            {
+                Gizmos.color = Color.gray;
+            }
+            else
+            {
+                Gizmos.color = Color.yellow;
+            }
+
+            if (_hitting)
+            {
+                Gizmos.color = _hittingColor;
+            }
+
+            if (collider is BoxCollider box)
+            {
+                var colliderTransform = box.transform;
+                var center = box.center;
+                var size = box.size;
+                
+                var matrix = Matrix4x4.TRS(
+                    colliderTransform.TransformPoint(center),
+                    colliderTransform.rotation,
+                    Vector3.Scale(colliderTransform.lossyScale, size)
+                );
+                
+                var inverseScale = new Vector3(
+                    1f / colliderTransform.lossyScale.x,
+                    1f / colliderTransform.lossyScale.y,
+                    1f / colliderTransform.lossyScale.z
+                );
+                
+                Gizmos.matrix = matrix;
+                Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+                Gizmos.matrix = Matrix4x4.identity;
+            }
+
+            
         }
     }
 }

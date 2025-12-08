@@ -15,7 +15,7 @@ namespace Arcatech.Actions
     {
 
         [SerializeField] SerializedDictionary<TargetingType, StatsEffect[]> StatChanges;
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new ApplyStatChangeEffectResult(StatChanges);
         }

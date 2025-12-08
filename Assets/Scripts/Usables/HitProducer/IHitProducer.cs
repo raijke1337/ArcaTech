@@ -28,11 +28,13 @@ namespace Arcatech.Usables
 
     public abstract class HitProducer : IHitProducer
     {
-        protected readonly int MaxHits;
+        protected int MaxHits;
         protected readonly EquipmentComponent Item;
         protected readonly BaseGameEntityComponent Owner;
         protected readonly bool SelfHitActivates;
         protected int HitsThisUse;  
+        
+        
         public HitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedHitProducer cfg)
         {
             MaxHits = cfg.maxHitsPerUse;
@@ -43,15 +45,20 @@ namespace Arcatech.Usables
 
         public virtual void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
+            if (Owner.ShowingDebugs) Debug.Log($"Hit on {triggerHitInfo.Target}, hits this use {HitsThisUse} out of {MaxHits}. This hit is {(triggerHitInfo.IsValidHit?"valid" : "not valid")}");
             if (triggerHitInfo.Target == Owner && !SelfHitActivates) return;
-            HitsThisUse++;
-            if (HitsThisUse > MaxHits) return;
+            
+            if (triggerHitInfo.IsValidHit) HitsThisUse++;
+            if (HitsThisUse > MaxHits)
+            {
+                return;
+            }
             Hit?.Invoke(triggerHitInfo);
         }
-        public abstract void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger);
+        public abstract void TriggerExited(TriggerHitInfo triggerExitInfo);
         public virtual void OnChangeState(StateMachineNotifyType info)
         {
-            if (info == StateMachineNotifyType.Use)
+            if (info == StateMachineNotifyType.Starting)
                 HitsThisUse = 0;
         }
 

@@ -6,8 +6,7 @@ using UnityEngine;
 namespace Arcatech.Units.Control
 {
 
-    public class PlayerAimingComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent,
-        IInteractionTargetPicker
+    public class PlayerAimingComponent : MonoBehaviour, IPausableComponent, IKillableComponent
     {
         public bool Killed { get; set; } = false;
         public bool Paused { get; set; } = false;
@@ -26,7 +25,6 @@ namespace Arcatech.Units.Control
         {
             if (Paused || Killed) return;
             DoAiming();
-            InteractionRaycast();
         }
         
 
@@ -97,56 +95,7 @@ namespace Arcatech.Units.Control
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(_aimPosition, 0.1f);
         }
-    
-
-
     #endregion
-        #region Interaction Picker
-
-        [Header("Interaction")]
-        [SerializeField] LayerMask targetingLayerMask;
-        [SerializeField] private readonly float raycastTimer = 0.3f;
-
-        private CountDownTimer _interactionRaycastTimer;
-        private float timer;
-        private IInteractive selected;
-        
-        private void InteractionRaycast()
-        {
-            if (timer < raycastTimer)
-            {
-                timer +=  Time.deltaTime;
-                return;
-            }
-            timer = 0;
-
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, 100f,
-                    targetingLayerMask))
-            {
-                if (hit.collider.TryGetComponent(out IInteractive inter))
-                {
-                    selected = inter;
-                }
-                else
-                {                
-                    selected = null;
-                }
-            }
-        }
-        public bool HasInteractiveSelected(out IInteractive item)
-        {
-            item = selected;
-            return selected != null;
-        }
-
-        public bool DoInteraction(IInteractor interactor)
-        {
-            if (selected == null) return false;
-            var result = selected.TryInteraction(interactor);
-            selected = result ? null : selected;
-            return result;
-        }
-        
-        #endregion
+ 
     }
 }

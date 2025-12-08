@@ -10,89 +10,76 @@ using UnityEngine.Serialization;
 
 namespace Arcatech.Interactions
 {
-    [RequireComponent(typeof(EntityStateMachineComponent), typeof(PlayerAimingComponent))]
+    [RequireComponent(typeof(PlayerAimingComponent), typeof(BaseGameEntityComponent))]
     public class InteractionComponent : ValidatedMonoBehaviour, IInteractor, IUnitCommandValidator,
         IUnitCommandPerformer
     {
-        [SerializeField, Range(0, 5)] private float interactRange = 1.5f;
-
-
-        [SerializeField] private SerializedStateTransition stateSuccess;
-        [SerializeField] private SerializedStateTransition stateFail;
-
-
-        [Space, SerializeField, Self] EntityStateMachineComponent stateMachine;
-
+        [SerializeField, Self] private BaseGameEntityComponent _base;
+        [SerializeField, ReadOnlyText] private string _itemLoaded;
+        
         [SerializeField, Tooltip("effects spawn here")]
         private Transform interactionActionTransform;
-
-        private IInteractionTargetPicker _aim;
-        private float time = 0f;
-
-        private void Start()
-        {
-
-            stateMachine.AddTransition(stateSuccess.Build());
-            stateMachine.AddTransition(stateFail.Build());
-
-            _aim = GetComponentInChildren<IInteractionTargetPicker>();
-            if (_aim == null) Debug.LogError("No IInteractionTargetPicker component found on " + gameObject.name);
-        }
-
-
-        private InteractionContext context;
-
+        private InteractionContext _context;
+        
         private InteractionContext ReadContext()
         {
-            if (context == null) context = new InteractionContext(stateMachine.GetMainEntity, interactionActionTransform);
-            return context;
+            if (_context == null) _context = new InteractionContext(_base, interactionActionTransform);
+            return _context;
         }
-
         public InteractionContext InteractionContext => ReadContext();
 
-        public bool Paused { get; set; }
-
-        private bool HasInteractiveItemInRange(IInteractive item)
+        public void RegisterInteractiveItem(IInteractive item)
         {
-            if (item == null) return false;
-            return Vector3.Distance(transform.position,item.GetBaseComponent.transform.position) <= interactRange;
+            _context.CurrentInteractive = item;
+            _itemLoaded = item.GetBaseComponent.GetName;
         }
 
-        private bool HasInteractiveItemSelected(out IInteractive item)
+        public void UnregisterInteractiveItem(IInteractive item)
         {
-            return _aim.HasInteractiveSelected(out item);
+            if  (_context.CurrentInteractive == item) _context.CurrentInteractive = null;
         }
-        
+
         public bool CanDoUnitCommand(UnitActionType type, out string info)
         {
-            info = "Paused";
-            if (Paused) return false;
-            
+            info = "Interaction comp: ";
             switch (type)
             {
                 case UnitActionType.Use:
-                    info = HasInteractiveItemSelected(out var item) ? "OK / " : "No interactive selected / ";
-                    info += HasInteractiveItemInRange(item) ? "OK" : "Interactive not in range";
-                    return HasInteractiveItemSelected(out item) && HasInteractiveItemInRange(item);
-                    
-                    default: return true;
+                    info += $"{(_context.CurrentInteractive == null ? "No item" : "Has item")}";
+                    return _context.CurrentInteractive != null;
+                
+                    default:
+                    info += "default OK"; 
+                        return true;
             }
+        }
+
+        public void PrepareCommand(UnitActionType type)
+        {
+            if (type == UnitActionType.Use)
+                Debug.Log($"PrepareCommand {type}");
         }
 
         public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
-            if (!wasSuccessful) return false;
-            if (type == UnitActionType.Use && CanDoUnitCommand(type, out _))
+            if (type == UnitActionType.Use)
             {
-                InteractionContext.UpdateInteractionResult(_aim.DoInteraction(this));
+                if (!wasSuccessful)
+                {
+                    Debug.Log($"DoUnitCommand {type} with result fail");
+                    return false;
+                }
+                if (CanDoUnitCommand(type, out _))
+                {
+                    Debug.Log($"Trying interaction and updating result");
+                    InteractionContext.UpdateInteractionResult(_context.CurrentInteractive.TryInteraction(this));
+                }
+
+                return false;
             }
+
             return true;
         }
 
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.gray;
-            Gizmos.DrawWireSphere(transform.position, interactRange);
-        }
     }
 }

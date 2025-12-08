@@ -10,7 +10,7 @@ namespace Arcatech.Actions
        
         [SerializeField] SoundClipData[] sounds;
         [SerializeField] bool RandomPitch = false;
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new ProduceSoundResult(sounds,RandomPitch);
         }

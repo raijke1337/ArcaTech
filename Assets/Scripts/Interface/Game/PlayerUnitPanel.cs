@@ -103,6 +103,11 @@ namespace Arcatech.UI
 
         #endregion
 
+        public void PrepareCommand(UnitActionType type)
+        {
+            
+        }
+
         public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
             usablesIcons.HandlePlayerAction(type, wasSuccessful);

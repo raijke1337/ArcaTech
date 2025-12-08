@@ -9,34 +9,49 @@ namespace Arcatech.Interactions
     {
         public Transform ActionTransform { get; }
         public BaseGameEntityComponent EntityComponent { get; }
+        public IInteractive CurrentInteractive { get; set; }
 
-        public bool NewInteractionWasPerformed(out bool interactionResult)
-        {
-            interactionResult = success;
-            if (update)
-            {
-                update = false;
-                return true;
-            }
-            return false;
-        }
-
-        public void UpdateInteractionResult(bool result)
-        {
-            success = result;
-            update = true;
-        }
+        private int _resultVersion;
+        private int _consumedVersion;
         
-        private bool success;
-        private bool update = false;
+        private bool _pendingResult;
+        
+        public void UpdateInteractionResult(bool success)
+        {
+            _pendingResult = success;
+            _resultVersion++;
+        }
 
+        public bool HasInteractionResult(out bool success)
+        {
+            if (_resultVersion == _consumedVersion)
+            {
+                success = false;
+                return false;
+            }
+
+            success = _pendingResult;
+            return true;
+        }
+
+        public bool ConsumeInteractionResult(out bool success)
+        {
+            if (_resultVersion == _consumedVersion)
+            {
+                success = false;
+                return false;
+            }
+
+            success = _pendingResult;
+            _consumedVersion = _resultVersion;
+            return true;
+        }
         public InteractionContext (BaseGameEntityComponent comp, Transform actionTransform)
         {
             EntityComponent = comp;
             ActionTransform = actionTransform;
-            update = false;
-            success = false;
         }
+        
 
     }
 }

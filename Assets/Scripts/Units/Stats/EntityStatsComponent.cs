@@ -14,31 +14,12 @@ namespace Arcatech.Stats
     /// also uses stat change strategies to affect the rest of components
     /// </summary>
     public partial class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
-        IKillableComponent, IEffectsTakerComponent
+        IKillableComponent, IEffectsTakerComponent, IStateAugmentor
     {
+        
         [Header("Config")] [SerializeField] private BaseStatsConfig startingConfig;
         [SerializeField] private bool preserveCurrentRatioOnMaxChange = true;
-
-        [Header("Stats-related states")] [SerializeField, Self]
-        private EntityStateMachineComponent stateMachine;
-        [SerializeField] ConditionGroup killCondition;
-        [SerializeField] private SerializedUnitState killedState;
-        private UnitState _killState;
-        private List<IKillableComponent> _killables;
-        [Space]
-        [SerializeField] ConditionGroup knockDownCondition;
-        [SerializeField] private SerializedUnitState knockDownState;
-        
-        
-        
-        
-        
-        private List<ISpawnerProvider> spawners = new List<ISpawnerProvider>();
-        
-        [SerializeField] SerializedUnitState StaggeredState;
-        [SerializeField] SerializedUnitState StunnedState;
-        protected UnitState _staggerState;
-        protected UnitState _stunnedState;
+        private List<ISpawnerProvider> spawners;
         
         private class StatRuntime
         {
@@ -116,7 +97,6 @@ namespace Arcatech.Stats
 
         private void Start()
         {
-            _killables = new(GetComponentsInChildren<IKillableComponent>(true));
             spawners =  new(GetComponentsInChildren<ISpawnerProvider>(true));
         }
 
@@ -151,6 +131,7 @@ namespace Arcatech.Stats
             init = true;
         }
 
+        #region inventory
         public event UnityAction ViewChangedInventory;
 
         public void RefreshView(UnitInventoryModel model)
@@ -176,6 +157,9 @@ namespace Arcatech.Stats
             RecalculateAllMaxAndClampCurrent();
         }
 
+        #endregion
+        
+        #region apply
         public void ApplyEffect(StatsEffect eff, BaseGameEntityComponent s)
         {
             if (eff == null) return;
@@ -223,10 +207,9 @@ namespace Arcatech.Stats
 
             RecomputeConditionalFlags();
             RecalculateAllMaxAndClampCurrent();
-            
-            StaggerOnDamageCheck(eff);
         }
 
+        #endregion
         private void Update()
         {
             if (Killed || Paused) return;
@@ -284,29 +267,8 @@ namespace Arcatech.Stats
                 // Re-aggregate Max if conditional mods exist (or effects ended, or ticks may have changed conditions)
                 RecalculateAllMaxAndClampCurrent();
             }
-            
-            CheckStates();
-            
-        }
-        /// <summary>
-        /// check the kill and stun states
-        /// </summary>
-        private void CheckStates()
-        {
-            if (!killCondition.IsEmpty && EvaluateConditionGroup(killCondition))
-            {
-                stateMachine.ForceUnitState(killedState.Build());
-                foreach (var k in _killables)
-                {
-                    k.Killed = true;
-                }
-            }
         }
 
-        private void StaggerOnDamageCheck(StatsEffect eff)
-        {
-            
-        }
         private void ApplyEquipmentProvider(IEquipmentStatsProvider provider, SourceKey key)
         {
             // 1) Persistent Max modifiers (null-safe)
@@ -441,7 +403,7 @@ namespace Arcatech.Stats
             {
                 if (spawners.Any())
                 {
-                    d.onApply.BuildActionResult().ProduceResult(null,null,
+                    d.onApply.Deserialize().ProduceResult(null,null,
                         spawners[UnityEngine.Random.Range(0, spawners.Count-1)].EffectSpawn.position,
                         Quaternion.identity);
                 }
@@ -630,5 +592,57 @@ namespace Arcatech.Stats
         public bool Killed { get; set; }
         
         public bool CheckStatsConditionGroup(ConditionGroup group) =>  EvaluateConditionGroup(group);
+        
+        #region statesAugmentor
+                
+        [Header("Stats-related states apply only if a state machine is available")]
+        [Header("--------------------------")]
+        [SerializeField,Self] EntityStateMachineComponent stateMachine;
+        [SerializeField] private SerializedStateTransition toKilledState;
+        private StateTransition _toKilled;
+        private UnitState _killState;
+        
+        
+        // [Space]
+        // [SerializeField] ConditionGroup knockDownCondition;
+        // [SerializeField] private SerializedUnitState knockDownState;
+        //
+        // [SerializeField] SerializedUnitState StaggeredState;
+        // [SerializeField] SerializedUnitState StunnedState;
+        // protected UnitState _staggerState;
+        // protected UnitState _stunnedState;
+
+        public void Attach(EntityStateMachineComponent machine)
+        {
+            _toKilled = toKilledState.Build();
+            _killState = _toKilled.NextState;
+            Debug.Log("Attach ok");
+            machine.AddTransition(_toKilled);
+        }
+
+        public void Detach(EntityStateMachineComponent machine)
+        {
+            machine.RemoveTransition(_toKilled);
+        }
+
+        public void OnStateEntered(UnitState state, StateMachineContext context)
+        {
+
+        }
+
+        public void OnStateExited(UnitState state, StateMachineContext context)
+        {
+            if (state == _killState)
+            {
+                
+                var _killables = GetComponentsInChildren<IKillableComponent>(true);
+                foreach (var k in _killables)
+                {
+                    k.Killed = true;
+                }
+            }
+        }
+        
+        #endregion
     }
 }

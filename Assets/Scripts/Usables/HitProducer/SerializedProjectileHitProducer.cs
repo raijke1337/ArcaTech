@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Arcatech.Actions;
 using Arcatech.Items;
 using Arcatech.Items.Projectiles;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Pool;
 
 namespace Arcatech.Usables
@@ -56,6 +53,7 @@ namespace Arcatech.Usables
                 defaultCapacity: config.projectilePoolSize,
                 maxSize: config.projectilePoolSize * 2  // Allow pool to grow if needed
             );
+            MaxHits *= _shooting.Shots;
         }
         private ProjectileComponent CreateProjectile()
         {
@@ -95,11 +93,6 @@ namespace Arcatech.Usables
         private IEnumerator ShootingCoroutine()
         {
 
-            if (_shooting.ShotDelay > 0)
-            {
-                yield return new WaitForSeconds(_shooting.ShotDelay);
-            }
-            Debug.Log("Shooting");
             int done = 0;
             while (done < _shooting.Shots)
             {
@@ -109,10 +102,29 @@ namespace Arcatech.Usables
                 var projectile = _projectilePool.Get();
                 projectile.Reset();
                 // Position and rotate it
-                
-                Vector3 place = Item.EffectSpawn.position;
-                Quaternion rotation = Item.EffectSpawn.rotation;
+                Vector3 place;
+                Quaternion rotation;
 
+                switch (_shooting.placeType)
+                {
+                    case SpawningPlaceType.WeaponSpawner:
+                        place = Item.EffectSpawn.position;
+                        rotation = Item.EffectSpawn.rotation;
+                        break;
+                    case SpawningPlaceType.WeaponParent:
+                        place = Item.transform.parent.position;
+                        rotation = Item.transform.parent.rotation;
+                        break;
+                    case SpawningPlaceType.UnitEffectsSpawn:
+                        place = Owner.EffectSpawn.position;
+                        rotation = Owner.EffectSpawn.rotation;
+                        break;
+                    default:
+                        Debug.Log("Unknown spawning place type");
+                        place = Vector3.zero;
+                        rotation = Quaternion.identity;
+                        break;
+                }
                 projectile.transform.position = place;
                 projectile.transform.rotation = rotation;
         
@@ -132,14 +144,11 @@ namespace Arcatech.Usables
                 case StateMachineNotifyType.NoNotify:
                     break;
                 case StateMachineNotifyType.Starting:
-                    Item.gameObject.SetActive(true); // just in case...
                     break;
                 case StateMachineNotifyType.Use:
-                    Item.gameObject.SetActive(true);
-                    _shootingCor = Item.StartCoroutine(ShootingCoroutine());
+                    _shootingCor = Owner.StartCoroutine(ShootingCoroutine());
                     break;
                 case StateMachineNotifyType.EndUse:
-                    if (_shootingCor != null) Item.StopCoroutine(_shootingCor);
                     break;
                 case StateMachineNotifyType.Cancel:
                     if (_shootingCor != null) Item.StopCoroutine(_shootingCor);
@@ -148,7 +157,7 @@ namespace Arcatech.Usables
                     throw new ArgumentOutOfRangeException(nameof(info), info, null);
             }
         }
-        public override void TriggerExited(BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger)
+        public override void TriggerExited(TriggerHitInfo triggerExitInfo)
         { }
     }
 }

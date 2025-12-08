@@ -5,7 +5,7 @@ namespace Arcatech.Actions
     [CreateAssetMenu(fileName = "Null result", menuName = "Actions/Action Result/Dummy null result")]
     public class NullResult : SerializedActionResult
     {
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new NullActionResult();
         }

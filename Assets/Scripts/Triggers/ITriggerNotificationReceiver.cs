@@ -5,6 +5,6 @@ namespace Arcatech.Triggers
     public interface ITriggerNotificationReceiver
     {
         void TriggerEntered(TriggerHitInfo triggerHitInfo);
-        void TriggerExited([CanBeNull] BaseGameEntityComponent exitComponent, ITriggerNotificationProvider trigger);
+        void TriggerExited(TriggerHitInfo triggerExitInfo);
     }
 }

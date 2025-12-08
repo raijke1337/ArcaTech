@@ -8,7 +8,7 @@ namespace Arcatech.Actions
     public class ApplyJumpResultSO : SerializedActionResult
     {
         [SerializeField] bool jumpState = true;
-        public override ActionResult BuildActionResult()
+        public override ActionResult Deserialize()
         {
             return new ApplyJumpResult(jumpState);
         }
