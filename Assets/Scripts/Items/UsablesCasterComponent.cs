@@ -68,6 +68,8 @@ namespace Arcatech.Items
             {
                 _stateUnit.AddTransition(usable.GetStateTransition);
             }
+
+            _redraw = true;
         }
 
         public void Update()

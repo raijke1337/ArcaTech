@@ -45,16 +45,18 @@ namespace Arcatech.Units
         {
             if (augmentor == null || _activeAugmentors.Contains(augmentor)) return;
             _activeAugmentors.Add(augmentor);
-            Debug.Log($"Register {augmentor}");
+
             augmentor.Attach(this);
+            if (GetMainEntity.ShowingDebugs) Debug.Log($"Register {augmentor}");
         }
 
         public void UnregisterAugmentor(IStateAugmentor augmentor)
         {
             if (augmentor == null || !_activeAugmentors.Contains(augmentor)) return;
             augmentor.Detach(this);
-            Debug.Log($"Deregister {augmentor}");
             _activeAugmentors.Remove(augmentor);
+            
+            if (GetMainEntity.ShowingDebugs) Debug.Log($"Deregister {augmentor}");
         }
         
         // --------------------------------------

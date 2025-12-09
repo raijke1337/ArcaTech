@@ -1,13 +1,10 @@
 ﻿using System;
-using Arcatech.Actions;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
 using Arcatech.Managers;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
 using KBCore.Refs;
-using NUnit.Framework;
 using UnityEngine.EventSystems;
 
 namespace Arcatech.Interactions
@@ -37,10 +34,11 @@ namespace Arcatech.Interactions
         
         public BaseGameEntityComponent GetBaseComponent => baseComp;
         private List<IKillableComponent> killableComponents;
-        
-        protected override void OnValidate()
+
+
+        private void Awake()
         {
-            base.OnValidate();
+            
             _current = new();
             handlersOnThisItem = new  List<InteractionHandlerBase>(GetComponentsInChildren<InteractionHandlerBase>());
             killableComponents =  new  List<IKillableComponent>(GetComponentsInChildren<IKillableComponent>());
@@ -200,7 +198,7 @@ namespace Arcatech.Interactions
             if (!triggerHitInfo.IsValidHit) return;
             if (triggerHitInfo.Target.CompareTag("Player"))
             {
-                Debug.Log("Player enters interaction area");
+                if (triggerHitInfo.Target.ShowingDebugs) Debug.Log("Player enters interaction area");
 
                 if (triggerHitInfo.Target.TryGetComponent(out EntityStateMachineComponent fsm))
                 {
@@ -210,6 +208,11 @@ namespace Arcatech.Interactions
                 if (triggerHitInfo.Target.TryGetComponent(out IInteractor interactor))
                 {
                     interactor.RegisterInteractiveItem(this);
+                }
+
+                if (_current == null)
+                {
+                    Awake();
                 }
 
                 foreach (var h in _current)

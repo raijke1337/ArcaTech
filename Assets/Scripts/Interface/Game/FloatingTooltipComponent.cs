@@ -11,10 +11,7 @@ namespace Arcatech.UI
 
         [SerializeField] private TextMeshProUGUI TitleLabel;
         [SerializeField] private TextMeshProUGUI InteractiveLabel;
-        //[SerializeField] private TextMeshProUGUI InspectLabel;
         private RectTransform _rectTransform;
-      //  private ITargetable currentTarget;
-
         private void Start()
         {
             _rectTransform = GetComponent<RectTransform>();
@@ -32,9 +29,8 @@ namespace Arcatech.UI
             // Add offset so tooltip doesn't overlap cursor
             Vector2 offset = new Vector2(30f, -30f);
             _rectTransform.position = mousePosition + offset;
-        
-            // Keep tooltip on screen
-           // ClampToScreen();
+
+           ClampToScreen();
         }
     
         void ClampToScreen()
@@ -66,15 +62,12 @@ namespace Arcatech.UI
         public void Set(ITargetable tgt)
         {
             TitleLabel.text = tgt.TargetName;
-            if (tgt is IInteractive i)
-            {
-                InteractiveLabel.gameObject.SetActive(true);
-                InteractiveLabel.text = i.InteractionText;
-            }
-            else
-            {
-                InteractiveLabel.gameObject.SetActive(false);
-            }
+            // if (tgt is IInteractive i)
+            // {
+            //     InteractiveLabel.gameObject.SetActive(true);
+            //     InteractiveLabel.text = i.InteractionText;
+            // }
+
             
         }
         

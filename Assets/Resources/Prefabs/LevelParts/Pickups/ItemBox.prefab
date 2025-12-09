@@ -113,11 +113,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pauser: {fileID: 2694229768090684165}
-  _name: 
+  _name: Mystery box
   entitySide: 0
   _effectSpawn: {fileID: 4679532302889400573}
   destroyOnDeath: 1
-  timerToDestroy: 2
+  timerToDestroy: 0
   _showDebugs: 0
   _rigidbody: {fileID: 2433852071694660535}
   playerOverride: 0
@@ -182,19 +182,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemDisappearsWhenUsed: 1
   handlersActivationType: 1
-  useCooldown: 0
+  useCooldown: 10
   baseComp: {fileID: 1817685239860021059}
   entityMouseOver: {fileID: 6923855417004280565}
   triggerTrackerComponent: {fileID: 8543700310010501694}
   handlersOnThisItem:
   - {fileID: 1141447577227378751}
-  - {fileID: 4662967982192831425}
   handlers: []
   interactTooltipText: Open
   condition: {fileID: 11400000, guid: af1b740f6150d3847abaae36f70dcb37, type: 2}
-  interactStart: {fileID: 0}
-  interactionSuccess: {fileID: 0}
-  interactionFail: {fileID: 0}
+  interactStart: {fileID: 11400000, guid: 4f88d8ba734f89946acb4a26f0d45a7c, type: 2}
+  interactionSuccess: {fileID: 11400000, guid: d909ef16991e56548a9d7dda758d2638, type: 2}
+  interactionFail: {fileID: 11400000, guid: 7130243591e58444dbefd6992373d4ba, type: 2}
 --- !u!114 &1141447577227378751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,14 +310,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8970017742291070290}
-    - targetCorrespondingSourceObject: {fileID: 5473813059742409218, guid: c80b2a7025a63e145a0cd07596fce382,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2158163495540631190}
-    - targetCorrespondingSourceObject: {fileID: 5473813059742409218, guid: c80b2a7025a63e145a0cd07596fce382,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4662967982192831425}
   m_SourcePrefab: {fileID: 100100000, guid: c80b2a7025a63e145a0cd07596fce382, type: 3}
 --- !u!4 &674935701156225789 stripped
 Transform:
@@ -366,43 +357,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _r: {fileID: 8313219147688725769}
---- !u!95 &2158163495540631190
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6229965758345446382}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &4662967982192831425
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6229965758345446382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29ed30e41eec48b68af239f73c66fe9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StartTrigger: Start
-  EndTrigger: End
-  UseTrigger: Use
 --- !u!23 &8313219147688725769 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 7988778690293427429, guid: c80b2a7025a63e145a0cd07596fce382,

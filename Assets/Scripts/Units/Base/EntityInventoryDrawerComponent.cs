@@ -24,18 +24,12 @@ namespace Arcatech.Units
         public event UnityAction ViewChangedInventory;
         public void RefreshView(UnitInventoryModel model)
         {
-            if (inventoryModel != null && inventoryModel != model)
+            if (inventoryModel != model)
             {
                 // model is changed for some reason
                 inventoryModel = model;
-                DrawItems(defaultItemsDrawStrat);
             }
-            if (inventoryModel == null)
-            {
-                // first init
-                inventoryModel = model;
-                DrawItems(defaultItemsDrawStrat);
-            }
+            DrawItems(defaultItemsDrawStrat);
         }
         
         #endregion
@@ -47,7 +41,7 @@ namespace Arcatech.Units
 
         private void DrawItems(IDrawItemStrategy strat)
         {
-            if (strat == currentDrawStrategy) return; // this is probably  checked elsewhere but just in case
+            if (strat == currentDrawStrategy || strat == null) return; // this is probably  checked elsewhere but just in case
             currentDrawStrategy = strat;
             foreach (var e in inventoryModel.ListEquipped)
             {
@@ -88,7 +82,7 @@ namespace Arcatech.Units
             if (drawItemsStrategyProvider is { NeedsRedraw: true })
             {
                 //Debug.Log($"Update strategy");
-                DrawItems(drawItemsStrategyProvider.GetDrawStrategy);
+                DrawItems(drawItemsStrategyProvider?.GetDrawStrategy);
             }
         }
     }

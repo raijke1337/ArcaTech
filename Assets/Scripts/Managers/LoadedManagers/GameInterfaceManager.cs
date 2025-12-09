@@ -5,6 +5,7 @@ using Arcatech.Texts;
 using Arcatech.UI;
 using Arcatech.Units;
 using Arcatech.Units.Control;
+using DG.Tweening;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -29,10 +30,11 @@ namespace Arcatech.Managers
         [SerializeField] private GameObject _ded;
         [SerializeField] private GameObject _pause;
         [SerializeField,Child] private ItemCardComponent inspectItemCard;
-        [SerializeField,Child] private FloatingTooltipComponent aimingTooltip;
+        [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
+        
+        private Sequence tooltipSeq;
         
         
-
         /// <summary>
         /// called by inputs
         /// </summary>
@@ -48,7 +50,6 @@ namespace Arcatech.Managers
 
         private void Start()
         {
-
             if (GameManager.Instance.GetCurrentLevelData.LevelType == LevelType.Game)
             {
                 _playerPan.gameObject.SetActive(true);
@@ -59,8 +60,6 @@ namespace Arcatech.Managers
                 _playerPan.gameObject.SetActive(false);
                 _ded.SetActive(false);
             }
-            //_aim = FindFirstObjectByType<PlayerAimingComponent>();
-           // if (_aim == null) Debug.LogWarning("Couldn't find PlayerAimingComponent");
         }
         
         #region game dialogues and texts
@@ -74,22 +73,68 @@ namespace Arcatech.Managers
         
         public void NotifyTargetable(ITargetable targetable, bool show)
         {
-            
-            Debug.Log($"NotifyTargetable {targetable} {show}");
-            // if (!show)
-            // {
-            //     aimingTooltip.gameObject.SetActive(false);
-            //     return;
-            // }
-            // if (!aimingTooltip.gameObject.activeSelf) 
-            // {
-            //     aimingTooltip.gameObject.SetActive(true);
-            //     aimingTooltip.Set(targetable);
-            // }
+            if (!show)
+            {
+               FadeOut(floatingTooltip.transform);
+                return;
+            }
+            floatingTooltip.Set(targetable);
+            FadeIn(floatingTooltip.transform);
         }
 
-        #region menus
+        #region effects
 
+        private void FadeIn(Transform window)
+        {
+            var cg = window.GetComponent<CanvasGroup>();
+
+            // Cancel any in-flight tweens (prevents stale OnComplete from hiding it)
+            tooltipSeq?.Kill(false);
+            cg.DOKill(false);
+            window.DOKill(false);
+
+            // Make sure it's active and start from hidden values if necessary
+            window.gameObject.SetActive(true);
+            if (cg.alpha < 1f) cg.alpha = 0f;
+            if (window.localScale.x < 1f || window.localScale.y < 1f) window.localScale = Vector3.zero;
+
+            tooltipSeq = DOTween.Sequence()
+                .Join(cg.DOFade(1f, 0.25f).SetEase(Ease.OutQuad))
+                .Join(window.DOScale(1f, 0.25f).SetEase(Ease.OutBack));
+        }
+
+        private void FadeOut(Transform window)
+        {
+            var cg = window.GetComponent<CanvasGroup>();
+
+            // Cancel any in-flight tweens
+            tooltipSeq?.Kill(false);
+            cg.DOKill(false);
+            window.DOKill(false);
+
+            tooltipSeq = DOTween.Sequence()
+                .Join(cg.DOFade(0f, 0.2f).SetEase(Ease.InQuad))
+                .Join(window.DOScale(0f, 0.2f).SetEase(Ease.InBack))
+                .OnComplete(() => window.gameObject.SetActive(false));
+
+        }
+        
+        #endregion
+
+        private void OnDisable()
+        {
+            tooltipSeq?.Kill(false);
+            if (floatingTooltip != null)
+            {
+                var t = floatingTooltip.transform;
+                t.DOKill(false);
+                t.GetComponent<CanvasGroup>()?.DOKill(false);
+            }
+        }
+
+
+        #region menus
+        
         
         
         public void ShowPauseMenu(PauseToggleEvent isPause)

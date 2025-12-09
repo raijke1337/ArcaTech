@@ -7,12 +7,8 @@ namespace Arcatech.Items
     public class ItemContainerComponent : InteractionHandlerBase
     {
         [SerializeField] private ItemSO content;
-
-        public void PutItem(ItemSO item)
-        {
-            content = item;
-        }
-
+        
+        public void PutItem(ItemSO item)=>content = item;
         ItemSO TakeItem()
         {
             ItemSO r =  content;
@@ -31,13 +27,11 @@ namespace Arcatech.Items
         }
 
         public override void OnPlayerEnter()
-        {
-            
-        }
+        { }
 
         public override void OnPlayerExit()
-        {
-            
-        }
+        { }
+        
+        
     }
 }

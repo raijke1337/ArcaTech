@@ -11,6 +11,7 @@ namespace Arcatech.Items
     [Serializable]
     public class Item : IIconContent
     {
+        protected ItemSO Config;
         public BaseGameEntityComponent Owner { get; }
         public SerializableGuid ID { get; }
         public Item(ItemSO cfg, BaseGameEntityComponent ow)
@@ -18,14 +19,21 @@ namespace Arcatech.Items
             Owner = ow;
             Description = cfg.Description;
             ID =  cfg.ID;
-            Boxed = cfg.PackItem();
-            Boxed.gameObject.SetActive(false);
+            Config = cfg;
         }
         public ItemSlot Slot { get; protected set; }
         public virtual Description Description { get; }
         public virtual float FillValue => 0;
         public virtual string IconNumber => string.Empty;
-        public ItemContainerComponent Boxed { get; }
 
+        public ItemContainerComponent PackItem
+        {
+            get
+            {
+                var box = GameObject.Instantiate(Config.worldItemContainerPrefab);
+                box.PutItem(Config);
+                return box;
+            }
+        }
     }
 }

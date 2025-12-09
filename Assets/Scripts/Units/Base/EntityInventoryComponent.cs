@@ -1,8 +1,6 @@
 ﻿using Arcatech.Items;
 using KBCore.Refs;
 using System.Collections.Generic;
-using Arcatech.Actions;
-using Arcatech.Interactions;
 using UnityEngine;
 
 namespace Arcatech.Units
@@ -22,7 +20,6 @@ namespace Arcatech.Units
 
         private List<IUnitInventoryView> _views;
         [SerializeField] private UnitInventoryModel _model;
-        [SerializeField] private ActionResultIsProducedInteractionHandler droppedItemPrefab;
 
         private void OnEnable()
         {
@@ -107,9 +104,10 @@ namespace Arcatech.Units
                 if (un != null) 
                 {
                     // something was dropped
-                    var box = un.Boxed;
-                    box.transform.position = transform.position;
+                    var box = un.PackItem;
+                    box.transform.position = transform.position+transform.forward;
                     box.gameObject.SetActive(true);
+                    Destroy(un.DisplayItem.gameObject);
                 }
             }
             else
