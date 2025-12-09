@@ -13,7 +13,7 @@ namespace Arcatech.Items
         
         [SerializeField] Description description;        
         [Space] public int MaxStack = 1;
-
+        [SerializeField] private ItemContainerComponent worldItemContainer;
 
         public virtual Item BuildItem(BaseGameEntityComponent owner)
         {
@@ -23,5 +23,12 @@ namespace Arcatech.Items
         public Description Description => description;
         public float FillValue => 0;
         public string IconNumber => string.Empty;
+
+        public ItemContainerComponent PackItem()
+        {
+            var box = Instantiate(worldItemContainer);
+            box.PutItem(this);
+            return box;
+        }
     }
 }

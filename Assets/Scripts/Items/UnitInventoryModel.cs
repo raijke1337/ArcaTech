@@ -113,16 +113,15 @@ namespace Arcatech.Items
         }
 
 
-        public void EquipItem (Equipment toEquip, out EquipSO dropped)
+        public void EquipItem (Equipment toEquip, out Equipment dropped)
         {
             dropped = null;
 
             if (equipments.TryGetValue(toEquip.Slot, out var drop))
             {
-               // dropped = drop.Config as EquipSO;
                 equipments.Remove(toEquip.Slot);
                 drop.OnUnequip();
-                
+                dropped = drop;
             }
 
             equipments[toEquip.Slot] =toEquip;

@@ -18,13 +18,14 @@ namespace Arcatech.Items
             Owner = ow;
             Description = cfg.Description;
             ID =  cfg.ID;
-            PackItem = cfg;
+            Boxed = cfg.PackItem();
+            Boxed.gameObject.SetActive(false);
         }
         public ItemSlot Slot { get; protected set; }
         public virtual Description Description { get; }
         public virtual float FillValue => 0;
         public virtual string IconNumber => string.Empty;
-        public ItemSO PackItem { get; }
+        public ItemContainerComponent Boxed { get; }
 
     }
 }

@@ -1,4 +1,5 @@
 using Arcatech.Interactions;
+using Arcatech.Units;
 using UnityEngine;
 
 namespace Arcatech.Items
@@ -7,24 +8,36 @@ namespace Arcatech.Items
     {
         [SerializeField] private ItemSO content;
 
-        public void PackItem(ItemSO item)
+        public void PutItem(ItemSO item)
         {
             content = item;
         }
 
+        ItemSO TakeItem()
+        {
+            ItemSO r =  content;
+            content = null; 
+            return r;
+        }
+
         public override void DoInteraction(bool success, IInteractor interactor)
         {
-            throw new System.NotImplementedException();
+            if (!success) return;
+            if (interactor.InteractionContext.EntityComponent
+                .TryGetComponent(out EntityInventoryComponent component))
+            {
+                component.PickUpItem(TakeItem().BuildItem(interactor.InteractionContext.EntityComponent));
+            }
         }
 
         public override void OnPlayerEnter()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public override void OnPlayerExit()
         {
-            throw new System.NotImplementedException();
+            
         }
     }
 }

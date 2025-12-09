@@ -15,8 +15,7 @@ namespace Arcatech.Units
             if (ctx.Interactor == null) return false;
             
             bool hasR = ctx.Interactor.InteractionContext.HasInteractionResult(out var result);
-                
-            Debug.Log($"Peek result: available {hasR}, result: {result}");
+            //Debug.Log($"Peek result: available {hasR}, result: {result}");
             if (!hasR)  return false;
             return result == resultIs;
         }

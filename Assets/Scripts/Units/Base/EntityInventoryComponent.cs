@@ -107,6 +107,9 @@ namespace Arcatech.Units
                 if (un != null) 
                 {
                     // something was dropped
+                    var box = un.Boxed;
+                    box.transform.position = transform.position;
+                    box.gameObject.SetActive(true);
                 }
             }
             else

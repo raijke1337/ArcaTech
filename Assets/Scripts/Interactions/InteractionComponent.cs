@@ -30,13 +30,13 @@ namespace Arcatech.Interactions
 
         public void RegisterInteractiveItem(IInteractive item)
         {
-            _context.CurrentInteractive = item;
+            ReadContext().CurrentInteractive = item;
             _itemLoaded = item.GetBaseComponent.GetName;
         }
 
         public void UnregisterInteractiveItem(IInteractive item)
         {
-            if  (_context.CurrentInteractive == item) _context.CurrentInteractive = null;
+            if  (ReadContext().CurrentInteractive == item) _context.CurrentInteractive = null;
         }
 
         public bool CanDoUnitCommand(UnitActionType type, out string info)
@@ -45,8 +45,8 @@ namespace Arcatech.Interactions
             switch (type)
             {
                 case UnitActionType.Use:
-                    info += $"{(_context.CurrentInteractive == null ? "No item" : "Has item")}";
-                    return _context.CurrentInteractive != null;
+                    info += $"{(ReadContext().CurrentInteractive == null ? "No item" : "Has item")}";
+                    return ReadContext().CurrentInteractive != null;
                 
                     default:
                     info += "default OK"; 
@@ -72,7 +72,7 @@ namespace Arcatech.Interactions
                 if (CanDoUnitCommand(type, out _))
                 {
                     Debug.Log($"Trying interaction and updating result");
-                    InteractionContext.UpdateInteractionResult(_context.CurrentInteractive.TryInteraction(this));
+                    InteractionContext.UpdateInteractionResult(ReadContext().CurrentInteractive.TryInteraction(this));
                 }
 
                 return false;
