@@ -34,8 +34,7 @@ namespace Arcatech.Usables
     [Serializable]
     public struct SharedUsablesSettings
     {
-        [SerializeField] public int charges;
-        [SerializeField] public float chargeReload;
+        [SerializeField] public SerializedChargesStrategy charge;
         [SerializeField] public StatsEffect useCost;
         [SerializeField] public DrawItemsStrategy drawItemsStrategy;
     }

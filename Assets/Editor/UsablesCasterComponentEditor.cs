@@ -1,14 +1,12 @@
 ﻿using System.Linq;
 using UnityEditor;
+using UnityEngine;
 
-namespace Arcatech.Items
+namespace Arcatech.Items.Editor
 {
-    using UnityEngine;
-    using UnityEditor;
-    using System.Collections.Generic;
 
     [CustomEditor(typeof(UsablesCasterComponent))]
-    public class UsablesCasterComponentEditor : Editor
+    public class UsablesCasterComponentEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {

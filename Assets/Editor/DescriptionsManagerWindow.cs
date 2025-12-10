@@ -20,8 +20,9 @@ public class DescriptionManagerWindow : EditorWindow
     {
         GetWindow<DescriptionManagerWindow>("Description Manager");
     }
+    
 
-    private void OnEnable()
+    private void OnGUI()
     {
         _cardStyle = new GUIStyle("box")
         {
@@ -39,10 +40,7 @@ public class DescriptionManagerWindow : EditorWindow
         {
             fontStyle = FontStyle.Bold
         };
-    }
-
-    private void OnGUI()
-    {
+        
         EditorGUILayout.Space();
         DrawCreateSection();
         EditorGUILayout.Space();

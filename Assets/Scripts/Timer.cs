@@ -66,6 +66,9 @@ namespace Arcatech
                 Stop();
             }
         }
+        /// <summary>
+        /// has expired
+        /// </summary>
         public bool IsReady => Time <= 0;
         public void Reset()
         {

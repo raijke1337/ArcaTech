@@ -26,7 +26,7 @@ namespace Arcatech.Usables
             {
             
             provider = item
-                .GetComponent<ITriggerNotificationProvider>(); // Assume pre-attached for melee;
+                .GetComponentInChildren<ITriggerNotificationProvider>(); // Assume pre-attached for melee;
             if (provider == null)
             {
                 // Fallback: Add/reuse a component as provider

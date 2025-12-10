@@ -24,9 +24,8 @@ namespace Arcatech.Usables
             _hitProducer = config.hitProducer.Deserialize(owner,equipment);
             _effectApplier = config.effectApplier.Deserialize();
             _results = new List<ActionResult>();
-            _maxCharges = config.settings.charges;
-            _currentCharges = config.settings.charges;
-            _chargeReloadTime = config.settings.chargeReload;
+            _reload = config.settings.charge.Deserialize();
+            
             foreach (var r in config.effects)
             {
                 _results.Add(r.Deserialize());
@@ -37,60 +36,33 @@ namespace Arcatech.Usables
 
         private readonly BaseGameEntityComponent _owner;
         private readonly EquipmentComponent _equipment;
+        public bool UsableIsReady()
+        {
+            return _reload.Ready;
+        }
+
         public StateTransition GetStateTransition { get; }
         public StatsEffect GetCost { get; }
 
         private readonly IHitProducer _hitProducer;
         private readonly IEffectApplier _effectApplier;
         private readonly List<ActionResult> _results;
-        
-        private readonly int _maxCharges;
-        private readonly float _chargeReloadTime;
-        private float _reloadTimer;
-        private int _currentCharges;
-
-        public float FillValue
-        {
-            get
-            {
-                if (_currentCharges < _maxCharges)
-                {
-                    return _reloadTimer / _chargeReloadTime;
-                }
-                return 0;
-            }
-        }
-        public string IconNumber => _currentCharges.ToString();
-        public bool UsableIsReady()
-        {
-            return _currentCharges > 0;
-        }
-
-
+        private readonly IReloadStrategy _reload;
+        public Description Description { get; }
+        public float FillValue => _reload.FillValue;
+        public string IconNumber => _reload.DisplayText;
+        public IDrawItemStrategy DrawStrategy { get; }
 
         public void DoUpdate(float delta)
         {
-            if (_currentCharges < _maxCharges)
-            {
-                if (_reloadTimer > 0)
-                {
-                    _reloadTimer -= delta;
-                }
-
-                if (_reloadTimer <= 0)
-                {
-                    _currentCharges++;
-                    _currentCharges = Mathf.Clamp(_currentCharges, 0, _maxCharges);
-                    _reloadTimer = _chargeReloadTime;
-                }
-            }
+            _reload.Tick(delta);
         }
 
         public void Notify(StateMachineNotifyType notifyType)
         {
             if (notifyType == StateMachineNotifyType.Use)
             {
-                _currentCharges--;
+                _reload.Use();
             }
             _hitProducer.OnChangeState(notifyType);
         }
@@ -101,7 +73,6 @@ namespace Arcatech.Usables
         }
         
 
-        public Description Description { get; }
-        public IDrawItemStrategy DrawStrategy { get; }
+
     }
 }
