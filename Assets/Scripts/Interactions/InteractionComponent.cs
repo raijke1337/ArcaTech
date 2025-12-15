@@ -56,8 +56,8 @@ namespace Arcatech.Interactions
 
         public void PrepareCommand(UnitActionType type)
         {
-            if (type == UnitActionType.Use)
-                Debug.Log($"PrepareCommand {type}");
+          //  if (type == UnitActionType.Use)
+             //   Debug.Log($"PrepareCommand {type}");
         }
 
         public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
@@ -66,12 +66,12 @@ namespace Arcatech.Interactions
             {
                 if (!wasSuccessful)
                 {
-                    Debug.Log($"DoUnitCommand {type} with result fail");
+                   // Debug.Log($"DoUnitCommand {type} with result fail");
                     return false;
                 }
                 if (CanDoUnitCommand(type, out _))
                 {
-                    Debug.Log($"Trying interaction and updating result");
+                  //  Debug.Log($"Trying interaction and updating result");
                     InteractionContext.UpdateInteractionResult(ReadContext().CurrentInteractive.TryInteraction(this));
                 }
 

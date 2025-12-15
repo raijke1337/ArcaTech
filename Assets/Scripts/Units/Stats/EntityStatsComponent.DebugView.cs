@@ -32,7 +32,7 @@ namespace Arcatech.Stats
         public struct DebugEffectView
         {
             public string displayName;
-            public StatsEffect effectAsset;
+            public UsableEffect effectAsset;
             public int stacks;
             public float? secondsRemaining;
             public IReadOnlyList<StatModifier> persistentMaxMods;

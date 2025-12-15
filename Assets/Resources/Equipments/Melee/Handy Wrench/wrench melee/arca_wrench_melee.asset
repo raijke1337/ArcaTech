@@ -15,11 +15,16 @@ MonoBehaviour:
   description: {fileID: 11400000, guid: ec308f1d47723a34d951e7f66f7716ea, type: 2}
   settings:
     charge: {fileID: 11400000, guid: fbb0922400831434f8a8f15b91012cd5, type: 2}
-    useCost: {fileID: 11400000, guid: 7c955d9b7f540cd4da9f0c43b0904e32, type: 2}
+    useCost: {fileID: 11400000, guid: b28d1dff71f068c48a69bc117abd3183, type: 2}
     drawItemsStrategy: {fileID: 11400000, guid: 0c8284373a6a2eb45b8a719e3880974e,
       type: 2}
   useStateTransition: {fileID: 11400000, guid: 3b04d2f2038f74740bc71547abd209d7, type: 2}
-  hitProducer: {fileID: 11400000, guid: f99a33ada73c61848807daf950b718cc, type: 2}
-  effectApplier: {fileID: 11400000, guid: 557a079671d77074e8911026024fea3a, type: 2}
-  effects:
-  - {fileID: 11400000, guid: 9f58592c887d05542a91c99636d28e36, type: 2}
+  compositeUsableEffects:
+  - hitProducer: {fileID: 11400000, guid: f99a33ada73c61848807daf950b718cc, type: 2}
+    effectApplier: {fileID: 11400000, guid: 557a079671d77074e8911026024fea3a, type: 2}
+    effects:
+    - {fileID: 11400000, guid: 9f58592c887d05542a91c99636d28e36, type: 2}
+    onValidHit: {fileID: 6481243711350322080, guid: 5a02b6e445c874941bfa6475aa9c4f4b,
+      type: 3}
+    onInvalidHit: {fileID: 5039004643809507552, guid: 2cfee1a623642dc4ab4e5d3bf667de1f,
+      type: 3}

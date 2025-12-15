@@ -1,5 +1,4 @@
 ﻿using System;
-using Arcatech.Actions;
 using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Texts;
@@ -17,14 +16,17 @@ namespace Arcatech.Usables
         
         [SerializeField] public SerializedStateTransition useStateTransition;
 
-        [Header("Hit producer")] 
+        [Header("Effects of usable")]
+        public CompositeUsableApplicationSerialized[] compositeUsableEffects;
+        
+        /*[Header("Hit producer")] 
         public SerializedHitProducer hitProducer;
         
         [Header("Apply effects of hits")]
         public SerializedEffectApplier effectApplier;
         
         [Header("The effects")]
-        public SerializedActionResult[] effects;
+        public SerializedActionResult[] effects;*/
 
         public UsableStrategy Deserialize(BaseGameEntityComponent owner, EquipmentComponent ingameItem)
         {
@@ -35,7 +37,8 @@ namespace Arcatech.Usables
     public struct SharedUsablesSettings
     {
         [SerializeField] public SerializedChargesStrategy charge;
-        [SerializeField] public StatsEffect useCost;
+        [SerializeField] public UsableEffect useCost;
         [SerializeField] public DrawItemsStrategy drawItemsStrategy;
     }
 }
+

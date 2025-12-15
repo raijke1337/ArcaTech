@@ -16,5 +16,13 @@ namespace Arcatech.Usables
                 usables.Add(st.Key, st.Value.Deserialize(ow,DisplayItem));
             }
         }
+
+        public void OnUnequip()
+        {
+            foreach (var st in usables.Values)
+            {
+                st.CleanUp();
+            }
+        }
     }
 }

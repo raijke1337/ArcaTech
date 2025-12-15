@@ -5,9 +5,7 @@ namespace Arcatech
 {
 
     #region delegates
-    public delegate void SimpleEventsHandler();
     public delegate void SimpleEventsHandler<T>(T arg);
-    public delegate void SimpleEventsHandler<T1, T2>(T1 arg1, T2 arg2);
 
     #endregion
 
@@ -27,8 +25,15 @@ namespace Arcatech
         ArmatureRoot,
         ShieldEmpty
     }
-
-
+    public enum ItemSlot
+    {
+        None,
+        MeleeWeap,
+        RangedWeap,
+        Shield,
+        Booster,
+        Costume,
+    }
 
 
     #endregion

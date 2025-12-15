@@ -19,18 +19,23 @@ namespace Arcatech
         public bool RequestCombatAction(UnitActionType type)
         {
             if (Paused || Killed) { return false; }
-            if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] {Time.time} Request {type} (validators: {_commandValidators.Count})");
+            if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] At {Time.time} Request {type} (validators: {_commandValidators.Count})");
             foreach (var v in _commandValidators)
             {
                 if (!v.CanDoUnitCommand(type, out string info))
                 {
-                    if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] failed command {type} in {v}.{info} {Time.time}");
+                    if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] failed command {type} in {v}.{info} at {Time.time}");
+                    foreach (var p in _commandPerformers)
+                    {
+                        p.DoUnitCommand(type, false);
+                    }
+                    // this should be in state machine but I think this bandaid is fine enough for now
                     return false;
                 }
             }
             var ok = stateMachine.TryCommandTransition(type,_commandPerformers);
             if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) 
-                Debug.Log($"[Input] {Time.time} Request {type} -> {(ok ? "accepted" : "deferred/rejected")}");
+                Debug.Log($"[Input] At {Time.time} Request {type} -> {(ok ? "accepted" : "deferred/rejected")}");
             return ok;
         }
 

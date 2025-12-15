@@ -76,7 +76,7 @@ namespace Arcatech.Stats
         private class ActiveEffect
         {
             public SourceKey key;
-            public StatsEffect effect;
+            public UsableEffect effect;
             public float? expireAt;
             public object sourceRef;
             public int stacks = 1;
@@ -120,7 +120,6 @@ namespace Arcatech.Stats
                         : rs.startCurrent;
                     st.current = Mathf.Clamp(startCurrent, st.minClamp, Mathf.Max(st.maxClamp, st.max));
                     stats[rs.stat] = st;
-
                 }
             }
 
@@ -160,7 +159,7 @@ namespace Arcatech.Stats
         #endregion
         
         #region apply
-        public void ApplyEffect(StatsEffect eff, BaseGameEntityComponent s)
+        public void ApplyEffect(UsableEffect eff, BaseGameEntityComponent s)
         {
             if (eff == null) return;
 
@@ -444,7 +443,7 @@ namespace Arcatech.Stats
         public float GetMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.max : 0f;
         public float GetBaseMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.baseMax : 0f;
 
-        public bool CanApplyCost(StatsEffect cost)
+        public bool CanApplyCost(UsableEffect cost)
         {
             if (cost == null) return true;
             if (cost.instantDeltas == null || cost.instantDeltas.Count == 0) return true;

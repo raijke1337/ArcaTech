@@ -11,7 +11,7 @@ public class SerializedUsableStrategiesWindow : EditorWindow
     private const int Columns = 3;  // Adjust number of columns as needed
     private const float CardWidth = 200f;  // Adjust card width
 
-    [MenuItem("Window/Serialized Usable Strategies")]
+    [MenuItem("Window/Game/Usables")]
     private static void ShowWindow()
     {
         var window = GetWindow<SerializedUsableStrategiesWindow>();
@@ -96,9 +96,9 @@ public class SerializedUsableStrategiesWindow : EditorWindow
         }
         
         // Additional info
-        if (strategy.effects != null)
+        if (strategy.compositeUsableEffects != null)
         {
-            EditorGUILayout.LabelField("Effects: " + strategy.effects.Length);
+            EditorGUILayout.LabelField("Effects: " + strategy.compositeUsableEffects.Length);
         }
         
         if (strategy.settings.useCost != null)

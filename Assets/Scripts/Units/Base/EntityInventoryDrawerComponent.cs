@@ -48,11 +48,11 @@ namespace Arcatech.Units
                 ItemPlaceType placeType = strat.GetPlaces[e.Slot];
                 if (placeType == ItemPlaceType.Hidden)
                 {
-                    e.OnUnequip(); 
+                    e.DisplayItem.gameObject.SetActive(false);
                 }
                 else
                 {
-                    e.OnEquip();
+                    e.DisplayItem.gameObject.SetActive(true);
                     e.SetItemParent(itemEmpties.ItemPositions[strat.GetPlaces[e.Slot]]);
                 }
             }

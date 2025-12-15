@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Arcatech.Actions;
+﻿using System.Linq;
 using Arcatech.Items;
-using Arcatech.Skills;
 using Arcatech.Stats;
 using Arcatech.Texts;
+using Arcatech.UI;
 using Arcatech.Units;
-using CartoonFX;
 using UnityEngine;
 
 namespace Arcatech.Usables
@@ -18,19 +15,28 @@ namespace Arcatech.Usables
             GetStateTransition = config.useStateTransition.Build();
             Description = config.description;
             GetCost = config.settings.useCost;
+            IconDrawType = config.settings.charge.drawType;
             _owner =  owner;
             _equipment = equipment;
             DrawStrategy = config.settings.drawItemsStrategy;
-            _hitProducer = config.hitProducer.Deserialize(owner,equipment);
-            _effectApplier = config.effectApplier.Deserialize();
-            _results = new List<ActionResult>();
-            _reload = config.settings.charge.Deserialize();
             
-            foreach (var r in config.effects)
-            {
-                _results.Add(r.Deserialize());
-            }
-            _hitProducer.Hit += HitProducerOnHit;
+            _usableEffects = config.compositeUsableEffects.Select(t=>
+                t.Deserialize(owner, equipment)).ToArray();
+            
+            //
+            // _hitProducer = config.hitProducer.Deserialize(owner,equipment);
+            // _effectApplier = config.effectApplier.Deserialize();
+            // _results = new List<ActionResult>();            
+            // foreach (var r in config.effects)
+            // {
+            //     _results.Add(r.Deserialize());
+            // }
+            // _hitProducer.Hit += HitProducerOnHit;
+            // this now happens inside composite effect
+            
+            _reload = config.settings.charge.Deserialize();
+            _hasTrail = _equipment.Trail;
+
         }
         
 
@@ -38,41 +44,67 @@ namespace Arcatech.Usables
         private readonly EquipmentComponent _equipment;
         public bool UsableIsReady()
         {
-            return _reload.Ready;
+            var ok = _reload.Ready;
+            return ok;
         }
 
         public StateTransition GetStateTransition { get; }
-        public StatsEffect GetCost { get; }
+        public UsableEffect GetCost { get; }
 
-        private readonly IHitProducer _hitProducer;
-        private readonly IEffectApplier _effectApplier;
-        private readonly List<ActionResult> _results;
+        
         private readonly IReloadStrategy _reload;
         public Description Description { get; }
+        public ActionIconDrawType IconDrawType { get; }
         public float FillValue => _reload.FillValue;
-        public string IconNumber => _reload.DisplayText;
+        public string StringInfo => _reload.DisplayText;
         public IDrawItemStrategy DrawStrategy { get; }
 
+        private bool _hasTrail;
+        private readonly CompositeUsableApplication[] _usableEffects;
+        
+        // private readonly IHitProducer _hitProducer;
+        // private readonly IEffectApplier _effectApplier;
+        // private readonly List<ActionResult> _results;
+        //
+        
+        
         public void DoUpdate(float delta)
         {
             _reload.Tick(delta);
         }
 
+        public void CleanUp()
+        {
+            foreach (var effect in _usableEffects)
+            {
+                effect.Clear();
+            }
+        }
         public void Notify(StateMachineNotifyType notifyType)
         {
-            if (notifyType == StateMachineNotifyType.Use)
+
+            foreach (var effect in _usableEffects)
             {
-                _reload.Use();
+                effect.StateMachineNotification(notifyType);
             }
-            _hitProducer.OnChangeState(notifyType);
-        }
-        
-        private void HitProducerOnHit(TriggerHitInfo hit)
-        {
-            _effectApplier.ApplyEffects(_owner,hit,_results,_equipment.EffectSpawn.transform.position);
-        }
-        
+            //  _hitProducer.OnChangeState(notifyType);
+            _reload.StateMachineNotification(notifyType);
+            
+            switch (notifyType)
+            {
+                
+                case StateMachineNotifyType.Starting:
+                {
+                    if (_hasTrail) _equipment.Trail.Begin();
+                    break;
+                }
+                case StateMachineNotifyType.EndUse:
+                {
+                    if (_hasTrail) _equipment.Trail.End();
+                    break;
+                }
 
-
+            }
+        }
     }
 }

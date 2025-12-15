@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Arcatech.Actions;
+using Arcatech.Effects;
+using Arcatech.EventBus;
+using CartoonFX;
 using UnityEngine;
 
 namespace Arcatech.Usables
@@ -18,12 +21,21 @@ namespace Arcatech.Usables
 
     public class SingleTargetEffectApplier : EffectApplier
     {
-        protected override void DoApplyLogic(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
+        private ParticlesEvent _particles;
+        private bool _setup;
+        protected override void DoApplyLogic(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin,  CFXR_Effect onValidApply)
         {
+            if (!_setup)
+            {
+                _particles = new ParticlesEvent(new[] { onValidApply });
+                _setup = true;
+            }
             foreach (var effect in effects)
             {
                 effect.ProduceResult(user, hit.Target, hit.Position,hit.Target.transform.rotation);
             }
+            _particles.Place = hit.Target.EffectSpawn.position;
+            EventBus<ParticlesEvent>.Raise(_particles);
         }
     }
 }

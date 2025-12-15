@@ -110,7 +110,7 @@ public class EntityStatsComponentEditor : Editor
                             EditorGUILayout.LabelField(e.displayName, _miniBold);
                             if (e.effectAsset != null)
                             {
-                                EditorGUILayout.ObjectField(e.effectAsset, typeof(StatsEffect), false, GUILayout.MaxWidth(200));
+                                EditorGUILayout.ObjectField(e.effectAsset, typeof(UsableEffect), false, GUILayout.MaxWidth(200));
                             }
                         }
 

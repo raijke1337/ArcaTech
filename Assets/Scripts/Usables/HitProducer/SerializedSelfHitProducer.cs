@@ -10,7 +10,7 @@ namespace Arcatech.Usables
     /// <summary>
     /// apply to user directly
     /// </summary>
-    [CreateAssetMenu(fileName = "New Self Hit Producer", menuName = "Usables/Hit Producer/Self target")]
+    [CreateAssetMenu(fileName = "hitProducer_", menuName = "Usables/Hit Producer/Self target")]
     public class SerializedSelfHitProducer : SerializedHitProducer
     {
         public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)

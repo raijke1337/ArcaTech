@@ -22,7 +22,7 @@ namespace Arcatech.Items
 
         public Description Description => description;
         public float FillValue => 0;
-        public string IconNumber => string.Empty;
+        public string StringInfo => string.Empty;
 
     }
 }

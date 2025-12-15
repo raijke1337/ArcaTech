@@ -9,7 +9,7 @@ using UnityEngine.Events;
 
 namespace Arcatech.Usables
 {
-    [CreateAssetMenu(fileName = "New Instant Hit Producer", menuName = "Usables/Hit Producer/Instant")]
+    [CreateAssetMenu(fileName = "hitProducer_", menuName = "Usables/Hit Producer/Instant")]
     public class SerializedInstantHitProducer : SerializedHitProducer
     {
         public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)

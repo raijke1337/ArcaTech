@@ -37,6 +37,6 @@ namespace Arcatech.Units
 /// </summary>
     public interface IEffectsTakerComponent
     {
-        public void ApplyEffect(StatsEffect effect,BaseGameEntityComponent source);
+        public void ApplyEffect(UsableEffect effect,BaseGameEntityComponent source);
     }
 }

@@ -39,7 +39,7 @@ namespace Arcatech.Units
 
         // ----- augmentor system ------------------------------------------------------
 
-        readonly List<IStateAugmentor> _activeAugmentors = new();
+        List<IStateAugmentor> _activeAugmentors = new();
 
         public void RegisterAugmentor(IStateAugmentor augmentor)
         {
@@ -81,7 +81,12 @@ namespace Arcatech.Units
             _context.Invulnerables = GetComponentsInChildren<IInvulnerability>();
             _context.Stats = GetComponentInChildren<EntityStatsComponent>();
             _context.Interactor = GetComponentInChildren<IInteractor>();
-            _activeAugmentors.AddRange(GetComponentsInChildren<IStateAugmentor>());
+            
+            var aug = GetComponentsInChildren<IStateAugmentor>();
+            foreach (var a in aug)
+            {
+                RegisterAugmentor(a);
+            }
             
             _currentState.EnterState(_context, animator);
         }
@@ -90,7 +95,7 @@ namespace Arcatech.Units
         {
             if (Paused || Killed) return;
 
-            _currentState?.UpdateState(Time.deltaTime);
+            _currentState?.UpdateState(_context,animator,Time.deltaTime);
             animator.SetFloat(_animatorParameter, _currentState?.TimeInState ?? 0f);
 
             int safety = 0;

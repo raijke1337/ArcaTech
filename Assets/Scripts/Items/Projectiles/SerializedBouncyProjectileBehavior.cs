@@ -74,6 +74,8 @@ namespace Arcatech.Items.Projectiles
 
         public override void NotifyCollision(TriggerHitInfo hit)
         {
+            if (!hit.IsValidHit || hit.Target == Owner) return;
+            
             _targets.Add(hit.Target);
             BaseGameEntityComponent nextTarget = FindNearestTarget(hit.Position);
         
@@ -106,13 +108,13 @@ namespace Arcatech.Items.Projectiles
             
                 // Skip invalid targets
                 if (entity == null) continue;
-                if (_cachedTransform != null && entity.gameObject == _cachedTransform.gameObject) continue;
+                if (entity.transform == _cachedTransform) continue;
                 if (Owner != null && entity == Owner) continue;
                 if (entity == _currentTarget) continue; // Don't bounce back to same target
                 if (_targets.Contains(entity)) continue; // already hit this
             
-                // Optional: Add team/faction filtering here
-                if (entity.GetEntitySide == Owner.GetEntitySide) continue;
+                // faction filtering 
+                if (entity.GetEntitySide == Owner.GetEntitySide || entity.GetEntitySide == Side.Unassigned) continue;
 
                 float distance = Vector3.Distance(searchPosition, entity.transform.position);
 

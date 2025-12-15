@@ -47,7 +47,7 @@ namespace Arcatech.Items.Editor
                 EditorGUILayout.LabelField(usable.Description.Title ?? "Unnamed", GUILayout.Width(120));
             
                 // Charges
-                EditorGUILayout.LabelField(usable.IconNumber, GUILayout.Width(60));
+                EditorGUILayout.LabelField(usable.StringInfo, GUILayout.Width(60));
             
                 // Recharge timer
                 EditorGUILayout.LabelField(usable.FillValue.ToString("F1"), GUILayout.Width(100));

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Actions;
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Arcatech.Units
 {
@@ -28,9 +28,12 @@ namespace Arcatech.Units
         [Header("Root motion enabled override disables aiming and movement")]
         public bool rootMotionEnabled = false;
 
-        [Header("State data")] public SerializedStateTransition[] transitions = new SerializedStateTransition[0];
-        public SerializedActionResult[] onEnterActions = new SerializedActionResult[0];
-        public SerializedActionResult[] onExitActions = new SerializedActionResult[0];
+        [Header("State data")] 
+        public SerializedStateTransition[] transitions;
+        [Space]
+        public SerializedActionResult[] onEnterActions;
+        public SerializedDictionary<float,SerializedActionResult[]> onNormalizedTimeActions;
+        public SerializedActionResult[] onExitActions;
 
         // Build a runtime UnitState instance from this ScriptableObject.
         // The created UnitState is purely a data + behavior object (not a UnityEngine.Object).
@@ -62,7 +65,8 @@ namespace Arcatech.Units
                 invulnerable: invulnerable,
                 transitions: Array.Empty<StateTransition>(),
                 onEnter: onEnterActions ?? Array.Empty<SerializedActionResult>(),
-                onExit: onExitActions ?? Array.Empty<SerializedActionResult>());
+                onExit: onExitActions ?? Array.Empty<SerializedActionResult>(),
+                onNormalizedTime: onNormalizedTimeActions ?? new Dictionary<float, SerializedActionResult[]>());
 
             cache[this] = placeholder; // important: add before recursing to break cycles
 
@@ -101,7 +105,6 @@ namespace Arcatech.Units
 
             return placeholder;
         }
-    
-
     }
+
 }

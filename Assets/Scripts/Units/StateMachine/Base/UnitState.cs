@@ -1,5 +1,6 @@
 ﻿using Arcatech.Actions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.AppUI.UI;
 using UnityEditor.Animations;
@@ -21,19 +22,22 @@ namespace Arcatech.Units
         public StateTransition[] Transitions { get; private set; }
         private ActionResult[] OnEnterState { get; }
         private ActionResult[] OnExitState { get; }
-
+        
+        readonly NormalizedActionBlock[] _normalizedActionSchedule;
+        int _nextActionIndex;
         public int AnimatorLayer => _animatorLayer;
-
-        private int _animatorHash;
-        private int _animatorLayer;
+        
+        private readonly int _animatorHash;
+        private readonly int _animatorLayer;
+        
         readonly float _crossfadeTime;
 
         /// <summary>
         /// until this time is reached, state will not exit (no transition is valid)
         /// </summary>
-        private float _minNormalizedTimeInState;
+        private readonly float _minNormalizedTimeInState;
 
-        private Animator _animator;
+        
         public UnitState(
             string name,
             int animatorHash = 0,
@@ -46,7 +50,8 @@ namespace Arcatech.Units
             bool isRootMotionState = false,
             StateTransition[] transitions = null,
             SerializedActionResult[] onEnter = null,
-            SerializedActionResult[] onExit = null)
+            SerializedActionResult[] onExit = null,
+            Dictionary <float,SerializedActionResult[]> onNormalizedTime = null)
         {
             StateName = name;
             _animatorHash = animatorHash;
@@ -75,7 +80,23 @@ namespace Arcatech.Units
                 : Array.Empty<ActionResult>();
 
             _minNormalizedTimeInState = minNormalizedTime;
+
+            if (onNormalizedTime != null && onNormalizedTime.Count > 0)
+            {
+                // sort by time, clamp, then build
+                _normalizedActionSchedule = onNormalizedTime
+                    .OrderBy(kv => kv.Key)
+                    .Select(kv => new NormalizedActionBlock(
+                        Mathf.Clamp01(kv.Key),
+                        kv.Value?.Select(v => v.Deserialize()).ToArray() ?? Array.Empty<ActionResult>()))
+                    .ToArray();
+            }
+            else
+            {
+                _normalizedActionSchedule = Array.Empty<NormalizedActionBlock>();
+            }
             _stateTimer = new StopwatchTimer();
+
         }
 
         internal void InternalSetTransitions(StateTransition[] transitions)
@@ -88,7 +109,7 @@ namespace Arcatech.Units
             
             _stateTimer.Reset();
             _stateTimer.Start();
-            _animator =  animator;
+            _nextActionIndex = 0;
 
             // Apply animator crossfade if an animation name/hash was provided
             if (animator != null && _animatorHash != 0)
@@ -117,9 +138,28 @@ namespace Arcatech.Units
                 a?.ProduceResult(context.Owner, null, context.Spawn.position, context.Spawn.rotation);
         }
 
-        public void UpdateState(float delta)
+        public void UpdateState(StateMachineContext context, Animator animator,float delta)
         {
             _stateTimer?.Tick(delta);
+            if (_normalizedActionSchedule.Length == 0) return;
+            if (!TryGetAnimatorProgress(animator, out var normalized)) return;
+
+            while (_nextActionIndex < _normalizedActionSchedule.Length &&
+                   normalized >= _normalizedActionSchedule[_nextActionIndex].Time)
+            {
+                var actions = _normalizedActionSchedule[_nextActionIndex].Actions;
+                if (actions == null || actions.Length == 0 || context == null) return;
+
+                var owner = context.Owner;
+                var pos = context.Spawn.position;
+                var rot = context.Spawn.rotation;
+
+                foreach (var action in actions)
+                    action?.ProduceResult(owner, null, pos, rot);
+                
+                _nextActionIndex++;
+            }
+            
         }
 
 
@@ -131,6 +171,7 @@ namespace Arcatech.Units
             _stateTimer.Stop();
 
         }
+
         public bool CanExitState(Animator animator)
         {
             if (_minNormalizedTimeInState <= 0f) return true;
@@ -179,8 +220,19 @@ namespace Arcatech.Units
                     return true;
                 }
             }
-
             return false; // Animator isn’t on our clip yet.
+        }
+        
+        readonly struct NormalizedActionBlock
+        {
+            public readonly float Time;
+            public readonly ActionResult[] Actions;
+
+            public NormalizedActionBlock(float time, ActionResult[] actions)
+            {
+                Time = time;
+                Actions = actions;
+            }
         }
     }
 }

@@ -5,12 +5,13 @@ using Arcatech.Units;
 namespace Arcatech
 {
     public interface 
-        IUsable : ICosted, IIconContent,IAffectsItemDisplay
+        IUsable : ICosted, IActionIconContent,IAffectsItemDisplay
     {
         public bool UsableIsReady();
         public StateTransition GetStateTransition { get; }
         void DoUpdate(float delta);
         void Notify(StateMachineNotifyType notifyType);
+        void CleanUp();
     }
 
    

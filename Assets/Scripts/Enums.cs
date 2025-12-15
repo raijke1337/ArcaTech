@@ -8,15 +8,7 @@ public enum Side
     EnemySide
 }
 
-public enum ItemSlot
-{
-    None,
-    MeleeWeap,
-    RangedWeap,
-    Shield,
-    Booster,
-    Costume,
-}
+
 
 public enum UnitActionType : byte
 {

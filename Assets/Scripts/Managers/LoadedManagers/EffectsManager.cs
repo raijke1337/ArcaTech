@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Arcatech.Actions;
 using Arcatech.Effects;
 using Arcatech.EventBus;
@@ -54,7 +55,7 @@ namespace Arcatech.Managers
 
         private void Spawn(IEnumerable< CFXR_Effect >prefabs, Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            if (prefabs == null)
+            if (prefabs == null || !prefabs.Any())
             {
                 Debug.LogWarning("[EffectsManager] Spawn called with null prefab.");
                 return;
@@ -95,7 +96,7 @@ namespace Arcatech.Managers
         {
             if (inst == null) return;
 
-            inst.transform.SetParent(transform, false);
+           // inst.transform.SetParent(transform, false);
             
             // Clean up
             inst.gameObject.SetActive(false);

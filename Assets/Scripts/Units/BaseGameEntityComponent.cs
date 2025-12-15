@@ -68,7 +68,7 @@ namespace Arcatech
 
 
 
-        public void ApplyStatsEffect(StatsEffect effect,BaseGameEntityComponent source)
+        public void ApplyStatsEffect(UsableEffect effect,BaseGameEntityComponent source)
         {
             if (Invulnerable) return;
             foreach (var v in _effectsTakerComponents)

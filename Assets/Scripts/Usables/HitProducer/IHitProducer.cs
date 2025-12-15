@@ -45,8 +45,19 @@ namespace Arcatech.Usables
 
         public virtual void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
-            if (Owner.ShowingDebugs) Debug.Log($"Hit on {triggerHitInfo.Target}, hits this use {HitsThisUse} out of {MaxHits}. This hit is {(triggerHitInfo.IsValidHit?"valid" : "not valid")}");
+            if (Owner.ShowingDebugs)
+            {
+                int counter = triggerHitInfo.IsValidHit ? HitsThisUse + 1 : HitsThisUse;
+                
+                Debug.Log($"{Item} hit with {triggerHitInfo.Source.GetType()} on {(triggerHitInfo.IsValidHit? triggerHitInfo.Target.GetName : triggerHitInfo.Position)}, " +
+                       $"hits this use {counter} out of {MaxHits}. This hit is {(triggerHitInfo.IsValidHit?"valid" : "not valid")}." +
+                       $"{((SelfHitActivates && triggerHitInfo.Target == Owner) ? "Owner Trigger Enabled!" : "")}");
+                
+            }
+            
             if (triggerHitInfo.Target == Owner && !SelfHitActivates) return;
+            
+            
             
             if (triggerHitInfo.IsValidHit) HitsThisUse++;
             if (HitsThisUse > MaxHits)
@@ -55,11 +66,14 @@ namespace Arcatech.Usables
             }
             Hit?.Invoke(triggerHitInfo);
         }
+
         public abstract void TriggerExited(TriggerHitInfo triggerExitInfo);
         public virtual void OnChangeState(StateMachineNotifyType info)
         {
             if (info == StateMachineNotifyType.Starting)
+            {
                 HitsThisUse = 0;
+            }
         }
 
         protected void CallHit(TriggerHitInfo triggerHitInfo) => Hit?.Invoke(triggerHitInfo);

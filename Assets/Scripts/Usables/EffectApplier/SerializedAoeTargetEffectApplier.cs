@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Arcatech.Actions;
+using Arcatech.Effects;
+using Arcatech.EventBus;
+using CartoonFX;
 using UnityEngine;
 
 namespace Arcatech.Usables
@@ -28,9 +32,18 @@ namespace Arcatech.Usables
             _targetLayer = cfg.targetLayer;
         }
 
+        private ParticlesEvent _particles;
+        private bool _setup;
 
-        protected override void DoApplyLogic(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
+        protected override void DoApplyLogic(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin, CFXR_Effect onValid)
         {
+            
+            if (!_setup)
+            {
+                _particles = new ParticlesEvent(new[] { onValid });
+                _setup = true;
+            }
+            
             if (Physics.OverlapSphereNonAlloc(hit.Position, _radius, _hits, _targetLayer) ==0 ) return;
             foreach (var h in _hits)
             {
@@ -40,6 +53,8 @@ namespace Arcatech.Usables
                 {
                     effect.ProduceResult(user, unit, unit.transform.position, unit.transform.rotation);
                 }
+                _particles.Place = hit.Target.EffectSpawn.position;
+                EventBus<ParticlesEvent>.Raise(_particles);
             }
         }
     }

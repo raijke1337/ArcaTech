@@ -123,9 +123,7 @@ namespace Arcatech.Items
                 drop.OnUnequip();
                 dropped = drop;
             }
-            toEquip.OnEquip();
-            equipments[toEquip.Slot] =toEquip;
-
+            equipments[toEquip.Slot] = toEquip;
             if (initialized) ModelUpdatedEvent.Invoke();
         }
         

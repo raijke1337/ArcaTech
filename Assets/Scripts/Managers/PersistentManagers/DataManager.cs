@@ -1,3 +1,4 @@
+using System;
 using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Managers.Save;
@@ -5,38 +6,27 @@ using Arcatech.Scenes;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Usables;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 namespace Arcatech.Managers
 {
     public class DataManager : GenericLazySingleton<DataManager>
     {
-
-        // awake is from generic class for now
-
-        //private void Awake()
-        //{
-        //    if (_instance == null)
-        //    {
-        //        _instance = this;
-        //        _bindLvls = new EventBinding<LevelCompletedEvent>(OnLevelComplete);
-
-
-        //        SaveService = new SavesHandler(new JsonSerializer());
-        //        ReloadSave();
-
-        //        EventBus<LevelCompletedEvent>.Register(_bindLvls);
-        //      //  Debug.Log($"register event binds in {this} at {Time.time}");
-        //    }
-
-        //    else Destroy(gameObject);
-        //}
+        
+        public static class GameRules
+        {
+            public const string ValidHitsLayer = "Entities";
+            public const string InvalidHitsLayer = "SolidObject";
+        }
+        
 
         private void OnDisable()
         {
             EventBus<LevelCompletedEvent>.Deregister(_bindLvls);
            // Debug.Log($"deregister event binds in {this} at {Time.time}");
         }
+
 
         #region SceneContainers
         private List<SceneContainer> _scenes;
@@ -90,13 +80,7 @@ namespace Arcatech.Managers
                 return null;
             }
         }
-
-        //public bool PlayerHasItem(ItemSO item)
-        //{
-        //    return _loadedSave.Inventory.Inventory.Contains(item) || _loadedSave.Inventory.Equipment.Contains(item);
-        //}
-
-
+        
         #endregion
 
         #region items

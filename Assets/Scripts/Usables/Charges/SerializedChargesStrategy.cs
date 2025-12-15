@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using Arcatech.UI;
+using Arcatech.Units;
+using UnityEngine;
 
 namespace Arcatech.Usables
 {
     [CreateAssetMenu(fileName = "charges_", menuName = "Usables/Charges/Base (only internal)",order = 0)]
     public class SerializedChargesStrategy : ScriptableObject
     {
+        public ActionIconDrawType drawType;
         public float internalCooldown = 0.1f;
 
         public virtual BasicChargesStrategy Deserialize()
@@ -15,6 +18,7 @@ namespace Arcatech.Usables
 
     public class BasicChargesStrategy : IReloadStrategy
     {
+        
         protected readonly float _intCd;
         protected float _internalCurrent;
         public BasicChargesStrategy(SerializedChargesStrategy charges)
@@ -35,20 +39,23 @@ namespace Arcatech.Usables
         
         public bool Ready => ReadyCheck();
 
-        public virtual void Use()
-        {
-            _internalCurrent = _intCd;
-        }
-
         public virtual float FillValue => 0;
         public virtual string DisplayText => "";
+        public virtual void StateMachineNotification(StateMachineNotifyType notifyType)
+        {
+            switch (notifyType)
+            {
+                case StateMachineNotifyType.Use:
+                    _internalCurrent = _intCd;
+                    break;
+            }
+        }
     }
 
-    public interface IReloadStrategy
+    public interface IReloadStrategy : IStateMachineNotificationReceiver
     {
         public void Tick(float d);
         public bool Ready { get; }
-        public void Use();
         public float FillValue { get; }
         public string DisplayText { get; }
     }

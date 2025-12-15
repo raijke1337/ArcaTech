@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Managers;
 using KBCore.Refs;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -15,11 +16,18 @@ namespace Arcatech.Triggers
 
         private List<ITriggerNotificationReceiver> _receivers;
         public bool Active { get; set; } = true;
+
+        private LayerMask _valid;
+        private LayerMask _invalid;
         
         private void OnEnable()
         { 
             collider.isTrigger = true;
-            collider.includeLayers = LayerMask.GetMask("Entities");
+            _valid = LayerMask.GetMask(DataManager.GameRules.ValidHitsLayer);
+            _invalid = LayerMask.GetMask(DataManager.GameRules.InvalidHitsLayer);
+
+         collider.includeLayers = (_valid| _invalid);
+            
             var r = GetComponentsInChildren<ITriggerNotificationReceiver>();
             foreach (var r2 in r) RegisterReceiver(r2);
         }
@@ -52,11 +60,13 @@ namespace Arcatech.Triggers
             if (!Active || _receivers == null || !_receivers.Any()) return;
             _hitting = true;
             other.TryGetComponent<BaseGameEntityComponent>(out var component);
+            
             foreach (var receiver in _receivers)
             {
                 receiver.TriggerEntered(new TriggerHitInfo(this, component,transform.position,Time.time));
-                _hittingColor = component? Color.green :   Color.red;
-            }
+            }              
+            
+            _hittingColor = component? Color.green : Color.red;
             CleanUpReceivers();
         }
 

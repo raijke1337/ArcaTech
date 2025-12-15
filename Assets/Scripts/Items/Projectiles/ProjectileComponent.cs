@@ -31,6 +31,7 @@ namespace Arcatech.Items.Projectiles
         
         ITriggerNotificationReceiver _receiver;
         
+        
         private void Start()
         {
             col = GetComponent<TriggerTrackerComponent>();
@@ -47,9 +48,8 @@ namespace Arcatech.Items.Projectiles
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             _receiver?.TriggerEntered(triggerHitInfo);
-            if (!triggerHitInfo.IsValidHit || triggerHitInfo.Target== _owner) return;
-            _currentHits++;
             _behavior.NotifyCollision(triggerHitInfo);
+            if (triggerHitInfo.IsValidHit) _currentHits++;
         }
         public void TriggerExited(TriggerHitInfo triggerExitInfo) => _receiver?.TriggerExited(triggerExitInfo);
         void Update()

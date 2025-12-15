@@ -24,7 +24,7 @@ namespace Arcatech.Items
         public ItemSlot Slot { get; protected set; }
         public virtual Description Description { get; }
         public virtual float FillValue => 0;
-        public virtual string IconNumber => string.Empty;
+        public virtual string StringInfo => string.Empty;
 
         public ItemContainerComponent PackItem
         {

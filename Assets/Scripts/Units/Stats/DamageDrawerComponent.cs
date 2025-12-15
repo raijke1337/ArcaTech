@@ -72,7 +72,7 @@ namespace Arcatech.Stats
             textPool.Enqueue(instance);
         }
 
-        public void ApplyEffect(StatsEffect effect, BaseGameEntityComponent source)
+        public void ApplyEffect(UsableEffect effect, BaseGameEntityComponent source)
         {
             // --- Handle Instant Deltas ---
             if (effect.instantDeltas != null && effect.instantDeltas.Count > 0)

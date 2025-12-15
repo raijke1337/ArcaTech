@@ -2,6 +2,7 @@
 using Arcatech.Actions;
 using Arcatech.Stats;
 using Arcatech.Units;
+using Drakkar.GameUtils;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -24,6 +25,18 @@ namespace Arcatech.Items
         [SerializeField] private string animatorStateStartedTrigger;
         [SerializeField] private string animatorStateExitTimeTrigger;
 
+
+        public DrakkarTrail Trail
+        {
+            get
+            {
+                if (!_trail) _trail = GetComponentInChildren<DrakkarTrail>();
+                return _trail;
+            }
+        }
+        private DrakkarTrail _trail;
+        
+        
         private int _startHash;
         int _exitHash;
         int _completedHash;
@@ -94,7 +107,6 @@ namespace Arcatech.Items
                 spawner = transform;
             }
         }
-
     }
 
 }

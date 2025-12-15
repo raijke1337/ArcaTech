@@ -7,17 +7,24 @@ namespace Arcatech.UI
 {
     public class IconContainerUIScript : MonoBehaviour
     { 
+        
+        [SerializeField] private TextMeshProUGUI _text;
         [SerializeField] private Image _timerFill; // 0 means item is ready
         [SerializeField] private Image _icon;
-        [SerializeField] private TextMeshProUGUI _text;
         IIconContent iconContent;
+        private bool _isAction = false;
 
         public void AssignIcon(IIconContent content)
         {
             iconContent = content;
             _icon.sprite = iconContent.Description.Picture;
-            _text.text = iconContent.IconNumber;
-            _timerFill.fillAmount = iconContent.FillValue;
+            _isAction = false;
+            if (content is IActionIconContent action)
+            {
+                _text.text = action.StringInfo;
+                _timerFill.fillAmount = action.FillValue;
+                _isAction = true;
+            }
         }
         
         public void OnUse(bool success)
@@ -29,13 +36,11 @@ namespace Arcatech.UI
 
         private void Update()
         {
-            if (iconContent != null)
-            {
-                _icon.sprite = iconContent.Description.Picture;
-                _text.text = iconContent.IconNumber;
-                _timerFill.fillAmount = iconContent.FillValue;
-            }
+            if (!_isAction) return;
+            var a = iconContent as IActionIconContent; // might be slow
+            _text.text = a.StringInfo;
+            _timerFill.fillAmount = a.FillValue;
         }
-
     }
+    
 }

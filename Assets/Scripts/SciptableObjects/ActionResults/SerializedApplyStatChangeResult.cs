@@ -14,7 +14,7 @@ namespace Arcatech.Actions
     public class SerializedApplyStatChangeResult : SerializedActionResult
     {
 
-        [SerializeField] SerializedDictionary<TargetingType, StatsEffect[]> StatChanges;
+        [SerializeField] SerializedDictionary<TargetingType, UsableEffect[]> StatChanges;
         public override ActionResult Deserialize()
         {
             return new ApplyStatChangeEffectResult(StatChanges);
@@ -36,8 +36,8 @@ namespace Arcatech.Actions
     }
     public class ApplyStatChangeEffectResult : ActionResult
     {
-        Dictionary <TargetingType, StatsEffect[]> _effs; 
-        public ApplyStatChangeEffectResult(SerializedDictionary<TargetingType, StatsEffect[]> cfg)
+        Dictionary <TargetingType, UsableEffect[]> _effs; 
+        public ApplyStatChangeEffectResult(SerializedDictionary<TargetingType, UsableEffect[]> cfg)
         {
             _effs = cfg; 
         }
@@ -53,7 +53,7 @@ namespace Arcatech.Actions
                     return true;
                 case TargetingType.ApplyToEnemyTarget:
                     if (target == source) return false;
-                    if (target.GetEntitySide != source.GetEntitySide)
+                    if (target.GetEntitySide != source.GetEntitySide && source.GetEntitySide != Side.Unassigned)
                         finalTarget = target;
                     return true;
                 case TargetingType.ApplyToAlliedTarget:

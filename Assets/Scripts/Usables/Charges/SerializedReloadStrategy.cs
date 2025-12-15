@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Arcatech.Units;
+using Unity.AppUI.UI;
+using UnityEngine;
 
 namespace Arcatech.Usables
 {
@@ -22,14 +24,19 @@ namespace Arcatech.Usables
         private CountDownTimer _timer;
         public ReloadStrategy(SerializedReloadStrategy charges) : base(charges)
         {
-            _uses = charges.usesToReload;
-            _reloadTime = charges.reloadTime;
+            _uses = Mathf.Max(1, charges.usesToReload);
+            _reloadTime = Mathf.Max(0f, charges.reloadTime);
             _timer = new CountDownTimer(charges.reloadTime);
             _usesLeft = _uses;
         }
 
         protected override bool ReadyCheck()
         {
+            if (_usesLeft == 0 && _timer.IsReady)
+            {
+                _usesLeft = _uses;
+            }
+            
             return _usesLeft > 0 && base.ReadyCheck();
         }
 
@@ -42,16 +49,26 @@ namespace Arcatech.Usables
                 if (_timer.IsReady) _usesLeft =  _uses;
             }
         }
-        
-        override public void Use()
+
+        public override void StateMachineNotification(StateMachineNotifyType notifyType)
         {
-            _usesLeft = Mathf.Clamp(_usesLeft--, 0, _uses);
-            base.Use();
-            if (_usesLeft == 0)
+            base.StateMachineNotification(notifyType);
+            switch (notifyType)
             {
-                _timer.Start();
+                case StateMachineNotifyType.Use:
+                {
+                    if (_usesLeft <= 0) return; // should never happen!
+                    _usesLeft--;
+                    
+                    if (_usesLeft == 0)
+                    {
+                        _timer.Start();
+                    }
+                    break;
+                }
             }
         }
+
 
         public override float FillValue
         {
@@ -61,7 +78,7 @@ namespace Arcatech.Usables
                 return base.FillValue;
             }
         }
-
         public override string DisplayText => _usesLeft.ToString();
+        
     }
 }

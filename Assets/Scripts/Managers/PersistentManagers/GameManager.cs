@@ -30,11 +30,7 @@ namespace Arcatech.Managers
         #endregion
        
         [SerializeField] private MenuPrefabControllerComp _mainMenuPrefab;
-
         [SerializeField] private GameInterfaceManager gameInterfaceManagerPrefab;
-        [SerializeField] private CamerasController gameCameraPrefab;        
-        public GameInterfaceManager GetGameInterfacePrefab => gameInterfaceManagerPrefab;
-        public CamerasController GetGameCameraPrefab => gameCameraPrefab;
 
         private void OnEnable()
         {

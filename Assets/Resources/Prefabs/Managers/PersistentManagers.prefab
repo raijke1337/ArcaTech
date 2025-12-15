@@ -17,6 +17,10 @@ GameObject:
   - component: {fileID: 8102464925495723807}
   - component: {fileID: 4576216533406728223}
   - component: {fileID: 8102464925495723776}
+  - component: {fileID: 3231485611276433679}
+  - component: {fileID: 2864500779690670232}
+  - component: {fileID: 2351699518774529498}
+  - component: {fileID: 171166962816380382}
   m_Layer: 0
   m_Name: PersistentManagers
   m_TagString: Untagged
@@ -134,6 +138,7 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
 --- !u!114 &8102464925495723806
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,12 +151,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ce7180ba862ff743bf93394949f205f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab: {fileID: 0}
   _mainMenuPrefab: {fileID: 1630084988138368169, guid: 68e960355551af84788cdb8581df6493,
     type: 3}
   gameInterfaceManagerPrefab: {fileID: 1243103795978326481, guid: 5d28c2a47aa54d5498ba43640d7f8f9d,
-    type: 3}
-  gameCameraPrefab: {fileID: 5202588624015166149, guid: 43fc5a1fac5d7844eb5b6cc5232dd9e0,
     type: 3}
   _mainScene: {fileID: 11400000, guid: ba1c67d30b7547a44b5aad88d661e90d, type: 2}
   _galleryScene: {fileID: 11400000, guid: 0775704f387b12b4b8ddb363dda0e343, type: 2}
@@ -170,8 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d2c817abec01df42a02918a742a2749, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _particleTextPrefab: {fileID: -1364766221019919504, guid: 09037bedced6fd8479db8016dab0c016,
-    type: 3}
+  prewarm: []
   emitterPrefab: {fileID: 153249698424754343, guid: a606c6bdfaa79c0458f0fb1a76634478,
     type: 3}
   maxSoundInstances: 30
@@ -216,3 +217,61 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SaveObject: 1
+--- !u!114 &3231485611276433679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8102464926349693799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d088f73d4d2f7694493ea80d35f89b7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2864500779690670232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8102464926349693799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0984cf082085f0e429bf56329c69c7ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2351699518774529498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8102464926349693799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 628557688023fba4b8e58d004aaacf45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PreUpdateSlots: 100
+  NormalUpdateSlots: 1000
+  PostUpdateSlots: 100
+  PreLateUpdateSlots: 30
+  LateUpdateSlots: 400
+  PostLateUpdateSlots: 30
+  FixedUpdateSlots: 10
+--- !u!114 &171166962816380382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8102464926349693799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c0a4f4d3c2ac554d8db0f45e0db71a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugDraw: 0
+  proceduralMaterial: {fileID: 0}
+  sphereMesh: {fileID: 0}

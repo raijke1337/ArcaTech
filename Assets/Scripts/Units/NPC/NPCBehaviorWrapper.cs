@@ -69,7 +69,7 @@ namespace Arcatech.Units
 
 
 
-        public void ApplyEffect(StatsEffect effect,BaseGameEntityComponent source)
+        public void ApplyEffect(UsableEffect effect,BaseGameEntityComponent source)
         {
             if (source == null) return;
             if (source.GetEntitySide != stateMachine.GetMainEntity.GetEntitySide && stateMachine.GetMainEntity.GetEntitySide != Side.Unassigned)
