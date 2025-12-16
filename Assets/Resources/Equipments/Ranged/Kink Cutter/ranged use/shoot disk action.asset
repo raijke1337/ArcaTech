@@ -14,14 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   description: {fileID: 11400000, guid: 6735804bbd9cce44e8bfa287034ae7b7, type: 2}
   settings:
-    charges: 1
-    chargeReload: 5
+    charge: {fileID: 11400000, guid: c4ae7d97ed13abc45b24ee77fce9e629, type: 2}
     useCost: {fileID: 11400000, guid: 36cf40889590a5e4383079dfbc0c16bf, type: 2}
     drawItemsStrategy: {fileID: 11400000, guid: 9f8705aab2a8b5e42ae6edf85e8513e7,
       type: 2}
-  useStateTransition: {fileID: 11400000, guid: aee7c566d7c038c428fa3f9438a39ef5, type: 2}
-  hitProducer: {fileID: 11400000, guid: 01b0b27ebe672f14d9b6f43fed397bd2, type: 2}
-  effectApplier: {fileID: 11400000, guid: 557a079671d77074e8911026024fea3a, type: 2}
-  effects:
-  - {fileID: 11400000, guid: d3d4e40436b292e4d9615436c63b30ee, type: 2}
-  - {fileID: 11400000, guid: 0eed1601c6e94bd4a9a3fe5791c85c70, type: 2}
+  useStateTransition: {fileID: 11400000, guid: cda903a070f8b234b8334d038061f186, type: 2}
+  compositeUsableEffects:
+  - hitProducer: {fileID: 11400000, guid: 01b0b27ebe672f14d9b6f43fed397bd2, type: 2}
+    effectApplier: {fileID: 11400000, guid: 557a079671d77074e8911026024fea3a, type: 2}
+    effects:
+    - {fileID: 11400000, guid: ea7e4eab57d56a6458e51fbf5d76eb96, type: 2}
+    onValidHit: {fileID: 6481243711350322080, guid: 5a02b6e445c874941bfa6475aa9c4f4b,
+      type: 3}
+    onInvalidHit: {fileID: 5039004643809507552, guid: 2cfee1a623642dc4ab4e5d3bf667de1f,
+      type: 3}
