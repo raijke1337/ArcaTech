@@ -10,21 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cc8855ea334f124cb9b91bd0e05f722, type: 3}
-  m_Name: arca_nailer_shootState
+  m_Name: nyailer use state
   m_EditorClassIdentifier: 
-  stateDisplayName: NailerShooting
+  stateDisplayName: NailerBurst
   animatorStateName: NailerBurst
   animatorLayer: 0
   crossfadeTime: 0.1
-  minTimeInStateNormalized: 0.8
+  minTimeInStateNormalized: 0.5
   allowsMovement: 0
-  allowsAiming: 0
+  allowsAiming: 1
   invulnerable: 0
   rootMotionEnabled: 0
   transitions:
+  - {fileID: 11400000, guid: 4a65a178c2ab61c4b8afc69a52ea7e2c, type: 2}
   - {fileID: 11400000, guid: 6240ee5947497124e9198ce184211ebe, type: 2}
   - {fileID: 11400000, guid: afda336735aae29408c5d781b3919137, type: 2}
-  onEnterActions:
-  - {fileID: 11400000, guid: fdde9ea6688ca714480219264fbc70ac, type: 2}
+  onEnterActions: []
+  onNormalizedTimeActions:
+    _serializedList:
+    - Key: 0.33
+      Value:
+      - {fileID: 11400000, guid: fdde9ea6688ca714480219264fbc70ac, type: 2}
   onExitActions:
   - {fileID: 11400000, guid: 7e1a78a56914198449b58fc6886b0694, type: 2}

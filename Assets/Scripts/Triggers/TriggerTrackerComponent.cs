@@ -58,6 +58,9 @@ namespace Arcatech.Triggers
         protected void OnTriggerEnter(Collider other)
         {
             if (!Active || _receivers == null || !_receivers.Any()) return;
+            if (other.isTrigger) return;
+            Debug.Log($"{this.name}: Hitting {other.gameObject.name}");
+            
             _hitting = true;
             other.TryGetComponent<BaseGameEntityComponent>(out var component);
             

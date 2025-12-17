@@ -127,44 +127,43 @@ namespace Arcatech.Usables
             {
                 done++;
 
-                // 1) Decide place/rotation once per "shot group" (burst element)
-                Vector3 place;
+                // Get the center position (character position)
+                Vector3 centerPlace;
                 var baseRot = Owner.transform.rotation;
+        
                 switch (_shooting.placeType)
                 {
                     case SpawningPlaceType.WeaponSpawner:
-                        place = Item.EffectSpawn.position;
+                        centerPlace = Item.EffectSpawn.position;
                         break;
                     case SpawningPlaceType.WeaponParent:
-                        place = Item.transform.parent.position;
+                        centerPlace = Item.transform.parent.position;
                         break;
                     case SpawningPlaceType.UnitEffectsSpawn:
-                        place = Owner.EffectSpawn.position;
+                        centerPlace = Owner.EffectSpawn.position;
                         break;
                     default:
                         Debug.Log("Unknown spawning place type");
-                        place = Vector3.zero;
+                        centerPlace = Vector3.zero;
                         break;
                 }
 
-                // 2) Spawn multiple pellets simultaneously
+                // Spawn multiple projectiles in a ring
                 foreach (var rot in _placementStrategy.GetRotations(baseRot, _shooting))
                 {
                     var projectile = _projectilePool.Get();
                     projectile.Reset();
 
-                    // Optional slight positional jitter to avoid exact overlap
-                    Vector3 offset = Vector3.zero;
-                    if (_shooting.PelletSpawnRadius > 0f)
-                    {
-                        // small radial offset in plane perpendicular to forward
-                        Vector2 circle = UnityEngine.Random.insideUnitCircle * _shooting.PelletSpawnRadius;
-                        var right = rot * Vector3.right;
-                        var up = rot * Vector3.up;
-                        offset = right * circle.x + up * circle.y;
-                    }
+                    // Calculate position around the character
+                    Vector3 spawnPosition = centerPlace;
+            
+                    // Add ring offset if you want projectiles to spawn at a distance from center
+                    float ringRadius = _shooting.PelletSpawnRadius > 0f ? _shooting.PelletSpawnRadius : 1f;
+                    Vector3 ringOffset = rot * Vector3.forward * ringRadius;
+                    spawnPosition += ringOffset;
 
-                    projectile.transform.SetPositionAndRotation(place + offset, rot);
+                    // Set position and rotation
+                    projectile.transform.SetPositionAndRotation(spawnPosition, rot);
 
                     projectile.gameObject.SetActive(true);
                     projectile.RegisterReceiver(this);
