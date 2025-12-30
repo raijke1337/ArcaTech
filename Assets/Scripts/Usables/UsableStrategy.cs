@@ -49,7 +49,7 @@ namespace Arcatech.Usables
         }
 
         public StateTransition GetStateTransition { get; }
-        public UsableEffect GetCost { get; }
+        public AppliedStatsDeltaEffect GetCost { get; }
 
         
         private readonly IReloadStrategy _reload;

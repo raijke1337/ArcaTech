@@ -15,10 +15,11 @@ namespace Arcatech
         private List <IUnitCommandValidator> _commandValidators;
         [SerializeField,Self] EntityStateMachineComponent stateMachine;
         private List<IUnitCommandPerformer> _commandPerformers;
-        
+        private bool _killed = false;
+
         public bool RequestCombatAction(UnitActionType type)
         {
-            if (Paused || Killed) { return false; }
+            if (Paused || _killed) { return false; }
             if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] At {Time.time} Request {type} (validators: {_commandValidators.Count})");
             foreach (var v in _commandValidators)
             {
@@ -89,7 +90,12 @@ namespace Arcatech
             if (_commandPerformers.Contains(performer)) _commandPerformers.Remove(performer);
         }
 
-        public bool Killed { get; set; } = false;
+
+        public void SetKilled(IKillerComponent comp, bool value)
+        {
+            _killed = value;
+        }
+
         public bool Paused { get; set; } = false;
 
     }

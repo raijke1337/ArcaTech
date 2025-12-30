@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 namespace Arcatech.Items.Projectiles
 {
-    [CreateAssetMenu(fileName = "New Projectile", menuName = "Projectiles/Projectile")]
+    [CreateAssetMenu(fileName = "projectile_", menuName = "Projectiles/Projectile")]
     public class SerializedProjectileConfiguration : ScriptableObject
     {
         [SerializeField] ProjectileComponent projectilePrefab;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Arcatech.Interactions
 {
-    public class ComponentsAreKilledHandler : InteractionHandlerBase
+    public class ComponentsAreKilledHandler : InteractionHandlerBase, IKillerComponent
     {
         [SerializeField, ReadOnlyText] private string killedComponents;
 
@@ -21,7 +21,7 @@ namespace Arcatech.Interactions
             if (!success) return;
             foreach (var component in toKill)
             {
-                component.Killed = true;   
+                component.SetKilled(this,true);   
             }
         }
 
@@ -32,5 +32,7 @@ namespace Arcatech.Interactions
         public override void OnPlayerExit()
         {
         }
+
+        public string KilledBy => $"Interaction handler {name}";
     }
 }

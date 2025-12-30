@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Arcatech.Actions;
 using Arcatech.Effects;
 using Arcatech.EventBus;
 using CartoonFX;
 using UnityEngine;
 using UnityEngine.Pool;
-using Random = UnityEngine.Random;
 
 namespace Arcatech.Managers
 {
@@ -72,7 +69,7 @@ namespace Arcatech.Managers
                 PooledEffect inst = pool.Count > 0 ? pool.Dequeue() : CreateInstance(prefab);
                 // Parent and position
                 var t = inst.transform;
-                if (parent != null)
+                if (parent != null && t.gameObject.activeInHierarchy)
                 {
                     t.SetParent(parent, false);
                     t.localPosition = Vector3.zero;

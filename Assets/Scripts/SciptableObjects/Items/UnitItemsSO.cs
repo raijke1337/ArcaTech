@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 namespace Arcatech.Items
 {
     [Serializable]
-    [CreateAssetMenu(fileName = "New Unit Items Preset", menuName = "Items/Inventory preset", order = 3)]
+    [CreateAssetMenu(fileName = "inventory_", menuName = "Items/Inventory preset", order = 3)]
     public class UnitItemsSO : ScriptableObjectID, IEntityItemsList
     {
         [SerializeField] List<EquipSO> Equipment;

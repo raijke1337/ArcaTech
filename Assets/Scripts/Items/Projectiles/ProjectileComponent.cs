@@ -41,6 +41,7 @@ namespace Arcatech.Items.Projectiles
         public void Setup(BaseGameEntityComponent owner, SerializedProjectileBehavior behavior, int maxHits)
         {
             _behavior = behavior.Deserialize(owner);
+            
             _maxHits = maxHits;
             _owner = owner;
         }

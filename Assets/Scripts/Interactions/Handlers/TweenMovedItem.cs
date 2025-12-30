@@ -11,6 +11,7 @@ namespace Arcatech.Interactions
     {
         [SerializeField] bool runFromEnable = true;
         [SerializeField] SerializedDOTweener tween;
+        [SerializeField]
         Tween cached;
         bool _pause = false;
         bool toggled = false;

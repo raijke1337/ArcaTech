@@ -73,7 +73,7 @@ namespace Arcatech.Units.Editor
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Pause / Death");
                 EditorGUILayout.Toggle("Paused", machine.Paused);
-                EditorGUILayout.Toggle("Killed", machine.Killed);
+            //    EditorGUILayout.Toggle("Killed", machine.SetKilled(null,true));
 
                 EditorGUILayout.Space();
                 DrawAugmentorList(machine);
@@ -152,8 +152,8 @@ namespace Arcatech.Units.Editor
                 if (GUILayout.Button("Toggle Pause"))
                     machine.Paused = !machine.Paused;
 
-                if (GUILayout.Button("Toggle Killed"))
-                    machine.Killed = !machine.Killed;
+                // if (GUILayout.Button("Toggle Killed"))
+                //     machine.SetKilled(!machine.Killed);
             }
         }
     }

@@ -1,10 +1,10 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech.Items.Projectiles
 {
-    [CreateAssetMenu(fileName = "New Basic Projectile Behavior", menuName = "Projectiles/Behavior/Bouncing")]
+    [CreateAssetMenu(fileName = "projectileBehavior_", menuName = "Projectiles/Behavior/Bouncing")]
     public class SerializedBouncyProjectileBehavior : SerializedBasicProjectileBehavior
     {
         [Min(1)] public float targetSearchRadius;
@@ -36,64 +36,71 @@ namespace Arcatech.Items.Projectiles
             _homingStrength = b.homingStrength;
             _targets  = new List<BaseGameEntityComponent>();
         }
-        
-        public override void UpdatePosition(float delta, Transform projectileTransform)
+
+        protected override void RotateProjectile(float distanceThisFrame, Transform projectileTransform, float deltaTime)
         {
-            if (!init)
-            {
-                init = true;
-                _cachedTransform =  projectileTransform;
-            }
-
-            // Calculate distance to travel this frame
-            float distanceThisFrame = _settings.speedPerSecond * delta;
-
-            // Optional: Add homing behavior between bounces
             if (_currentTarget && _homingStrength > 0f)
             {
                 Vector3 directionToTarget = (_currentTarget.transform.position - projectileTransform.position).normalized;
                 Vector3 currentForward = projectileTransform.forward;
             
                 // Smoothly interpolate toward target
-                Vector3 newDirection = Vector3.Slerp(currentForward, directionToTarget, _homingStrength * delta);
+                Vector3 newDirection = Vector3.Slerp(currentForward, directionToTarget, _homingStrength * deltaTime);
                 projectileTransform.rotation = Quaternion.LookRotation(newDirection);
-            }
-
-            // Move projectile forward
-            projectileTransform.position += projectileTransform.forward * distanceThisFrame;
-
-            // Track distance traveled in current bounce segment
-            _distanceTraveled += distanceThisFrame;
-
-            // Check if exceeded max flight distance
-            if (_distanceTraveled >= _settings.maxFlightDistance)
-            {
-                BehaviorCompleted = true;
             }
         }
 
         public override void NotifyCollision(TriggerHitInfo hit)
         {
-            if (!hit.IsValidHit || hit.Target == Owner) return;
-            
-            _targets.Add(hit.Target);
-            BaseGameEntityComponent nextTarget = FindNearestTarget(hit.Position);
-        
-            if (nextTarget)
+            if (hit.Target == Owner) return;
+
+            if (!hit.IsValidHit)
             {
-                _currentTarget = nextTarget;
-                _distanceTraveled = 0f; 
-                Vector3 directionToTarget = (nextTarget.transform.position - hit.Position).normalized;
-                _cachedTransform.rotation = Quaternion.LookRotation(directionToTarget);
+                // --- Ricochet Logic 
+                Vector3 incomingDirection = hit.ImpactDirection; // Use the precise impact direction
+                Vector3 surfaceNormal = hit.Normal; // Use the accurate surface normal
+
+                // Calculate the reflected direction
+                Vector3 reflectedDirection = Vector3.Reflect(incomingDirection, surfaceNormal);
+
+                // Apply a small random spread to the reflection for more natural bounces (optional)
+                // Example: apply +/- 5 degrees on Y axis (for mostly horizontal surfaces)
+                // You might want to adjust based on the normal for more generalized spread.
+                float randomAngle = Random.Range(-5f, 5f);
+                reflectedDirection = Quaternion.AngleAxis(randomAngle, Vector3.up) * reflectedDirection;
+                // Or rotate around an axis perpendicular to both normal and incoming direction for more complex spread if needed.
+
+                // Update projectile's rotation to the new reflected direction
+                _cachedTransform.rotation = Quaternion.LookRotation(reflectedDirection);
+
+                // Move the projectile slightly away from the collision point to prevent immediate re-collision
+                _cachedTransform.position = hit.Position + reflectedDirection;
+
+                Debug.Log(
+                    $"Ricochet! Initial dir: {incomingDirection}, Normal: {surfaceNormal}, Reflected: {reflectedDirection}");
+
+                // IMPORTANT: If you want the normalized speed curve to restart after a ricochet,
+                // or if ricochet should reset its "distance traveled", you need to handle that here.
+                // Resetting `_distanceTraveled` might be appropriate depending on game design.
+                // _distanceTraveled = 0f; // Reset distance for this new "phase" of flight.
+                // This would make the speed curve restart from 0, potentially making the projectile fast again right after a bounce.
+                // Or, keep tracking total distance but evaluate the curve differently.
+                // It depends on your desired gameplay.
             }
             else
             {
-                // No valid target found, end behavior
-                BehaviorCompleted = true;
+                _targets.Add(hit.Target);
+                BaseGameEntityComponent nextTarget = FindNearestTarget(hit.Position);
+                if (nextTarget)
+                {
+                    _currentTarget = nextTarget;
+                    Vector3 directionToTarget = (nextTarget.transform.position - hit.Position).normalized;
+                    _cachedTransform.rotation = Quaternion.LookRotation(directionToTarget);
+                }
             }
         }
-        
-        
+
+
         private BaseGameEntityComponent FindNearestTarget(Vector3 searchPosition)
         {
             Collider[] hitColliders = Physics.OverlapSphere(searchPosition, _rad);
@@ -124,15 +131,19 @@ namespace Arcatech.Items.Projectiles
             }
             return nearestEntity;
         }
-        
-        
+
+        protected override void Init(Transform projectileTransform)
+        {
+            base.Init(projectileTransform);
+            _cachedTransform =  projectileTransform;
+        }
+
         public override void Reset()
         {
-            _distanceTraveled = 0f;
+            _cachedTransform = null;
             _currentTarget = null;
-            init = false;
-            BehaviorCompleted = false;
             _targets.Clear();
+            base.Reset();
         }
     }
     

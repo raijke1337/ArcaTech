@@ -11,7 +11,7 @@ public class StatsEffectBrowserWindow : EditorWindow
     private class FolderGroup
     {
         public string folderPath;
-        public List<UsableEffect> items = new List<UsableEffect>();
+        public List<AppliedStatsDeltaEffect> items = new List<AppliedStatsDeltaEffect>();
         public bool expanded = true;
     }
 
@@ -72,12 +72,12 @@ public class StatsEffectBrowserWindow : EditorWindow
     private void RefreshData()
     {
         var guids = AssetDatabase.FindAssets("t:Arcatech.Stats.StatsEffect t:UsableEffect");
-        var all = new List<(string path, UsableEffect obj)>(guids.Length);
+        var all = new List<(string path, AppliedStatsDeltaEffect obj)>(guids.Length);
 
         foreach (var guid in guids)
         {
             var path = AssetDatabase.GUIDToAssetPath(guid);
-            var obj = AssetDatabase.LoadAssetAtPath<UsableEffect>(path);
+            var obj = AssetDatabase.LoadAssetAtPath<AppliedStatsDeltaEffect>(path);
             if (obj != null)
                 all.Add((path, obj));
         }
@@ -256,7 +256,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         GUILayout.Space(2);
     }
 
-    private void DrawEffectCard(UsableEffect effect)
+    private void DrawEffectCard(AppliedStatsDeltaEffect effect)
     {
         using (new GUILayout.VerticalScope("box", GUILayout.Width(_cardWidth)))
         {
@@ -367,7 +367,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         GUILayout.Space(2);
     }
 
-    private string GetTitle(UsableEffect effect)
+    private string GetTitle(AppliedStatsDeltaEffect effect)
     {
         try
         {
@@ -379,7 +379,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         }
     }
 
-    private Texture GetPreviewTexture(UsableEffect effect)
+    private Texture GetPreviewTexture(AppliedStatsDeltaEffect effect)
     {
         try
         {
@@ -403,7 +403,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         }
     }
 
-    private bool MatchesSearch(UsableEffect effect)
+    private bool MatchesSearch(AppliedStatsDeltaEffect effect)
     {
         if (string.IsNullOrWhiteSpace(_search)) return true;
 
@@ -446,7 +446,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         string baseName = "StatsEffect";
         string path = AssetDatabase.GenerateUniqueAssetPath(Path.Combine(folder, $"{baseName}.asset"));
 
-        var asset = ScriptableObject.CreateInstance<UsableEffect>();
+        var asset = ScriptableObject.CreateInstance<AppliedStatsDeltaEffect>();
         AssetDatabase.CreateAsset(asset, path);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -457,7 +457,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         RefreshData();
     }
 
-    private void DuplicateAsset(UsableEffect effect)
+    private void DuplicateAsset(AppliedStatsDeltaEffect effect)
     {
         if (effect == null) return;
         string src = AssetDatabase.GetAssetPath(effect);
@@ -468,7 +468,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         {
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            var newObj = AssetDatabase.LoadAssetAtPath<UsableEffect>(dst);
+            var newObj = AssetDatabase.LoadAssetAtPath<AppliedStatsDeltaEffect>(dst);
             Selection.activeObject = newObj != null ? newObj : effect;
             if (newObj != null) EditorGUIUtility.PingObject(newObj);
             RefreshData();
@@ -479,7 +479,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         }
     }
 
-    private void DeleteAsset(UsableEffect effect)
+    private void DeleteAsset(AppliedStatsDeltaEffect effect)
     {
         if (effect == null) return;
         string path = AssetDatabase.GetAssetPath(effect);
@@ -503,7 +503,7 @@ public class StatsEffectBrowserWindow : EditorWindow
 
     // ---------- Formatting helpers for numeric summaries ----------
 
-    private List<string> BuildInstantLines(UsableEffect effect)
+    private List<string> BuildInstantLines(AppliedStatsDeltaEffect effect)
     {
         var lines = new List<string>();
         if (effect?.instantDeltas == null) return lines;
@@ -515,7 +515,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         return lines;
     }
 
-    private List<string> BuildModifierLines(UsableEffect effect)
+    private List<string> BuildModifierLines(AppliedStatsDeltaEffect effect)
     {
         var lines = new List<string>();
         if (effect?.persistentModifiers == null) return lines;
@@ -536,7 +536,7 @@ public class StatsEffectBrowserWindow : EditorWindow
         return lines;
     }
 
-    private List<string> BuildPeriodicLines(UsableEffect effect)
+    private List<string> BuildPeriodicLines(AppliedStatsDeltaEffect effect)
     {
         var lines = new List<string>();
         if (effect?.periodicDeltas == null) return lines;

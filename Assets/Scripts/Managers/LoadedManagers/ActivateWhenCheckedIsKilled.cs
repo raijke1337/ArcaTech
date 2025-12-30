@@ -14,7 +14,8 @@ namespace Arcatech.Level
             {
                 if (check.TryGetComponent<BaseGameEntityComponent>(out var a))
                 {
-                    if (!a.Killed) return false;
+                    if (!a) return true;
+                    if (a.EntityAlive) return false;
                 }
             }
 

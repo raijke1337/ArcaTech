@@ -10,6 +10,5 @@ namespace Arcatech.Interactions
     {
         public BaseGameEntityComponent GetBaseComponent { get; }
         public bool TryInteraction(IInteractor interactor);
-        public string InteractionText { get; }
     }
 }

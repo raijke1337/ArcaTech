@@ -210,7 +210,7 @@ namespace Drakkar
 		}
 		public static void TryRemoveLate(ILateUpdatable obj)
 		{
-			
+			if (!instance) return;
 			if (instance.lateUpdate.Contains(obj))
 				instance.lateUpdate.BookRemove(obj);
 		}

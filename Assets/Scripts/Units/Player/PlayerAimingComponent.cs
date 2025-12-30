@@ -8,7 +8,8 @@ namespace Arcatech.Units.Control
 
     public class PlayerAimingComponent : MonoBehaviour, IPausableComponent, IKillableComponent
     {
-        public bool Killed { get; set; } = false;
+        public void SetKilled(IKillerComponent comp, bool value) => _killed = value;
+
         public bool Paused { get; set; } = false;
 
         
@@ -23,7 +24,7 @@ namespace Arcatech.Units.Control
 
         private void Update()
         {
-            if (Paused || Killed) return;
+            if (Paused || _killed) return;
             DoAiming();
         }
         
@@ -38,8 +39,8 @@ namespace Arcatech.Units.Control
         private List<IAim> aimInterfaces = new List<IAim>();
 
         private Plane groundPlane;
-        
-        
+        private bool _killed = false;
+
 
         private void DoAiming()
         {

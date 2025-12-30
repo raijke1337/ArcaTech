@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Arcatech.Usables
 {
-    [CreateAssetMenu(fileName = "New aoe hit applier", menuName = "Usables/Hit Applier/AoE")]
+    [CreateAssetMenu(fileName = "usable_applier_aoe_", menuName = "Usables/Hit Applier/AoE")]
     public class SerializedAoeTargetEffectApplier : SerializedEffectApplier
     {
         public float radius;

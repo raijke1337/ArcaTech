@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Arcatech
 {
-    [CreateAssetMenu(fileName = "SequenceTweenPreset", menuName = "Tweening/Sequence Preset")]
+    [CreateAssetMenu(fileName = "tweenSO_sequence_", menuName = "Tweening/Sequence Preset")]
     public class SerializedDOTweenSequence : SerializedDOTweener
     {
         [Header("Sequence Settings")]

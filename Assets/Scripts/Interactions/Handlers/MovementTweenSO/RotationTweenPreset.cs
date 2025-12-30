@@ -2,7 +2,7 @@
 using UnityEngine;
 namespace Arcatech
 {
-    [CreateAssetMenu(fileName = "RotationTweenPreset", menuName = "Tweening/Rotation Preset")]
+    [CreateAssetMenu(fileName = "tweenSO_rotation_", menuName = "Tweening/Rotation Preset")]
     public class RotationTweenPreset : SerializedDOTweener
     {
         public enum RotationMode

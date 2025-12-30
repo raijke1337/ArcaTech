@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Arcatech.Usables
 {
-    [CreateAssetMenu(fileName = "New Usable Strategy", menuName = "Usables/Base Strategy")]
+    [CreateAssetMenu(fileName = "usable_", menuName = "Usables/Base Strategy")]
     public class SerializedUsableStrategy : ScriptableObject
     {
         
@@ -37,7 +37,7 @@ namespace Arcatech.Usables
     public struct SharedUsablesSettings
     {
         [SerializeField] public SerializedChargesStrategy charge;
-        [SerializeField] public UsableEffect useCost;
+        [SerializeField] public AppliedStatsDeltaEffect useCost;
         [SerializeField] public DrawItemsStrategy drawItemsStrategy;
     }
 }

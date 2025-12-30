@@ -2,7 +2,7 @@
 using UnityEngine;
 namespace Arcatech
 {
-    [CreateAssetMenu(fileName = "MovementTweenPreset", menuName = "Tweening/Movement Preset")]
+    [CreateAssetMenu(fileName = "tweenSO_movement_", menuName = "Tweening/Movement Preset")]
     public class MovementTweenPreset : SerializedDOTweener
     {
         
@@ -10,7 +10,7 @@ namespace Arcatech
         
         [Header("Movement Settings")]
         public Vector3 targetPosition;
-        public bool useLocalPosition = true;
+       // public bool useLocalPosition = true;
         public bool isRelative = false;  // If true, adds to current position
         public bool snapping = false;    // Snap to integer values
 
@@ -36,14 +36,15 @@ namespace Arcatech
             
             
             Tween tween;
-            if (useLocalPosition)
-            {
-                tween = target.DOLocalMove(targetPosition, duration, snapping);
-            }
-            else
-            {
-                tween = target.DOMove(targetPosition, duration, snapping);
-            }
+            // if (useLocalPosition)
+            // {
+            //     tween = target.GetComponent<Rigidbody>().DOMove(targetPosition, duration, snapping);
+            // }
+            // else
+            // {
+            //     tween = target.DOMove(targetPosition, duration, snapping);
+            // }
+            tween = target.GetComponent<Rigidbody>().DOMove(targetPosition, duration, snapping);
 
             // Apply settings
             tween.SetRelative(isRelative)

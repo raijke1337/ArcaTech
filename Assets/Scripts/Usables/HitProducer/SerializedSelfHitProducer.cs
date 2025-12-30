@@ -10,7 +10,7 @@ namespace Arcatech.Usables
     /// <summary>
     /// apply to user directly
     /// </summary>
-    [CreateAssetMenu(fileName = "hitProducer_", menuName = "Usables/Hit Producer/Self target")]
+    [CreateAssetMenu(fileName = "hitProducer_self_", menuName = "Usables/Hit Producer/Self target")]
     public class SerializedSelfHitProducer : SerializedHitProducer
     {
         public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
@@ -42,7 +42,7 @@ namespace Arcatech.Usables
                 case StateMachineNotifyType.Starting:
                     break;
                 case StateMachineNotifyType.Use:
-                    CallHit(new TriggerHitInfo(null,Owner,Owner.EffectSpawn.transform.position,Time.time));
+                    CallHit(new TriggerHitInfo(null,Owner,Owner.EffectSpawn.position,Vector3.up,Vector3.up, Time.time));
                     break;
                 case StateMachineNotifyType.EndUse:
                     break;

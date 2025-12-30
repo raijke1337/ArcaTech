@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Arcatech.Units
 {
-    [CreateAssetMenu(menuName = "States/State Transition")]
+    [CreateAssetMenu(fileName = "transitionTo_",menuName = "States/State Transition")]
     public class SerializedStateTransition : ScriptableObject
     {
         public int Priority;

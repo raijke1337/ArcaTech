@@ -11,7 +11,7 @@ namespace Arcatech.Items
     /// equipSO has an item that is equipped.
     /// it might have a skill, or not
     /// </summary>
-    [Serializable, CreateAssetMenu(fileName = "New Equip Item", menuName = "Items/Equipment")]
+    [Serializable, CreateAssetMenu(fileName = "equipment_", menuName = "Items/Equipment")]
     public class EquipSO : ItemSO
     {
         [SerializeField] public EquipmentComponent itemPrefab;

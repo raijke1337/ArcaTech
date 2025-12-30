@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
 using Arcatech.Items;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Arcatech.Usables
 {
-    [CreateAssetMenu(fileName = "hitProducer_", menuName = "Usables/Hit Producer/Instant")]
+    [CreateAssetMenu(fileName = "hitProducer_triggerOnItem_", menuName = "Usables/Hit Producer/Weapon hitbox")]
     public class SerializedInstantHitProducer : SerializedHitProducer
     {
         public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
@@ -27,16 +24,6 @@ namespace Arcatech.Usables
             
             provider = item
                 .GetComponentInChildren<ITriggerNotificationProvider>(); // Assume pre-attached for melee;
-            if (provider == null)
-            {
-                // Fallback: Add/reuse a component as provider
-                var tracker =
-                    item.gameObject
-                        .AddComponent<
-                            TriggerTrackerComponent>(); 
-
-                provider = tracker;
-            }
             provider.Active = false;
             provider.RegisterReceiver(this);
         }

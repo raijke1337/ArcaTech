@@ -1,5 +1,4 @@
-﻿using System;
-using Arcatech.Actions;
+﻿using Arcatech.Actions;
 using Arcatech.Stats;
 using Arcatech.Units;
 using Drakkar.GameUtils;
@@ -10,7 +9,7 @@ using UnityEngine.Assertions;
 namespace Arcatech.Items
 {
     [RequireComponent(typeof(Animator))]
-    public class EquipmentComponent : ValidatedMonoBehaviour,IDamageableComponent, IKillableComponent,ISpawnerProvider
+    public class EquipmentComponent : ValidatedMonoBehaviour, ISpawnerProvider
     {
         [SerializeField] protected Transform spawner;
         [SerializeField,Self] protected Animator animator;
@@ -40,7 +39,7 @@ namespace Arcatech.Items
         private int _startHash;
         int _exitHash;
         int _completedHash;
-        
+
         /// <summary>
         /// should only get damaged if it has a stats component attached (costume parts)
         /// </summary>
@@ -48,7 +47,7 @@ namespace Arcatech.Items
         {
             _startHash = Animator.StringToHash(animatorStateStartedTrigger);
             _exitHash = Animator.StringToHash(animatorStateExitTimeTrigger);
-            
+
             if (onDamaged != null && onDamaged.Length > 0)
             {
                 _damagedRes = new ActionResult[onDamaged.Length];
@@ -67,37 +66,6 @@ namespace Arcatech.Items
                 }
             }
         }
-
-        #region IDamageableComponent
-        public void Damage(float damage, ResourceStatType stat)
-        {
-            if (_damagedRes is not { Length: > 0 }) return;
-            foreach (var r in _damagedRes)
-            {
-                r.ProduceResult(null,null,spawner.position,spawner.rotation);
-            }
-        }
-    #endregion
-        #region IKillableComponent
-        private bool _k;
-
-        public bool Killed
-        {
-            get => _k;
-            set
-            {
-                _k = value;
-                if (_killedRes is not { Length: > 0 }) return;
-                foreach (var r in _killedRes)
-                {
-                    r.ProduceResult(null,null,spawner.position,spawner.rotation);
-                }
-                gameObject.SetActive(false);
-            }
-
-        }     
-        #endregion
-
 
         protected virtual void OnEnable()
         {

@@ -9,7 +9,6 @@ namespace Arcatech.Interactions
 {
     public interface ITargetable : IPointerEnterHandler, IPointerExitHandler
     {
-        public Side Side { get; }
-        public string TargetName { get; }
+        public Description GetInfo { get; }
     }
 }

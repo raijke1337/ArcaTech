@@ -5,6 +5,6 @@ namespace Arcatech
 {
     public interface ICosted
     {
-        public UsableEffect GetCost { get; }
+        public AppliedStatsDeltaEffect GetCost { get; }
     }
 }

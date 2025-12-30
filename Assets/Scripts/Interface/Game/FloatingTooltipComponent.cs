@@ -61,14 +61,7 @@ namespace Arcatech.UI
 
         public void Set(ITargetable tgt)
         {
-            TitleLabel.text = tgt.TargetName;
-            // if (tgt is IInteractive i)
-            // {
-            //     InteractiveLabel.gameObject.SetActive(true);
-            //     InteractiveLabel.text = i.InteractionText;
-            // }
-
-            
+            TitleLabel.text = tgt.GetInfo.Title;
         }
         
     }

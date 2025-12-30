@@ -14,7 +14,7 @@ namespace Arcatech.Stats
     /// also uses stat change strategies to affect the rest of components
     /// </summary>
     public partial class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
-        IKillableComponent, IEffectsTakerComponent, IStateAugmentor
+        IKillableComponent, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>, IStateAugmentor, IKillerComponent
     {
         
         [Header("Config")] [SerializeField] private BaseStatsConfig startingConfig;
@@ -76,7 +76,7 @@ namespace Arcatech.Stats
         private class ActiveEffect
         {
             public SourceKey key;
-            public UsableEffect effect;
+            public AppliedStatsDeltaEffect effect;
             public float? expireAt;
             public object sourceRef;
             public int stacks = 1;
@@ -159,7 +159,7 @@ namespace Arcatech.Stats
         #endregion
         
         #region apply
-        public void ApplyEffect(UsableEffect eff, BaseGameEntityComponent s)
+        public void ApplyEffect(AppliedStatsDeltaEffect eff, BaseGameEntityComponent s)
         {
             if (eff == null) return;
 
@@ -211,7 +211,7 @@ namespace Arcatech.Stats
         #endregion
         private void Update()
         {
-            if (Killed || Paused) return;
+            if (_killed || Paused) return;
             
             float dt = Time.deltaTime;
             float now = Time.time;
@@ -443,7 +443,7 @@ namespace Arcatech.Stats
         public float GetMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.max : 0f;
         public float GetBaseMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.baseMax : 0f;
 
-        public bool CanApplyCost(UsableEffect cost)
+        public bool CanApplyCost(AppliedStatsDeltaEffect cost)
         {
             if (cost == null) return true;
             if (cost.instantDeltas == null || cost.instantDeltas.Count == 0) return true;
@@ -588,8 +588,8 @@ namespace Arcatech.Stats
         }
 
         public bool Paused { get; set; }
-        public bool Killed { get; set; }
-        
+        public void SetKilled(IKillerComponent c, bool value) => _killed = value;
+
         public bool CheckStatsConditionGroup(ConditionGroup group) =>  EvaluateConditionGroup(group);
         
         #region statesAugmentor
@@ -600,26 +600,17 @@ namespace Arcatech.Stats
         [SerializeField] private SerializedStateTransition toKilledState;
         private StateTransition _toKilled;
         private UnitState _killState;
-        
-        
-        // [Space]
-        // [SerializeField] ConditionGroup knockDownCondition;
-        // [SerializeField] private SerializedUnitState knockDownState;
-        //
-        // [SerializeField] SerializedUnitState StaggeredState;
-        // [SerializeField] SerializedUnitState StunnedState;
-        // protected UnitState _staggerState;
-        // protected UnitState _stunnedState;
+        private bool _killed;
 
-        public void Attach(EntityStateMachineComponent machine)
+
+        public void Attach(IStateAugmentorReceiver machine)
         {
             _toKilled = toKilledState.Build();
             _killState = _toKilled.NextState;
-            Debug.Log("Attach ok");
             machine.AddTransition(_toKilled);
         }
 
-        public void Detach(EntityStateMachineComponent machine)
+        public void Detach(IStateAugmentorReceiver machine)
         {
             machine.RemoveTransition(_toKilled);
         }
@@ -633,15 +624,16 @@ namespace Arcatech.Stats
         {
             if (state == _killState)
             {
-                
-                var _killables = GetComponentsInChildren<IKillableComponent>(true);
-                foreach (var k in _killables)
+                var killables = GetComponentsInChildren<IKillableComponent>(true);
+                foreach (var k in killables)
                 {
-                    k.Killed = true;
+                    k.SetKilled(this,true);
                 }
             }
         }
         
         #endregion
+
+        public string KilledBy => "Stats";
     }
 }

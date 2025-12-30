@@ -11,11 +11,12 @@ using UnityEngine;
 namespace Arcatech.Units
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public partial class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent
+    public partial class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent, IStateAugmentorReceiver
     {
+
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
+        [SerializeField, Child] Animator animator;
         public BaseGameEntityComponent GetMainEntity => gameEntity;
-        [SerializeField, Self,Child] Animator animator;
 
         [Space, Header("States")] 
         [SerializeField] SerializedUnitState startingState;
@@ -40,10 +41,15 @@ namespace Arcatech.Units
         // ----- augmentor system ------------------------------------------------------
 
         List<IStateAugmentor> _activeAugmentors = new();
+        private bool _killed;
 
         public void RegisterAugmentor(IStateAugmentor augmentor)
         {
-            if (augmentor == null || _activeAugmentors.Contains(augmentor)) return;
+            if (augmentor == null || _activeAugmentors.Contains(augmentor))
+            {
+                Debug.Log($"tried to register {augmentor} and failed");
+                return;
+            }
             _activeAugmentors.Add(augmentor);
 
             augmentor.Attach(this);
@@ -70,7 +76,8 @@ namespace Arcatech.Units
             {
                 Spawn = gameEntity.transform,
                 Owner = gameEntity,
-                CurrentState = null
+                CurrentState = null,
+                Animator = animator,
             };
 
             _currentState = startingState.Build();
@@ -93,7 +100,7 @@ namespace Arcatech.Units
 
         void Update()
         {
-            if (Paused || Killed) return;
+            if (Paused || _killed) return;
 
             _currentState?.UpdateState(_context,animator,Time.deltaTime);
             animator.SetFloat(_animatorParameter, _currentState?.TimeInState ?? 0f);
@@ -108,7 +115,7 @@ namespace Arcatech.Units
 
         bool TransitionsInUpdate()
         {
-            if (Paused || Killed) return false;
+            if (Paused || _killed) return false;
 
             var chosen = PickBestTransition(out _);
             if (chosen == null || chosen.NextState == null) return false;
@@ -123,7 +130,7 @@ namespace Arcatech.Units
         public bool TryCommandTransition(UnitActionType actionType,
             IEnumerable<IUnitCommandPerformer> commandPerformers)
         {
-            if (Paused || Killed) return false;
+            if (Paused || _killed) return false;
 
             CacheCommandContext(actionType, commandPerformers);
             _context.PendingCommand = actionType;
@@ -322,6 +329,20 @@ namespace Arcatech.Units
 
         // ---------------------------------------------------------------------
         public bool Paused { get; set; }
-        public bool Killed { get; set; }
+
+        public void SetKilled(IKillerComponent comp, bool value) => _killed = value;
+    }
+
+    public interface IStateAugmentorReceiver
+    {
+        /// <summary>
+        /// this needs to be called when the augmentor is not a part of the statemachine gameobject hierarchy
+        /// </summary>
+        /// <param name="augmentor"></param>
+        public void RegisterAugmentor(IStateAugmentor augmentor);
+        public void UnregisterAugmentor(IStateAugmentor augmentor);
+        public void AddTransition(StateTransition transition);
+        public void RemoveTransition(StateTransition transition);
+        public StateMachineContext Context { get; }
     }
 }

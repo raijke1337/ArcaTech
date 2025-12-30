@@ -3,7 +3,7 @@
     using UnityEngine;
     using DG.Tweening;
 
-    [CreateAssetMenu(fileName = "ShakeTweenPreset", menuName = "Tweening/Shaking Preset")]
+    [CreateAssetMenu(fileName = "tweenSO_shaking_", menuName = "Tweening/Shaking Preset")]
     public class ShakeTweenPreset : SerializedDOTweener
     {
         [Header("Basic Settings")] [SerializeField]

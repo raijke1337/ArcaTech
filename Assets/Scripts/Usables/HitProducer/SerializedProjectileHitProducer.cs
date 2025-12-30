@@ -13,7 +13,7 @@ namespace Arcatech.Usables
     /// <summary>
     /// uses projectiles to report hits
     /// </summary>
-    [CreateAssetMenu(fileName = "hitProducer_", menuName = "Usables/Hit Producer/Projectile")]
+    [CreateAssetMenu(fileName = "hitProducer_projectile_", menuName = "Usables/Hit Producer/Projectile")]
     public class SerializedProjectileHitProducer : SerializedHitProducer
     {
         [SerializeField] public SerializedProjectileConfiguration projectile;
@@ -26,9 +26,10 @@ namespace Arcatech.Usables
     }
 
 
-    public class ProjectileHitProducer : HitProducer
+    public class ProjectileHitProducer : HitProducer,IKillerComponent
     {
 
+        public string KilledBy => "Hits producer";
         private SerializedProjectileConfiguration _projectile;
         private ShootingConfig _shooting;
         private Coroutine _shootingCor;
@@ -115,7 +116,7 @@ namespace Arcatech.Usables
             // Destroy the projectile GameObject when pool is destroyed
             if (projectile != null && projectile.gameObject != null)
             {
-                projectile.Entity.Killed = true;
+                projectile.Entity.SetKilled(this,true);
             }
         }
 

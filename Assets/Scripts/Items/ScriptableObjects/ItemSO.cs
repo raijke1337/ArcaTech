@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 
 namespace Arcatech.Items
 {
-    [Serializable, CreateAssetMenu(fileName = "New Backpack Item", menuName = "Items/Just Item")]
+    [Serializable, CreateAssetMenu(fileName = "item_", menuName = "Items/Just Item")]
     public class ItemSO : ScriptableObjectID, IIconContent
     {
         

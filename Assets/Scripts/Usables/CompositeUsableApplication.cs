@@ -55,7 +55,7 @@ namespace Arcatech.Usables
            // _particlesEventValidHit = new ParticlesEvent(new CFXR_Effect[]{config.onValidHit});
           //  _particlesEventValidHit.Parent = equipment.EffectSpawn;
              _effect = config.onValidHit;
-            _particlesEventInvalidHit = new ParticlesEvent(new CFXR_Effect[]{config.onInvalidHit});
+            _particlesEventInvalidHit = new ParticlesEvent(new []{config.onInvalidHit});
             _particlesEventInvalidHit.Parent = equipment.EffectSpawn;
             
             _hitProducer.Hit += Hit;
@@ -63,7 +63,7 @@ namespace Arcatech.Usables
 
         private void Hit(TriggerHitInfo info)
         {
-            Debug.Log(info.IsValidHit? "Valid hit" : "Invalid hit");
+           if (_owner.ShowingDebugs) Debug.Log(info.IsValidHit? "Valid hit" : "Invalid hit");
             
             if (info.IsValidHit)
             {

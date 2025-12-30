@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Arcatech.Managers;
+using Arcatech.Texts;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
@@ -11,9 +12,9 @@ namespace Arcatech.Interactions
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
     [RequireComponent(typeof(EntityMouseOverGlowComponent))]
-    public class InteractiveItemComponent : ValidatedMonoBehaviour, IInteractive, IStateAugmentor,ITriggerNotificationReceiver
+    public class InteractiveItemComponent : ValidatedMonoBehaviour, IInteractive, IStateAugmentor,ITriggerNotificationReceiver,IKillerComponent
     {
-
+        [SerializeField] private Description itemDescription;
         [SerializeField] private bool itemDisappearsWhenUsed;
         [SerializeField] 
         private HandlersActivation handlersActivationType;
@@ -60,8 +61,6 @@ namespace Arcatech.Interactions
 
         #region interaction
 
-        [SerializeField] private string interactTooltipText = "Interact";
-
         [Space, Header("Condition checker")]
         [SerializeField]
         protected InteractionCondition condition;
@@ -87,7 +86,6 @@ namespace Arcatech.Interactions
         }
 
         public bool TryInteraction(IInteractor interactor) => condition.CheckCondition(interactor, this);
-        public string InteractionText => interactTooltipText;
 
         #endregion
 
@@ -100,9 +98,6 @@ namespace Arcatech.Interactions
         {
             GameInterfaceManager.Instance?.NotifyTargetable(this,false);
         }
-
-        public Side Side => GetBaseComponent.GetEntitySide;
-        public string TargetName =>  GetBaseComponent.GetName;
 
         
         #region state
@@ -117,7 +112,7 @@ namespace Arcatech.Interactions
         
         private List<StateTransition> _transitions;
         
-        public void Attach(EntityStateMachineComponent machine)
+        public void Attach(IStateAugmentorReceiver machine)
         {
             foreach (var s in _transitions)
             {
@@ -125,7 +120,7 @@ namespace Arcatech.Interactions
             }
         }
 
-        public void Detach(EntityStateMachineComponent machine)
+        public void Detach(IStateAugmentorReceiver machine)
         {
             foreach (var s in _transitions)
             {
@@ -186,12 +181,19 @@ namespace Arcatech.Interactions
             fsm.UnregisterAugmentor(this);
             foreach (var k in killableComponents)
             {
-                k.Killed = true;
+                k.SetKilled(this,true);
             }
         }
 
         #endregion
 
+        #region Description
+
+
+        private Description _setDescription;
+        public Description GetInfo => _setDescription == null ? itemDescription : _setDescription;
+        public void SetDescription(Description description) => _setDescription = description;
+        #endregion
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
@@ -242,6 +244,7 @@ namespace Arcatech.Interactions
             }
         }
 
+        public string KilledBy => $"Interactive item {name}";
     }
     
     public enum HandlersActivation

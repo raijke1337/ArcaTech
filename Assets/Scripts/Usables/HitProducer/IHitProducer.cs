@@ -52,12 +52,9 @@ namespace Arcatech.Usables
                 Debug.Log($"{Item} hit with {triggerHitInfo.Source.GetType()} on {(triggerHitInfo.IsValidHit? triggerHitInfo.Target.GetName : triggerHitInfo.Position)}, " +
                        $"hits this use {counter} out of {MaxHits}. This hit is {(triggerHitInfo.IsValidHit?"valid" : "not valid")}." +
                        $"{((SelfHitActivates && triggerHitInfo.Target == Owner) ? "Owner Trigger Enabled!" : "")}");
-                
             }
             
             if (triggerHitInfo.Target == Owner && !SelfHitActivates) return;
-            
-            
             
             if (triggerHitInfo.IsValidHit) HitsThisUse++;
             if (HitsThisUse > MaxHits)
@@ -75,7 +72,6 @@ namespace Arcatech.Usables
                 HitsThisUse = 0;
             }
         }
-
         protected void CallHit(TriggerHitInfo triggerHitInfo) => Hit?.Invoke(triggerHitInfo);
         public event UnityAction<TriggerHitInfo> Hit;
     }

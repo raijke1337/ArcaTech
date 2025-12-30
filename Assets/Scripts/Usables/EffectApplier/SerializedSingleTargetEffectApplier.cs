@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Arcatech.Usables
 {
-    [CreateAssetMenu(fileName = "New single target hit applier", menuName = "Usables/Hit Applier/Single target")]
+    [CreateAssetMenu(fileName = "usable_applier_single_", menuName = "Usables/Hit Applier/Single target")]
     public class SerializedSingleTargetEffectApplier : SerializedEffectApplier
     {
         public override IEffectApplier Deserialize()

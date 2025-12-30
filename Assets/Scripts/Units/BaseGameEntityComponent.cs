@@ -30,19 +30,15 @@ namespace Arcatech
         [Space, SerializeField] protected bool _showDebugs = false;
         public Transform EffectSpawn => _effectSpawn;
 
-        List<IEffectsTakerComponent> _effectsTakerComponents;
+        List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>> _effectsTakerComponents;
         #if UNITY_EDITOR
-        public IReadOnlyList<IEffectsTakerComponent> GetEffectsTakersForEditor=> _effectsTakerComponents;
+        public IReadOnlyList<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>> GetEffectsTakersForEditor=> _effectsTakerComponents;
         #endif
         
         public string GetName =>  _name;
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
         private Collider Collider { get; set; }
-
-        [Space, Header("Rigidbody override"), SerializeField, Self]
-        Rigidbody _rigidbody;
-         [SerializeField] bool playerOverride = false;
 
 
         protected override void OnValidate()
@@ -59,8 +55,7 @@ namespace Arcatech
         {
             Collider = GetComponent<Collider>();
             
-            _rigidbody.isKinematic = !playerOverride;
-            _effectsTakerComponents = new List<IEffectsTakerComponent>(GetComponentsInChildren<IEffectsTakerComponent>());
+            _effectsTakerComponents = new List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>>(GetComponentsInChildren<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>>());
         }
 
         
@@ -68,7 +63,7 @@ namespace Arcatech
 
 
 
-        public void ApplyStatsEffect(UsableEffect effect,BaseGameEntityComponent source)
+        public void ApplyStatsEffect(AppliedStatsDeltaEffect effect,BaseGameEntityComponent source)
         {
             if (Invulnerable) return;
             foreach (var v in _effectsTakerComponents)
@@ -80,21 +75,18 @@ namespace Arcatech
         #endregion
         
         public bool Invulnerable { get; set; }
-        
+        public bool EntityAlive => !_killed;
         bool _killed = false;
-
-        public bool Killed
+        public void SetKilled(IKillerComponent comp, bool value)
         {
-            get => _killed;
-            set
-            {
-                _killed = value;
+            if (ShowingDebugs) Debug.Log($"{GetName} dead, called by: {comp.KilledBy}");
+            
+            _killed = value;
             //    _rigidbody.isKinematic = !value;
-                Collider.isTrigger = value;
-                if (_killed && destroyOnDeath)
-                {
-                    Destroy(gameObject, timerToDestroy);
-                }
+            Collider.isTrigger = value;
+            if (_killed && destroyOnDeath)
+            {
+                Destroy(gameObject, timerToDestroy);
             }
         }
 

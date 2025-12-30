@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Arcatech.Units
 {
-    [CreateAssetMenu(fileName = "Unit state ", menuName = "States/Unit state")]
+    [CreateAssetMenu(fileName = "state_", menuName = "States/Unit state")]
     public class SerializedUnitState : ScriptableObject
     {
         [Header("Identity")] public string stateDisplayName = "NewState";

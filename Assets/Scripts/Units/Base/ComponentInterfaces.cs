@@ -3,20 +3,22 @@ using Arcatech.Triggers;
 
 namespace Arcatech.Units
 {
-    /// <summary>
-    /// called in stat update strategy by statsComp and maybe more
-    /// </summary>
-    public interface IDamageableComponent
-    {
-        public void Damage(float damage, ResourceStatType stat);
-    }
+
     /// <summary>
     /// called in stat update strategy by statsComp and maybe more
     /// </summary>
     public interface IKillableComponent
     {
-        public bool Killed { get; set; }
+        public void SetKilled(IKillerComponent component, bool value);
     }
+/// <summary>
+/// this is used to track death sources in entities 
+/// </summary>
+    public interface IKillerComponent
+    {
+        public string KilledBy { get; }
+    }
+    
     /// <summary>
     /// called in stat update strategy by statsComp and maybe more
     /// </summary>
@@ -31,12 +33,11 @@ namespace Arcatech.Units
     {
         public bool Paused { get; set; }
     }
-
 /// <summary>
-/// used by entity stats  mainly
+/// takes the applied effect
 /// </summary>
-    public interface IEffectsTakerComponent
+    public interface IAppliedEffectsTakerComponent<in T> where T : BaseAppliedEffect
     {
-        public void ApplyEffect(UsableEffect effect,BaseGameEntityComponent source);
+        public void ApplyEffect(T effect,BaseGameEntityComponent source);
     }
 }
