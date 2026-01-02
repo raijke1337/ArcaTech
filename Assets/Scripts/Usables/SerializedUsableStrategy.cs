@@ -18,15 +18,6 @@ namespace Arcatech.Usables
 
         [Header("Effects of usable")]
         public CompositeUsableApplicationSerialized[] compositeUsableEffects;
-        
-        /*[Header("Hit producer")] 
-        public SerializedHitProducer hitProducer;
-        
-        [Header("Apply effects of hits")]
-        public SerializedEffectApplier effectApplier;
-        
-        [Header("The effects")]
-        public SerializedActionResult[] effects;*/
 
         public UsableStrategy Deserialize(BaseGameEntityComponent owner, EquipmentComponent ingameItem)
         {

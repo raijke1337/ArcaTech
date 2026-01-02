@@ -65,15 +65,6 @@ namespace Arcatech
             // Determine target
             Transform target = defaultTarget;
             Tween t;
-            //if (step.useTargetOverride && !string.IsNullOrEmpty(step.targetGameObjectName))
-            //{
-            //    GameObject foundObject = GameObject.Find(step.targetGameObjectName);
-            //    if (foundObject != null)
-            //    {
-            //        target = foundObject.transform;
-            //    }
-            //}
-
             // Handle different step types
             switch (step.stepType)
             {
@@ -94,28 +85,10 @@ namespace Arcatech
                     {
                         AddTweenToSequence(sequence, t, step);
                     }
-                    //if (step.tweenAction != SequenceStep.TweenAction.UsePreset)
-                    //{
-                    //    if (step.useCustomCurve)
-                    //    {
-                    //        tween.SetEase(step.customCurve);
-                    //    }
-                    //    else
-                    //    {
-                    //        tween.SetEase(step.easeType);
-                    //    }
-
-                    //    if (step.hasCallback && step.onStepComplete != null)
-                    //    {
-                    //        tween.OnComplete(() => step.onStepComplete.Invoke());
-                    //    }
-                    //}
                     break;
             }
 
         }
-
-
         private void AddTweenToSequence(Sequence sequence, Tween tween, SequenceStep step)
         {
             switch (step.stepType)

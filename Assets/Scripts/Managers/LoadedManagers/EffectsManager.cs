@@ -46,10 +46,9 @@ namespace Arcatech.Managers
         
         private void HandleEvent(ParticlesEvent request)
         {
+            if (request.Effects == null || request.Effects.Length == 0) return; // lazy ass guard
             Spawn(request.Effects, request.Place, Quaternion.identity, request.Parent); 
         }
-
-
         private void Spawn(IEnumerable< CFXR_Effect >prefabs, Vector3 position, Quaternion rotation, Transform parent = null)
         {
             if (prefabs == null || !prefabs.Any())

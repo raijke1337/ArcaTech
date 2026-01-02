@@ -10,6 +10,7 @@ using Arcatech.Units;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace Arcatech
 {
@@ -20,15 +21,17 @@ namespace Arcatech
     public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, ISpawnerProvider,IInvulnerability
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
-
+        [SerializeField, Self] Rigidbody _rb;
+        [SerializeField] private bool setKinematic = true;
+        
         [Space, SerializeField] string _name;
         [SerializeField] Side entitySide;
-        [SerializeField] Transform _effectSpawn;
+        [SerializeField] Transform effectSpawn;
         [SerializeField] private bool destroyOnDeath = true;
         [SerializeField, Range(0, 10)] private float timerToDestroy = 2f;
         
         [Space, SerializeField] protected bool _showDebugs = false;
-        public Transform EffectSpawn => _effectSpawn;
+        public Transform EffectSpawn => effectSpawn;
 
         List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>> _effectsTakerComponents;
         #if UNITY_EDITOR
@@ -45,16 +48,16 @@ namespace Arcatech
         {
             base.OnValidate();
             gameObject.layer = LayerMask.NameToLayer("Entities");
-            if (_effectSpawn == null)
+            if (effectSpawn == null)
             {
-                _effectSpawn = transform;
+                effectSpawn = transform;
             }
         }
 
         private void OnEnable()
         {
             Collider = GetComponent<Collider>();
-            
+            _rb.isKinematic = setKinematic;
             _effectsTakerComponents = new List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>>(GetComponentsInChildren<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>>());
         }
 

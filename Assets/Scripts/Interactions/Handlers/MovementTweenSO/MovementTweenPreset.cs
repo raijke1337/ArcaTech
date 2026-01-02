@@ -5,9 +5,6 @@ namespace Arcatech
     [CreateAssetMenu(fileName = "tweenSO_movement_", menuName = "Tweening/Movement Preset")]
     public class MovementTweenPreset : SerializedDOTweener
     {
-        
-        
-        
         [Header("Movement Settings")]
         public Vector3 targetPosition;
        // public bool useLocalPosition = true;
@@ -33,17 +30,7 @@ namespace Arcatech
 
         protected override Tween Build(Transform target)
         {
-            
-            
             Tween tween;
-            // if (useLocalPosition)
-            // {
-            //     tween = target.GetComponent<Rigidbody>().DOMove(targetPosition, duration, snapping);
-            // }
-            // else
-            // {
-            //     tween = target.DOMove(targetPosition, duration, snapping);
-            // }
             tween = target.GetComponent<Rigidbody>().DOMove(targetPosition, duration, snapping);
 
             // Apply settings

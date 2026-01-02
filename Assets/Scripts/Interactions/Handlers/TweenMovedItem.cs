@@ -7,11 +7,10 @@ using UnityEngine;
 namespace Arcatech.Interactions
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class TweenMovedItem : InteractionHandlerBase, IPausableComponent
+    public partial class TweenMovedItem : InteractionHandlerBase, IPausableComponent
     {
         [SerializeField] bool runFromEnable = true;
         [SerializeField] SerializedDOTweener tween;
-        [SerializeField]
         Tween cached;
         bool _pause = false;
         bool toggled = false;

@@ -52,8 +52,6 @@ namespace Arcatech.Usables
             _results = config.effects.Select(t => t.Deserialize()).ToList();
             _equipment = equipment;
             _owner =  owner;
-           // _particlesEventValidHit = new ParticlesEvent(new CFXR_Effect[]{config.onValidHit});
-          //  _particlesEventValidHit.Parent = equipment.EffectSpawn;
              _effect = config.onValidHit;
             _particlesEventInvalidHit = new ParticlesEvent(new []{config.onInvalidHit});
             _particlesEventInvalidHit.Parent = equipment.EffectSpawn;
@@ -69,13 +67,6 @@ namespace Arcatech.Usables
             {
                 _effectApplier.ApplyEffects(_owner,info,_results,_equipment.EffectSpawn.transform.position, _effect);
             }
-
-            // moved into applier so particles are placed on the targets
-            // if (info.IsValidHit && info.Target!= _owner)
-            // {
-            //     _particlesEventValidHit.Place = info.Position;
-            //     EventBus<ParticlesEvent>.Raise(_particlesEventValidHit);
-            // }
             
             else
             {

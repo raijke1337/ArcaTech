@@ -23,7 +23,7 @@ namespace Arcatech
     
     [Space,Header("Ground Detection")]
     [SerializeField] private bool useGroundDetection = true;
-    [SerializeField] private LayerMask groundLayerMask = 1; // Default layer
+  //  [SerializeField] private LayerMask groundLayerMask = 1; // Default layer
     [SerializeField] private float maxRaycastDistance = 10f;
     
 
@@ -77,7 +77,7 @@ namespace Arcatech
             RaycastHit hit;
             Vector3 rayStart = parentTransform.position;
             
-            if (Physics.Raycast(rayStart, Vector3.down, out hit, maxRaycastDistance, groundLayerMask))
+            if (Physics.Raycast(rayStart, Vector3.down, out hit))
             {
                 shadowPosition = hit.point + new Vector3(shadowOffset.x, 0.01f, shadowOffset.z);
                 
