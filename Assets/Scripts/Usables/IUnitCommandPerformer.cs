@@ -18,7 +18,7 @@ namespace Arcatech.Items
     public interface IUnitCommandPerformer
     {
         void PrepareCommand(UnitActionType type);
-        bool DoUnitCommand(UnitActionType type,bool wasSuccessful);
+        void DoUnitCommand(UnitActionType type,bool wasSuccessful);
     }
 
 

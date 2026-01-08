@@ -13,13 +13,12 @@ namespace Arcatech.Stats
     /// new component to handle the current stats and their changes on any game entity
     /// also uses stat change strategies to affect the rest of components
     /// </summary>
-    public partial class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
+    public class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
         IKillableComponent, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>, IStateAugmentor, IKillerComponent
     {
         
         [Header("Config")] [SerializeField] private BaseStatsConfig startingConfig;
         [SerializeField] private bool preserveCurrentRatioOnMaxChange = true;
-        private List<ISpawnerProvider> spawners;
         
         private class StatRuntime
         {
@@ -36,7 +35,23 @@ namespace Arcatech.Stats
             public float effectMultMax;
         }
 
+        #region NEW
+
+        private StatsRepository _mainStats;
+        private DamageModifierHolder _damageModifierHolder;
+        
+        
+        #endregion
+        
+        
         private readonly Dictionary<ResourceStatType, StatRuntime> stats = new();
+        private readonly Dictionary<SourceKey, List<StatModifier>> liveEquipMaxModifiers = new();
+        private bool init = false;
+        private void Awake()
+        {
+            if (init) return;
+            InitializeFromConfig();
+        }
 
         private struct SourceKey : IEquatable<SourceKey>
         {
@@ -59,7 +74,6 @@ namespace Arcatech.Stats
         private int NextId() => _nextId++;
 
         // Store equipment-provided Max modifiers (we’ll aggregate each recalc)
-        private readonly Dictionary<SourceKey, List<StatModifier>> liveEquipMaxModifiers = new();
 
         private class PeriodicRuntime
         {
@@ -87,18 +101,6 @@ namespace Arcatech.Stats
 
         // If true, re-aggregate Max every frame to reflect conditional Max modifiers
         private bool _hasConditionalMaxMods = false;
-
-        private bool init = false;
-        private void Awake()
-        {
-            if (init) return;
-            InitializeFromConfig();
-        }
-
-        private void Start()
-        {
-            spawners =  new(GetComponentsInChildren<ISpawnerProvider>(true));
-        }
 
         public void InitializeFromConfig()
         {
@@ -159,9 +161,9 @@ namespace Arcatech.Stats
         #endregion
         
         #region apply
-        public void ApplyEffect(AppliedStatsDeltaEffect eff, BaseGameEntityComponent s)
+        public bool ApplyEffect(AppliedStatsDeltaEffect eff, BaseGameEntityComponent s)
         {
-            if (eff == null) return;
+            if (eff == null) return false;
 
             var key = new SourceKey(eff, NextId());
             float now = Time.time;
@@ -206,6 +208,7 @@ namespace Arcatech.Stats
 
             RecomputeConditionalFlags();
             RecalculateAllMaxAndClampCurrent();
+            return true;
         }
 
         #endregion
@@ -396,16 +399,6 @@ namespace Arcatech.Stats
                 float delta = newCurrent - sr.current;
                 if (Mathf.Abs(delta) > 0.0001f)
                     SetCurrentInternal(d.stat, newCurrent, source, key.source);
-            }
-
-            if (d.onApply!=null)
-            {
-                if (spawners.Any())
-                {
-                    d.onApply.Deserialize().ProduceResult(null,null,
-                        spawners[UnityEngine.Random.Range(0, spawners.Count-1)].EffectSpawn.position,
-                        Quaternion.identity);
-                }
             }
         }
 

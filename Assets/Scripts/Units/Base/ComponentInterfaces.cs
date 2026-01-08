@@ -38,6 +38,9 @@ namespace Arcatech.Units
 /// </summary>
     public interface IAppliedEffectsTakerComponent<in T> where T : BaseAppliedEffect
     {
-        public void ApplyEffect(T effect,BaseGameEntityComponent source);
+        /// <param name="effect"></param>
+        /// <param name="source"></param>
+        /// <returns>true if applied successfully</returns>
+        public bool ApplyEffect(T effect,BaseGameEntityComponent source);
     }
 }

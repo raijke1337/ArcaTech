@@ -18,7 +18,7 @@ namespace Arcatech
     /// new component that defines any game entity
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider), typeof(LittlePauseHelperComponent))]
-    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, ISpawnerProvider,IInvulnerability
+    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IInvulnerability
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
         [SerializeField, Self] Rigidbody _rb;
@@ -32,11 +32,9 @@ namespace Arcatech
         
         [Space, SerializeField] protected bool _showDebugs = false;
         public Transform EffectSpawn => effectSpawn;
-
+        
         List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>> _effectsTakerComponents;
-        #if UNITY_EDITOR
-        public IReadOnlyList<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>> GetEffectsTakersForEditor=> _effectsTakerComponents;
-        #endif
+
         
         public string GetName =>  _name;
         public Side GetEntitySide => entitySide;
@@ -62,17 +60,20 @@ namespace Arcatech
         }
 
         
-        #region stats effects
+        #region applied usable effects
 
-
-
-        public void ApplyStatsEffect(AppliedStatsDeltaEffect effect,BaseGameEntityComponent source)
+        public bool ApplyStatsEffect(BaseAppliedEffect effect,BaseGameEntityComponent source)
         {
-            if (Invulnerable) return;
-            foreach (var v in _effectsTakerComponents)
+            if (Invulnerable) return false;
+            if (effect is AppliedStatsDeltaEffect statsDelta)
             {
-                v.ApplyEffect(effect, source);
+                foreach (var v in _effectsTakerComponents)
+                {
+                    v.ApplyEffect(statsDelta, source);
+                }
             }
+
+            return true;
         }
 
         #endregion
@@ -95,10 +96,5 @@ namespace Arcatech
 
         public bool Paused { get; set; }
 
-    }
-
-    public interface IInvulnerability
-    {
-        public bool Invulnerable { get; set; }
     }
 }

@@ -20,38 +20,35 @@ namespace Arcatech.Interactions
         [SerializeField, Tooltip("effects spawn here")]
         private Transform interactionActionTransform;
         private InteractionContext _context;
-        
-        private InteractionContext ReadContext()
+
+        private void OnEnable()
         {
-            if (_context == null) _context = new InteractionContext(_base, interactionActionTransform);
-            return _context;
+            _context = new InteractionContext(_base, interactionActionTransform);
         }
-        public InteractionContext InteractionContext => ReadContext();
+        public InteractionContext InteractionContext => _context;
 
         public void RegisterInteractiveItem(IInteractive item)
         {
-            ReadContext().CurrentInteractive = item;
+            _context.CurrentInteractive = item;
             _itemLoaded = item.GetBaseComponent.GetName;
         }
 
         public void UnregisterInteractiveItem(IInteractive item)
         {
-            if  (ReadContext().CurrentInteractive == item) _context.CurrentInteractive = null;
+            if  (_context.CurrentInteractive == item) _context.CurrentInteractive = null;
         }
 
         public bool CanDoUnitCommand(UnitActionType type, out string info)
         {
-            info = "Interaction comp: ";
+            info = "OK";
             switch (type)
             {
                 case UnitActionType.Use:
-                    info += $"{(ReadContext().CurrentInteractive == null ? "No item" : "Has item")}";
-                    return ReadContext().CurrentInteractive != null;
-                
-                    default:
-                    info += "default OK"; 
-                        return true;
+                    info += $"{(_context.CurrentInteractive == null ? "No item" : "Has item")}";
+                    return _context.CurrentInteractive != null;
             }
+
+            return true;
         }
 
         public void PrepareCommand(UnitActionType type)
@@ -60,25 +57,16 @@ namespace Arcatech.Interactions
              //   Debug.Log($"PrepareCommand {type}");
         }
 
-        public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
+        public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
             if (type == UnitActionType.Use)
             {
-                if (!wasSuccessful)
-                {
-                   // Debug.Log($"DoUnitCommand {type} with result fail");
-                    return false;
-                }
                 if (CanDoUnitCommand(type, out _))
                 {
                   //  Debug.Log($"Trying interaction and updating result");
-                    InteractionContext.UpdateInteractionResult(ReadContext().CurrentInteractive.TryInteraction(this));
+                    InteractionContext.UpdateInteractionResult(_context.CurrentInteractive.TryInteraction(this));
                 }
-
-                return false;
             }
-
-            return true;
         }
 
     }

@@ -1,4 +1,3 @@
-using System;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units.Control;
@@ -10,41 +9,34 @@ using UnityEngine.AI;
 
 namespace Arcatech.Units
 {
-    /// <summary>
-    /// this is now separate from ActiveUnitComp (aka StateMachine)
-    /// </summary>
+    
     [RequireComponent(typeof(BehaviorGraphAgent),typeof(NavMeshAgent),typeof(UnitInputsComponent))]
     [RequireComponent(typeof(BaseGameEntityComponent),typeof(EntityStatsComponent))]
-    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>,IKillableComponent,IPausableComponent,IMove,IStatUpdatesViewer
+    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>,IKillableComponent,IPausableComponent,IMove
     {
         [SerializeField,Self]protected NavMeshAgent agent;
         [SerializeField,Self]protected BehaviorGraphAgent behavior;
         [SerializeField,Self]protected BaseGameEntityComponent entity;
         [SerializeField,Self]protected UnitInputsComponent unitInputs;
-        
-        
-        [Space, Header("Stats"),SerializeField,Self]
-        protected EntityStatsComponent stats;
+        [SerializeField,Self]protected EntityStatsComponent stats;
 
-        [SerializeField] private readonly string hpParamaterName = "CurrentHP";
-        [SerializeField] private readonly string energyParamaterName = "CurrentEnergy";
-        [SerializeField] private readonly string staminaParamaterName = "CurrentStamina";
         
         
         private BlackboardReference bbref;
+        private readonly string combatEventChannelName = "CombatEnterEvent";
+        private readonly string selfRef = "Wrapper";
+        
         EnterCombatEventChannel combatEventChannel;
+        
+        #region BLACKBOARD
 
-        public bool CombatState
-        {
-            get
-            {
-                bbref.GetVariableValue("CombatState", out bool result);
-                return result;  
-            }
-            set => combatEventChannel.SendEventMessage(value);
-        }
+        public float GetStatPercent(ResourceStatType statType) => stats.GetCurrent(statType) / stats.GetMax(statType);
+        public bool ActionAvailable(UnitActionType actionType) => unitInputs.CanPerformCombatAction(actionType);
 
-         
+        public bool RequestAction(UnitActionType actiontype) => unitInputs.RequestCombatAction(actiontype);
+
+        #endregion
+        
         
         protected void Start()
         {
@@ -52,27 +44,20 @@ namespace Arcatech.Units
             {
                 // failsafe for unset units
                 bbref = behavior.BlackboardReference;
-                bbref.GetVariableValue("PlayerAttackedEvent", out combatEventChannel);
+                bbref.GetVariableValue(combatEventChannelName, out combatEventChannel);
                 Assert.IsNotNull(combatEventChannel);
-
-                bbref.SetVariableValue(hpParamaterName, 1f);
-                bbref.SetVariableValue(energyParamaterName, 1f);
-                bbref.SetVariableValue(staminaParamaterName, 1f);
+                bbref.SetVariableValue(selfRef,this);
             }
-            if (stats)
-            {
-                stats.RegisterStatsViewer(this);
-            }
-            // 
         }
-        public void ApplyEffect(AppliedStatsDeltaEffect effect,BaseGameEntityComponent source)
+        public bool ApplyEffect(AppliedStatsDeltaEffect effect,BaseGameEntityComponent source)
         {
-            if (source == null) return;
-            if (source.GetEntitySide != entity.GetEntitySide && entity.GetEntitySide != Side.Unassigned)
+            if (!behavior) return true;
+            if (source == null) return true;
+            if (source.GetEntitySide != entity.GetEntitySide && source.GetEntitySide != Side.Unassigned)
             {
-                CombatState = true;
-               // Debug.Log($"{GetMainEntity.GetName} received {effect} from {source}, entering combat");
+                combatEventChannel.SendEventMessage(true);
             }
+            return true;
         }
 
         public void SetKilled(IKillerComponent component, bool value)
@@ -94,7 +79,6 @@ namespace Arcatech.Units
             
                 if (!behavior) return;
                 behavior.enabled = !_paused;
-                
             }
         }
 
@@ -112,23 +96,7 @@ namespace Arcatech.Units
         public float ActualMovementVelocity => agent.velocity.magnitude;
         public bool IsGrounded => agent.isOnNavMesh;
         public bool UseRootMotion { get; set; }
-        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, object changeSource)
-        {
-            switch (stat)
-            {
-                case ResourceStatType.Health:
-                    bbref.SetVariableValue(hpParamaterName, statCurrent / statMax);
-                    break;
-                case ResourceStatType.Stamina:
-                    bbref.SetVariableValue(staminaParamaterName, statCurrent / statMax);
-                    break;
-                case ResourceStatType.Energy:
-                    bbref.SetVariableValue(energyParamaterName, statCurrent / statMax);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(stat), stat, null);
-            }
-        }
+
     }
 }
 

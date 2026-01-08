@@ -1,5 +1,6 @@
 ﻿using System;
 using Arcatech.Units;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Arcatech.Interactions
@@ -48,6 +49,7 @@ namespace Arcatech.Interactions
         }
         public InteractionContext (BaseGameEntityComponent comp, Transform actionTransform)
         {
+            Assert.IsNotNull(comp);
             EntityComponent = comp;
             ActionTransform = actionTransform;
         }

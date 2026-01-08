@@ -23,20 +23,7 @@ namespace Arcatech.Usables
             _usableEffects = config.compositeUsableEffects.Select(t=>
                 t.Deserialize(owner, equipment)).ToArray();
             
-            //
-            // _hitProducer = config.hitProducer.Deserialize(owner,equipment);
-            // _effectApplier = config.effectApplier.Deserialize();
-            // _results = new List<ActionResult>();            
-            // foreach (var r in config.effects)
-            // {
-            //     _results.Add(r.Deserialize());
-            // }
-            // _hitProducer.Hit += HitProducerOnHit;
-            // this now happens inside composite effect
-            
             _reload = config.settings.charge.Deserialize();
-            _hasTrail = _equipment.Trail;
-
         }
         
 
@@ -59,15 +46,8 @@ namespace Arcatech.Usables
         public string StringInfo => _reload.DisplayText;
         public IDrawItemStrategy DrawStrategy { get; }
 
-        private bool _hasTrail;
         private readonly CompositeUsableApplication[] _usableEffects;
-        
-        // private readonly IHitProducer _hitProducer;
-        // private readonly IEffectApplier _effectApplier;
-        // private readonly List<ActionResult> _results;
-        //
-        
-        
+
         public void DoUpdate(float delta)
         {
             _reload.Tick(delta);
@@ -87,24 +67,8 @@ namespace Arcatech.Usables
             {
                 effect.StateMachineNotification(notifyType);
             }
-            //  _hitProducer.OnChangeState(notifyType);
             _reload.StateMachineNotification(notifyType);
-            
-            switch (notifyType)
-            {
-                
-                case StateMachineNotifyType.Starting:
-                {
-                    if (_hasTrail) _equipment.Trail.Begin();
-                    break;
-                }
-                case StateMachineNotifyType.EndUse:
-                {
-                    if (_hasTrail) _equipment.Trail.End();
-                    break;
-                }
-
-            }
+            _equipment.StateMachineNotification(notifyType);
         }
     }
 }

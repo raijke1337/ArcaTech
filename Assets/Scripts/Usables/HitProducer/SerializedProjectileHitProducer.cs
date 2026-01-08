@@ -28,15 +28,12 @@ namespace Arcatech.Usables
 
     public class ProjectileHitProducer : HitProducer,IKillerComponent
     {
-
         public string KilledBy => "Hits producer";
         private SerializedProjectileConfiguration _projectile;
         private ShootingConfig _shooting;
         private Coroutine _shootingCor;
 
         private ISpreadStrategy _placementStrategy;
-
-
         private IObjectPool<ProjectileComponent> _projectilePool;
 
         /// <summary>
@@ -92,7 +89,8 @@ namespace Arcatech.Usables
         {
             // Reset projectile state when retrieved from pool
             projectile.Reset();
-            // projectile.gameObject.SetActive(true);  
+            projectile.gameObject.SetActive(true);  
+            projectile.Active = true;
             _activeProjectiles.Add(projectile);
         }
 
@@ -107,6 +105,7 @@ namespace Arcatech.Usables
             // Clean up projectile when returned to pool
             projectile.UnregisterReceiver(this);
             projectile.ProjectileFinished -= HandleProjectileExpiry;
+            projectile.Active = false;
             projectile.gameObject.SetActive(false);
             _activeProjectiles.Remove(projectile);
         }
@@ -126,9 +125,9 @@ namespace Arcatech.Usables
 
             while (done < _shooting.TotalBursts)
             {
+                yield return new WaitForEndOfFrame();
                 done++;
 
-                // Get the center position (character position)
                 Vector3 centerPlace;
                 var baseRot = Owner.transform.rotation;
         
@@ -158,13 +157,15 @@ namespace Arcatech.Usables
                     // Calculate position around the character
                     Vector3 spawnPosition = centerPlace;
             
-                    // Add ring offset if you want projectiles to spawn at a distance from center
-                    float ringRadius = _shooting.PelletSpawnRadius > 0f ? _shooting.PelletSpawnRadius : 1f;
-                    Vector3 ringOffset = rot * Vector3.forward * ringRadius;
-                    spawnPosition += ringOffset;
+                    
+                    // // Add ring offset - projectiles spawn at a distance from center
+                    // float ringRadius = _shooting.PelletSpawnRadius > 0f ? _shooting.PelletSpawnRadius : 1f;
+                    // Vector3 ringOffset = rot * Vector3.forward * ringRadius;
+                    // spawnPosition += ringOffset;
 
                     // Set position and rotation
                     projectile.transform.SetPositionAndRotation(spawnPosition, rot);
+                    Debug.Log($"Set projectile spawn {spawnPosition} at {Time.time}");
 
                     projectile.gameObject.SetActive(true);
                     projectile.RegisterReceiver(this);

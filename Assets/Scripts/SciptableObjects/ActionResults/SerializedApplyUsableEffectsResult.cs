@@ -76,22 +76,23 @@ namespace Arcatech.Actions
         public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
             Quaternion placeRot)
         {
-           
+            bool result = true;
             foreach (var type in _effs.Keys)
             {
                 if (TryPickEffectTarget(type, user, target, out var final))
                 {
                     if (final==null) return false;
+
                     foreach (var effect in _effs[type])
                     {
-                        final.ApplyStatsEffect(effect,user);
+                        if (!final.ApplyStatsEffect(effect, user))
+                        {
+                            result = false;
+                        }
                     }
-
-                    return true;
                 }
             }
-
-            return false;
+            return result;
         }
     }
 }

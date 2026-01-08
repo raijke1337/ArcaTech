@@ -21,8 +21,6 @@ namespace Arcatech.Items
 
         private Transform _spawnPoint;
         
-        // DEBUG
-        [SerializeField] private bool _showDebugInfo = true;
         
         public bool Active
         {
@@ -38,11 +36,6 @@ namespace Arcatech.Items
 
             _spawnPoint = equipment.EffectSpawn;
             
-            Debug.Log($"[BeamWeapon] Initialize called. SpawnPoint: {_spawnPoint?.name ?? "NULL"}");
-            if (_spawnPoint != null)
-            {
-                Debug.Log($"[BeamWeapon] SpawnPoint position: {_spawnPoint.position}, forward: {_spawnPoint.forward}");
-            }
             
             SetupLineRenderer();
             SetupOwnerCollider();
@@ -67,13 +60,11 @@ namespace Arcatech.Items
             _lineRenderer.positionCount = 2;
             _lineRenderer.enabled = false;
             
-            Debug.Log($"[BeamWeapon] LineRenderer setup complete. UseWorldSpace: {_lineRenderer.useWorldSpace}");
         }
 
         private void SetupOwnerCollider()
         {
             _ownerCollider = _owner.GetComponent<Collider>();
-            Debug.Log($"[BeamWeapon] Owner collider: {(_ownerCollider != null ? _ownerCollider.name : "NOT FOUND")}");
         }
 
         public void StartBeam(Vector3 direction)
@@ -83,7 +74,6 @@ namespace Arcatech.Items
             _lastHitDistances.Clear();
             _lineRenderer.enabled = true;
             
-            Debug.Log($"[BeamWeapon] StartBeam called. Direction: {direction}");
         }
 
         public void StopBeam()
@@ -91,10 +81,9 @@ namespace Arcatech.Items
             _isActive = false;
             _lineRenderer.enabled = false;
             
-            Debug.Log($"[BeamWeapon] StopBeam called");
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (!_isActive) return;
             
@@ -107,7 +96,6 @@ namespace Arcatech.Items
         {
             if (_spawnPoint == null)
             {
-                Debug.LogError("[BeamWeapon] SpawnPoint is NULL in UpdateBeamVisuals!");
                 return;
             }
 
@@ -117,12 +105,7 @@ namespace Arcatech.Items
 
             _lineRenderer.SetPosition(0, beamStart);
             _lineRenderer.SetPosition(1, beamEnd);
-
-            if (_showDebugInfo)
-            {
-                Debug.Log($"[BeamWeapon] Beam visual updated - Start: {beamStart}, End: {beamEnd}");
-                Debug.DrawLine(beamStart, beamEnd, Color.red, 0.016f);
-            }
+            
         }
 
         private void PerformRaycasts()
@@ -152,35 +135,18 @@ namespace Arcatech.Items
             Vector3 beamStart = _spawnPoint.position;
             Vector3 beamDirection = _spawnPoint.forward;
 
-            if (_showDebugInfo)
-            {
-                Debug.Log($"[BeamWeapon] Raycast from {beamStart} in direction {beamDirection} for {_config.beamLength} units");
-            }
-
             RaycastHit[] hits = Physics.RaycastAll(beamStart, beamDirection, _config.beamLength);
 
-            if (_showDebugInfo)
-            {
-                Debug.Log($"[BeamWeapon] Raycast hit {hits.Length} objects");
-            }
 
             // Sort hits by distance
             System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
             foreach (RaycastHit hit in hits)
             {
-                if (_showDebugInfo)
-                {
-                    Debug.Log($"[BeamWeapon] Hit object: {hit.collider.name}, Distance: {hit.distance}");
-                }
-
                 // Ignore owner's collider if configured
                 if (hit.collider == _ownerCollider)
                 {
-                    if (_showDebugInfo)
-                    {
-                        Debug.Log($"[BeamWeapon] Ignoring hit on owner collider: {hit.collider.name}");
-                    }
+
                     continue;
                 }
 
@@ -189,10 +155,7 @@ namespace Arcatech.Items
                 // Check minimum distance requirement
                 if (target != null && !CanHitTarget(target, hit.distance))
                 {
-                    if (_showDebugInfo)
-                    {
-                        Debug.Log($"[BeamWeapon] Target {target.GetName} failed distance check");
-                    }
+
                     continue;
                 }
 
@@ -204,11 +167,7 @@ namespace Arcatech.Items
                     hitNormal: hit.normal,
                     time: Time.time
                 );
-
-                if (_showDebugInfo)
-                {
-                    Debug.Log($"[BeamWeapon] Valid hit registered on {(target != null ? target.GetName : "environment")} at {hit.point}");
-                }
+                
 
                 NotifyReceivers(hitInfo);
 
@@ -228,10 +187,7 @@ namespace Arcatech.Items
             }
 
             bool canHit = Mathf.Abs(currentDistance - lastDistance) >= _config.minDistanceBetweenHits;
-            if (_showDebugInfo && !canHit)
-            {
-                Debug.Log($"[BeamWeapon] Hit distance check failed: current={currentDistance}, last={lastDistance}, min required={_config.minDistanceBetweenHits}");
-            }
+
             return canHit;
         }
 
@@ -246,13 +202,11 @@ namespace Arcatech.Items
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)
         {
             _receivers.Add(receiver);
-            Debug.Log($"[BeamWeapon] Receiver registered: {receiver.GetType().Name}");
         }
 
         public void UnregisterReceiver(ITriggerNotificationReceiver receiver)
         {
             _receivers.Remove(receiver);
-            Debug.Log($"[BeamWeapon] Receiver unregistered: {receiver.GetType().Name}");
         }
     }
 }

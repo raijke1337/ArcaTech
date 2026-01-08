@@ -108,10 +108,9 @@ namespace Arcatech.UI
             
         }
 
-        public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
+        public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
             usablesIcons.HandlePlayerAction(type, wasSuccessful);
-            return true;
         }
     }
 }

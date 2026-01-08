@@ -3,9 +3,11 @@ using System.Linq;
 using Arcatech.Items;
 using Arcatech.Units;
 using KBCore.Refs;
+using Unity.Behavior;
 using UnityEngine;
 namespace Arcatech
 {
+    
     /// <summary>
     /// class that handles inputs from Behavior tree or player commands
     /// </summary>
@@ -19,7 +21,9 @@ namespace Arcatech
 
         public bool RequestCombatAction(UnitActionType type)
         {
-            if (Paused || _killed) { return false; }
+            if (Paused) return false;
+            if (_killed) return false;
+            
             if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] At {Time.time} Request {type} (validators: {_commandValidators.Count})");
             foreach (var v in _commandValidators)
             {
@@ -37,9 +41,22 @@ namespace Arcatech
             var ok = stateMachine.TryCommandTransition(type,_commandPerformers);
             if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) 
                 Debug.Log($"[Input] At {Time.time} Request {type} -> {(ok ? "accepted" : "deferred/rejected")}");
-            return ok;
+
+            if (!ok) return false;
+
+            return true;
         }
 
+        public bool CanPerformCombatAction(UnitActionType type)
+        {
+            foreach (var v in _commandValidators)
+            {
+                if (!v.CanDoUnitCommand(type, out var info)) return false;
+            }
+
+            return true;
+        }
+        
         public Vector3 InputMovement { get; protected set; }
         private void OnEnable() => ControllerStartBindings(true);  
         private void OnDisable() => ControllerStartBindings(false);

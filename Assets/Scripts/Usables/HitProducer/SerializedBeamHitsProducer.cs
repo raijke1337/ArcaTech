@@ -112,11 +112,7 @@ namespace Arcatech.Usables
             _beamActive = true;
             _hitThisFrame.Clear();
             _beamShooter.StartBeam(Owner.transform.forward);
-        
-            if (Owner.ShowingDebugs)
-            {
-                Debug.Log($"{Item} beam started");
-            }
+
         }
 
         private void StopBeam()
@@ -124,11 +120,7 @@ namespace Arcatech.Usables
             _beamActive = false;
             _beamShooter.StopBeam();
             _hitThisFrame.Clear();
-        
-            if (Owner.ShowingDebugs)
-            {
-                Debug.Log($"{Item} beam stopped. Total hits: {HitsThisUse}");
-            }
+
         }
     }
 

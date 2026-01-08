@@ -16,28 +16,23 @@ public partial class RotateTowardsAction : Action
     [SerializeReference] public BlackboardVariable<string> Value;
     // is rotation clockwise?
 
-    
-    
-    
     protected override Status OnStart()
     {
         if (Agent.Value == null || Target.Value == null) return Status.Failure;
-        if (Agent.Value.TryGetComponent(out Animator animator) )
-        {
-        }
-        else
-        {
-            animator = Agent.Value.GetComponentInChildren<Animator>();
-        }
-        Animator.Value = animator;
+
         return Status.Running;
     }
 
-
+    protected override void OnDeserialize()
+    {
+        base.OnDeserialize();
+        if (!Agent.Value.TryGetComponent(out Animator animator)) 
+            animator = Agent.Value.GetComponentInChildren<Animator>();
+        Animator.Value = animator;
+    }
 
     protected override Status OnUpdate()
     {
-        
         
         // Calculate direction to target
         Vector3 directionToTarget = (Target.Value.transform.position - Agent.Value.transform.position).normalized;

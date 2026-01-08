@@ -133,9 +133,9 @@ namespace Arcatech.Items
             _currentUsable = usable;
         }
 
-        public bool DoUnitCommand(UnitActionType type, bool wasSuccessful)
+        public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
-            if (type is UnitActionType.Movement or UnitActionType.Jump or UnitActionType.Use) return true;
+            if (type is UnitActionType.Movement or UnitActionType.Jump or UnitActionType.Use) return;
 
 
             if (_stateUnit.GetMainEntity.ShowingDebugs && _stateUnit.verboseDebugs)
@@ -145,7 +145,7 @@ namespace Arcatech.Items
             
             if (!wasSuccessful)
             {
-                return false;
+                return;
             }
             if (_usables[type].DrawStrategy != null && _usables[type].DrawStrategy != _currentDrawItemStrategy)
             {
@@ -153,9 +153,7 @@ namespace Arcatech.Items
                 _redraw = true;
             }
             _stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
-      
-            return true;
-        }
+      }
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)
         {

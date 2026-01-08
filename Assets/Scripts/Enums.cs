@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Behavior;
 
 public enum Side
 {
@@ -9,7 +10,7 @@ public enum Side
 }
 
 
-
+[BlackboardEnum]
 public enum UnitActionType : byte
 {
     Melee,

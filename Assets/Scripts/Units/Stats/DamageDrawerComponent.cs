@@ -16,17 +16,18 @@ namespace Arcatech.Stats
         [SerializeField] private float dotsDisplayInterval = 0.5f;
 
         public bool Paused { get; set; }
-
-        public void ApplyEffect(AppliedStatsDeltaEffect effect, BaseGameEntityComponent source)
+        
+        
+        public bool ApplyEffect(AppliedStatsDeltaEffect effect, BaseGameEntityComponent source)
         {
-            if (Paused) return;
+            if (Paused) return false;
 
             // Instant deltas
             if (effect.instantDeltas != null && effect.instantDeltas.Count > 0)
             {
                 foreach (var delta in effect.instantDeltas)
                 {
-                    if (delta.stat != ResourceStatType.Health) return;
+                    if (delta.stat != ResourceStatType.Health) return true;
 
                     if (delta.amount < 0)
                     {
@@ -44,7 +45,7 @@ namespace Arcatech.Stats
             {
                 foreach (var periodicDelta in effect.periodicDeltas)
                 {
-                    if (periodicDelta.delta.stat!= ResourceStatType.Health) return;
+                    if (periodicDelta.delta.stat!= ResourceStatType.Health) return true;
                     if (periodicDelta.intervalSeconds <= 0) continue;
 
                     bool isDamage = periodicDelta.delta.amount < 0;
@@ -70,6 +71,9 @@ namespace Arcatech.Stats
                     }
                 }
             }
+            
+            return true;
+
         }
 
         private IEnumerator DisplayPeriodicRoutine(float totalAmount, float effectDuration, float displayInterval, bool isDamage)

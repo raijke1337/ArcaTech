@@ -42,6 +42,7 @@ namespace Arcatech.Units
         private void DrawItems(IDrawItemStrategy strat)
         {
             if (strat == currentDrawStrategy || strat == null) return; // this is probably  checked elsewhere but just in case
+            Debug.Log("DrawItems: " + strat);
             currentDrawStrategy = strat;
             foreach (var e in inventoryModel.ListEquipped)
             {

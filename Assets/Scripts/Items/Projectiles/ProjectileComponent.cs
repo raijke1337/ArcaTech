@@ -32,7 +32,7 @@ namespace Arcatech.Items.Projectiles
         ITriggerNotificationReceiver _receiver;
         
         
-        private void Start()
+        private void Awake()
         {
             col = GetComponent<TriggerTrackerComponent>();
             col.RegisterReceiver(this);
@@ -65,12 +65,19 @@ namespace Arcatech.Items.Projectiles
         public void Reset()
         {
             _behavior.Reset();
+            transform.position = Vector3.zero;
             _currentHits = 0;
         }
+
         /// <summary>
         /// called by the spawner (hit producer)
         /// </summary>
-        public bool Active { get; set; }
+        public bool Active
+        {
+            get => col.Active;
+            set => col.Active = value;
+        }
+
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)=> _receiver = receiver;
         public void UnregisterReceiver(ITriggerNotificationReceiver receiver) => _receiver = null;
 

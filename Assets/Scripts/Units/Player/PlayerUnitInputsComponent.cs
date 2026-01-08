@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 
 namespace Arcatech.Units.Control
 {
+
     [RequireComponent(typeof(PlayerAimingComponent))]
     [RequireComponent(typeof(InteractionComponent))]
     public class PlayerUnitInputsComponent : UnitInputsComponent
