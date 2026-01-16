@@ -1,29 +1,40 @@
-Shader "URP/FX/EMP_Shock_Unlit"
+Shader "URP/FX/EMP_Shock_Sparks"
 {
     Properties
     {
-        [HDR]_BaseColor("Shock Band Color", Color) = (0.1, 0.7, 1.0, 1.0)
-        [HDR]_RimColor("Rim Glow Color", Color) = (0.2, 0.9, 1.0, 1.0)
-        [HDR]_ArcColor("Electric Arc Color", Color) = (0.6, 1.0, 1.0, 1.0)
+        // Spark texture: use your single-channel (R) spark sheet, set to Repeat
+        _SparkTex("Spark Texture (R)", 2D) = "black" {}
+        [HDR]_SparkColor("Spark Color (HDR)", Color) = (0.2, 0.85, 1.0, 1.0)
+        _SparkIntensity("Spark Intensity", Range(0, 10)) = 3.0
 
-        _GlowIntensity("Global Glow Intensity", Range(0, 10)) = 2.0
-        _Opacity("Overall Opacity", Range(0, 1)) = 0.85
+        // How many spark tiles around circumference and along height
+        _SparkTilingU("Tiling Around (lanes)", Range(1, 64)) = 16
+        _SparkTilingV("Tiling Up (rows)", Range(1, 16)) = 4
 
+        // Movement
+        _SparkScrollU("Scroll Around Speed", Range(-10, 10)) = 1.0
+        _SparkScrollV("Scroll Up Speed", Range(-10, 10)) = 0.8
+
+        // Spawn and lifetime shaping
+        _SparkSpawnRate("Spawn Rate (per sec)", Range(0.1, 10)) = 2.0
+        _SparkLifeTravel("Lifetime Travel (rows)", Range(0, 2)) = 0.85
+
+        // Cut black background from spark texture (0..1 threshold)
+        _SparkCutoff("Spark Cutoff", Range(0, 1)) = 0.25
+
+        // Optional distortion using a noise texture
+        _NoiseTex("Noise (R)", 2D) = "gray" {}
+        _NoiseScale("Noise Scale (Angle, Height)", Vector) = (4, 2, 0, 0)
+        _SparkWarp("Noise Warp Amount", Range(0, 1)) = 0.2
+        _NoiseStrength("Noise Strength (misc)", Range(0, 1)) = 0.35
+
+        // Readability rim
+        [HDR]_RimColor("Rim Glow Color", Color) = (0.3, 0.9, 1.0, 1.0)
+        _RimStrength("Rim Strength", Range(0, 4)) = 0.6
         _RimPower("Rim Power", Range(0.5, 8.0)) = 2.5
 
-        _BandWidth("Shock Band Width", Range(0.005, 0.5)) = 0.12
-        _BandSpeed("Shock Band Speed", Range(-5, 5)) = 0.75
-
-        _ArcCount("Arc Count (around Y)", Range(1, 64)) = 24
-        _ArcSharpness("Arc Sharpness", Range(0.5, 10)) = 3.0
-        _ArcSpeed("Arc Rotation Speed", Range(-10, 10)) = 1.5
-
-        _ScanDensity("Scanline Density", Range(1, 64)) = 24
-        _ScanSpeed("Scanline Speed", Range(-10, 10)) = 2.0
-
-        _NoiseTex("Noise (R)", 2D) = "white" {}
-        _NoiseScale("Noise Scale (Angle, Height)", Vector) = (4, 2, 0, 0)
-        _NoiseStrength("Noise Strength", Range(0, 1)) = 0.35
+        // Global transparency
+        _Opacity("Overall Opacity", Range(0, 1)) = 0.9
     }
 
     SubShader
@@ -38,9 +49,10 @@ Shader "URP/FX/EMP_Shock_Unlit"
 
         Pass
         {
-            Name "EMPShock"
+            Name "EMPShockSparks"
             Tags { "LightMode"="SRPDefaultUnlit" }
 
+            // Soft additive. For full additive: Blend One One
             Blend SrcAlpha One
             ZWrite Off
             Cull Back
@@ -51,37 +63,31 @@ Shader "URP/FX/EMP_Shock_Unlit"
             #pragma multi_compile_instancing
             #pragma target 3.0
 
-            // Core + explicit transforms (some URP versions need SpaceTransforms.hlsl separately)
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            #ifndef PI
-            #define PI 3.14159265359
-            #endif
-
+            TEXTURE2D(_SparkTex); SAMPLER(sampler_SparkTex);
             TEXTURE2D(_NoiseTex); SAMPLER(sampler_NoiseTex);
 
             CBUFFER_START(UnityPerMaterial)
-                float4 _BaseColor;
-                float4 _RimColor;
-                float4 _ArcColor;
-
-                float _GlowIntensity;
-                float _Opacity;
-
-                float _RimPower;
-
-                float _BandWidth;
-                float _BandSpeed;
-
-                float _ArcCount;
-                float _ArcSharpness;
-                float _ArcSpeed;
-
-                float _ScanDensity;
-                float _ScanSpeed;
+                float4 _SparkColor;
+                float  _SparkIntensity;
+                float  _SparkTilingU;
+                float  _SparkTilingV;
+                float  _SparkScrollU;
+                float  _SparkScrollV;
+                float  _SparkSpawnRate;
+                float  _SparkLifeTravel;
+                float  _SparkCutoff;
 
                 float2 _NoiseScale;
-                float _NoiseStrength;
+                float  _SparkWarp;
+                float  _NoiseStrength;
+
+                float4 _RimColor;
+                float  _RimStrength;
+                float  _RimPower;
+
+                float  _Opacity;
             CBUFFER_END
 
             struct Attributes
@@ -117,71 +123,74 @@ Shader "URP/FX/EMP_Shock_Unlit"
                 return OUT;
             }
 
+            // Angle around cylinder from object-space xz -> [0,1)
             float Angle01FromXZ(float2 xz)
             {
-                // HLSL atan2(y, x)
-                float a = atan2(xz.x, xz.y);           // [-PI, PI]
-                a = a / (2.0 * PI) + 0.5;              // [0,1)
+                float a = atan2(xz.x, xz.y);          // [-PI, PI]
+                a = a / (2.0 * PI) + 0.5;             // [0,1)
                 return frac(a);
             }
 
-            float Triangle01(float x)
+            // Simple stable hash to seed per-tile timing
+            float Hash11(float p)
             {
-                float f = frac(x);
-                return abs(f * 2.0 - 1.0);
+                p = frac(p * 0.1031);
+                p *= p + 33.33;
+                p *= p + p;
+                return frac(p);
             }
-
-            float SmoothBand(float v, float center, float halfWidth)
-            {
-                float d = abs(v - center);
-                return smoothstep(halfWidth, 0.0, d);
-            }
-
-            float3 SafeNormalize(float3 v) { return normalize(v + 1e-5); }
 
             half4 frag(Varyings IN) : SV_Target
             {
                 float3 N = SafeNormalize(IN.normalWS);
                 float3 V = SafeNormalize(_WorldSpaceCameraPos.xyz - IN.positionWS);
 
-                // Unity _Time.x is time in seconds; match older comment behavior
                 float t = _Time.x;
+                float ang01 = Angle01FromXZ(IN.positionOS.xz);   // 0..1 around Y
+                float vcoord = saturate(IN.uv.y);                // 0..1 bottom->top
 
-                float ang01 = Angle01FromXZ(IN.positionOS.xz);
-                float vcoord = saturate(IN.uv.y);
-
+                // Optional noise warp in angle/height space
                 float2 nUV = float2(ang01 * _NoiseScale.x, vcoord * _NoiseScale.y + t * 0.25);
-                float noiseR = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, nUV).r;
-                float noise  = (noiseR * 2.0 - 1.0) * _NoiseStrength;
+                float noiseR = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, nUV).r; // 0..1
+                float warp = (noiseR * 2.0 - 1.0) * _SparkWarp;
 
-                float arcPhase = ang01 * _ArcCount + t * _ArcSpeed;
-                float arcTri   = Triangle01(arcPhase + noise * 0.15);
-                float arcs     = pow(saturate(1.0 - arcTri), _ArcSharpness);
+                // Tile indices for stable per-cell randomization
+                float uCell = floor(ang01 * _SparkTilingU);
+                float vCell = floor(vcoord * _SparkTilingV);
+                float seed  = Hash11(uCell + vCell * 57.0);
 
-                float scan = 0.5 + 0.5 * sin((vcoord * _ScanDensity - t * _ScanSpeed) * (2.0 * PI));
+                // Life 0..1 per tile, repeats with _SparkSpawnRate
+                float life    = frac(t * _SparkSpawnRate + seed);
+                float lifeIn  = smoothstep(0.00, 0.15, life);
+                float lifeOut = smoothstep(1.00, 0.85, life);
+                float lifeFade = lifeIn * lifeOut;
 
-                float bandCenter = frac(t * _BandSpeed);
-                float band       = SmoothBand(vcoord, bandCenter, max(_BandWidth, 1e-4));
+                // Spark UVs: tile, scroll, and per-life travel
+                float u = frac(ang01 * _SparkTilingU + t * _SparkScrollU + warp);
+                float v = frac(vcoord * _SparkTilingV - t * _SparkScrollV - life * _SparkLifeTravel);
 
+                float2 sparkUV = float2(u, v);
+                float sparkTex = SAMPLE_TEXTURE2D(_SparkTex, sampler_SparkTex, sparkUV).r;
+
+                // Cut out black background, then apply fade
+                float sparkMask = saturate((sparkTex - _SparkCutoff) / max(1e-4, 1.0 - _SparkCutoff));
+                float spark     = sparkMask * lifeFade;
+
+                // Subtle readability rim (top-down)
                 float rim = pow(saturate(1.0 - abs(dot(N, V))), _RimPower);
 
-                float arcsMod = arcs * (0.65 + 0.35 * scan) * (0.75 + 0.25 * noiseR);
-                float bandMod = band;
-
+                // Color and alpha (soft additive output uses color * alpha)
                 float3 color =
-                      _RimColor.rgb  * rim
-                    + _ArcColor.rgb  * arcsMod
-                    + _BaseColor.rgb * bandMod;
+                    _SparkColor.rgb * (spark * _SparkIntensity) +
+                    _RimColor.rgb   * (_RimStrength * rim);
 
-                color *= _GlowIntensity;
+                float alpha = saturate(_Opacity * (spark + 0.25 * _RimStrength * rim));
 
-                float alpha = saturate(_Opacity * (0.35 * rim + 0.6 * arcsMod + 0.9 * bandMod));
                 return half4(color * alpha, alpha);
             }
             ENDHLSL
         }
     }
 
-    // If the project is actually not using URP, this fallback avoids magenta but won’t render the effect in Built-in.
     FallBack "Hidden/InternalErrorShader"
 }

@@ -8,12 +8,13 @@ using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Pick a point on NavMesh Surface", story: "[Agent] tries to find a point in [range] on NavmeshSurface and sets it as [target]", category: "Action/Navigation", id: "e77d4315743160a2f4a00a4f1ffaef9a")]
+[NodeDescription(name: "Pick a point on NavMesh Surface", story: "[Agent] tries to find a point around [Start] in [range] on NavmeshSurface and sets it as [target]", category: "Action/Navigation", id: "e77d4315743160a2f4a00a4f1ffaef9a")]
 public partial class PickAPointOnNavMeshSurfaceAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
     [SerializeReference] public BlackboardVariable<float> Range;
     [SerializeReference] public BlackboardVariable<Vector3> Target;
+    [SerializeReference] public BlackboardVariable<Vector3> Start;
     NavMeshSurface _navMeshSurface;
     NavMeshAgent _navMeshAgent;
     
@@ -39,13 +40,13 @@ public partial class PickAPointOnNavMeshSurfaceAction : Action
     
     Vector3 GetRandomNavMeshPoint(float radius, int maxAttempts = 30)
     {
-        Vector3 pos = Agent.Value.transform.position;
+        Vector3 start = Start.Value;
         
         for (int i = 0; i < maxAttempts; i++)
         {
             Vector3 randomPoint = Random.insideUnitSphere * radius;
-            randomPoint += pos;
-            randomPoint.y = pos.y;
+            randomPoint += start;
+            randomPoint.y = start.y;
             
             
             NavMeshHit hit;

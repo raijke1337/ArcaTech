@@ -29,7 +29,7 @@ namespace Arcatech
             {
                 if (!v.CanDoUnitCommand(type, out string info))
                 {
-                    if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] failed command {type} in {v}.{info} at {Time.time}");
+                    if (stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] Command fail {type} in {v}.{info} at {Time.time}.");
                     foreach (var p in _commandPerformers)
                     {
                         p.DoUnitCommand(type, false);
@@ -39,21 +39,22 @@ namespace Arcatech
                 }
             }
             var ok = stateMachine.TryCommandTransition(type,_commandPerformers);
-            if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) 
-                Debug.Log($"[Input] At {Time.time} Request {type} -> {(ok ? "accepted" : "deferred/rejected")}");
-
-            if (!ok) return false;
-
-            return true;
+            if (stateMachine.GetMainEntity.ShowingDebugs)
+            {
+                Debug.Log($"[Inputs] Command: {type}, state machine response: {(ok? "OK" : stateMachine.LastCommandRejectReason)}");
+            }
+            return ok;
         }
 
-        public bool CanPerformCombatAction(UnitActionType type)
+        public bool CanPerformCombatAction(UnitActionType type, out string info)
         {
+            info = "OK";
             foreach (var v in _commandValidators)
             {
-                if (!v.CanDoUnitCommand(type, out var info)) return false;
+                if (!v.CanDoUnitCommand(type, out info)) return false; 
+                info = "OK";
             }
-
+            
             return true;
         }
         

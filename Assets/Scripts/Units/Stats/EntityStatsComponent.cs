@@ -4,6 +4,7 @@ using Arcatech.Units;
 using System.Collections.Generic;
 using System.Linq;
 using KBCore.Refs;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,46 +14,24 @@ namespace Arcatech.Stats
     /// new component to handle the current stats and their changes on any game entity
     /// also uses stat change strategies to affect the rest of components
     /// </summary>
-    public class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
-        IKillableComponent, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>, IStateAugmentor, IKillerComponent
+    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView, IPausableComponent,
+        IKillableComponent, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>, IKillerComponent
     {
         
         [Header("Config")] [SerializeField] private BaseStatsConfig startingConfig;
         [SerializeField] private bool preserveCurrentRatioOnMaxChange = true;
         
-        private class StatRuntime
-        {
-            public float baseMax;
-            public float current;
-            public float max;
-            public float minClamp;
-            public float maxClamp;
-
-            // Computed each recalc (not permanently accumulated)
-            public float equipAddMax;
-            public float equipMultMax;
-            public float effectAddMax;
-            public float effectMultMax;
-        }
-
-        #region NEW
-
-        private StatsRepository _mainStats;
-        private DamageModifierHolder _damageModifierHolder;
-        
-        
-        #endregion
-        
-        
         private readonly Dictionary<ResourceStatType, StatRuntime> stats = new();
         private readonly Dictionary<SourceKey, List<StatModifier>> liveEquipMaxModifiers = new();
+        
         private bool init = false;
         private void Awake()
         {
             if (init) return;
             InitializeFromConfig();
+            TryGetComponent(out _aug);
         }
-
+        
         private struct SourceKey : IEquatable<SourceKey>
         {
             public readonly object source;
@@ -87,17 +66,19 @@ namespace Arcatech.Stats
 
         private readonly List<PeriodicRuntime> periodic = new();
 
-        private class ActiveEffect
+        public class AppliedEffectInstance
         {
-            public SourceKey key;
             public AppliedStatsDeltaEffect effect;
             public float? expireAt;
             public object sourceRef;
             public int stacks = 1;
             public List<StatModifier> persistentMaxMods = new();
+            
+            
+            public BaseAppliedEffect Effect;
         }
 
-        private readonly List<ActiveEffect> activeEffects = new();
+        private readonly List<AppliedEffectInstance> activeEffects = new();
 
         // If true, re-aggregate Max every frame to reflect conditional Max modifiers
         private bool _hasConditionalMaxMods = false;
@@ -157,6 +138,54 @@ namespace Arcatech.Stats
             RecomputeConditionalFlags();
             RecalculateAllMaxAndClampCurrent();
         }
+        
+        
+        private void ApplyEquipmentProvider(IEquipmentStatsProvider provider, SourceKey key)
+        {
+            // 1) Persistent Max modifiers (null-safe)
+            var modsEnum = provider.GetPersistentModifiers();
+            List<StatModifier> mods = modsEnum != null ? modsEnum.ToList() : new List<StatModifier>();
+            List<StatModifier> maxMods = mods.Where(m => m.target == StatTarget.Max).ToList(); // never null
+
+            if (maxMods.Count > 0)
+            {
+                liveEquipMaxModifiers[key] = maxMods;
+                if (!_hasConditionalMaxMods && maxMods.Any(m => !m.condition.IsEmpty))
+                    _hasConditionalMaxMods = true;
+            }
+
+            // 2) Periodic deltas (null-safe)
+            var pdsEnum = provider.GetPeriodicDeltas();
+            if (pdsEnum != null)
+            {
+                foreach (var p in pdsEnum)
+                {
+                    periodic.Add(new PeriodicRuntime
+                    {
+                        key = key,
+                        spec = p,
+                        accumulator = 0f,
+                        expireAt = null,
+                        sourceRef = provider.Source
+                    });
+                }
+            }
+
+            // 3) Immediate recompute so changes show in the inspector right away
+            RecomputeConditionalFlags();
+            RecalculateAllMaxAndClampCurrent();
+        }
+
+        private void RemoveAllEquipmentContributions()
+        {
+            liveEquipMaxModifiers.Clear();
+
+            for (int i = periodic.Count - 1; i >= 0; --i)
+            {
+                if (!periodic[i].expireAt.HasValue && periodic[i].key.source is IEquipmentStatsProvider)
+                    periodic.RemoveAt(i);
+            }
+        }
 
         #endregion
         
@@ -196,9 +225,8 @@ namespace Arcatech.Stats
                 });
             }
 
-            activeEffects.Add(new ActiveEffect
+            activeEffects.Add(new AppliedEffectInstance
             {
-                key = key,
                 effect = eff,
                 expireAt = expire,
                 sourceRef = s,
@@ -269,54 +297,10 @@ namespace Arcatech.Stats
                 // Re-aggregate Max if conditional mods exist (or effects ended, or ticks may have changed conditions)
                 RecalculateAllMaxAndClampCurrent();
             }
+
+            CheckKillCondition();
         }
 
-        private void ApplyEquipmentProvider(IEquipmentStatsProvider provider, SourceKey key)
-        {
-            // 1) Persistent Max modifiers (null-safe)
-            var modsEnum = provider.GetPersistentModifiers();
-            List<StatModifier> mods = modsEnum != null ? modsEnum.ToList() : new List<StatModifier>();
-            List<StatModifier> maxMods = mods.Where(m => m.target == StatTarget.Max).ToList(); // never null
-
-            if (maxMods.Count > 0)
-            {
-                liveEquipMaxModifiers[key] = maxMods;
-                if (!_hasConditionalMaxMods && maxMods.Any(m => !m.condition.IsEmpty))
-                    _hasConditionalMaxMods = true;
-            }
-
-            // 2) Periodic deltas (null-safe)
-            var pdsEnum = provider.GetPeriodicDeltas();
-            if (pdsEnum != null)
-            {
-                foreach (var p in pdsEnum)
-                {
-                    periodic.Add(new PeriodicRuntime
-                    {
-                        key = key,
-                        spec = p,
-                        accumulator = 0f,
-                        expireAt = null,
-                        sourceRef = provider.Source
-                    });
-                }
-            }
-
-            // 3) Immediate recompute so changes show in the inspector right away
-            RecomputeConditionalFlags();
-            RecalculateAllMaxAndClampCurrent();
-        }
-
-        private void RemoveAllEquipmentContributions()
-        {
-            liveEquipMaxModifiers.Clear();
-
-            for (int i = periodic.Count - 1; i >= 0; --i)
-            {
-                if (!periodic[i].expireAt.HasValue && periodic[i].key.source is IEquipmentStatsProvider)
-                    periodic.RemoveAt(i);
-            }
-        }
 
         private void RecomputeConditionalFlags()
         {
@@ -511,6 +495,8 @@ namespace Arcatech.Stats
         private bool EvaluateConditionGroup(ConditionGroup group)
         {
             if (group.IsEmpty) return true;
+            if (!init) InitializeFromConfig();
+            
 
             bool result = group.requireAll;
             foreach (var c in group.statConditions)
@@ -583,50 +569,30 @@ namespace Arcatech.Stats
         public bool Paused { get; set; }
         public void SetKilled(IKillerComponent c, bool value) => _killed = value;
 
+        private bool _killed;
         public bool CheckStatsConditionGroup(ConditionGroup group) =>  EvaluateConditionGroup(group);
         
-        #region statesAugmentor
-                
-        [Header("Stats-related states apply only if a state machine is available")]
-        [Header("--------------------------")]
-        [SerializeField,Self] EntityStateMachineComponent stateMachine;
-        [SerializeField] private SerializedStateTransition toKilledState;
-        private StateTransition _toKilled;
-        private UnitState _killState;
-        private bool _killed;
+        
+        #region failsafe for no state augmentor kill condition
 
-
-        public void Attach(IStateAugmentorReceiver machine)
+        private StatsStateAugmentorComponent _aug;
+        private void CheckKillCondition()
         {
-            _toKilled = toKilledState.Build();
-            _killState = _toKilled.NextState;
-            machine.AddTransition(_toKilled);
-        }
-
-        public void Detach(IStateAugmentorReceiver machine)
-        {
-            machine.RemoveTransition(_toKilled);
-        }
-
-        public void OnStateEntered(UnitState state, StateMachineContext context)
-        {
-
-        }
-
-        public void OnStateExited(UnitState state, StateMachineContext context)
-        {
-            if (state == _killState)
+            if (_aug) return;
+            if (stats[ResourceStatType.Health].current <= 0f)
             {
                 var killables = GetComponentsInChildren<IKillableComponent>(true);
                 foreach (var k in killables)
                 {
                     k.SetKilled(this,true);
                 }
+
+                Debug.Log($"placeholder kill {name}");
+                if (TryGetComponent<Animator>(out var animator)) animator.Play("Dead");
             }
         }
+        public string KilledBy => "Stats 0 hp";
         
         #endregion
-
-        public string KilledBy => "Stats";
     }
 }

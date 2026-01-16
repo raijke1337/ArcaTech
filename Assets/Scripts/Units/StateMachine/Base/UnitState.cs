@@ -112,8 +112,22 @@ namespace Arcatech.Units
             _nextActionIndex = 0;
 
             // Apply animator crossfade if an animation name/hash was provided
+            
             if (animator != null && _animatorHash != 0)
-                animator.CrossFadeInFixedTime(_animatorHash, _crossfadeTime, _animatorLayer);
+            {
+                if (!animator.HasState(_animatorLayer, _animatorHash))
+                {
+                    Debug.LogWarning(
+                        $"[{StateName}] Animator '{animator.runtimeAnimatorController.name}' " +
+                        $"has no state hash {_animatorHash} on layer {_animatorLayer}. " +
+                        $"Check the SerializedUnitState asset.");
+                }
+                else
+                {
+                    animator.CrossFadeInFixedTime(_animatorHash, _crossfadeTime, _animatorLayer);
+                }
+            }
+
 
             foreach (var m in context.Movers)
             {

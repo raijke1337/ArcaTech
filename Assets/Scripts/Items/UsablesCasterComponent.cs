@@ -98,9 +98,6 @@ namespace Arcatech.Items
 
         #endregion
 
-
-
-
         public bool CanDoUnitCommand(UnitActionType type, out string info)
         {
             info = $"No usable for action type {type}";

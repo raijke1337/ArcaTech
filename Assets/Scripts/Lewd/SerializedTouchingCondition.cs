@@ -7,7 +7,6 @@ namespace Arcatech.Lewding
     public class TouchingCondition : SerializedStateTransitionCondition
     {
         public TouchZoneType TypeOfTouch;
-        public override string ConditionName => $"Touched {TypeOfTouch}";
 
         public override bool CanTransition(StateMachineContext ctx)
         {

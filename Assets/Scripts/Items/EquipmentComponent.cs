@@ -1,5 +1,6 @@
 ﻿using System;
 using Arcatech.Units;
+using CartoonFX;
 using Drakkar.GameUtils;
 using KBCore.Refs;
 using UnityEngine;
@@ -8,18 +9,12 @@ namespace Arcatech.Items
 {
     public class EquipmentComponent : MonoBehaviour,IStateMachineNotificationReceiver
     {
-        [SerializeField] protected Transform spawner;
-
-        public Transform EffectSpawn
-        {
-            get
-            {
-                Debug.Log($"Get spawner position: {spawner.position} at {Time.time}");
-                return spawner;
-            }
-        }
+        [SerializeField] private Transform spawner;
+        [SerializeField] private ParticleSystem useParticleEffect;
+        public Transform EffectSpawn => spawner;
         private EquipmentAnimator _equipmentAnimator;
         private DrakkarTrail _trail;
+        
 
         protected virtual void OnEnable()
         {
@@ -30,6 +25,9 @@ namespace Arcatech.Items
             }
             TryGetComponent(out _equipmentAnimator);
             TryGetComponent(out _trail);
+            if (!useParticleEffect) return;
+           // useParticleEffect.clearBehavior = CFXR_Effect.ClearBehavior.Disable;
+           // useParticleEffect.enabled = false;
         }
 
 
@@ -45,6 +43,11 @@ namespace Arcatech.Items
                 case StateMachineNotifyType.EndUse:
                 {
                     if (_trail) _trail.End();
+                    break;
+                }
+                case StateMachineNotifyType.Use:
+                {
+                    if (useParticleEffect)  useParticleEffect.Play(); 
                     break;
                 }
             }

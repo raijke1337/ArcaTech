@@ -28,7 +28,7 @@ namespace Arcatech.Triggers
             _valid = LayerMask.GetMask(DataManager.GameRules.ValidHitsLayer);
             _invalid = LayerMask.GetMask(DataManager.GameRules.InvalidHitsLayer);
 
-         collider.includeLayers = (_valid| _invalid);
+              collider.includeLayers = (_valid| _invalid);
             
             var r = GetComponentsInChildren<ITriggerNotificationReceiver>();
             foreach (var r2 in r) RegisterReceiver(r2);
@@ -61,7 +61,7 @@ namespace Arcatech.Triggers
         {
             if (!Active || _receivers == null || !_receivers.Any()) return;
             if (other.isTrigger) return;
-            Debug.Log($"{this.name}: Hitting {other.gameObject.name}");
+           // Debug.Log($"{this.name}: Hitting {other.gameObject.name}");
 
             _hitting = true;
             other.TryGetComponent<BaseGameEntityComponent>(out var component);
@@ -182,7 +182,11 @@ namespace Arcatech.Triggers
             {
                 Gizmos.color = Color.gray;
             }
-            else
+            else if (Active)
+            {
+                Gizmos.color = Color.blue;
+            }
+            else if (!Active)
             {
                 Gizmos.color = Color.yellow;
             }

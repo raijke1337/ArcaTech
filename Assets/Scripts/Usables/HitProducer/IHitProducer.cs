@@ -49,7 +49,7 @@ namespace Arcatech.Usables
             {
                 int counter = triggerHitInfo.IsValidHit ? HitsThisUse + 1 : HitsThisUse;
                 
-                Debug.Log($"{Item} hit with {triggerHitInfo.Source.GetType()} on {(triggerHitInfo.IsValidHit? triggerHitInfo.Target.GetName : triggerHitInfo.Position)}, " +
+                Debug.Log($"{Item} hit with {triggerHitInfo.Source.GetType()} on {(triggerHitInfo.IsValidHit? triggerHitInfo.Target.GetName : "Invalid object at "+ triggerHitInfo.Position)} " +
                        $"hits this use {counter} out of {MaxHits}. This hit is {(triggerHitInfo.IsValidHit?"valid" : "not valid")}." +
                        $"{((SelfHitActivates && triggerHitInfo.Target == Owner) ? "Owner Trigger Enabled!" : "")}");
             }

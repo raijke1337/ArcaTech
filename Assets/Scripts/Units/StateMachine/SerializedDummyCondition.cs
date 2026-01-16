@@ -6,7 +6,6 @@ namespace Arcatech.Units
     public class SerializedDummyCondition : SerializedStateTransitionCondition
     {
         [SerializeField] private bool result;
-        public override string ConditionName => result.ToString();
         public override bool CanTransition(StateMachineContext ctx) => result;
     }
 }

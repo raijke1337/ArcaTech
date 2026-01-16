@@ -7,6 +7,17 @@ namespace Arcatech.Units
 {
     public partial class EntityStateMachineComponent
     {
+        public enum CommandRejectReason
+        {
+            None,
+            PausedOrKilled,
+            NoCurrentState,
+            NoValidTransitionYet
+        }
+
+        public CommandRejectReason LastCommandRejectReason { get; private set; }
+        
+        
 #if UNITY_EDITOR
         public StateMachineContext Context => _context;
         public UnitState CurrentUnitState => _currentState;

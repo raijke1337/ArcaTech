@@ -165,7 +165,7 @@ namespace Arcatech.Usables
 
                     // Set position and rotation
                     projectile.transform.SetPositionAndRotation(spawnPosition, rot);
-                    Debug.Log($"Set projectile spawn {spawnPosition} at {Time.time}");
+                 //   Debug.Log($"Set projectile spawn {spawnPosition} at {Time.time}");
 
                     projectile.gameObject.SetActive(true);
                     projectile.RegisterReceiver(this);

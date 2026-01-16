@@ -19,6 +19,7 @@ namespace Arcatech.Stats
 
         [Header("Stacking")] public StackType stackType;
         public int maxStacks = 99;
-        [Header("Visual")] [SerializeField] private string reference = "TODO";
     }
+    
+    
 }

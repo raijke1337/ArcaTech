@@ -6,7 +6,6 @@ namespace Arcatech.Units
     public class PendingCommandCondition : SerializedStateTransitionCondition
     {
         public UnitActionType requiredCommand;
-        public override string ConditionName => "Pending unit command "+ requiredCommand;
 
         public override bool CanTransition(StateMachineContext ctx)
         {

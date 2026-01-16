@@ -2,9 +2,9 @@
 
 namespace Arcatech.Stats
 {
-    public class DamageModifierHolder :IAppliedEffectsTakerComponent<AppliedDamageTakenModifierEffect>
+    public class DamageModifierHolder :IAppliedEffectsTakerComponent<AppliedStatDeltaAmpEffect>
     {
-        public bool  ApplyEffect(AppliedDamageTakenModifierEffect effect, BaseGameEntityComponent source)
+        public bool  ApplyEffect(AppliedStatDeltaAmpEffect effect, BaseGameEntityComponent source)
         {
             throw new System.NotImplementedException();
         }

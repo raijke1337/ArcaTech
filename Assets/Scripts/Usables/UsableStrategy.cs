@@ -62,7 +62,7 @@ namespace Arcatech.Usables
         }
         public void Notify(StateMachineNotifyType notifyType)
         {
-
+            Debug.Log($"{this.Description.Title} state {notifyType}");
             foreach (var effect in _usableEffects)
             {
                 effect.StateMachineNotification(notifyType);

@@ -10,7 +10,6 @@ namespace Arcatech.Lewding
         const float eps = 0.0001f;
         public ConditionOp Comparison;
         public float CompareTo;
-        public override string ConditionName => $"Lewdness is {Comparison} than {CompareTo}";
         public override bool CanTransition(StateMachineContext ctx)
         {
             var val = ctx.EcchiContext.LewdStage;

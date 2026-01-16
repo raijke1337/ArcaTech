@@ -8,7 +8,6 @@ namespace Arcatech.Units
     {
         public bool resultIs = true;
 
-        public override string ConditionName => "Interaction attempt result "+resultIs;
 
         public override bool CanTransition(StateMachineContext ctx)
         {

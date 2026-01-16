@@ -19,11 +19,12 @@ namespace Arcatech.Units
         [SerializeField,Self]protected BaseGameEntityComponent entity;
         [SerializeField,Self]protected UnitInputsComponent unitInputs;
         [SerializeField,Self]protected EntityStatsComponent stats;
+        [SerializeField,Self]protected Animator animator;
+        
 
         
-        
         private BlackboardReference bbref;
-        private readonly string combatEventChannelName = "CombatEnterEvent";
+        private readonly string combatEventChannelName = "EnterCombatEventChannel";
         private readonly string selfRef = "Wrapper";
         
         EnterCombatEventChannel combatEventChannel;
@@ -31,9 +32,19 @@ namespace Arcatech.Units
         #region BLACKBOARD
 
         public float GetStatPercent(ResourceStatType statType) => stats.GetCurrent(statType) / stats.GetMax(statType);
-        public bool ActionAvailable(UnitActionType actionType) => unitInputs.CanPerformCombatAction(actionType);
 
-        public bool RequestAction(UnitActionType actiontype) => unitInputs.RequestCombatAction(actiontype);
+        public bool ActionAvailable(UnitActionType actionType)
+        {
+            
+            var ok = unitInputs.CanPerformCombatAction(actionType, out var info);
+            if (!ok && entity.ShowingDebugs) Debug.Log(info);
+            return ok;
+        }
+
+        public bool RequestAction(UnitActionType actiontype)
+        {
+            return  unitInputs.RequestCombatAction(actiontype);
+        }
 
         #endregion
         
@@ -74,7 +85,6 @@ namespace Arcatech.Units
             set
             {
                 _paused = value;
-                // base.OnPause(paused);   
                 agent.isStopped = _paused;
             
                 if (!behavior) return;
@@ -92,11 +102,16 @@ namespace Arcatech.Units
                 agent.isStopped = !value;
             }
         }
-        public Vector3 MovementVector { get; set; }
+        public Vector3 MovementVector { get => agent.velocity; set => agent.velocity= value; }
+
         public float ActualMovementVelocity => agent.velocity.magnitude;
         public bool IsGrounded => agent.isOnNavMesh;
-        public bool UseRootMotion { get; set; }
 
+        public bool UseRootMotion
+        {
+            get => animator.applyRootMotion;
+            set => animator.applyRootMotion = value;
+        }
     }
 }
 

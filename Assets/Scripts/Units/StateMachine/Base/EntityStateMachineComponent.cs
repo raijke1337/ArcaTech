@@ -13,6 +13,7 @@ namespace Arcatech.Units
     [RequireComponent(typeof(BaseGameEntityComponent))]
     public partial class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent, IStateAugmentorReceiver
     {
+        
 
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Child] Animator animator;
@@ -50,8 +51,8 @@ namespace Arcatech.Units
                 Debug.Log($"tried to register {augmentor} and failed");
                 return;
             }
+            
             _activeAugmentors.Add(augmentor);
-
             augmentor.Attach(this);
             if (GetMainEntity.ShowingDebugs) Debug.Log($"Register {augmentor}");
         }
@@ -78,6 +79,7 @@ namespace Arcatech.Units
                 Owner = gameEntity,
                 CurrentState = null,
                 Animator = animator,
+                PendingCommand = UnitActionType.None
             };
 
             _currentState = startingState.Build();
@@ -130,14 +132,22 @@ namespace Arcatech.Units
         public bool TryCommandTransition(UnitActionType actionType,
             IEnumerable<IUnitCommandPerformer> commandPerformers)
         {
-            if (Paused || _killed) return false;
+            LastCommandRejectReason = CommandRejectReason.None;
+
+            if (Paused || _killed)
+            {
+                LastCommandRejectReason = CommandRejectReason.PausedOrKilled;
+                return false;
+            }
 
             CacheCommandContext(actionType, commandPerformers);
             _context.PendingCommand = actionType;
 
             bool committed = ValidateCommandTransition();
 
-            // true = committed immediately; false = buffered for later or invalid.
+            if (!committed && LastCommandRejectReason == CommandRejectReason.None)
+                LastCommandRejectReason = CommandRejectReason.NoValidTransitionYet;
+
             return committed;
         }
 
@@ -176,6 +186,7 @@ namespace Arcatech.Units
         {
             if (_currentState == null)
             {
+                LastCommandRejectReason = CommandRejectReason.NoCurrentState;
                 CompletePendingCommand(false);
                 return false;
             }
@@ -183,7 +194,8 @@ namespace Arcatech.Units
             var chosen = PickBestTransition(out _);
             if (chosen == null)
             {
-                // No transition yet; keep the command buffered so Update() can consume it later.
+                // keep command buffered, but make it clear why
+                LastCommandRejectReason = CommandRejectReason.NoValidTransitionYet;
                 return false;
             }
 
@@ -240,18 +252,6 @@ namespace Arcatech.Units
         // ---------------------------------------------------------------------
         // external helpers
         // ---------------------------------------------------------------------
-        public void ForceUnitState(UnitState forcedState, bool immediate = true)
-        {
-            if (forcedState == null) return;
-
-            CompletePendingCommand(false);
-
-            _currentState?.ExitState(_context, animator);
-            _currentState = forcedState;
-            _context.CurrentState = _currentState;
-            _context.ClearCommand();
-            _currentState.EnterState(_context, animator);
-        }
 
         public void AddTransition(StateTransition transition)
         {
@@ -264,6 +264,7 @@ namespace Arcatech.Units
             if (transition == null) return;
             _addedTransitions.Remove(transition);
         }
+        
 
         // ---------------------------------------------------------------------
         // candidate / picker
@@ -330,19 +331,10 @@ namespace Arcatech.Units
         // ---------------------------------------------------------------------
         public bool Paused { get; set; }
 
-        public void SetKilled(IKillerComponent comp, bool value) => _killed = value;
-    }
-
-    public interface IStateAugmentorReceiver
-    {
-        /// <summary>
-        /// this needs to be called when the augmentor is not a part of the statemachine gameobject hierarchy
-        /// </summary>
-        /// <param name="augmentor"></param>
-        public void RegisterAugmentor(IStateAugmentor augmentor);
-        public void UnregisterAugmentor(IStateAugmentor augmentor);
-        public void AddTransition(StateTransition transition);
-        public void RemoveTransition(StateTransition transition);
-        public StateMachineContext Context { get; }
+        public void SetKilled(IKillerComponent comp, bool value)
+        {
+            _killed = value;
+            _context.PendingCommand = UnitActionType.None;
+        }
     }
 }
