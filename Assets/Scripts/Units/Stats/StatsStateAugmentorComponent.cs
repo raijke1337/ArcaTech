@@ -10,17 +10,16 @@ namespace Arcatech.Stats
     [RequireComponent(typeof(EntityStatsComponent),typeof(EntityStateMachineComponent))]
     public class StatsStateAugmentorComponent : ValidatedMonoBehaviour, IStateAugmentor, IKillerComponent
     {
-        [Header("Stats-related states apply only if a state machine is available")]
-        [Header("--------------------------")]
+        
         [SerializeField, Self]
         private EntityStatsComponent stats;
         [SerializeField,Self] EntityStateMachineComponent stateMachine;
         [SerializeField] private SerializedStateTransition toKilledState;
-        [SerializeField] private SerializedStateTransition toStaggerState;
+        [SerializeField] private SerializedStateTransition toKnockDown;
         private StateTransition _toKilled;
-        private StateTransition _toStagger;
+        private StateTransition _toKnockDown;
         private UnitState _killState;
-        private UnitState _staggerState;
+        private UnitState _knockDownStart;
         
         private StateMachineContext _stateMachineCtx;
 
@@ -29,15 +28,19 @@ namespace Arcatech.Stats
             if (toKilledState != null)
             {
                 _toKilled = toKilledState.Build();
-                _killState = _toKilled.NextState;
                 machine.AddTransition(_toKilled);
+                
+                
+                _killState = _toKilled.NextState;
             }
 
-            if (toStaggerState != null)
+            if (toKnockDown != null)
             {
-                _toStagger = toStaggerState.Build();
-                _staggerState = _toStagger.NextState;
-                machine.AddTransition(_toStagger);
+                _toKnockDown = toKnockDown.Build();
+                machine.AddTransition(_toKnockDown);
+                
+                
+                _knockDownStart = _toKnockDown.NextState;
             }
             _stateMachineCtx = machine.Context; // TODO: set some trigger for stagger / dmg anim instead of plain stat condition
         }
@@ -45,15 +48,30 @@ namespace Arcatech.Stats
         public void Detach(IStateAugmentorReceiver machine)
         {
             if (_toKilled != null) machine.RemoveTransition(_toKilled);
-            if (_toStagger != null) machine.RemoveTransition(_toStagger);
+            if (_toKnockDown != null) machine.RemoveTransition(_toKnockDown);
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)
         {
+            if (state == _knockDownStart)
+            {
+                context.KnockDownState = true;
+            }
+
+            if (state == _killState)
+            {
+                context.DeadState = true;
+            }
+
+            if (state.StateName == "KnockDownEnd")
+            {
+                context.KnockDownState = false;
+            }
         }
 
         public void OnStateExited(UnitState state, StateMachineContext context)
         {
+
             if (state == _killState)
             {
                 var killables = GetComponentsInChildren<IKillableComponent>(true);

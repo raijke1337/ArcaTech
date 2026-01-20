@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using Arcatech.Units.Control;
-using com.cyborgAssets.inspectorButtonPro;
+using Arcatech.EventBus;
 using Unity.Cinemachine;
 using UnityEngine;
 namespace Arcatech.Managers
@@ -10,11 +8,28 @@ namespace Arcatech.Managers
     {
         [SerializeField] private CinemachineCamera closeCam;
 
-        [ProButton]
-        public void ToggleCamera(float time = 5f)
+        private EventBinding<CameraEvent> _camBind;
+        private void Start()
         {
-            closeCam.gameObject.SetActive(closeCam.gameObject.activeInHierarchy);
+            _camBind = new EventBinding<CameraEvent>(OnCameraEvent);
+            EventBus<CameraEvent>.Register(_camBind);
         }
+        private void OnCameraEvent(CameraEvent cameraEvent)
+        {
+            // 1) activate close up camera
+            // 2) load the movement or orbiting settings into the camera
+        }
+
+        private void OnDisable()
+        {
+            EventBus<CameraEvent>.Deregister(_camBind);
+        }
+    }
+    public struct CameraEvent : IEvent
+    {
+        // placeholder for global camera event calls
+        // start / end
+        // + movement path or settings
     }
 }
 

@@ -22,8 +22,6 @@ namespace Arcatech.Units
         [Space, Header("States")] 
         [SerializeField] SerializedUnitState startingState;
 
-        readonly string _animatorParameterName = "TimeInState";
-        int _animatorParameter;
 
         [SerializeField] public bool verboseDebugs = false;
 
@@ -71,7 +69,6 @@ namespace Arcatech.Units
         
         void Start()
         {
-            _animatorParameter = Animator.StringToHash(_animatorParameterName);
 
             _context = new StateMachineContext
             {
@@ -105,7 +102,6 @@ namespace Arcatech.Units
             if (Paused || _killed) return;
 
             _currentState?.UpdateState(_context,animator,Time.deltaTime);
-            animator.SetFloat(_animatorParameter, _currentState?.TimeInState ?? 0f);
 
             int safety = 0;
             const int kMaxChain = 8;
@@ -134,11 +130,12 @@ namespace Arcatech.Units
         {
             LastCommandRejectReason = CommandRejectReason.None;
 
-            if (Paused || _killed)
+            if (Paused || _killed || _context.KnockDownState)
             {
-                LastCommandRejectReason = CommandRejectReason.PausedOrKilled;
+                LastCommandRejectReason = CommandRejectReason.IncapacitatedState;
                 return false;
             }
+            
 
             CacheCommandContext(actionType, commandPerformers);
             _context.PendingCommand = actionType;

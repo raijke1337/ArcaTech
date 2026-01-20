@@ -19,6 +19,8 @@ namespace Arcatech.Units
         [CanBeNull] public IInvulnerability[] Invulnerables;
         [CanBeNull] public IInteractor Interactor;
         public Animator Animator;
+        public bool KnockDownState { get; set; }
+        public bool DeadState { get; set; }
         
         public void ClearCommand ()=> PendingCommand = UnitActionType.None;
     }

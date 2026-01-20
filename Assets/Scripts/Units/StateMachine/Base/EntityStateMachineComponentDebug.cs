@@ -10,7 +10,7 @@ namespace Arcatech.Units
         public enum CommandRejectReason
         {
             None,
-            PausedOrKilled,
+            IncapacitatedState,
             NoCurrentState,
             NoValidTransitionYet
         }
