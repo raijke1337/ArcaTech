@@ -8,9 +8,10 @@ namespace Arcatech.Units
     {
         [SerializeField] public bool KnockDownStateIs = false;
         [SerializeField] public bool DeadStateIs = false;
+        [SerializeField] public bool DamageStateIs = false;
         public override bool CanTransition(StateMachineContext ctx)
         {
-            return (ctx.DeadState == DeadStateIs && ctx.KnockDownState == KnockDownStateIs);
+            return (ctx.DeadState == DeadStateIs && ctx.KnockDownState == KnockDownStateIs && ctx.InterruptQueued == DamageStateIs);
         }
     }
 }

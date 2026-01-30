@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Arcatech.Items;
+using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
 
@@ -11,8 +12,8 @@ namespace Arcatech.Usables
     {
         [Header("Beam Configuration")] public SerializedBeamShooterConfig beamConfig;
 
-        [Header("Hit Report Settings")] [Min(0.01f)]
-        public float hitReportFrequency = 0.1f; // Time between hit reports in seconds
+        [Header("Hit Settings")] [Min(0.01f)]
+        public float HitsRefreshInterval = 0.1f; // how many seconds pass before the hits buffer is flushed, and they are reported as new
 
         public bool reportOnHitEnter = true;
         public bool reportOnHitContinuous = true;
@@ -23,11 +24,11 @@ namespace Arcatech.Usables
         }
     }
 
-    public class BeamHitProducer : HitProducer
+    public class BeamHitProducer : HitProducer, ITriggerNotificationReceiver
     {
         
         private readonly BeamWeaponComponent _beamShooter;
-        private readonly HashSet<BaseGameEntityComponent> _hitThisFrame = new();
+        private readonly HashSet<BaseGameEntityComponent> _bufferedHits = new();
  
         private bool _beamActive;
 
@@ -40,32 +41,18 @@ namespace Arcatech.Usables
             _beamActive = false;
         }
         
-        public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
+        public void TriggerEntered(TriggerHitInfo triggerHitInfo) // the buffering is done in the mono beam shooter
         {
             if (!_beamActive)
             {
                 return;
             }
-
-            // Filter self-hits
-            if (triggerHitInfo.Target == Owner && !SelfHitActivates)
-            {
-                return;
-            }
-
-            // Skip if not a valid hit and we're not counting environment hits
-            if (!triggerHitInfo.IsValidHit)
-            {
-                return;
-            }
-            
             // Prevent duplicate hits on the same target in the same frame
-            if (_hitThisFrame.Contains(triggerHitInfo.Target))
+            if (!_bufferedHits.Add(triggerHitInfo.Target))
             {
                 return;
             }
-            _hitThisFrame.Add(triggerHitInfo.Target);
-        
+
             HitsThisUse++;
             if (HitsThisUse <= MaxHits)
             {
@@ -75,15 +62,15 @@ namespace Arcatech.Usables
                               $"hits this use: {HitsThisUse}/{MaxHits}");
                 }
             
-                CallHit(triggerHitInfo);
+                HitCallback(triggerHitInfo);
             }
         }
 
-        public override void TriggerExited(TriggerHitInfo triggerExitInfo)
+        public void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
             if (triggerExitInfo.Target != null)
             {
-                _hitThisFrame.Remove(triggerExitInfo.Target);
+                _bufferedHits.Remove(triggerExitInfo.Target);
             }
 
             if (Owner.ShowingDebugs)
@@ -110,7 +97,7 @@ namespace Arcatech.Usables
         private void StartBeam()
         {
             _beamActive = true;
-            _hitThisFrame.Clear();
+            _bufferedHits.Clear();
             _beamShooter.StartBeam(Owner.transform.forward);
 
         }
@@ -119,9 +106,10 @@ namespace Arcatech.Usables
         {
             _beamActive = false;
             _beamShooter.StopBeam();
-            _hitThisFrame.Clear();
-
+            _bufferedHits.Clear();
         }
+        
+        
     }
 
 [Serializable]
@@ -135,7 +123,10 @@ namespace Arcatech.Usables
 
         [Header("Hit Detection")] [Min(0.01f)] public float raycastFrequency; // Time between raycasts in seconds
         [Min(1)] public int raycastsPerFrame; // Number of raycasts to perform per frame
-    
+
+        [Header("Reporting")] public float interval; // how much time a target needs to be in a beam to be reported as a hit
+        [Header("Reporting")] public float gracePeriod; // how much time a target can spend out of beam and not be excluded from report
+        
         [Header("Hit Filtering")]
         [Min(0)] public float minDistanceBetweenHits; // Minimum distance on beam before same entity can be hit again
     }

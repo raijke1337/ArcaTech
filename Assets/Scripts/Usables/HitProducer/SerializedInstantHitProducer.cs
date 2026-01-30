@@ -13,9 +13,10 @@ namespace Arcatech.Usables
         {
             return new InstantHitProducer(owner, item,this);
         }
+
     }
     
-        public class InstantHitProducer : HitProducer
+        public class InstantHitProducer : HitProducer, ITriggerNotificationReceiver
         {
             private ITriggerNotificationProvider provider; // From item (e.g., EquipmentComponent's hitbox)
           
@@ -51,10 +52,16 @@ namespace Arcatech.Usables
                     break;
             }
         }
-
-
-        public override void TriggerExited(TriggerHitInfo triggerExitInfo)
+        
+        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
+            HitCallback(triggerHitInfo);
         }
+
+        public void TriggerExited(TriggerHitInfo triggerExitInfo)
+        {
+           // HitCallback(triggerExitInfo);
+        }
+
     }
 }

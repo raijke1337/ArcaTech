@@ -72,7 +72,6 @@ namespace Arcatech
                     v.ApplyEffect(statsDelta, source);
                 }
             }
-
             return true;
         }
 

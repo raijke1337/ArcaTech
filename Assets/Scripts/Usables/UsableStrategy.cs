@@ -20,7 +20,7 @@ namespace Arcatech.Usables
             _equipment = equipment;
             DrawStrategy = config.settings.drawItemsStrategy;
             
-            _usableEffects = config.compositeUsableEffects.Select(t=>
+            _usableEffects = config.usableData.Select(t=>
                 t.Deserialize(owner, equipment)).ToArray();
             
             _reload = config.settings.charge.Deserialize();
@@ -62,7 +62,7 @@ namespace Arcatech.Usables
         }
         public void Notify(StateMachineNotifyType notifyType)
         {
-            Debug.Log($"{this.Description.Title} state {notifyType}");
+           // Debug.Log($"{this.Description.Title} state {notifyType}");
             foreach (var effect in _usableEffects)
             {
                 effect.StateMachineNotification(notifyType);

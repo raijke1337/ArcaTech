@@ -225,7 +225,7 @@ MonoBehaviour:
   effectSpawn: {fileID: 7839314505225563933}
   destroyOnDeath: 0
   timerToDestroy: 2
-  _showDebugs: 1
+  _showDebugs: 0
 --- !u!114 &2712598585342110039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,6 +257,7 @@ MonoBehaviour:
   entity: {fileID: 2276539188783938308}
   unitInputs: {fileID: 2494332768464867219}
   stats: {fileID: 2712598585342110039}
+  animator: {fileID: 6047767746083955861}
 --- !u!114 &6017142278139704755
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,6 +360,12 @@ MonoBehaviour:
   animator: {fileID: 6047767746083955861}
   startingState: {fileID: 11400000, guid: 44d05975934c4364ebce778c45961dee, type: 2}
   verboseDebugs: 0
+  _context:
+    PendingCommand: 0
+    Spawn: {fileID: 0}
+    Owner: {fileID: 0}
+    Stats: {fileID: 0}
+    Animator: {fileID: 0}
 --- !u!114 &4254907401553634058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,7 +417,15 @@ MonoBehaviour:
   stats: {fileID: 2712598585342110039}
   stateMachine: {fileID: 7178321968876317679}
   toKilledState: {fileID: 11400000, guid: aa806e69f163ab043a5541d5106fee78, type: 2}
-  toStaggerState: {fileID: 0}
+  toKnockDown: {fileID: 0}
+  canBeInterrupted: 1
+  interruptCondition:
+    requireAll: 0
+    invert: 0
+    statConditions: []
+  toDamageInterrupt: {fileID: 11400000, guid: 16390df93d29d0a45a4db169b6d17308, type: 2}
+  dmgFrontAnimatorParameter: DamageFront
+  dmgRightAnimatorParameter: DamageRight
 --- !u!1001 &1969979068874704690
 PrefabInstance:
   m_ObjectHideFlags: 0

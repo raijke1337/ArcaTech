@@ -1,4 +1,5 @@
-﻿using Arcatech.Interactions;
+﻿using System;
+using Arcatech.Interactions;
 using Arcatech.Lewding;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
@@ -7,6 +8,7 @@ using UnityEngine;
 
 namespace Arcatech.Units
 {
+    [Serializable]
     public partial class StateMachineContext
     {
         public UnitActionType PendingCommand;
@@ -21,8 +23,9 @@ namespace Arcatech.Units
         public Animator Animator;
         public bool KnockDownState { get; set; }
         public bool DeadState { get; set; }
-        
-        public void ClearCommand ()=> PendingCommand = UnitActionType.None;
+        public bool InterruptQueued { get; set; }
+
+        public void ClearCommand() => PendingCommand = UnitActionType.None;
     }
 
     public partial class StateMachineContext

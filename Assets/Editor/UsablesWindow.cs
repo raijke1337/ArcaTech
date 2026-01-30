@@ -96,9 +96,9 @@ public class SerializedUsableStrategiesWindow : EditorWindow
         }
         
         // Additional info
-        if (strategy.compositeUsableEffects != null)
+        if (strategy.usableData != null)
         {
-            EditorGUILayout.LabelField("Effects: " + strategy.compositeUsableEffects.Length);
+            EditorGUILayout.LabelField("Effects: " + strategy.usableData.Length);
         }
         
         if (strategy.settings.useCost != null)

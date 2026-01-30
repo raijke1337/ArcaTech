@@ -25,7 +25,7 @@ namespace Arcatech.Units
 
         [SerializeField] public bool verboseDebugs = false;
 
-        StateMachineContext _context;
+        [SerializeField] StateMachineContext _context;
         UnitState _currentState;
 
         readonly List<StateTransition> _addedTransitions = new();

@@ -26,7 +26,7 @@ namespace Arcatech.Usables
     }
 
 
-    public class ProjectileHitProducer : HitProducer,IKillerComponent
+    public class ProjectileHitProducer : HitProducer,IKillerComponent, ITriggerNotificationReceiver
     {
         public string KilledBy => "Hits producer";
         private SerializedProjectileConfiguration _projectile;
@@ -56,7 +56,7 @@ namespace Arcatech.Usables
                 defaultCapacity: config.projectilePoolSize,
                 maxSize: config.projectilePoolSize * 2 // Allow pool to grow if needed
             );
-            MaxHits *= _shooting.TotalBursts;
+            //MaxHits *= _shooting.TotalBursts;
 
             switch (_shooting.Pattern)
             {
@@ -198,9 +198,14 @@ namespace Arcatech.Usables
                     throw new ArgumentOutOfRangeException(nameof(info), info, null);
             }
         }
-    
 
-    public override void TriggerExited(TriggerHitInfo triggerExitInfo)
+
+        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
+        {
+            
+        }
+
+        public void TriggerExited(TriggerHitInfo triggerExitInfo)
         { }
     }
 }

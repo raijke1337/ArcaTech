@@ -13,58 +13,50 @@ namespace Arcatech.Usables
     /// <summary>
     /// delivery 
     /// </summary>
-    public interface IHitProducer : ITriggerNotificationReceiver
+    public interface IHitProducer
     {
         void OnChangeState(StateMachineNotifyType info);
-        event UnityAction<TriggerHitInfo> Hit;
+        event UnityAction<TriggerHitInfo> ValidHit;
+        event UnityAction<TriggerHitInfo> InvalidHit;
     }
 
     public abstract class SerializedHitProducer : ScriptableObject
     {        
-        [Min(0)] public int maxHitsPerUse = 1;
-        public bool activateOnSelfHit = false;
+        [Min(0)] public int maxValidHitsPerUse = 1;
+        public bool enemyIsValidHit = true;
+        public bool allyIsValidHit = false;
+        public bool undefinedIsValidHit = false;
+        public bool environmentIsValidHit = false;
+        
         public abstract IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item);
     }
 
     public abstract class HitProducer : IHitProducer
     {
-        protected int MaxHits;
+        protected readonly int MaxHits;
         protected readonly EquipmentComponent Item;
         protected readonly BaseGameEntityComponent Owner;
-        protected readonly bool SelfHitActivates;
-        protected int HitsThisUse;  
+
+        private readonly bool enemyValid;
+        private readonly bool allyValid;
+        private readonly bool undefinedValid;
+        private readonly bool environmentValid;
         
+        protected int HitsThisUse;  
         
         public HitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedHitProducer cfg)
         {
-            MaxHits = cfg.maxHitsPerUse;
+            MaxHits = cfg.maxValidHitsPerUse;
             Owner = owner;
             Item = item;
-            SelfHitActivates = cfg.activateOnSelfHit;
+
+            enemyValid = cfg.enemyIsValidHit;
+            allyValid = cfg.allyIsValidHit;
+            undefinedValid = cfg.undefinedIsValidHit;
+            environmentValid = cfg.environmentIsValidHit;
         }
 
-        public virtual void TriggerEntered(TriggerHitInfo triggerHitInfo)
-        {
-            if (Owner.ShowingDebugs)
-            {
-                int counter = triggerHitInfo.IsValidHit ? HitsThisUse + 1 : HitsThisUse;
-                
-                Debug.Log($"{Item} hit with {triggerHitInfo.Source.GetType()} on {(triggerHitInfo.IsValidHit? triggerHitInfo.Target.GetName : "Invalid object at "+ triggerHitInfo.Position)} " +
-                       $"hits this use {counter} out of {MaxHits}. This hit is {(triggerHitInfo.IsValidHit?"valid" : "not valid")}." +
-                       $"{((SelfHitActivates && triggerHitInfo.Target == Owner) ? "Owner Trigger Enabled!" : "")}");
-            }
-            
-            if (triggerHitInfo.Target == Owner && !SelfHitActivates) return;
-            
-            if (triggerHitInfo.IsValidHit) HitsThisUse++;
-            if (HitsThisUse > MaxHits)
-            {
-                return;
-            }
-            Hit?.Invoke(triggerHitInfo);
-        }
 
-        public abstract void TriggerExited(TriggerHitInfo triggerExitInfo);
         public virtual void OnChangeState(StateMachineNotifyType info)
         {
             if (info == StateMachineNotifyType.Starting)
@@ -72,8 +64,16 @@ namespace Arcatech.Usables
                 HitsThisUse = 0;
             }
         }
-        protected void CallHit(TriggerHitInfo triggerHitInfo) => Hit?.Invoke(triggerHitInfo);
-        public event UnityAction<TriggerHitInfo> Hit;
+
+        public event UnityAction<TriggerHitInfo> ValidHit;
+        public event UnityAction<TriggerHitInfo> InvalidHit;
+
+        protected void HitCallback(TriggerHitInfo info)
+        { 
+            // todo: determine if the hit is valid or not, call the events
+            Debug.Log($"Hit {info.Target}");
+        }
+
     }
 
     

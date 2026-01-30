@@ -24,15 +24,7 @@ namespace Arcatech.Usables
         public SelfHitProducer( BaseGameEntityComponent owner, EquipmentComponent item,SerializedSelfHitProducer cfg) : base(owner, item,cfg)
         {
         }
-
-        public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
-        {
-        }
-
-        public override void TriggerExited(TriggerHitInfo triggerExitInfo)
-        {
-        }
-
+        
         public override void OnChangeState(StateMachineNotifyType info)
         {
             switch (info)
@@ -41,8 +33,8 @@ namespace Arcatech.Usables
                     break;
                 case StateMachineNotifyType.Starting:
                     break;
-                case StateMachineNotifyType.Use:
-                    CallHit(new TriggerHitInfo(null,Owner,Owner.EffectSpawn.position,Vector3.up,Vector3.up, Time.time));
+                case StateMachineNotifyType.Use: 
+                    HitCallback(new TriggerHitInfo(null,Owner,Owner.EffectSpawn.position, Vector3.up,Vector3.up, Time.time));
                     break;
                 case StateMachineNotifyType.EndUse:
                     break;

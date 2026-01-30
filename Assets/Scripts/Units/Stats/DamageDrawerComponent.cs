@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Arcatech.Managers;
 using Arcatech.Units;
 using KBCore.Refs;
@@ -15,6 +16,8 @@ namespace Arcatech.Stats
         [Header("DoT/HoT Display")]
         [SerializeField] private float dotsDisplayInterval = 0.5f;
 
+        
+        
         public bool Paused { get; set; }
         
         

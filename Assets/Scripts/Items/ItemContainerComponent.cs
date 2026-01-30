@@ -62,9 +62,9 @@ namespace Arcatech.Items
         { }
 
         [ProButton]
-        public void DebugPreview(ItemSO toLoad)
+        public void DebugPreview(ItemSO debugLoad)
         {
-            PutItem(toLoad);
+            PutItem(debugLoad);
         }
         
     }

@@ -11,13 +11,12 @@ namespace Arcatech.Usables
     public class SerializedUsableStrategy : ScriptableObject
     {
         
-        [SerializeField] public Description description;
-        public SharedUsablesSettings settings;
-        
-        [SerializeField] public SerializedStateTransition useStateTransition;
+        public Description description;
+        public GenericUsableConfig settings;
+        public SerializedStateTransition useStateTransition;
 
         [Header("Effects of usable")]
-        public CompositeUsableApplicationSerialized[] compositeUsableEffects;
+        public UsableDataContainer[] usableData;
 
         public UsableStrategy Deserialize(BaseGameEntityComponent owner, EquipmentComponent ingameItem)
         {
@@ -25,7 +24,7 @@ namespace Arcatech.Usables
         }
     }
     [Serializable]
-    public struct SharedUsablesSettings
+    public struct GenericUsableConfig
     {
         [SerializeField] public SerializedChargesStrategy charge;
         [SerializeField] public AppliedStatsDeltaEffect useCost;
