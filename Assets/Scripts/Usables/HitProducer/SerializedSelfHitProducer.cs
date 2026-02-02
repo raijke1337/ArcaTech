@@ -1,6 +1,7 @@
 ﻿using System;
 using Arcatech.Items;
 using Arcatech.Triggers;
+using Arcatech.UI;
 using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,16 +14,21 @@ namespace Arcatech.Usables
     [CreateAssetMenu(fileName = "hitProducer_self_", menuName = "Usables/Hit Producer/Self target")]
     public class SerializedSelfHitProducer : SerializedHitProducer
     {
+        [SerializeField, Tooltip("overlap is done at the effect spawn so 1 should be enough")] private float overlapRadius = 1f;
         public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
         {
-            return new SelfHitProducer(owner,item,this);
+            return new SelfHitProducer(overlapRadius, owner,item,this);
         }
     }
 
     public class SelfHitProducer : HitProducer
     {
-        public SelfHitProducer( BaseGameEntityComponent owner, EquipmentComponent item,SerializedSelfHitProducer cfg) : base(owner, item,cfg)
+        private float _r;
+        private Collider[] _c;
+        public SelfHitProducer(float rad, BaseGameEntityComponent owner, EquipmentComponent item,SerializedSelfHitProducer cfg) : base(owner, item,cfg)
         {
+            _r = rad;
+            _c = new Collider[8];
         }
         
         public override void OnChangeState(StateMachineNotifyType info)
@@ -33,8 +39,21 @@ namespace Arcatech.Usables
                     break;
                 case StateMachineNotifyType.Starting:
                     break;
-                case StateMachineNotifyType.Use: 
-                    HitCallback(new TriggerHitInfo(null,Owner,Owner.EffectSpawn.position, Vector3.up,Vector3.up, Time.time));
+                case StateMachineNotifyType.Use:
+                    if (Physics.OverlapSphereNonAlloc(Owner.EffectSpawn.position, _r, _c) > 0)
+                    {
+                        foreach (var hit in _c)
+                        {
+                            if (!hit) continue;
+                            if (!hit.TryGetComponent(out BaseGameEntityComponent c)) continue;
+                            if (c == Owner)
+                            {
+                                HitCallback(new TriggerHitInfo(null, hit, Owner.EffectSpawn.position, Vector3.up,
+                                    Vector3.up, Time.time));
+                                break;
+                            }
+                        }
+                    }
                     break;
                 case StateMachineNotifyType.EndUse:
                     break;

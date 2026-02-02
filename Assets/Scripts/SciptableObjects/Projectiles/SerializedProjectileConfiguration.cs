@@ -10,13 +10,13 @@ namespace Arcatech.Items.Projectiles
         [SerializeField] SerializedProjectileBehavior projectileBehavior;
 
 
-        public ProjectileComponent ProduceProjectile (BaseGameEntityComponent owner,int maxHits, Vector3 pos, Quaternion rot)
+        public ProjectileComponent ProduceProjectile (BaseGameEntityComponent owner, Vector3 pos, Quaternion rot)
         {
             ProjectileComponent proj = Instantiate(projectilePrefab, pos, rot);
             Vector3 dir = owner.transform.forward;
             proj.transform.forward = dir;
             
-            proj.Setup(owner,projectileBehavior,maxHits);
+            proj.Setup(owner,projectileBehavior);
             
             return proj;
         }

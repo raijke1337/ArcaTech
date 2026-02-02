@@ -16,17 +16,13 @@ namespace Arcatech.Usables
     public interface IHitProducer
     {
         void OnChangeState(StateMachineNotifyType info);
-        event UnityAction<TriggerHitInfo> ValidHit;
-        event UnityAction<TriggerHitInfo> InvalidHit;
+        event UnityAction<TriggerHitInfo> EntityHit;
+        event UnityAction<TriggerHitInfo> EnvironmentHit;
     }
 
     public abstract class SerializedHitProducer : ScriptableObject
     {        
         [Min(0)] public int maxValidHitsPerUse = 1;
-        public bool enemyIsValidHit = true;
-        public bool allyIsValidHit = false;
-        public bool undefinedIsValidHit = false;
-        public bool environmentIsValidHit = false;
         
         public abstract IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item);
     }
@@ -37,23 +33,13 @@ namespace Arcatech.Usables
         protected readonly EquipmentComponent Item;
         protected readonly BaseGameEntityComponent Owner;
 
-        private readonly bool enemyValid;
-        private readonly bool allyValid;
-        private readonly bool undefinedValid;
-        private readonly bool environmentValid;
-        
-        protected int HitsThisUse;  
+        private int HitsThisUse;  
         
         public HitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedHitProducer cfg)
         {
             MaxHits = cfg.maxValidHitsPerUse;
             Owner = owner;
             Item = item;
-
-            enemyValid = cfg.enemyIsValidHit;
-            allyValid = cfg.allyIsValidHit;
-            undefinedValid = cfg.undefinedIsValidHit;
-            environmentValid = cfg.environmentIsValidHit;
         }
 
 
@@ -65,16 +51,20 @@ namespace Arcatech.Usables
             }
         }
 
-        public event UnityAction<TriggerHitInfo> ValidHit;
-        public event UnityAction<TriggerHitInfo> InvalidHit;
+        public event UnityAction<TriggerHitInfo> EntityHit;
+        public event UnityAction<TriggerHitInfo> EnvironmentHit;
 
         protected void HitCallback(TriggerHitInfo info)
-        { 
-            // todo: determine if the hit is valid or not, call the events
-            Debug.Log($"Hit {info.Target}");
+        {
+            if (!info.TryGetEntityTarget(out var entity))
+            {
+                EnvironmentHit?.Invoke(info);
+            }
+            if (HitsThisUse >= MaxHits) return;
+            if (entity != Owner) HitsThisUse++;
+            // this is actually a band-aid but should work fine
+
+            EntityHit?.Invoke(info);
         }
-
     }
-
-    
 }

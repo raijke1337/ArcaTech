@@ -24,7 +24,6 @@ namespace Arcatech.Items.Projectiles
         private readonly float _rad;
         private BaseGameEntityComponent _currentTarget;
         private float _homingStrength;
-        private readonly int _layer;
         private Transform _cachedTransform;
         
         private List <BaseGameEntityComponent> _targets;
@@ -32,7 +31,6 @@ namespace Arcatech.Items.Projectiles
         public BouncyProjectileBehavior(SerializedBouncyProjectileBehavior b, BaseProjectileSettings settings,BaseGameEntityComponent owner) : base(settings,owner)
         {
             _rad = b.targetSearchRadius;
-            _layer = LayerMask.NameToLayer("Entities");
             _homingStrength = b.homingStrength;
             _targets  = new List<BaseGameEntityComponent>();
         }
@@ -52,11 +50,9 @@ namespace Arcatech.Items.Projectiles
 
         public override void NotifyCollision(TriggerHitInfo hit)
         {
-            if (hit.Target == Owner) return;
-
-            if (!hit.IsValidHit)
-            {
-                // --- Ricochet Logic 
+            if (!hit.TargetCollider.TryGetComponent(out BaseGameEntityComponent entity))
+            { 
+                // --- Ricochet off wall
                 Vector3 incomingDirection = hit.ImpactDirection; // Use the precise impact direction
                 Vector3 surfaceNormal = hit.Normal; // Use the accurate surface normal
 
@@ -87,16 +83,16 @@ namespace Arcatech.Items.Projectiles
                 // Or, keep tracking total distance but evaluate the curve differently.
                 // It depends on your desired gameplay.
             }
-            else
+            if (entity ==  Owner) return;
+            // hit an enemy
+            
+            _targets.Add(entity);
+            BaseGameEntityComponent nextTarget = FindNearestTarget(hit.Position);
+            if (nextTarget)
             {
-                _targets.Add(hit.Target);
-                BaseGameEntityComponent nextTarget = FindNearestTarget(hit.Position);
-                if (nextTarget)
-                {
-                    _currentTarget = nextTarget;
-                    Vector3 directionToTarget = (nextTarget.transform.position - hit.Position).normalized;
-                    _cachedTransform.rotation = Quaternion.LookRotation(directionToTarget);
-                }
+                _currentTarget = nextTarget;
+                Vector3 directionToTarget = (nextTarget.transform.position - hit.Position).normalized;
+                _cachedTransform.rotation = Quaternion.LookRotation(directionToTarget);
             }
         }
 

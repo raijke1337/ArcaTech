@@ -11,7 +11,7 @@ namespace Arcatech.Items
         // Nested class to encapsulate all state relevant to a single target being hit by the beam.
         private class TargetBeamState
         {
-            public BaseGameEntityComponent Target; // Reference to the entity being tracked.
+            public Collider Target; // Reference to the entity being tracked.
             public float ContinuousBeamTime; // Total time continuously in beam (or within grace period).
 
             public int
@@ -22,7 +22,7 @@ namespace Arcatech.Items
 
             public TriggerHitInfo LastTriggerHitInfo; // Most recent hit info for notification.
 
-            public TargetBeamState(BaseGameEntityComponent target)
+            public TargetBeamState(Collider target)
             {
                 Target = target;
                 ContinuousBeamTime = 0f;
@@ -64,12 +64,12 @@ namespace Arcatech.Items
         private Transform _spawnPoint;
 
         // --- NEW / MODIFIED FIELDS FOR CONTINUOUS HIT DETECTION ---
-        private readonly Dictionary<BaseGameEntityComponent, TargetBeamState> _trackedTargets = new();
+        private readonly Dictionary<Collider, TargetBeamState> _trackedTargets = new();
 
-        private readonly HashSet<BaseGameEntityComponent>
+        private readonly HashSet<Collider>
             _targetsHitThisFrame = new(); // Populated by raycasts, cleared each LateUpdate
 
-        private readonly List<BaseGameEntityComponent>
+        private readonly List<Collider>
             _targetsToRemove = new(); // Used for safe removal from _trackedTargets
         // --- END NEW / MODIFIED FIELDS ---
 
@@ -215,24 +215,24 @@ namespace Arcatech.Items
                     continue;
                 }
 
-                BaseGameEntityComponent target = hit.collider.GetComponent<BaseGameEntityComponent>();
+                var hitCollider = hit.collider;
 
-                if (target != null)
+                if (hitCollider != null)
                 {
                     // Add the target to the set of entities actually hit by raycasts this frame
-                    _targetsHitThisFrame.Add(target);
+                    _targetsHitThisFrame.Add(hitCollider);
 
                     // Get or create the TargetBeamState for this entity
-                    if (!_trackedTargets.TryGetValue(target, out TargetBeamState state))
+                    if (!_trackedTargets.TryGetValue(hitCollider, out TargetBeamState state))
                     {
-                        state = new TargetBeamState(target);
-                        _trackedTargets.Add(target, state);
+                        state = new TargetBeamState(hitCollider);
+                        _trackedTargets.Add(hitCollider, state);
                     }
 
                     // Always update the LastTriggerHitInfo with the most recent hit details
                     state.LastTriggerHitInfo = new TriggerHitInfo(
                         triggerNotificationProvider: this,
-                        baseGameEntityComponent: target,
+                        hit: hit.collider,
                         hitPosition: hit.point,
                         impactDirection: beamDirection,
                         hitNormal: hit.normal,
@@ -253,7 +253,7 @@ namespace Arcatech.Items
             // Iterate through all currently tracked targets to update their state
             foreach (var entry in _trackedTargets)
             {
-                BaseGameEntityComponent target = entry.Key;
+                Collider target = entry.Key;
                 TargetBeamState state = entry.Value;
 
                 if (_targetsHitThisFrame.Contains(target))
@@ -298,7 +298,7 @@ namespace Arcatech.Items
             }
 
             // Perform actual removals after iteration to avoid modifying collection during enumeration
-            foreach (BaseGameEntityComponent target in _targetsToRemove)
+            foreach (Collider target in _targetsToRemove)
             {
                 // Remove from _trackedTargets
                 _trackedTargets.Remove(target);

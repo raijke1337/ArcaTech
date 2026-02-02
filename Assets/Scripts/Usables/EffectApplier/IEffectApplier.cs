@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using Arcatech.Actions;
+using Arcatech.Effects;
+using Arcatech.EventBus;
 using CartoonFX;
-using UnityEditor.Search;
 using UnityEngine;
 
 namespace Arcatech.Usables
@@ -9,22 +10,29 @@ namespace Arcatech.Usables
     // apply directly, in aoe or to self maybe?
     public interface IEffectApplier
     {
-        void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin,
-            CFXR_Effect onValidApply);
+        void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin);
     }
 
     public abstract class SerializedEffectApplier : ScriptableObject
     {
-        public abstract IEffectApplier Deserialize();
+        public abstract IEffectApplier Deserialize(CFXR_Effect applicationEffect);
     }
 
     public abstract class EffectApplier : IEffectApplier
     {
-        public void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin, CFXR_Effect onValidApply)
+        private ParticlesEvent _onApplication;
+        public EffectApplier(CFXR_Effect applicationEffect)
         {
-            if (!hit.IsValidHit) return;
-            DoApplyLogic(user, hit, effects, origin,onValidApply);
+            _onApplication = new ParticlesEvent (applicationEffect);
         }
-        protected abstract void DoApplyLogic(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects,Vector3 origin,CFXR_Effect onValidApply);
+
+        public abstract void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects,
+            Vector3 origin);
+
+        protected void PlayApplicationParticles(Vector3 position)
+        {
+            _onApplication.Place = position;
+            EventBus<ParticlesEvent>.Raise(_onApplication);
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace Arcatech.Interactions
             triggerTracker.UnregisterReceiver(this);
         }
 
-        bool ValidateComponent(BaseGameEntityComponent comp, out IInteractor interactor )
+        bool ValidateComponent(Collider comp, out IInteractor interactor )
         {
             interactor = null;
             return comp.CompareTag("Player") && comp.TryGetComponent(out interactor) &&
@@ -40,7 +40,7 @@ namespace Arcatech.Interactions
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             if (Completed) return;
-            if (!ValidateComponent(triggerHitInfo.Target, out var interactor)) return;
+            if (!ValidateComponent(triggerHitInfo.TargetCollider, out var interactor)) return;
             foreach (var handler in handlers)
             {
                 handler.OnPlayerEnter();
@@ -51,7 +51,7 @@ namespace Arcatech.Interactions
         {
             
             if (Completed) return;
-            if (!ValidateComponent(triggerExitInfo.Target, out var interactor)) return;
+            if (!ValidateComponent(triggerExitInfo.TargetCollider, out var interactor)) return;
             
             if (!allowMultipleActivations)
             {

@@ -7,8 +7,6 @@ namespace Arcatech.Items.Projectiles
     {
         [Tooltip("How aggressively the projectile turns back toward the owner once returning.")]
         public float returnHomingStrength = 8f;
-        public float curveAmplitude = 1f;
-        public float curveFrequency = 2f * Mathf.PI;
         
         public override ProjectileBehavior Deserialize(BaseGameEntityComponent owner)
         {
@@ -19,8 +17,6 @@ namespace Arcatech.Items.Projectiles
     public class BoomerangProjectileBehavior : BaseProjectileBehavior
     {
         private readonly float _returnHomingStrength;
-        private readonly float _curveAmplitude;
-        private readonly float _curveFrequency;
         private Transform _cachedTransform;
         private bool _returning;
         private bool _initDirection;
@@ -32,8 +28,6 @@ namespace Arcatech.Items.Projectiles
             : base(settings, owner)
         {
             _returnHomingStrength = serialized.returnHomingStrength;
-            _curveAmplitude = serialized.curveAmplitude;
-            _curveFrequency = serialized.curveFrequency;
         }
 
 
@@ -69,7 +63,7 @@ namespace Arcatech.Items.Projectiles
                 if (Owner)
                 {
                     // HOMING: Calculate direction to owner with homing strength
-                    Vector3 directionToOwner = (Owner.transform.position - projectileTransform.position).normalized;
+                    Vector3 directionToOwner = (Owner.EffectSpawn.position - projectileTransform.position).normalized;
                     Vector3 newDirection = Vector3.Slerp(projectileTransform.forward, directionToOwner,
                         _returnHomingStrength * deltaTime);
                     projectileTransform.rotation = Quaternion.LookRotation(newDirection);
@@ -114,14 +108,13 @@ namespace Arcatech.Items.Projectiles
 
         public override void NotifyCollision(TriggerHitInfo hit)
         {
-            if (!hit.IsValidHit) return;
-            if (hit.Target == Owner && _returning)
+            if (!hit.TargetCollider.TryGetComponent(out BaseGameEntityComponent entity)) return;
+            if (entity == Owner && _returning)
             {
-                Debug.Log($"Boomerang returned to {hit.Target}");
                 BehaviorCompleted = true;
                 return;
             }
-            if (hit.IsValidHit && hit.Target != Owner)
+            if (entity != Owner)
                 BeginReturnPhase(_cachedTransform);
         }
         

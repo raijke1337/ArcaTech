@@ -10,39 +10,48 @@ using UnityEngine.Events;
 
 namespace Arcatech.Items.Projectiles
 {
+    public interface IProjectile
+    {
+        public void OnEnd();
+        public void OnValidHit();
+        public void OnInvalidHit();
+        
+    }
+
+
+
     [RequireComponent(typeof(TriggerTrackerComponent), typeof(BaseGameEntityComponent))]
-    public sealed class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver,ITriggerNotificationProvider
+    public sealed class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver,
+        ITriggerNotificationProvider
     {
 
         #region projectilEvents
+
         public event UnityAction<ProjectileComponent> ProjectileFinished = delegate { };
-       
-        
+
+
         #endregion
-        
+
         [SerializeField, Self] private BaseGameEntityComponent entity;
         public BaseGameEntityComponent Entity => entity;
-        
-        TriggerTrackerComponent col;
+
         ProjectileBehavior _behavior;
-        private int _maxHits;
-        int _currentHits = 0;
+        TriggerTrackerComponent _col;
+        
         private BaseGameEntityComponent _owner;
-        
+
         ITriggerNotificationReceiver _receiver;
-        
-        
+
+
         private void Awake()
         {
-            col = GetComponent<TriggerTrackerComponent>();
-            col.RegisterReceiver(this);
+            _col = GetComponent<TriggerTrackerComponent>();
+            _col.RegisterReceiver(this);
         }
 
-        public void Setup(BaseGameEntityComponent owner, SerializedProjectileBehavior behavior, int maxHits)
+        public void Setup(BaseGameEntityComponent owner, SerializedProjectileBehavior behavior)
         {
             _behavior = behavior.Deserialize(owner);
-            
-            _maxHits = maxHits;
             _owner = owner;
         }
 
@@ -50,23 +59,28 @@ namespace Arcatech.Items.Projectiles
         {
             _receiver?.TriggerEntered(triggerHitInfo);
             _behavior.NotifyCollision(triggerHitInfo);
-            if (triggerHitInfo.IsValidHit) _currentHits++;
         }
+
         public void TriggerExited(TriggerHitInfo triggerExitInfo) => _receiver?.TriggerExited(triggerExitInfo);
+
         void Update()
         {
             if (Paused) return;
 
-            _behavior.UpdatePosition(Time.deltaTime,transform);
-            if (_behavior.BehaviorCompleted || _currentHits >= _maxHits) ProjectileFinished.Invoke(this);
+            _behavior.UpdatePosition(Time.deltaTime, transform);
+            if (_behavior.BehaviorCompleted)
+            {
+                ProjectileFinished.Invoke(this);
+            }
         }
-        public bool Paused { get; set; } = false;
+    
+
+         public bool Paused { get; set; } = false;
 
         public void Reset()
         {
             _behavior.Reset();
             transform.position = Vector3.zero;
-            _currentHits = 0;
         }
 
         /// <summary>
@@ -74,8 +88,8 @@ namespace Arcatech.Items.Projectiles
         /// </summary>
         public bool Active
         {
-            get => col.Active;
-            set => col.Active = value;
+            get => _col.Active;
+            set => _col.Active = value;
         }
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)=> _receiver = receiver;

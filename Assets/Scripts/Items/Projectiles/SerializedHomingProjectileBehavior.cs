@@ -103,16 +103,16 @@ namespace Arcatech.Items.Projectiles
 
         public override void NotifyCollision(TriggerHitInfo hit)
         {
-            if (hit.Target == null)
+            if (hit.TargetCollider == null)
                 return;
 
-            if (hit.Target == Owner)
+            if (hit.TargetCollider == Owner)
             {
                 BehaviorCompleted = true;
                 return;
             }
 
-            if (_currentTarget == hit.Target)
+            if (_currentTarget == hit.TargetCollider)
             {
                 _currentTarget = null;
             }

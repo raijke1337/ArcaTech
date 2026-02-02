@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 433e097080054f0ea485a76ed30fb6cc, type: 3}
-  m_Name: wrench skill
+  m_Name: wrench throw skill
   m_EditorClassIdentifier: 
   description: {fileID: 11400000, guid: ad64032297861a647aa54b35f425f3fe, type: 2}
   settings:
@@ -19,12 +19,13 @@ MonoBehaviour:
     drawItemsStrategy: {fileID: 11400000, guid: 0c8284373a6a2eb45b8a719e3880974e,
       type: 2}
   useStateTransition: {fileID: 11400000, guid: 828e0f67657b4e5408ea71d43cc16559, type: 2}
-  compositeUsableEffects:
+  usableData:
   - hitProducer: {fileID: 11400000, guid: 9c933c64aa7461747aef10314fc4aba6, type: 2}
+    proceedOnSelfHit: 0
     effectApplier: {fileID: 11400000, guid: 557a079671d77074e8911026024fea3a, type: 2}
+    applicationEffect: {fileID: 6481243711350322080, guid: 5a02b6e445c874941bfa6475aa9c4f4b,
+      type: 3}
     effects:
     - {fileID: 11400000, guid: 255f52fb01ea1234c95687a0cbf874f2, type: 2}
-    onValidHit: {fileID: 6481243711350322080, guid: 5a02b6e445c874941bfa6475aa9c4f4b,
-      type: 3}
     onInvalidHit: {fileID: 5039004643809507552, guid: 2cfee1a623642dc4ab4e5d3bf667de1f,
       type: 3}

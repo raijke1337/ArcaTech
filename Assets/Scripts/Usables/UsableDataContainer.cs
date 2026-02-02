@@ -8,6 +8,8 @@ using Arcatech.Units;
 using CartoonFX;
 using UnityEngine;
 using Arcatech.EventBus;
+using AYellowpaper.SerializedCollections;
+
 namespace Arcatech.Usables
 {
     [Serializable]
@@ -15,15 +17,19 @@ namespace Arcatech.Usables
     {
         [Header("Hit producer")]
         [SerializeField] public SerializedHitProducer hitProducer;
-        
+
+        [SerializeField] public bool proceedOnSelfHit; // continue the logic into applier on self hit (probably should stick to false) 
+        // struct start
         [Header("Apply effects of hits")]
         [SerializeField] public SerializedEffectApplier effectApplier;
+        [SerializeField] public CFXR_Effect applicationEffect;
         
         [Header("The effects to apply")]
         [SerializeField] public SerializedActionResult[] effects;
-
+        // struct end
+        // TODO!
+        
         [Header("Visual")]
-        [SerializeField] public CFXR_Effect onValidHit;
         [SerializeField] public CFXR_Effect onInvalidHit;
         
         public CompositeUsableApplication Deserialize(BaseGameEntityComponent owner, EquipmentComponent equipment)
@@ -36,49 +42,45 @@ namespace Arcatech.Usables
     {
         private readonly BaseGameEntityComponent _owner;
         private readonly EquipmentComponent _equipment;
-        private IHitProducer _hitProducer;
-        private IEffectApplier _effectApplier;
-        private List<ActionResult> _results;
+        private readonly IHitProducer _hitProducer;
+        private readonly IEffectApplier _effectApplier;
+        private readonly List<ActionResult> _results;
+        private readonly bool _proceedOnSelfHit;
 
-       // private ParticlesEvent _particlesEventValidHit;
         private ParticlesEvent _particlesEventInvalidHit;
-        CFXR_Effect _effect;
         
         public CompositeUsableApplication(BaseGameEntityComponent owner, EquipmentComponent equipment,
             UsableDataContainer config)
         {
             _hitProducer = config.hitProducer.Deserialize(owner, equipment);
-            _effectApplier = config.effectApplier.Deserialize();
+            _effectApplier = config.effectApplier.Deserialize(config.applicationEffect);
             _results = config.effects.Select(t => t.Deserialize()).ToList();
             _equipment = equipment;
             _owner =  owner;
-             _effect = config.onValidHit;
-            _particlesEventInvalidHit = new ParticlesEvent(new []{config.onInvalidHit});
-            _particlesEventInvalidHit.Parent = equipment.EffectSpawn;
+            _particlesEventInvalidHit = new ParticlesEvent(config.onInvalidHit)
+            {
+                Parent = equipment.EffectSpawn
+            };
+            _proceedOnSelfHit = config.proceedOnSelfHit;
             
-            _hitProducer.ValidHit += HandleValidHit;
-            _hitProducer.InvalidHit += HandleInvalidHit;
-            
+            _hitProducer.EntityHit += HandleEntityHit;
+            _hitProducer.EnvironmentHit += HandleEnvironmentHit;
         }
 
-        private void HandleInvalidHit(TriggerHitInfo arg0)
+        private void HandleEnvironmentHit(TriggerHitInfo arg0)
         {
+            if (_owner.ShowingDebugs) Debug.Log("Invalid hit");
+            _particlesEventInvalidHit.Place = arg0.Position;
+            EventBus<ParticlesEvent>.Raise(_particlesEventInvalidHit);
         }
 
-        private void HandleValidHit(TriggerHitInfo info)
+        private void HandleEntityHit(TriggerHitInfo info)
         {
-           if (_owner.ShowingDebugs) Debug.Log(info.IsValidHit? "Valid hit" : "Invalid hit");
-            
-            if (info.IsValidHit)
-            {
-                _effectApplier.ApplyEffects(_owner,info,_results,_equipment.EffectSpawn.transform.position, _effect);
-            }
-            
-            else
-            {
-                _particlesEventInvalidHit.Place = info.Position;
-                EventBus<ParticlesEvent>.Raise(_particlesEventInvalidHit);
-            }
+           if (_owner.ShowingDebugs) Debug.Log("Valid hit");
+           // do not call application for self hit (happens because of collider issues)
+           if (info.TryGetEntityTarget(out var e) && e == _owner && !_proceedOnSelfHit) return;
+           
+           _effectApplier.ApplyEffects(_owner,info,_results,_equipment.EffectSpawn.transform.position);
         }
 
 
@@ -90,8 +92,8 @@ namespace Arcatech.Usables
 
         public void Clear()
         {
-            _hitProducer.ValidHit -= HandleValidHit;
-            _hitProducer.InvalidHit -= HandleInvalidHit;
+            _hitProducer.EntityHit -= HandleEntityHit;
+            _hitProducer.EnvironmentHit -= HandleEnvironmentHit;
         }
     }
 }

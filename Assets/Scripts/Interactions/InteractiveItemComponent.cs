@@ -197,17 +197,14 @@ namespace Arcatech.Interactions
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
-            if (!triggerHitInfo.IsValidHit) return;
-            if (triggerHitInfo.Target.CompareTag("Player"))
+            if (triggerHitInfo.TargetCollider.CompareTag("Player"))
             {
-                if (triggerHitInfo.Target.ShowingDebugs) Debug.Log("Player enters interaction area");
-
-                if (triggerHitInfo.Target.TryGetComponent(out EntityStateMachineComponent fsm))
+                if (triggerHitInfo.TargetCollider.TryGetComponent(out EntityStateMachineComponent fsm))
                 {
                     fsm.RegisterAugmentor(this);
                 }
 
-                if (triggerHitInfo.Target.TryGetComponent(out IInteractor interactor))
+                if (triggerHitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
                 {
                     interactor.RegisterInteractiveItem(this);
                 }
@@ -226,14 +223,13 @@ namespace Arcatech.Interactions
 
         public void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
-            if (!triggerExitInfo.IsValidHit) return;
-            if (triggerExitInfo.Target.CompareTag("Player"))
+            if (triggerExitInfo.TargetCollider.CompareTag("Player"))
             {
-                if (triggerExitInfo.Target.TryGetComponent(out EntityStateMachineComponent fsm))
+                if (triggerExitInfo.TargetCollider.TryGetComponent(out EntityStateMachineComponent fsm))
                 {
                     fsm.UnregisterAugmentor(this);
                 }
-                if (triggerExitInfo.Target.TryGetComponent(out IInteractor interactor))
+                if (triggerExitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
                 {
                     interactor.UnregisterInteractiveItem(this);
                 }

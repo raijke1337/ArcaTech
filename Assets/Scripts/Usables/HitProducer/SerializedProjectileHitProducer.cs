@@ -81,7 +81,7 @@ namespace Arcatech.Usables
         private ProjectileComponent CreateProjectile()
         {
             // Create a new projectile instance
-            var projectile = _projectile.ProduceProjectile(Owner, MaxHits, Vector3.zero, Quaternion.identity);
+            var projectile = _projectile.ProduceProjectile(Owner, Vector3.zero, Quaternion.identity);
             return projectile;
         }
 
@@ -202,10 +202,12 @@ namespace Arcatech.Usables
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
-            
+            HitCallback(triggerHitInfo);
         }
 
         public void TriggerExited(TriggerHitInfo triggerExitInfo)
-        { }
+        {
+            
+        }
     }
 }

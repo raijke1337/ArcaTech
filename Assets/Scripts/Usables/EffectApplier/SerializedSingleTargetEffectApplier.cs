@@ -11,9 +11,9 @@ namespace Arcatech.Usables
     [CreateAssetMenu(fileName = "usable_applier_single_", menuName = "Usables/Hit Applier/Single target")]
     public class SerializedSingleTargetEffectApplier : SerializedEffectApplier
     {
-        public override IEffectApplier Deserialize()
+        public override IEffectApplier Deserialize(CFXR_Effect applicationEffect)
         {
-            return new SingleTargetEffectApplier();
+            return new SingleTargetEffectApplier(applicationEffect);
         }
     }
     
@@ -21,21 +21,20 @@ namespace Arcatech.Usables
 
     public class SingleTargetEffectApplier : EffectApplier
     {
-        private ParticlesEvent _particles;
-        private bool _setup;
-        protected override void DoApplyLogic(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin,  CFXR_Effect onValidApply)
+        public SingleTargetEffectApplier(CFXR_Effect applicationEffect) : base(applicationEffect)
         {
-            if (!_setup)
+        }
+
+        public override void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
+        {
+            if (hit.TryGetEntityTarget(out BaseGameEntityComponent component))
             {
-                _particles = new ParticlesEvent(new[] { onValidApply });
-                _setup = true;
+                foreach (var e in effects)
+                {
+                    e.ProduceResult(user, component, hit.Position, Quaternion.identity);
+                }
+                PlayApplicationParticles(hit.Position);
             }
-            foreach (var effect in effects)
-            {
-                effect.ProduceResult(user, hit.Target, hit.Position,hit.Target.transform.rotation);
-            }
-            _particles.Place = hit.Target.EffectSpawn.position;
-            EventBus<ParticlesEvent>.Raise(_particles);
         }
     }
 }

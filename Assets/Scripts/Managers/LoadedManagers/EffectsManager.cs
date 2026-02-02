@@ -19,76 +19,79 @@ namespace Arcatech.Managers
                 var entry = prewarm[i];
                 if (entry.prefab == null || entry.initial <= 0) continue;
 
-                if (!pools.ContainsKey(entry.prefab))
-                    pools[entry.prefab] = new Queue<PooledEffect>();
+                if (!_particlesPools.ContainsKey(entry.prefab))
+                    _particlesPools[entry.prefab] = new Queue<PooledEffect>();
 
                 maxPerPrefab[entry.prefab] = entry.max > 0 ? entry.max : int.MaxValue;
 
                 for (int j = 0; j < entry.initial; j++)
                 {
-                 var ins =   CreateInstance(entry.prefab);
+                    var ins = CreateInstance(entry.prefab);
                 }
             }
         }
-        
-        #region particles
-        
-        private EventBinding<ParticlesEvent> _placeParticleEventBind;
-        
-        [Header("Optional prewarm")]
-        public List<PrewarmEntry> prewarm = new List<PrewarmEntry>();
-        
-        // Pools keyed by prefab asset
-        readonly Dictionary<CFXR_Effect, Queue<PooledEffect>> pools = new Dictionary<CFXR_Effect, Queue<PooledEffect>>();
-        // Optional caps
-        readonly Dictionary<CFXR_Effect, int> maxPerPrefab = new Dictionary<CFXR_Effect, int>();
 
-        
+        #region particles
+
+        private EventBinding<ParticlesEvent> _placeParticleEventBind;
+
+        [Header("Optional prewarm")] public List<PrewarmEntry> prewarm = new List<PrewarmEntry>();
+
+        // Pools keyed by prefab asset
+        readonly Dictionary<CFXR_Effect, Queue<PooledEffect>>
+            _particlesPools = new();
+
+        // Optional caps
+        readonly Dictionary<CFXR_Effect, int> maxPerPrefab = new();
+
+
         private void HandleEvent(ParticlesEvent request)
         {
-            if (request.Effects == null || request.Effects.Length == 0) return; // lazy ass guard
-            Spawn(request.Effects, request.Place, Quaternion.identity, request.Parent); 
+            if (request.Effect == null) return; // lazy ass guard
+            Spawn(request.Effect, request.Place, Quaternion.identity, request.Parent);
         }
-        private void Spawn(IEnumerable< CFXR_Effect >prefabs, Vector3 position, Quaternion rotation, Transform parent = null)
+
+        private void Spawn(CFXR_Effect prefab, Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            if (prefabs == null || !prefabs.Any())
+            if (prefab == null)
             {
                 Debug.LogWarning("[EffectsManager] Spawn called with null prefab.");
                 return;
             }
 
-            foreach (var prefab in prefabs)
+            if (!_particlesPools.TryGetValue(prefab, out var pool))
             {
-                if (!pools.TryGetValue(prefab, out var pool))
-                {
-                    pool = new Queue<PooledEffect>();
-                    pools[prefab] = pool;
-                }
-                
-                PooledEffect inst = pool.Count > 0 ? pool.Dequeue() : CreateInstance(prefab);
-                // Parent and position
-                var t = inst.transform;
-                if (parent != null && t.gameObject.activeInHierarchy)
-                {
-                    t.SetParent(parent, false);
-                    t.localPosition = Vector3.zero;
-                    t.localRotation = Quaternion.identity;
-                    t.SetPositionAndRotation(position, rotation); // if position is world-space
-                }
-                else
-                {
-                    t.SetParent(transform, false);
-                    t.SetPositionAndRotation(position, rotation);
-                }
-
-                // Ensure clean state and play
-                inst.gameObject.SetActive(true);
-                inst.PrepareForPlay();
-                inst.PlayNow();
+                pool = new Queue<PooledEffect>();
+                _particlesPools[prefab] = pool;
             }
+
+            PooledEffect inst = pool.Count > 0 ? pool.Dequeue() : CreateInstance(prefab);
+            // Parent and position
+            if (!inst) return;
+            // sometimes null - FIX
+            
+            var t = inst.transform;
+            if (parent != null && t.gameObject.activeInHierarchy)
+            {
+                t.SetParent(parent, false);
+                t.localPosition = Vector3.zero;
+                t.localRotation = Quaternion.identity;
+            }
+            else
+            {
+                t.SetParent(transform, false);
+            }
+
+            t.SetPositionAndRotation(position, rotation); // if position is world-space
+
+            // Ensure clean state and play
+            inst.gameObject.SetActive(true);
+            inst.PrepareForPlay();
+            inst.PlayNow();
+
         }
-        
-        public void Return(PooledEffect inst)
+
+    public void Return(PooledEffect inst)
         {
             if (inst == null) return;
 
@@ -97,10 +100,10 @@ namespace Arcatech.Managers
             // Clean up
             inst.gameObject.SetActive(false);
             var prefab = inst.prefabKey;
-            if (!pools.TryGetValue(prefab, out var pool))
+            if (!_particlesPools.TryGetValue(prefab, out var pool))
             {
                 pool = new Queue<PooledEffect>();
-                pools[prefab] = pool;
+                _particlesPools[prefab] = pool;
             }
 
             // Optional: enforce max pool size per prefab
@@ -152,7 +155,7 @@ namespace Arcatech.Managers
 
         #region sound fx
 
-        IObjectPool<SoundEmitter> pool;
+        IObjectPool<SoundEmitter> soundsPool;
         readonly List<SoundEmitter> active = new List<SoundEmitter>();
         //to stop all
         public readonly Dictionary<SoundClipData, int> Counts = new Dictionary<SoundClipData, int>();
@@ -211,7 +214,7 @@ namespace Arcatech.Managers
 
         void InitSoundPool()
         {
-            pool = new ObjectPool<SoundEmitter>(
+            soundsPool = new ObjectPool<SoundEmitter>(
 
                 CreateSoundEmitter,
                 OnTakeFromPool,
@@ -227,11 +230,11 @@ namespace Arcatech.Managers
 
         public SoundEmitter GetSound()
         {
-            return pool.Get();
+            return soundsPool.Get();
         }
         public void ReturnSound(SoundEmitter s)
         {
-            pool.Release(s);
+            soundsPool.Release(s);
         }
 
         public bool CanPlaySound(SoundClipData data)

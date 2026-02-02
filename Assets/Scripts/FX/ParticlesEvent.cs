@@ -8,14 +8,14 @@ namespace Arcatech.Effects
 {
     public struct ParticlesEvent : IEvent
     {
-        public ParticlesEvent(IEnumerable<CFXR_Effect> particles)
+        public ParticlesEvent(CFXR_Effect particles)
         {
-            Effects = particles.ToArray();
+            Effect = particles;
             Parent =  null;
             Place = Vector3.zero;
         }
 
-        public CFXR_Effect[] Effects  { get; }
+        public CFXR_Effect Effect  { get; }
         public Transform Parent { get; set; }
         public Vector3 Place { get; set; }
     }

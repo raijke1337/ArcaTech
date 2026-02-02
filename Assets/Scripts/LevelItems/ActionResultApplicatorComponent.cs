@@ -18,7 +18,7 @@ namespace Arcatech.Triggers
 
 
         [SerializeField,
-         Tooltip("If enabled, will apply to any unit entering. Still checks the application logic in results")]
+         Tooltip("If enabled, will activate on any unit entering. Still checks the application logic in results")]
         private bool applyToAllTargets = false;
 
         [Header("if 0, apply once. if >0, apply the results every f seconds")] [SerializeField, Range(0, 3)]
@@ -124,15 +124,16 @@ namespace Arcatech.Triggers
 
         public void TriggerEntered(TriggerHitInfo info)
         {
-            if (_killed || Paused) return;
-            if (!info.IsValidHit || info.Target == baseComp) return;
+            if (_killed || Paused || !info.TargetCollider) return;
+            if (!info.TargetCollider.TryGetComponent(out BaseGameEntityComponent entity)) return;
+            if (entity == baseComp) return;
 
-            if (info.Target.CompareTag("Player") || applyToAllTargets)
+            if (entity.CompareTag("Player") || applyToAllTargets)
             {
                 foreach (var action in _entry)
                 {
-                    action.ProduceResult(baseComp, info.Target, baseComp.EffectSpawn.position,
-                        baseComp.EffectSpawn.rotation);
+                    action.ProduceResult(baseComp, entity, info.Position,
+                        Quaternion.Euler(info.ImpactDirection));
                 }
             }
 
@@ -149,25 +150,26 @@ namespace Arcatech.Triggers
         }
     
 
-    public void TriggerExited(TriggerHitInfo triggerExitInfo)
+    public void TriggerExited(TriggerHitInfo info)
         {
-            if (_killed || Paused || !triggerExitInfo.IsValidHit ) return;
-            
-            if (triggerExitInfo.Target.CompareTag("Player") || applyToAllTargets)
+            if (_killed || Paused || !info.TargetCollider) return;
+            if (!info.TargetCollider.TryGetComponent(out BaseGameEntityComponent entity)) return;
+            if (entity == baseComp) return;
+
+            if (entity.CompareTag("Player") || applyToAllTargets)
             {
-                foreach (var action in _entry)
+                foreach (var action in _exit)
                 {
-                    action.ProduceResult(baseComp, triggerExitInfo.Target, baseComp.EffectSpawn.position,
-                        baseComp.EffectSpawn.rotation);
+                    action.ProduceResult(baseComp, entity, info.Position,
+                        Quaternion.Euler(info.ImpactDirection));
                 }
             }
-            if (killEntityOnExit)
+
+            if (!killEntityOnExit) return;
+            foreach (var killable in killables)
             {
-                foreach (var killable in killables)
-                {
-                    killable.SetKilled(this,true);
-                    return;
-                }
+                killable.SetKilled(this,true);
+                return;
             }
         }
         public bool Paused { get; set; } = false;

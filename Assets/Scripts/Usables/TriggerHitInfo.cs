@@ -5,31 +5,41 @@ using UnityEngine;
 
 namespace Arcatech
 {
-
     [Serializable]
     public struct TriggerHitInfo
     {
         public TriggerHitInfo(ITriggerNotificationProvider triggerNotificationProvider,
-            [CanBeNull] BaseGameEntityComponent baseGameEntityComponent,
+            Collider hit,
             Vector3 hitPosition, Vector3 impactDirection, Vector3 hitNormal,
             float time) // Added impactDir and hitNormal
         {
             Source = triggerNotificationProvider;
-            Target = baseGameEntityComponent;
+            TargetCollider = hit;
             Position = hitPosition;
             ImpactDirection = impactDirection; // From the incoming projectile
             Normal = hitNormal; // Normal of the surface hit
             Time = time;
+            TargetCollider.TryGetComponent(out _targetEntity);
         }
 
-        public bool IsValidHit => Target != null; // Changed to null check for clarity
+        private BaseGameEntityComponent _targetEntity;
+
+        /// <summary>
+        /// helper method to avoid endless TryGetComponent()s
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public bool TryGetEntityTarget(out BaseGameEntityComponent entity)
+        {
+            entity = _targetEntity;
+            return entity != null;
+        }
         public ITriggerNotificationProvider Source { get; }
 
         /// <summary>
-        /// The hit entity, can be null for environment hits
+        /// The hit collider. 
         /// </summary>
-        [CanBeNull]
-        public BaseGameEntityComponent Target { get; }
+        public Collider TargetCollider { get; }
 
         /// <summary>
         /// The  point in world space where the hit occurred.

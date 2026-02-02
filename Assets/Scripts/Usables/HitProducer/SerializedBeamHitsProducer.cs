@@ -43,40 +43,21 @@ namespace Arcatech.Usables
         
         public void TriggerEntered(TriggerHitInfo triggerHitInfo) // the buffering is done in the mono beam shooter
         {
-            if (!_beamActive)
-            {
-                return;
-            }
+            if (!_beamActive || !triggerHitInfo.TargetCollider.TryGetComponent(out BaseGameEntityComponent component))return;
             // Prevent duplicate hits on the same target in the same frame
-            if (!_bufferedHits.Add(triggerHitInfo.Target))
+            if (!_bufferedHits.Add(component))
             {
                 return;
             }
-
-            HitsThisUse++;
-            if (HitsThisUse <= MaxHits)
-            {
-                if (Owner.ShowingDebugs)
-                {
-                    Debug.Log($"{Item} beam hit {triggerHitInfo.Target.GetName} at {triggerHitInfo.Position}, " +
-                              $"hits this use: {HitsThisUse}/{MaxHits}");
-                }
             
-                HitCallback(triggerHitInfo);
-            }
+            HitCallback(triggerHitInfo);
         }
 
         public void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
-            if (triggerExitInfo.Target != null)
-            {
-                _bufferedHits.Remove(triggerExitInfo.Target);
-            }
+            if (!triggerExitInfo.TargetCollider.TryGetComponent(out BaseGameEntityComponent component)) return;
+                _bufferedHits.Remove(component);
 
-            if (Owner.ShowingDebugs)
-            {
-                Debug.Log($"{Item} beam no longer hitting {triggerExitInfo.Target?.GetName ?? "target"}");
-            }
         }
 
         public override void OnChangeState(StateMachineNotifyType info)
