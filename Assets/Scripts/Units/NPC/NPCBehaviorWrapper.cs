@@ -9,7 +9,6 @@ using UnityEngine.AI;
 
 namespace Arcatech.Units
 {
-    
     [RequireComponent(typeof(BehaviorGraphAgent),typeof(NavMeshAgent),typeof(UnitInputsComponent))]
     [RequireComponent(typeof(BaseGameEntityComponent),typeof(EntityStatsComponent))]
     public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>,IKillableComponent,IPausableComponent,IMove
@@ -20,7 +19,9 @@ namespace Arcatech.Units
         [SerializeField,Self]protected UnitInputsComponent unitInputs;
         [SerializeField,Self]protected EntityStatsComponent stats;
         [SerializeField,Self]protected Animator animator;
-        
+
+        [Header("Units group")] [SerializeField]
+        private string unitsGroupID = "default";
 
         
         private BlackboardReference bbref;

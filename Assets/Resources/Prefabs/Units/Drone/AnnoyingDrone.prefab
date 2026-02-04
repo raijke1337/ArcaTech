@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.00000003774895, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4844052350111332844}
@@ -29185,6 +29185,9 @@ GameObject:
   - component: {fileID: 1679770266468458347}
   - component: {fileID: 1985418301468533546}
   - component: {fileID: 7440828731475365642}
+  - component: {fileID: 3449377898306960188}
+  - component: {fileID: 8313408130058783401}
+  - component: {fileID: 4602461347960634962}
   m_Layer: 6
   m_Name: AnnoyingDrone
   m_TagString: Enemy
@@ -29425,7 +29428,7 @@ MonoBehaviour:
           m_Value0: 4589160577479290072
           m_Value1: 640302405207125233
         Name: CombatGraph
-        m_Value: {fileID: -2287761924095290272, guid: 3f53debe4fb682945ad4aff6728cdc5a,
+        m_Value: {fileID: -2287761924095290272, guid: 12c8b9897c256b74ca5039f0c61fbe94,
           type: 2}
 --- !u!114 &1679770266468458347
 MonoBehaviour:
@@ -29480,3 +29483,60 @@ MonoBehaviour:
   unitInputs: {fileID: 1985418301468533546}
   stats: {fileID: 3226091138531149808}
   animator: {fileID: 3133112164409071038}
+--- !u!114 &3449377898306960188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8278921167306010142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd437cf65684b7c9b1b4e8b6badeb2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SimpleEntityShadowComponent
+  shadowSize: 1
+  shadowOpacity: 0.5
+  shadowOffset: {x: 0, y: -0.1, z: 0}
+  shadowColor: {r: 0, g: 0, b: 0, a: 1}
+  followParent: 1
+  useGroundDetection: 1
+  maxRaycastDistance: 10
+--- !u!114 &8313408130058783401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8278921167306010142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6a9024c18004c448809c70c6a6ed80e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.DamageDrawerComponent
+  entity: {fileID: 8532651558083822446}
+  dotsDisplayInterval: 0.5
+--- !u!114 &4602461347960634962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8278921167306010142}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35298c26bcf8446a96c3d39db0538fee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.StatsStateAugmentorComponent
+  stats: {fileID: 3226091138531149808}
+  stateMachine: {fileID: 1679770266468458347}
+  toKilledState: {fileID: 0}
+  toKnockDown: {fileID: 0}
+  canBeInterrupted: 1
+  interruptCondition:
+    requireAll: 0
+    invert: 0
+    statConditions: []
+  toDamageInterrupt: {fileID: 0}
+  dmgFrontAnimatorParameter: DamageFront
+  dmgRightAnimatorParameter: DamageRight
