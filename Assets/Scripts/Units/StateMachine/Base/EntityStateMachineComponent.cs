@@ -6,6 +6,7 @@ using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
 using KBCore.Refs;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 
 namespace Arcatech.Units
@@ -13,7 +14,7 @@ namespace Arcatech.Units
     [RequireComponent(typeof(BaseGameEntityComponent))]
     public partial class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent, IStateAugmentorReceiver
     {
-        
+        public StateMachineContext GetContext => _context;
 
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Child] Animator animator;
@@ -21,7 +22,6 @@ namespace Arcatech.Units
 
         [Space, Header("States")] 
         [SerializeField] SerializedUnitState startingState;
-
 
         [SerializeField] public bool verboseDebugs = false;
 
@@ -333,5 +333,10 @@ namespace Arcatech.Units
             _killed = value;
             _context.PendingCommand = UnitActionType.None;
         }
+    }
+
+    public interface IUnitContextProvider
+    {
+        public StateMachineContext GetContext { get; }
     }
 }

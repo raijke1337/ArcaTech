@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
   m_Name: Player
   m_EditorClassIdentifier: 
-  VersionTimestamp: 639058184135613595
+  VersionTimestamp: 639059880477435599
   AssetID:
     m_Value0: 3755367631025775911
     m_Value1: 5732415151284591354
@@ -21,6 +21,7 @@ MonoBehaviour:
     - rid: 8712958006895575773
     - rid: 3368080196197155696
     - rid: 3368080196364665172
+    - rid: 3368080240371827704
   m_SharedBlackboardVariableGuids:
   - m_Value0: 4344911326730831427
     m_Value1: 1621594225047898114
@@ -28,6 +29,8 @@ MonoBehaviour:
     m_Value1: 5857256900626859269
   - m_Value0: 7502420543953867264
     m_Value1: 11822374047380407725
+  - m_Value0: 1729445671212897316
+    m_Value1: 1630059389911149053
   references:
     version: 2
     RefIds:
@@ -49,6 +52,15 @@ MonoBehaviour:
           m_Value1: 11822374047380407725
         Name: staminaCurrent
         m_Value: 100
+    - rid: 3368080240371827704
+      type: {class: 'BlackboardVariable`1[[PlayerEventAnnounce, Assembly-CSharp]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1729445671212897316
+          m_Value1: 1630059389911149053
+        Name: PlayerStateAnnouncement
+        m_Value: {fileID: 0}
     - rid: 8712958006895575773
       type: {class: 'BlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]',
         ns: Unity.Behavior, asm: Unity.Behavior}
@@ -56,7 +68,7 @@ MonoBehaviour:
         GUID:
           m_Value0: 4344911326730831427
           m_Value1: 1621594225047898114
-        Name: Place
+        Name: Transform
         m_Value: {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:
@@ -77,7 +89,8 @@ MonoBehaviour:
   - rid: 8712958006895575772
   - rid: 3368080196197155592
   - rid: 3368080196364665104
-  m_VersionTimestamp: 639058184135613595
+  - rid: 3368080240371827597
+  m_VersionTimestamp: 639059880477435599
   m_CommandBuffer:
     m_Commands: []
   m_RuntimeBlackboardAsset: {fileID: -7754439094378708053}
@@ -92,7 +105,7 @@ MonoBehaviour:
           m_Value0: 13018177132081839005
           m_Value1: 5857256900626859269
         Name: isKnockedDown
-        IsExposed: 1
+        IsExposed: 0
         m_IsShared: 1
         m_Value: 0
     - rid: 3368080196364665104
@@ -103,9 +116,20 @@ MonoBehaviour:
           m_Value0: 7502420543953867264
           m_Value1: 11822374047380407725
         Name: staminaCurrent
-        IsExposed: 1
+        IsExposed: 0
         m_IsShared: 1
         m_Value: 100
+    - rid: 3368080240371827597
+      type: {class: 'TypedVariableModel`1[[PlayerEventAnnounce, Assembly-CSharp]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 1729445671212897316
+          m_Value1: 1630059389911149053
+        Name: PlayerStateAnnouncement
+        IsExposed: 0
+        m_IsShared: 1
+        m_Value: {fileID: 0}
     - rid: 8712958006895575772
       type: {class: 'TypedVariableModel`1[[UnityEngine.Transform, UnityEngine.CoreModule]]',
         ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
@@ -113,7 +137,7 @@ MonoBehaviour:
         ID:
           m_Value0: 4344911326730831427
           m_Value1: 1621594225047898114
-        Name: Place
-        IsExposed: 1
+        Name: Transform
+        IsExposed: 0
         m_IsShared: 1
         m_Value: {fileID: 0}

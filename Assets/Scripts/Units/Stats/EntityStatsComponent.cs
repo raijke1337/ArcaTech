@@ -415,8 +415,14 @@ namespace Arcatech.Stats
 
         #region Public
 
-        public bool HasStat(ResourceStatType stat) => stats.ContainsKey(stat);
-        public float GetCurrent(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.current : 0f;
+        bool HasStat(ResourceStatType stat) => stats.ContainsKey(stat);
+
+        public bool TryGetCurrent(ResourceStatType stat, out float value)
+        {
+            value = 0f;
+            if (HasStat(stat)) value = stats[stat].current;
+            return HasStat(stat);
+        }
         public float GetMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.max : 0f;
         public float GetBaseMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.baseMax : 0f;
 
@@ -530,7 +536,8 @@ namespace Arcatech.Stats
             float val;
             if (c.target == StatTarget.Current)
             {
-                float cur = GetCurrent(c.stat);
+                float cur;
+                TryGetCurrent(c.stat, out cur);
                 if (c.usePercentOfMax)
                 {
                     float max = Mathf.Max(0.00001f, GetMax(c.stat));

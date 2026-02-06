@@ -32,7 +32,15 @@ namespace Arcatech.Units
         
         #region BLACKBOARD
 
-        public float GetStatPercent(ResourceStatType statType) => stats.GetCurrent(statType) / stats.GetMax(statType);
+        public float GetStatPercent(ResourceStatType statType)
+        {
+            if (stats.TryGetCurrent(statType, out var value))
+            {
+                return value/stats.GetMax(statType);
+            }
+
+            return 0;
+        }
 
         public bool ActionAvailable(UnitActionType actionType)
         {
