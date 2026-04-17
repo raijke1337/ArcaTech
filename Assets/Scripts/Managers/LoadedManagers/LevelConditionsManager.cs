@@ -22,12 +22,12 @@ namespace Arcatech.Level
         private BaseGameEntityComponent _p;
         private IInteractor _player;
         private List<EntityStateMachineComponent> allEnemies;
-        private List<InteractiveItemComponent> allCollectables;
+        private List<InteractiveEventsTriggerComponent> allCollectables;
         private List<Collider> allSecretZones = new List<Collider>(); // NYI
 
         [SerializeField] private float eventsRefreshTimer = 1;
         [SerializeField] private List<LevelConditionHolder> trackedEvents;
-        [SerializeField] private List<PassiveInteractionHandlersActivator> triggerAreas;
+        [SerializeField] private List<PassiveEventsTriggerComponent> triggerAreas;
         
         private Coroutine refreshConditionsCor;
 
@@ -35,7 +35,7 @@ namespace Arcatech.Level
 
         private void OnValidate()
         {
-            triggerAreas = FindObjectsByType<PassiveInteractionHandlersActivator>(FindObjectsSortMode.None).ToList();
+            triggerAreas = FindObjectsByType<PassiveEventsTriggerComponent>(FindObjectsSortMode.None).ToList();
         }
 
 
@@ -44,7 +44,7 @@ namespace Arcatech.Level
 
             allEnemies = FindObjectsByType<EntityStateMachineComponent>(FindObjectsSortMode.None)
                 .Where(t => t.CompareTag("Enemy")).ToList();
-            allCollectables = FindObjectsOfType<InteractiveItemComponent>().Where(t => t.CompareTag("Collectable"))
+            allCollectables = FindObjectsOfType<InteractiveEventsTriggerComponent>().Where(t => t.CompareTag("Collectable"))
                 .ToList();
 
             _p = GameObject.FindWithTag("Player").GetComponent<BaseGameEntityComponent>();
@@ -194,7 +194,7 @@ namespace Arcatech.Level
     {
        // [SerializeField] bool ActivateImmediately = true;
         public List<GameObject> Check;
-        public List<InteractionHandlerBase> Items;
+        public List<InteractionEventHandlerBase> Items;
         public bool Completed { get; private set; }
 
         

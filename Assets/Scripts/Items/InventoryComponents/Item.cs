@@ -26,7 +26,7 @@ namespace Arcatech.Items
         public virtual float FillValue => 0;
         public virtual string StringInfo => string.Empty;
 
-        public ItemContainerComponent PackItem
+        public ItemPickedUpInteraction PackItem
         {
             get
             {
