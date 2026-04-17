@@ -12,6 +12,8 @@ namespace Arcatech.Interactions
     {
         [SerializeField] DialoguePart textSuccess;
         [SerializeField] DialoguePart textFailure;
+        [SerializeField] DialoguePart onEnter;
+        [SerializeField] DialoguePart onExit;
         public override void DoInteraction(bool success, IInteractor interactor)
         {
             GameInterfaceManager.Instance.HandleDialoguePart(success? textSuccess : textFailure,true);
@@ -19,12 +21,12 @@ namespace Arcatech.Interactions
 
         public override void OnPlayerEnter()
         {
-            
+            GameInterfaceManager.Instance.HandleDialoguePart(onEnter,true);
         }
 
         public override void OnPlayerExit()
         {
-            
+            GameInterfaceManager.Instance.HandleDialoguePart(onExit,true);
         }
     }
 }

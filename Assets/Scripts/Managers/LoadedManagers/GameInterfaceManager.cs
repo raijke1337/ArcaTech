@@ -49,14 +49,14 @@ namespace Arcatech.Managers
 
         private void Start()
         {
-            if (GameManager.Instance.GetCurrentLevelData.LevelType == LevelType.Game)
+            // if (GameManager.Instance.GetCurrentLevelData.LevelType != LevelType.Game)
+            // {
+            //     _playerPan.gameObject.SetActive(false);
+            //     _ded.SetActive(false);
+            // }
+           // else
             {
                 _playerPan.gameObject.SetActive(true);
-                _ded.SetActive(false);
-            }
-            else
-            {
-                _playerPan.gameObject.SetActive(false);
                 _ded.SetActive(false);
             }
         }
