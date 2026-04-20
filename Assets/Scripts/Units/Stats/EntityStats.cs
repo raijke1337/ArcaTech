@@ -10,7 +10,7 @@ using UnityEngine.Events;
 namespace Arcatech.Stats
 {
     /// <summary>
-    /// updated class placeholder with separate responsibilities
+    /// new (unused) class placeholder with separate responsibilities
     /// </summary>
     public class EntityStats : ValidatedMonoBehaviour, 
         IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>, 

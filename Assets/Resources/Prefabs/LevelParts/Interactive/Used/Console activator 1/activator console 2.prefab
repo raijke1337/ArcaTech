@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 535068643025303903}
   - component: {fileID: 5696623800802242230}
   - component: {fileID: 8507211934231587219}
+  - component: {fileID: 7523096699049047334}
   m_Layer: 6
   m_Name: activate
   m_TagString: Untagged
@@ -66,7 +67,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collider: {fileID: 5696623800802242230}
+  triggerCollider: {fileID: 5696623800802242230}
+  cachedRigidbody: {fileID: 7523096699049047334}
+  _hitVisualizationDuration: 2
+  _hitSphereRadius: 0.1
+  _lineLength: 0.5
+--- !u!54 &7523096699049047334
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103627127994304300}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &8262341705497536744
 GameObject:
   m_ObjectHideFlags: 0
@@ -109,14 +141,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8262341705497536744}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 0.0990566, b: 0.0990566, a: 1}
   m_Intensity: 1
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -178,17 +210,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 3
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
   m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!114 &8436048522235525004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,10 +309,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8301224856059246016}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -316,14 +354,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pauser: {fileID: 213637709370317643}
+  _rb: {fileID: 1291726167058966527}
+  setKinematic: 1
   _name: Console
   entitySide: 0
-  _effectSpawn: {fileID: 8795362550428976565}
+  effectSpawn: {fileID: 8795362550428976565}
   destroyOnDeath: 0
   timerToDestroy: 2
   _showDebugs: 0
-  _rigidbody: {fileID: 1291726167058966527}
-  playerOverride: 0
 --- !u!114 &1846659786570626030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -383,16 +421,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffa2e06f5c72926489bd70a5200d2cef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseComp: {fileID: 1846573254879890371}
+  activationArea: {fileID: 8507211934231587219}
+  disappearWhenTriggered: 0
+  allowMultipleActivations: 0
   itemDescription: {fileID: 11400000, guid: f0f9fa6b9b1a2fa428d898533200ef07, type: 2}
-  itemDisappearsWhenUsed: 0
   handlersActivationType: 0
   useCooldown: 10
-  baseComp: {fileID: 1846573254879890371}
   entityMouseOver: {fileID: 1846659786570626030}
-  triggerTrackerComponent: {fileID: 8507211934231587219}
-  handlersOnThisItem:
+  interactionEventsOnThis:
   - {fileID: 8436048522235525004}
-  handlers: []
+  otherInteractionEvents: []
   condition: {fileID: 11400000, guid: af1b740f6150d3847abaae36f70dcb37, type: 2}
   interactStart: {fileID: 11400000, guid: 4f88d8ba734f89946acb4a26f0d45a7c, type: 2}
   interactionSuccess: {fileID: 11400000, guid: 1d88dd4e9998f25438b50c1fdd962226, type: 2}

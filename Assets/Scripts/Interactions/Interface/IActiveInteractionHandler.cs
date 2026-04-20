@@ -7,8 +7,6 @@ namespace Arcatech.Interactions
     public interface IActiveInteractionHandler
     {
         public void DoInteraction(bool success, IInteractor interactor);
-        // public void OnPlayerEnter();
-        // public void OnPlayerExit();
 
     }
 

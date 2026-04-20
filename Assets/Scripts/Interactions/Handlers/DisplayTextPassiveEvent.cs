@@ -18,6 +18,7 @@ namespace Arcatech.Interactions
         public override void OnInteractorEnter(IInteractor interactor)
         {
             GameInterfaceManager.Instance.HandleDialoguePart(onEnter, true);
+            
         }
 
         public override void OnInteractorExit(IInteractor interactor)

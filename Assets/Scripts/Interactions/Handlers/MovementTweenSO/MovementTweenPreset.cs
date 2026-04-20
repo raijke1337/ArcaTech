@@ -31,12 +31,11 @@ namespace Arcatech
         protected override Tween Build(Transform target)
         {
             Tween tween;
-            tween = target.GetComponent<Rigidbody>().DOMove(targetPosition, duration, snapping);
+            tween = target.GetComponent<Rigidbody>().DOMove(targetPosition, duration, snapping)
+                .SetRelative(isRelative)
+                .SetDelay(delay)
+                .SetLoops(loops, loopType);
 
-            // Apply settings
-            tween.SetRelative(isRelative)
-                 .SetDelay(delay)
-                 .SetLoops(loops, loopType);
 
             // Set easing
             if (useCustomCurve)

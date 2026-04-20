@@ -11,11 +11,35 @@ using UnityEngine.EventSystems;
 namespace Arcatech.Interactions
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
+    public abstract class EventsTrigger : ValidatedMonoBehaviour,ITriggerNotificationReceiver
+    {
+        [Space,SerializeField, Self] protected BaseGameEntityComponent baseComp;
+        [SerializeField,Child] protected TriggerTrackerComponent activationArea;
+        
+        [SerializeField] protected bool disappearWhenTriggered;
+        
+        [SerializeField] protected bool allowMultipleActivations = false;
+        public abstract void TriggerEntered(TriggerHitInfo triggerHitInfo);
+        public abstract void TriggerExited(TriggerHitInfo triggerExitInfo);
+        
+        
+        protected virtual void Start()
+        {
+            activationArea.Active = true;
+            activationArea.RegisterReceiver(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            activationArea.UnregisterReceiver(this);
+        }
+    }
+    
+
     [RequireComponent(typeof(EntityMouseOverGlowComponent))]
-    public class InteractiveEventsTriggerComponent : ValidatedMonoBehaviour, IInteractive, IStateAugmentor,ITriggerNotificationReceiver,IKillerComponent
+    public class InteractiveEventsTriggerComponent : EventsTrigger, IInteractive, IStateAugmentor,IKillerComponent
     {
         [SerializeField] private Description itemDescription;
-        [SerializeField] private bool itemDisappearsWhenUsed;
         [SerializeField] 
         private HandlersActivation handlersActivationType;
         
@@ -23,9 +47,8 @@ namespace Arcatech.Interactions
         private float _cd = 0;
 
         
-        [Space,SerializeField, Self] private BaseGameEntityComponent baseComp;
+
         [SerializeField, Self] private EntityMouseOverGlowComponent entityMouseOver;
-        [SerializeField,Self,Child] private TriggerTrackerComponent usageAreaTrigger;
         [Space]
         
         [SerializeField] private List<InteractionEventHandlerBase> interactionEventsOnThis;
@@ -52,16 +75,7 @@ namespace Arcatech.Interactions
             _current.AddRange(otherInteractionEvents);
         }
 
-        private void Start()
-        {
-            usageAreaTrigger.Active = true;
-            usageAreaTrigger.RegisterReceiver(this);
-        }
 
-        private void OnDisable()
-        {
-            usageAreaTrigger.UnregisterReceiver(this);
-        }
 
 
         #region interaction
@@ -186,7 +200,7 @@ namespace Arcatech.Interactions
             }
 
             if (state != _successStateRef) return;
-            if (!itemDisappearsWhenUsed) return;
+            if (!disappearWhenTriggered) return;
             
             var fsm = context.Owner.GetComponent<EntityStateMachineComponent>();
             fsm.UnregisterAugmentor(this);
@@ -206,7 +220,7 @@ namespace Arcatech.Interactions
         public void SetDescription(Description description) => _setDescription = description;
         #endregion
 
-        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
+        public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             if (triggerHitInfo.TargetCollider.CompareTag("Player"))
             {
@@ -217,7 +231,7 @@ namespace Arcatech.Interactions
 
                 if (triggerHitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
                 {
-                    interactor.RegisterInteractiveItem(this);
+                    interactor.RegisterInteractiveItemInContext(this);
                 }
 
                 if (_current == null)
@@ -227,7 +241,7 @@ namespace Arcatech.Interactions
             }
         }
 
-        public void TriggerExited(TriggerHitInfo triggerExitInfo)
+        public override  void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
             if (triggerExitInfo.TargetCollider.CompareTag("Player"))
             {
@@ -237,7 +251,7 @@ namespace Arcatech.Interactions
                 }
                 if (triggerExitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
                 {
-                    interactor.UnregisterInteractiveItem(this);
+                    interactor.UnregisterInteractiveItemFromContext(this);
                 }
             }
         }

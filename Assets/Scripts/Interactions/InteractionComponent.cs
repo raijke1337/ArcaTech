@@ -27,13 +27,13 @@ namespace Arcatech.Interactions
         }
         public InteractionContext InteractionContext => _context;
 
-        public void RegisterInteractiveItem(IInteractive item)
+        public void RegisterInteractiveItemInContext(IInteractive item)
         {
             _context.CurrentInteractive = item;
             _itemLoaded = item.GetBaseComponent.GetName;
         }
 
-        public void UnregisterInteractiveItem(IInteractive item)
+        public void UnregisterInteractiveItemFromContext(IInteractive item)
         {
             if  (_context.CurrentInteractive == item) _context.CurrentInteractive = null;
         }

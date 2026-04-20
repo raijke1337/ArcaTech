@@ -8,8 +8,8 @@ namespace Arcatech.Interactions
     public interface IInteractor
     {
         public InteractionContext InteractionContext { get; }
-        public void RegisterInteractiveItem(IInteractive item);
-        public void UnregisterInteractiveItem(IInteractive item);
+        public void RegisterInteractiveItemInContext(IInteractive item);
+        public void UnregisterInteractiveItemFromContext(IInteractive item);
 
     }
 }

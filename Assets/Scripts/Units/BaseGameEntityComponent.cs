@@ -21,6 +21,10 @@ namespace Arcatech
     public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IInvulnerability
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
+        /// <summary>
+        /// use this to pause.
+        /// </summary>
+        public LittlePauseHelperComponent Pauser => _pauser;
         [SerializeField, Self] Rigidbody _rb;
         [SerializeField] private bool setKinematic = true;
         

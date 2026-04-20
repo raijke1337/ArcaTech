@@ -3,6 +3,7 @@ using DG.Tweening;
 using NUnit.Framework;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace Arcatech.Interactions
 {

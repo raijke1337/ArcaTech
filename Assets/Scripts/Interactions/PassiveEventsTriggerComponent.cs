@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Triggers;
 using KBCore.Refs;
@@ -7,28 +8,21 @@ using UnityEngine;
 namespace Arcatech.Interactions
 {
     [RequireComponent(typeof(TriggerTrackerComponent))]
-    public class PassiveEventsTriggerComponent : ValidatedMonoBehaviour, ITriggerNotificationReceiver
+    public class PassiveEventsTriggerComponent : EventsTrigger
     {
-        [SerializeField,Self] TriggerTrackerComponent activationArea;
-        [SerializeField] private bool allowMultipleActivations = false;
+        [SerializeField] private float pausePlayerTime = 0f;
         [SerializeField] InteractionCondition condition;
         [SerializeField] private List<PassiveInteractionHandlerBase> handlers;
         public bool Completed { get; private set; } = false;
     
         public IReadOnlyList<PassiveInteractionHandlerBase> Handlers => handlers;
-        private void Start()
+        protected override void Start()
         {
             var onThis = GetComponentsInChildren<PassiveInteractionHandlerBase>(true);
             handlers.AddRange(onThis.Except(handlers));
-            
-            activationArea.RegisterReceiver(this);
+            base.Start();
         }
-
-        private void OnDisable()
-        {
-            activationArea.UnregisterReceiver(this);
-        }
-
+        
         bool ValidateComponent(Collider comp, out IInteractor interactor )
         {
             interactor = null;
@@ -37,7 +31,7 @@ namespace Arcatech.Interactions
         }
 
 
-        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
+        public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             if (Completed) return;
             if (!ValidateComponent(triggerHitInfo.TargetCollider, out var interactor)) return;
@@ -45,9 +39,14 @@ namespace Arcatech.Interactions
             {
                 handler.OnInteractorEnter(interactor);
             }
+            if (pausePlayerTime > 0f && triggerHitInfo.TryGetEntityTarget(out var p))
+            {
+                p.Pauser.Pause(pausePlayerTime);
+            }
+            Completed = true;
         }
 
-        public void TriggerExited(TriggerHitInfo triggerExitInfo)
+        public override void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
             
             if (Completed) return;
@@ -64,5 +63,6 @@ namespace Arcatech.Interactions
                 handler.OnInteractorExit(interactor);
             }
         }
+
     }
 }
