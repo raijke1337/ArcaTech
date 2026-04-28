@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Arcatech.SaveSystem
 {
@@ -8,6 +9,12 @@ namespace Arcatech.SaveSystem
         public LoadDataResult TryLoadData(out GameData data);
     }
 
+    public abstract class SaveService : ScriptableObject, ISaveLoadService
+    {
+        public abstract bool SaveData(GameData data);
+        public abstract LoadDataResult TryLoadData(out GameData data);
+    }
+
     public interface ISaveable
     {
         public void PopulateSaveData(GameData data);
@@ -15,8 +22,8 @@ namespace Arcatech.SaveSystem
 
     public interface ISavedProgressItem :IComparable<ISavedProgressItem>
     {
-        public string ItemID { get; }
-        public bool Completed { get; set; }
+        public string SavedItemID { get; }
+        public bool SavedItemState { get; set; }
         public event SimpleEventsHandler<ISavedProgressItem> UpdateEvent;
     }
 }

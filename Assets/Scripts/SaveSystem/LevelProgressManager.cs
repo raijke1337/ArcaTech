@@ -34,7 +34,7 @@ namespace Arcatech.SaveSystem
                 
                 foreach (var item in _trackedItems)
                 {
-                    _data.Completed[item.ItemID] =  item.Completed;
+                    _data.Completed[item.SavedItemID] =  item.SavedItemState;
                 }
                 SaveManager.Instance.UpdateData(_data);
             }
@@ -59,13 +59,13 @@ namespace Arcatech.SaveSystem
         {
             foreach (var item in _trackedItems)
             {
-                if (_data.Completed.TryGetValue(item.ItemID, out var completed))
+                if (_data.Completed.TryGetValue(item.SavedItemID, out var completed))
                 {
-                    item.Completed = completed;
+                    item.SavedItemState = completed;
                 }
                 else
                 {
-                    Debug.LogWarning($"No record in save data for {item.ItemID}");
+                    Debug.LogWarning($"No record in save data for {item.SavedItemID}");
                 }
             }
         }
@@ -90,16 +90,22 @@ namespace Arcatech.SaveSystem
 
         private void WriteData(ISavedProgressItem item)
         {
-            Debug.Log($"Writing data into cached record for {item.ItemID}");
-            _data.Completed[item.ItemID] = item.Completed;
+            Debug.Log($"Writing data into cached record for {item.SavedItemID}");
+            _data.Completed[item.SavedItemID] = item.SavedItemState;
         }
         /// <summary>
-        /// TODO: Call somewhere, externally
+        /// TODO: Call during game progress
         /// </summary>
         private void OnLevelCompleted()
         {
             Track(false);
             SaveManager.Instance.UpdateData(_data);
+        }
+
+        private void OnApplicationQuit()
+        {
+            Debug.Log("Placeholder: saving!");
+            OnLevelCompleted();
         }
     }
 }

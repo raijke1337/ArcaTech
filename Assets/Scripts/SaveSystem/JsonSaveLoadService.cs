@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Arcatech.SaveSystem
 {
     [CreateAssetMenu(fileName = "JSON Save/Load Provider", menuName = "System Asset/Save Load Service/JSON Serializer")]
-    public class JsonSaveLoadService : ScriptableObject, ISaveLoadService
+    public class JsonSaveLoadService : SaveService
     {
     
 
@@ -23,7 +23,7 @@ namespace Arcatech.SaveSystem
             public string Hash;
         }
 
-        public bool SaveData(GameData data)
+        public override bool SaveData(GameData data)
         {
             if (data == null)
             {
@@ -64,7 +64,7 @@ namespace Arcatech.SaveSystem
             }
         }
 
-        public LoadDataResult TryLoadData(out GameData data)
+        public override LoadDataResult TryLoadData(out GameData data)
         {
             data = null;
 
