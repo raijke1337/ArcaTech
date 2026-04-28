@@ -17,9 +17,13 @@ namespace Arcatech.SaveSystem
 
         public LevelProgressData(LevelProgressData other)
         {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+
             levelID = other.levelID;
-            Completed = other.Completed;
-            resumePosition  = other.resumePosition;
+            resumePosition = other.resumePosition;
+            Completed = other.Completed != null
+                ? other.Completed.ToDictionary(pair => pair.Key, pair => pair.Value)
+                : new Dictionary<string, bool>();
         }
         
         public void PopulateSaveData(GameData data)
@@ -55,8 +59,9 @@ namespace Arcatech.SaveSystem
                 foreach (var kvp in updates)
                 {
                     existing.Completed[kvp.Key] = kvp.Value;
-                    existing.resumePosition = resumePosition;
                 }
+                
+                existing.resumePosition = resumePosition;
             }
         }
     }

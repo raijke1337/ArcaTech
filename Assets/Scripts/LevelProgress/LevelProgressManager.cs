@@ -93,7 +93,8 @@ namespace Arcatech.SaveSystem
         public void SavedItemAnnounce(ISavedProgressItem item) => RecordItem(item);
         private void RecordItem(ISavedProgressItem item)
         {
-            Debug.Log($"Caching item state for {item.SavedItemID}");
+            Debug.Log($"Recording item state for {item.SavedItemID}");
+            
             _currentProgress.Completed[item.SavedItemID] = item.ReadItemState;
             
             if (item is CheckpointTrigger checkpoint)

@@ -1,6 +1,7 @@
 using System;
 using Arcatech.Interactions;
 using Arcatech.Managers;
+using Arcatech.SaveSystem;
 using Arcatech.Texts;
 using Arcatech.Units;
 using com.cyborgAssets.inspectorButtonPro;
@@ -8,7 +9,7 @@ using UnityEngine;
 
 namespace Arcatech.Items
 {
-    public class ItemPickedUpInteraction : InteractionEventHandlerBase
+    public class ItemPickedUpInteraction : InteractionEventHandlerBase,ISavedProgressItem
     {
         [SerializeField] private ItemSO content;
         [SerializeField] private int count = 1;
@@ -44,6 +45,7 @@ namespace Arcatech.Items
                 .TryGetComponent(out EntityInventoryComponent component))
             {
                 component.PickUpItem(TakeItem().BuildItem(interactor.InteractionContext.EntityComponent), count);;
+                CollectibleUpdate();
             }
         }
 
@@ -54,6 +56,21 @@ namespace Arcatech.Items
                 SetBillboard(content.Description);
             }
         }
+
+        #region  collectible
+
+        public string SavedItemID => entity.EntityID;
+        public bool ReadItemState { get; private set; }
+        public void OnWriteItemState(bool state, LevelProgressManager manager)
+        {
+            if (state) gameObject.SetActive(false);
+        }
+        void CollectibleUpdate()
+        {
+            ReadItemState = true;
+            LevelProgressManager.Instance.SavedItemAnnounce(this);
+        }
         
+        #endregion
     }
 }
