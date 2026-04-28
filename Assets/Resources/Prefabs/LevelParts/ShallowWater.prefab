@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2135461259038509012}
+  - component: {fileID: 6646203952845067877}
+  - component: {fileID: 9122809958651523805}
   m_Layer: 4
   m_Name: ShallowWater
   m_TagString: Untagged
@@ -33,6 +35,45 @@ Transform:
   - {fileID: 6910836724852139117}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6646203952845067877
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6861710800022198246}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 50, y: 0.2, z: 50}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &9122809958651523805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6861710800022198246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b6d50154ec84be694da73f35a0d5d99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Level.WaterSplashesDrawerComponent
+  onWaterEnter: {fileID: 114389566158634072, guid: 6d420372e2148a44e9f83eb0a68497a0,
+    type: 3}
+  onWaterExit: {fileID: 2636004172619719528, guid: c16fbdc93e175764ebf71f5842fc9f3c,
+    type: 3}
+  onWaterStay: {fileID: 5562622869132305057, guid: 53e075087ccdf7e44bd4d371fa55facf,
+    type: 3}
 --- !u!1 &7115332374328324430
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Arcatech.Actions;
 using UnityEditorInternal;
 using UnityEngine;
@@ -16,7 +17,6 @@ namespace Arcatech.Units
             return new StateMachineNotification(notifyType);
         }
     }
-    
     public class StateMachineNotification : ActionResult
     {
         public StateMachineNotification(StateMachineNotifyType notifyType)=>_type = notifyType;
@@ -33,7 +33,6 @@ namespace Arcatech.Units
             {
                 Debug.LogWarning($"No statement receivers found for {_type} in {nameof(StateMachineNotificationActionSO)}");
             }
-    
             foreach (var receiver in _receivers)
             {
                 receiver.StateMachineNotification(_type);

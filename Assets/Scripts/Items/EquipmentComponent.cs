@@ -7,16 +7,14 @@ using UnityEngine;
 
 namespace Arcatech.Items
 {
-    public class EquipmentComponent : MonoBehaviour,IStateMachineNotificationReceiver
+    public class EquipmentComponent : MonoBehaviour,IUsableComponent
     {
         [SerializeField] private Transform spawner;
-        [SerializeField] private ParticleSystem useParticleEffect;
         public Transform EffectSpawn => spawner;
         private EquipmentAnimator _equipmentAnimator;
-        private DrakkarTrail _trail;
+        [SerializeField] DrakkarTrail _trail;
         
-
-        protected virtual void OnEnable()
+        protected void OnEnable()
         {
             if (spawner == null)
             {
@@ -24,14 +22,10 @@ namespace Arcatech.Items
                 spawner = transform;
             }
             TryGetComponent(out _equipmentAnimator);
-            TryGetComponent(out _trail);
-            if (!useParticleEffect) return;
-           // useParticleEffect.clearBehavior = CFXR_Effect.ClearBehavior.Disable;
-           // useParticleEffect.enabled = false;
         }
 
 
-        public void StateMachineNotification(StateMachineNotifyType notifyType)
+        public void OnChangeUsableState(StateMachineNotifyType notifyType)
         {
             switch (notifyType)
             {
@@ -47,17 +41,11 @@ namespace Arcatech.Items
                 }
                 case StateMachineNotifyType.Use:
                 {
-                    if (useParticleEffect)  useParticleEffect.Play(); 
+                    //if (useParticleEffect)  useParticleEffect.Play(); 
                     break;
                 }
             }
-            if (_equipmentAnimator) _equipmentAnimator.StateMachineNotification(notifyType);
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.DrawLine(spawner.position, spawner.position+spawner.transform.forward);
-            Gizmos.DrawWireSphere(spawner.position, 0.5f);
+            if (_equipmentAnimator) _equipmentAnimator.OnChangeUsableState(notifyType);
         }
     }
 }

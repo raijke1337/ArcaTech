@@ -41,7 +41,7 @@ namespace Arcatech.Usables
 
         public virtual float FillValue => 0;
         public virtual string DisplayText => "";
-        public virtual void StateMachineNotification(StateMachineNotifyType notifyType)
+        public virtual void OnChangeUsableState(StateMachineNotifyType notifyType)
         {
             switch (notifyType)
             {
@@ -52,11 +52,13 @@ namespace Arcatech.Usables
         }
     }
 
-    public interface IReloadStrategy : IStateMachineNotificationReceiver
+    public interface IReloadStrategy : IUsableComponent
     {
         public void Tick(float d);
         public bool Ready { get; }
         public float FillValue { get; }
         public string DisplayText { get; }
     }
+    
+    
 }

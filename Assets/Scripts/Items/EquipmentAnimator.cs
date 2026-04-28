@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Arcatech.Items
 {
     [RequireComponent(typeof(Animator))]
-    public class EquipmentAnimator : ValidatedMonoBehaviour,IStateMachineNotificationReceiver
+    public class EquipmentAnimator : ValidatedMonoBehaviour,IUsableComponent
     {
         [SerializeField,Self] Animator animator;
         [SerializeField] private SerializedDictionary<StateMachineNotifyType, string> _animatorStrings;
@@ -24,7 +24,7 @@ namespace Arcatech.Items
         }
 
 
-        public void StateMachineNotification(StateMachineNotifyType notifyType)
+        public void OnChangeUsableState(StateMachineNotifyType notifyType)
         {
             if (_hashes.TryGetValue(notifyType, out var hash)) animator.SetTrigger(hash);
         }

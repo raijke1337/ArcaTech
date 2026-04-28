@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.EventBus;
@@ -96,7 +97,6 @@ namespace Arcatech
                 Destroy(gameObject, timerToDestroy);
             }
         }
-
         public bool Paused { get; set; }
 
     }

@@ -60,9 +60,9 @@ namespace Arcatech.Usables
             return _available > 0 && base.ReadyCheck();
         }
 
-        public override void StateMachineNotification(StateMachineNotifyType notifyType)
+        public override void OnChangeUsableState(StateMachineNotifyType notifyType)
         {
-            base.StateMachineNotification(notifyType);
+            base.OnChangeUsableState(notifyType);
 
             switch (notifyType)
             {

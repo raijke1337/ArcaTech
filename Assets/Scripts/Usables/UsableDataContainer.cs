@@ -38,7 +38,7 @@ namespace Arcatech.Usables
         }
     }
 
-    public class CompositeUsableApplication : IStateMachineNotificationReceiver
+    public class CompositeUsableApplication : IUsableComponent
     {
         private readonly BaseGameEntityComponent _owner;
         private readonly EquipmentComponent _equipment;
@@ -85,9 +85,9 @@ namespace Arcatech.Usables
 
 
         
-        public void StateMachineNotification(StateMachineNotifyType notifyType)
+        public void OnChangeUsableState(StateMachineNotifyType notifyType)
         {
-            _hitProducer.OnChangeState(notifyType);
+            _hitProducer.OnChangeUsableState(notifyType);
         }
 
         public void Clear()

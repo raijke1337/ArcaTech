@@ -39,6 +39,7 @@ namespace Arcatech.Usables
         public AppliedStatsDeltaEffect GetCost { get; }
 
         
+        private readonly CompositeUsableApplication[] _usableEffects;
         private readonly IReloadStrategy _reload;
         public Description Description { get; }
         public ActionIconDrawType IconDrawType { get; }
@@ -46,7 +47,6 @@ namespace Arcatech.Usables
         public string StringInfo => _reload.DisplayText;
         public IDrawItemStrategy DrawStrategy { get; }
 
-        private readonly CompositeUsableApplication[] _usableEffects;
 
         public void DoUpdate(float delta)
         {
@@ -62,13 +62,12 @@ namespace Arcatech.Usables
         }
         public void Notify(StateMachineNotifyType notifyType)
         {
-           // Debug.Log($"{this.Description.Title} state {notifyType}");
             foreach (var effect in _usableEffects)
             {
-                effect.StateMachineNotification(notifyType);
+                effect.OnChangeUsableState(notifyType);
             }
-            _reload.StateMachineNotification(notifyType);
-            _equipment.StateMachineNotification(notifyType);
+            _reload.OnChangeUsableState(notifyType);
+            _equipment.OnChangeUsableState(notifyType);
         }
     }
 }

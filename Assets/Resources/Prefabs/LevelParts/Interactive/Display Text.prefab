@@ -14,7 +14,9 @@ GameObject:
   - component: {fileID: 191432122932565360}
   - component: {fileID: 2291539699434430438}
   - component: {fileID: 8016685324157890910}
-  m_Layer: 0
+  - component: {fileID: 8924725522568266769}
+  - component: {fileID: 5947406123470694086}
+  m_Layer: 6
   m_Name: Display Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,8 +88,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 827b824bfeda48aabbc604bca40f1f65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textSuccess: {fileID: 11400000, guid: 7cbbc48603064fc43b1ef42883233698, type: 2}
-  textFailure: {fileID: 11400000, guid: a721122e5f6122c40a09faccd928a014, type: 2}
+  onEnter: {fileID: 11400000, guid: e82ff22f2ba22ba4aad11545912f4362, type: 2}
+  onExit: {fileID: 0}
 --- !u!114 &2291539699434430438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,8 +102,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 988cbdb62e8445b1a01312ef41942e2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerTracker: {fileID: 8390706416827097626}
+  baseComp: {fileID: 5947406123470694086}
+  activationArea: {fileID: 8390706416827097626}
+  disappearWhenTriggered: 1
   allowMultipleActivations: 0
+  pausePlayerTime: 0
   condition: {fileID: 11400000, guid: af1b740f6150d3847abaae36f70dcb37, type: 2}
   handlers:
   - {fileID: 191432122932565360}
@@ -132,3 +137,36 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &8924725522568266769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5877487407430005226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.LittlePauseHelperComponent
+--- !u!114 &5947406123470694086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5877487407430005226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
+  _pauser: {fileID: 8924725522568266769}
+  _rb: {fileID: 8016685324157890910}
+  setKinematic: 1
+  _name: 
+  entitySide: 0
+  effectSpawn: {fileID: 7840350066785753601}
+  destroyOnDeath: 1
+  timerToDestroy: 2
+  _showDebugs: 0

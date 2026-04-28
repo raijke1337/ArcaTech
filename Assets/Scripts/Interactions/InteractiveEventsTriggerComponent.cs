@@ -101,8 +101,12 @@ namespace Arcatech.Interactions
                 _failStateRef = toF.NextState;
                 _transitions.Add(toF);
             }
-
-            _transitions.Add(interactStart?.Build());
+            var toStart = interactStart?.Build();
+            if (toStart != null)
+            {
+                _startStateRef = toStart.NextState;
+                _transitions.Add(toStart);
+            }
         }
 
         private void Update()
@@ -133,6 +137,7 @@ namespace Arcatech.Interactions
 
         private UnitState _successStateRef;
         private UnitState _failStateRef;
+        private UnitState _startStateRef;
         
         
         private List<StateTransition> _transitions;

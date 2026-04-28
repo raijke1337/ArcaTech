@@ -28,7 +28,5 @@ namespace Arcatech.Interactions
         {
             if (success) _animator.SetTrigger(uHash);
         }
-        
-
     }
 }

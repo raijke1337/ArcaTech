@@ -29,10 +29,10 @@ namespace Arcatech.Usables
             provider.RegisterReceiver(this);
         }
 
-        public override void OnChangeState(StateMachineNotifyType info)
+        public override void OnChangeUsableState(StateMachineNotifyType info)
         {
 
-            base.OnChangeState(info);
+            base.OnChangeUsableState(info);
             switch (info)
             {
                 case StateMachineNotifyType.NoNotify:

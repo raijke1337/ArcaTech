@@ -31,7 +31,7 @@ namespace Arcatech.Usables
             _c = new Collider[8];
         }
         
-        public override void OnChangeState(StateMachineNotifyType info)
+        public override void OnChangeUsableState(StateMachineNotifyType info)
         {
             switch (info)
             {
@@ -62,7 +62,7 @@ namespace Arcatech.Usables
                 default:
                     throw new ArgumentOutOfRangeException(nameof(info), info, null);
             }
-            base.OnChangeState(info);
+            base.OnChangeUsableState(info);
         }
 
     }

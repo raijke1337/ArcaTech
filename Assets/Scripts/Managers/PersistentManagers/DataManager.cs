@@ -1,7 +1,6 @@
 using System;
 using Arcatech.EventBus;
 using Arcatech.Items;
-using Arcatech.Managers.Save;
 using Arcatech.Scenes;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +19,7 @@ namespace Arcatech.Managers
             public const string InvalidHitsLayer = "SolidObject";
         }
         
-
-        private void OnDisable()
-        {
-            EventBus<LevelCompletedEvent>.Deregister(_bindLvls);
-           // Debug.Log($"deregister event binds in {this} at {Time.time}");
-        }
+        
 
 
         #region SceneContainers
@@ -96,45 +90,6 @@ namespace Arcatech.Managers
         }
 
         #endregion
-
-
-
-        #region saving
-
-        private GameSaveData _loadedSave;
-
-        private ISavesService SaveService;
-        EventBinding<LevelCompletedEvent> _bindLvls;
-        public void OnNewGame()
-        {
-            _newGame = true;
-            ReloadSave();
-        }
-
-        public void ReloadSave()
-        {
-            _loadedSave = SaveService.Load();
-        }
-        public void SaveGame()
-        {
-           // SaveService.Save(_loadedSave);
-        }
-
-        #endregion
-        #region observing channels
-
-
-        private void OnLevelComplete(LevelCompletedEvent lvl)
-        {
-           // _loadedSave.OpenedLevelsID.Add(lvl.CompletedLevel.ID.ToString());
-        }
-
-
-        #endregion
-
-        private void OnApplicationQuit()
-        {
-            SaveGame();
-        }
+        
     }
 }

@@ -129,7 +129,6 @@ namespace Arcatech.Managers
         #region UNITY UI
         public void OnStartNewGameButton()
         {
-            DataManager.Instance.OnNewGame();
             RequestLoadSceneFromContainer(_newgameScene);
         }
         public void OnGalleryButton()

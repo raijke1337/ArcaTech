@@ -95,7 +95,7 @@ namespace Arcatech.Items.Projectiles
         private void BeginReturnPhase(Transform projectileTransform)
         {
             if (_returning) return;
-            Debug.Log(projectileTransform);
+            //Debug.Log(projectileTransform);
             _returning = true;
             // _distanceTraveled = 0f;  // Keep for curve continuity, or reset if you want a fresh wave
             if (Owner)

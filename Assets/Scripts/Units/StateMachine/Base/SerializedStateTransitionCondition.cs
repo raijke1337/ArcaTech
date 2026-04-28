@@ -8,4 +8,6 @@ namespace Arcatech.Units
         public string ConditionName => name;
         public abstract bool CanTransition(StateMachineContext ctx);
     }
+    
+    
 }

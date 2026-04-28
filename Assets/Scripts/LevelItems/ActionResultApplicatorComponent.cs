@@ -6,6 +6,9 @@ using Arcatech.Units;
 using KBCore.Refs;
 using UnityEngine;
 
+namespace Arcatech.Level
+{
+}
 
 namespace Arcatech.Triggers
 {

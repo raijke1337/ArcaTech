@@ -13,9 +13,8 @@ namespace Arcatech.Usables
     /// <summary>
     /// delivery 
     /// </summary>
-    public interface IHitProducer
+    public interface IHitProducer: IUsableComponent
     {
-        void OnChangeState(StateMachineNotifyType info);
         event UnityAction<TriggerHitInfo> EntityHit;
         event UnityAction<TriggerHitInfo> EnvironmentHit;
     }
@@ -43,7 +42,7 @@ namespace Arcatech.Usables
         }
 
 
-        public virtual void OnChangeState(StateMachineNotifyType info)
+        public virtual void OnChangeUsableState(StateMachineNotifyType info)
         {
             if (info == StateMachineNotifyType.Starting)
             {

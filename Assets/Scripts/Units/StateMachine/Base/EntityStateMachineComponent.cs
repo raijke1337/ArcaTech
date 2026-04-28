@@ -14,8 +14,6 @@ namespace Arcatech.Units
     [RequireComponent(typeof(BaseGameEntityComponent))]
     public partial class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent, IStateAugmentorReceiver
     {
-        public StateMachineContext GetContext => _context;
-
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Child] Animator animator;
         public BaseGameEntityComponent GetMainEntity => gameEntity;
@@ -333,10 +331,5 @@ namespace Arcatech.Units
             _killed = value;
             _context.PendingCommand = UnitActionType.None;
         }
-    }
-
-    public interface IUnitContextProvider
-    {
-        public StateMachineContext GetContext { get; }
     }
 }

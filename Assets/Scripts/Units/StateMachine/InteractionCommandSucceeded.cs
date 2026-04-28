@@ -7,8 +7,6 @@ namespace Arcatech.Units
     public class InteractionCommandSucceeded : SerializedStateTransitionCondition
     {
         public bool resultIs = true;
-
-
         public override bool CanTransition(StateMachineContext ctx)
         {
             if (ctx.Interactor == null) return false;

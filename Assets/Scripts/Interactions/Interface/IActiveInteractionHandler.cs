@@ -10,6 +10,7 @@ namespace Arcatech.Interactions
 
     }
 
+
     public interface IPassiveInteractionHandler
     {
         public void OnInteractorEnter(IInteractor interactor);

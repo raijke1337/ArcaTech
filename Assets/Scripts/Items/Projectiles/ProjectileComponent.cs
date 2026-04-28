@@ -4,21 +4,13 @@ using Arcatech.Skills;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using System.Linq;
+using Drakkar.GameUtils;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Arcatech.Items.Projectiles
 {
-    public interface IProjectile
-    {
-        public void OnEnd();
-        public void OnValidHit();
-        public void OnInvalidHit();
-        
-    }
-
-
 
     [RequireComponent(typeof(TriggerTrackerComponent), typeof(BaseGameEntityComponent))]
     public sealed class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver,
@@ -33,6 +25,7 @@ namespace Arcatech.Items.Projectiles
         #endregion
 
         [SerializeField, Self] private BaseGameEntityComponent entity;
+        [SerializeField] private DrakkarTrail trail;
         public BaseGameEntityComponent Entity => entity;
 
         ProjectileBehavior _behavior;
@@ -89,7 +82,13 @@ namespace Arcatech.Items.Projectiles
         public bool Active
         {
             get => _col.Active;
-            set => _col.Active = value;
+            set
+            {
+                _col.Active = value;
+                if (!trail) return;
+                if (value) trail.Begin();
+                else trail.End();
+            }
         }
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)=> _receiver = receiver;

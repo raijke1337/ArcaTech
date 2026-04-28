@@ -14,5 +14,9 @@ namespace Arcatech
         void CleanUp();
     }
 
+    public interface IUsableComponent
+    {
+        public void OnChangeUsableState(StateMachineNotifyType notification);
+    }
    
 }

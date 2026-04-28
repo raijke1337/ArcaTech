@@ -32,8 +32,7 @@ namespace Arcatech.Managers
         [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
         
         private Sequence tooltipSeq;
-        
-        
+
         /// <summary>
         /// called by inputs
         /// </summary>

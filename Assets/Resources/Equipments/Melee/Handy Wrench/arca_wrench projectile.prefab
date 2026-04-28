@@ -62,6 +62,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -86,9 +88,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!95 &3877140732431948781
 Animator:
@@ -127,6 +131,7 @@ GameObject:
   - component: {fileID: 5495094405985039056}
   - component: {fileID: 5583655048206583044}
   - component: {fileID: 1139309180198338418}
+  - component: {fileID: 6478178242372315339}
   m_Layer: 6
   m_Name: arca_wrench projectile
   m_TagString: Untagged
@@ -147,7 +152,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4241523795472904082}
   - {fileID: 8023284191244469104}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -184,7 +188,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collider: {fileID: 6074824665655175326}
+  triggerCollider: {fileID: 6074824665655175326}
+  cachedRigidbody: {fileID: 6507032882160400354}
+  _hitVisualizationDuration: 2
+  _hitSphereRadius: 0.1
+  _lineLength: 0.5
 --- !u!54 &6507032882160400354
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -192,10 +200,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6322378502437355212}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -237,14 +245,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pauser: {fileID: 5495094405985039056}
+  _rb: {fileID: 6507032882160400354}
+  setKinematic: 1
   _name: 
   entitySide: 0
-  _effectSpawn: {fileID: 6698622227185165430}
+  effectSpawn: {fileID: 6698622227185165430}
   destroyOnDeath: 1
   timerToDestroy: 0
   _showDebugs: 0
-  _rigidbody: {fileID: 6507032882160400354}
-  playerOverride: 0
 --- !u!114 &1139309180198338418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,58 +266,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 5583655048206583044}
---- !u!1 &7877191672750273534
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4241523795472904082}
-  - component: {fileID: 8810031507005434568}
-  m_Layer: 6
-  m_Name: trail
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4241523795472904082
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7877191672750273534}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6698622227185165430}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8810031507005434568
+  trail: {fileID: 6478178242372315339}
+--- !u!114 &6478178242372315339
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7877191672750273534}
+  m_GameObject: {fileID: 6322378502437355212}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3351d65a5e49c64d9002bba88ce89a9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  Length: 0.7571498
+  m_EditorClassIdentifier: GameUtils::Drakkar.GameUtils.DrakkarTrail
+  Length: 0.39063004
   Steps: 4
-  StepTime: 1
+  StepTime: 0
   EndingSpeed: 4
   Bounds: 1
-  Interpolation: 3
+  Interpolation: 0
   Edges: 0
   Edge1: 0.5
   Edge2: 0.666666
-  TrailMaterial: {fileID: 2100000, guid: 17eb36cb89a5b20499c80bf5daebaa39, type: 2}
+  TrailMaterial: {fileID: 0}
   Layer: 0

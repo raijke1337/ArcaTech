@@ -10,6 +10,5 @@ namespace Arcatech.Interactions
         public InteractionContext InteractionContext { get; }
         public void RegisterInteractiveItemInContext(IInteractive item);
         public void UnregisterInteractiveItemFromContext(IInteractive item);
-
     }
 }

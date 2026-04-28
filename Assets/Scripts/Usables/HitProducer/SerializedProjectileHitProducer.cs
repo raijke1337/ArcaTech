@@ -97,6 +97,7 @@ namespace Arcatech.Usables
         private void HandleProjectileExpiry(ProjectileComponent projectile)
         {
             // Return projectile to pool instead of destroying
+            
             _projectilePool.Release(projectile);
         }
 
@@ -177,9 +178,9 @@ namespace Arcatech.Usables
         }
     
 
-    public override void OnChangeState(StateMachineNotifyType info)
+    public override void OnChangeUsableState(StateMachineNotifyType info)
         {
-            base.OnChangeState(info);
+            base.OnChangeUsableState(info);
             switch (info)
             {
                 case StateMachineNotifyType.NoNotify:

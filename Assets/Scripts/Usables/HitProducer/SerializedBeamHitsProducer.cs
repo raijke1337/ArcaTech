@@ -60,9 +60,9 @@ namespace Arcatech.Usables
 
         }
 
-        public override void OnChangeState(StateMachineNotifyType info)
+        public override void OnChangeUsableState(StateMachineNotifyType info)
         {
-            base.OnChangeState(info);
+            base.OnChangeUsableState(info);
 
             switch (info)
             {

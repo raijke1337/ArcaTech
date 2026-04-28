@@ -53,6 +53,8 @@ namespace Arcatech.Units
             int animHash = string.IsNullOrEmpty(animatorStateName) ? 0 : Animator.StringToHash(animatorStateName);
 
             // Construct a placeholder UnitState with empty transitions (we'll fill them next).
+            
+            
             var placeholder = new UnitState(
                 name: stateDisplayName,
                 animatorHash: animHash,
@@ -105,6 +107,7 @@ namespace Arcatech.Units
 
             return placeholder;
         }
+
     }
 
 }

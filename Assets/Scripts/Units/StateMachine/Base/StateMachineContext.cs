@@ -24,12 +24,26 @@ namespace Arcatech.Units
         public bool KnockDownState { get; set; }
         public bool DeadState { get; set; }
         public bool InterruptQueued { get; set; }
+        public bool InInteraction { get; set; } = false;
 
-        public void ClearCommand() => PendingCommand = UnitActionType.None;
+        public void ClearCommand()
+        {
+            PendingCommand = UnitActionType.None;
+            InInteraction = false;
+        }
     }
 
+    /// <summary>
+    /// ecchi code part
+    /// </summary>
     public partial class StateMachineContext
     {
-        [CanBeNull] public LewdnessContext EcchiContext;
+        private LewdnessContext _lewdnessContext;
+        public void InitEcchiContext(LewdnessSettings cfg) =>
+            _lewdnessContext = new LewdnessContext(cfg,Animator);
+
+        [CanBeNull]
+        public LewdnessContext EcchiContext => _lewdnessContext;
+        
     }
 }
