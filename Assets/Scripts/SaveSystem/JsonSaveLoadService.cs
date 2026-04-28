@@ -10,8 +10,7 @@ namespace Arcatech.SaveSystem
     [CreateAssetMenu(fileName = "JSON Save/Load Provider", menuName = "System Asset/Save Load Service/JSON Serializer")]
     public class JsonSaveLoadService : SaveService
     {
-    
-
+        
         [SerializeField] private string fileName = "save.json";
         [SerializeField] private string hashSalt = "Arcatech_Save_v1";
 
@@ -81,13 +80,12 @@ namespace Arcatech.SaveSystem
                 if (wrapper.Data == null || string.IsNullOrEmpty(wrapper.Hash))
                 {
                     Debug.LogWarning("Corrupted save file structure.");
-                    return LoadDataResult.HashFail;
+                    return LoadDataResult.Missing;
                 }
 
                 var recalculatedHash = ComputeHash(JsonConvert.SerializeObject(wrapper.Data));
                 if (!string.Equals(wrapper.Hash, recalculatedHash, StringComparison.Ordinal))
                 {
-                    Debug.LogWarning("Save hash mismatch.");
                     return LoadDataResult.HashFail;
                 }
 

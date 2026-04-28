@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Arcatech.Managers;
 using Arcatech.Texts;
-using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
 using KBCore.Refs;
@@ -10,34 +9,8 @@ using UnityEngine.EventSystems;
 
 namespace Arcatech.Interactions
 {
-    [RequireComponent(typeof(BaseGameEntityComponent))]
-    public abstract class EventsTrigger : ValidatedMonoBehaviour,ITriggerNotificationReceiver
-    {
-        [Space,SerializeField, Self] protected BaseGameEntityComponent baseComp;
-        [SerializeField,Child] protected TriggerTrackerComponent activationArea;
-        
-        [SerializeField] protected bool disappearWhenTriggered;
-        
-        [SerializeField] protected bool allowMultipleActivations = false;
-        public abstract void TriggerEntered(TriggerHitInfo triggerHitInfo);
-        public abstract void TriggerExited(TriggerHitInfo triggerExitInfo);
-        
-        
-        protected virtual void Start()
-        {
-            activationArea.Active = true;
-            activationArea.RegisterReceiver(this);
-        }
-
-        protected virtual void OnDisable()
-        {
-            activationArea.UnregisterReceiver(this);
-        }
-    }
-    
-
     [RequireComponent(typeof(EntityMouseOverGlowComponent))]
-    public class InteractiveEventsTriggerComponent : EventsTrigger, IInteractive, IStateAugmentor,IKillerComponent
+    public class InteractiveEventsTriggerComponent : EventsTrigger, IInteractive, IStateAugmentor
     {
         [SerializeField] private Description itemDescription;
         [SerializeField] 
@@ -57,7 +30,6 @@ namespace Arcatech.Interactions
         private List<IActiveInteractionHandler> _current;
         
         public BaseGameEntityComponent GetBaseComponent => baseComp;
-        private List<IKillableComponent> killableComponents;
 
         protected override void OnValidate()
         {
@@ -70,7 +42,6 @@ namespace Arcatech.Interactions
             
             _current = new();
             interactionEventsOnThis = new  List<InteractionEventHandlerBase>(GetComponentsInChildren<InteractionEventHandlerBase>());
-            killableComponents =  new  List<IKillableComponent>(GetComponentsInChildren<IKillableComponent>());
             _current.AddRange(interactionEventsOnThis);
             _current.AddRange(otherInteractionEvents);
         }
@@ -209,10 +180,7 @@ namespace Arcatech.Interactions
             
             var fsm = context.Owner.GetComponent<EntityStateMachineComponent>();
             fsm.UnregisterAugmentor(this);
-            foreach (var k in killableComponents)
-            {
-                k.SetKilled(this,true);
-            }
+            StartDisable();
         }
 
         #endregion

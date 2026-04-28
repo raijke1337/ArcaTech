@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using KBCore.Refs;
+using UnityEngine;
 
 namespace Arcatech.Interactions
-{
-    public abstract class PassiveInteractionHandlerBase : MonoBehaviour, IPassiveInteractionHandler
-    {
-        
+{    
+    [RequireComponent(typeof(BaseGameEntityComponent))]
+    public abstract class PassiveInteractionHandlerBase : ValidatedMonoBehaviour, IPassiveInteractionHandler
+    {        
+        [SerializeField,Self] protected BaseGameEntityComponent baseGameEntityComponent;
         public abstract void OnInteractorEnter(IInteractor interactor);
         public abstract void OnInteractorExit(IInteractor interactor);
     }

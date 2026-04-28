@@ -20,10 +20,10 @@ namespace Arcatech.SaveSystem
         public void PopulateSaveData(GameData data);
     }
 
-    public interface ISavedProgressItem :IComparable<ISavedProgressItem>
+    public interface ISavedProgressItem
     {
         public string SavedItemID { get; }
-        public bool SavedItemState { get; set; }
-        public event SimpleEventsHandler<ISavedProgressItem> UpdateEvent;
+        public bool ReadItemState { get; }
+        public void OnWriteItemState(bool state, LevelProgressManager manager);
     }
 }

@@ -1,17 +1,9 @@
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Arcatech.EventBus;
-using Arcatech.Interactions;
-using Arcatech.Managers;
 using Arcatech.Stats;
-using Arcatech.Triggers;
 using Arcatech.Units;
 using KBCore.Refs;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
+using UnityEngine.Events;
 
 namespace Arcatech
 {
@@ -45,8 +37,10 @@ namespace Arcatech
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
         private Collider Collider { get; set; }
-
-
+        
+        
+        [SerializeField, ReadOnlyText] private string id;
+        public string EntityID => id;
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -55,6 +49,7 @@ namespace Arcatech
             {
                 effectSpawn = transform;
             }
+            if (string.IsNullOrEmpty(id)) id = SerializableGuid.NewGuid().ToString();
         }
 
         private void OnEnable()
@@ -83,15 +78,17 @@ namespace Arcatech
         #endregion
         
         public bool Invulnerable { get; set; }
+        
         public bool EntityAlive => !_killed;
         bool _killed = false;
+        public UnityEvent<BaseGameEntityComponent> AnnounceDead;
+
         public void SetKilled(IKillerComponent comp, bool value)
         {
-            if (ShowingDebugs) Debug.Log($"{GetName} dead, called by: {comp.KilledBy}");
-            
+            if (ShowingDebugs) Debug.Log($"{GetName} {(value ? "dead" : "resurrected")}, called by: {comp.KilledBy}");
             _killed = value;
-            //    _rigidbody.isKinematic = !value;
             Collider.isTrigger = value;
+            AnnounceDead?.Invoke(this);
             if (_killed && destroyOnDeath)
             {
                 Destroy(gameObject, timerToDestroy);

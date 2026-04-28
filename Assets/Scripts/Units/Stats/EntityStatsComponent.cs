@@ -574,7 +574,15 @@ namespace Arcatech.Stats
         }
 
         public bool Paused { get; set; }
-        public void SetKilled(IKillerComponent c, bool value) => _killed = value;
+
+        public void SetKilled(IKillerComponent c, bool value)
+        {
+            _killed = value;
+            if (value)
+            {
+                InitializeFromConfig(); // reset unit stats, called on reload checkpoint
+            }
+        }
 
         private bool _killed;
         public bool CheckStatsConditionGroup(ConditionGroup group) =>  EvaluateConditionGroup(group);

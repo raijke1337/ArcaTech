@@ -34,7 +34,6 @@ namespace Arcatech.Managers
 
         private void OnEnable()
         {
-            Bindings(true);
             DOTween.Init();
             _dataManager = DataManager.Instance;
 
@@ -54,12 +53,6 @@ namespace Arcatech.Managers
             {
                 Instantiate(_mainMenuPrefab);
             }
-        }
-
-
-        private void OnDisable()
-        {
-            Bindings(false);
         }
 
         #endregion
@@ -152,38 +145,6 @@ namespace Arcatech.Managers
         
         #endregion
 
-
-        #region level complete
-        EventBinding<LevelCompletedEvent> _levelBind;
-        private void Bindings(bool isStart)
-        {
-            if (isStart)
-            {
-                _levelBind = new EventBinding<LevelCompletedEvent>(OnLevelCompleteTrigger);
-                EventBus<LevelCompletedEvent>.Register(_levelBind);
-                //Debug.Log($"register event binds in {this} at {Time.time}");
-            }
-            else
-            {
-                EventBus<LevelCompletedEvent>.Deregister(_levelBind);
-                //Debug.Log($"deregister event binds in {this} at {Time.time}");
-            }
-        }
-
-        private void OnLevelCompleteTrigger(LevelCompletedEvent obj)
-        {
-
-            if (obj.CompletedLevel.NextLevel == null)
-            {
-                Debug.Log($"Level complete trigger has no next lv assigned, returning to main");
-                OnReturnToMain();
-            }
-            else
-            {
-                RequestLoadSceneFromContainer(obj.CompletedLevel.NextLevel);
-            }
-        }
-        #endregion
 
 
         public void OnReturnToMain()

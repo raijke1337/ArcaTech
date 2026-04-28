@@ -10,7 +10,18 @@ namespace Arcatech.SaveSystem
     {
         public string levelID;
         public Dictionary<string, bool> Completed = new();
+        public SerializableVector3 resumePosition;
+        public LevelProgressData()
+        {
+        }
 
+        public LevelProgressData(LevelProgressData other)
+        {
+            levelID = other.levelID;
+            Completed = other.Completed;
+            resumePosition  = other.resumePosition;
+        }
+        
         public void PopulateSaveData(GameData data)
         {
             if (data == null)
@@ -30,15 +41,21 @@ namespace Arcatech.SaveSystem
                 data.levelRecords.Add(new LevelProgressData
                 {
                     levelID = levelID,
-                    Completed = new Dictionary<string, bool>(Completed)
+                    Completed = new Dictionary<string, bool>(Completed),
+                    resumePosition = resumePosition
                 });
             }
             else
             {
                 existing.Completed ??= new Dictionary<string, bool>();
-                foreach (var kvp in Completed)
+
+                // Snapshot the pairs so mutations don’t affect the enumerator.
+                var updates = Completed?.ToArray() ?? Array.Empty<KeyValuePair<string, bool>>();
+
+                foreach (var kvp in updates)
                 {
                     existing.Completed[kvp.Key] = kvp.Value;
+                    existing.resumePosition = resumePosition;
                 }
             }
         }

@@ -12,6 +12,7 @@ namespace Arcatech.Interactions
     {
         [SerializeField] private float pausePlayerTime = 0f;
         [SerializeField] InteractionCondition condition;
+        [Header("Assign extras here")]
         [SerializeField] private List<PassiveInteractionHandlerBase> handlers;
         public bool Completed { get; private set; } = false;
     
@@ -44,6 +45,10 @@ namespace Arcatech.Interactions
                 p.Pauser.Pause(pausePlayerTime);
             }
             Completed = true;
+            if (disappearWhenTriggered)
+            {
+                StartDisable();
+            }
         }
 
         public override void TriggerExited(TriggerHitInfo triggerExitInfo)
@@ -51,16 +56,17 @@ namespace Arcatech.Interactions
             
             if (Completed) return;
             if (!ValidateComponent(triggerExitInfo.TargetCollider, out var interactor)) return;
-            
-            if (!allowMultipleActivations)
-            {
-                Completed = true;
-                triggerExitInfo.Source.Active = false;
-            }
+
             
             foreach (var handler in handlers)
             {
                 handler.OnInteractorExit(interactor);
+            }
+                        
+            if (!allowMultipleActivations)
+            {
+                Completed = true;
+                triggerExitInfo.Source.Active = false;
             }
         }
 

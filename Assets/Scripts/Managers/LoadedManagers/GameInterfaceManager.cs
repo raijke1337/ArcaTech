@@ -30,7 +30,6 @@ namespace Arcatech.Managers
         [SerializeField] private GameObject _pause;
         [SerializeField,Child] private ItemCardComponent inspectItemCard;
         [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
-        
         private Sequence tooltipSeq;
 
         /// <summary>
@@ -148,7 +147,7 @@ namespace Arcatech.Managers
         }
 
         
-        public void GameOver()
+        public void ShowPlayerDeadMenu()
         {
             _ded.SetActive(true);
         }
@@ -158,9 +157,8 @@ namespace Arcatech.Managers
         }
         public void OnRestart()
         {
-            int ndex = SceneManager.GetActiveScene().buildIndex;
-            SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
-            SceneManager.LoadScene(ndex);
+            var currentLevelID = SceneManager.GetActiveScene().name;
+            SceneManager.LoadScene(currentLevelID);
         }
 
         #endregion
