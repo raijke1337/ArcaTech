@@ -53,7 +53,5 @@ namespace Arcatech.Interactions
             EntityComponent = comp;
             ActionTransform = actionTransform;
         }
-        
-
     }
 }

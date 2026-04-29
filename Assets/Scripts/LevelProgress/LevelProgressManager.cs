@@ -107,7 +107,6 @@ namespace Arcatech.SaveSystem
         private void OnPlayerAnnounceDead(BaseGameEntityComponent arg0)
         {
             if (arg0.EntityAlive) return;
-            
             _currentProgress = new LevelProgressData(_checkpointProgress);
             SaveManager.Instance.UpdateData(_checkpointProgress);
             GameInterfaceManager.Instance.ShowPlayerDeadMenu();

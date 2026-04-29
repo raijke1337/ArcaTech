@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Triggers;
-using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Interactions
