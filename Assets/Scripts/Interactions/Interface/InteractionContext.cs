@@ -7,7 +7,7 @@ namespace Arcatech.Interactions
         public IInteractor Interactor;
         public InteractableComponent Target;
         public Vector3 InteractionPoint;
-        public InteractionStatus FinalStatus;
+        public InteractionState State;
         public bool WasLocked; // флаг блокировки управления игрока
     }
 }

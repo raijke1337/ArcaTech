@@ -40,24 +40,33 @@ namespace Arcatech.Interactions
         #endregion
         public bool CanDoUnitCommand(UnitActionType type, out string info)
         {
-            info = "OK";
-            // switch (type)
-            // {
-            //     case UnitActionType.Use:
-            //         info += $"{(_context.CurrentInteractive == null ? "No item" : "Has item")}";
-            //         return _context.CurrentInteractive != null;
-            // }
+            info = "Interaction";
+            if (type == UnitActionType.Use)
+            {
+                return State == InteractionState.Idle;
+            }
             return true;
         }
         
         public void PrepareCommand(UnitActionType type)
         {
+            if (type == UnitActionType.Use)
+            {
+                State = InteractionState.Starting;
+            }
         }
 
         public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
             if (type == UnitActionType.Use && wasSuccessful)
             {
+                var ctx = new InteractionContext
+                {
+                    Interactor = this,
+                    InteractionPoint = _target.InteractionPoint ? _target.InteractionPoint.position : transform.position
+                };
+                
+                State = InteractionState.InProgress;
                 if (_active != null && _active == _target)
                 {
                     // Повторное нажатие = запрос отмены (для коробки, длительных действий)
@@ -66,15 +75,12 @@ namespace Arcatech.Interactions
                 }
                 else if (_target != null && _target.IsAvailable)
                 {
-                    var ctx = new InteractionContext
-                    {
-                        Interactor = this,
-                        InteractionPoint = _target.InteractionPoint ? _target.InteractionPoint.position : transform.position
-                    };
+
                     _active = _target;
                     _target.StartInteraction(ctx);
                 }
             }
+            State = InteractionState.Idle;
         }
 
         public void RegisterInteractive(InteractableComponent interactable)
@@ -96,6 +102,7 @@ namespace Arcatech.Interactions
         }
 
         public InteractionState State { get; private set; }
+        public BaseGameEntityComponent Entity => entity;
 
         void RefreshTarget()
         {
@@ -105,19 +112,10 @@ namespace Arcatech.Interactions
             _target = _inRange[0]; // для MVP; позже можно по angle/distance
         }
 
-        public void SetInteractionLock(bool locked)
+        public void SetInteractionState(InteractionState state)
         {
-            Debug.Log($"Lock movement {locked} in {entity}");
-           // GetComponent<PlayerMovement>().enabled = !locked;
-            // или событие в StateMachine
-            if (locked) State = InteractionState.InProgress;
-            else State = InteractionState.Idle;
+            Debug.Log($"{state} in {entity}");
+            State = state;
         }
-    }
-
-    public enum InteractionState
-    {
-        Idle,
-        InProgress
     }
 }

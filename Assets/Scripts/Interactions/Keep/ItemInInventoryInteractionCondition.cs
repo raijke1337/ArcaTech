@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Arcatech.Interactions
 {
-    [CreateAssetMenu(fileName = "New item in inventory condition",menuName = "Interactions/Condition/Item in inventory")]
+   // [CreateAssetMenu(fileName = "condition_hasItem_",menuName = "Interactions/Condition/Item in inventory")]
     public class ItemInInventoryInteractionCondition : InteractionCondition
     {
         [SerializeField, UnityEngine.Range(0, 10)] private int itemsConsumed = 0;
@@ -16,17 +16,14 @@ namespace Arcatech.Interactions
         private void OnValidate()
         {
             Assert.IsNotNull(itemNeeded);
-          //  Debug.Log(itemNeeded.ID);
         }
 
         public override bool Check(InteractionContext context)
         {
-            // if (context.Interactor.EntityComponent.TryGetComponent(out EntityInventoryComponent inventory))
-            // {
-            //     return inventory.TryUseItem(itemNeeded,itemsConsumed);
-            // }
-            throw new NotImplementedException();
-
+            if (context.Interactor.Entity.TryGetComponent(out EntityInventoryComponent inventory))
+            {
+                return inventory.TryUseItem(itemNeeded,itemsConsumed);
+            }
             return false;
         }
     }

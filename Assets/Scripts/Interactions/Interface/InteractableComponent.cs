@@ -2,6 +2,7 @@
 using Arcatech.Managers;
 using Arcatech.Texts;
 using Arcatech.Triggers;
+using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,7 +11,8 @@ namespace Arcatech.Interactions
     /// <summary>
     /// item to be interacted with
     /// </summary>
-    public class InteractableComponent : MonoBehaviour, ITriggerNotificationReceiver, ITargetable
+    [RequireComponent(typeof(BaseGameEntityComponent))]
+    public class InteractableComponent : ValidatedMonoBehaviour, ITriggerNotificationReceiver, ITargetable
     {
         [Header("Anchor")] [SerializeField] private Transform _interactionPoint;
         [Header("Pipeline")] [SerializeField] private List<InteractionCondition> _conditions;
@@ -25,6 +27,10 @@ namespace Arcatech.Interactions
         [SerializeField] protected TriggerTrackerComponent activationArea;
         
         [Space,SerializeField] Description description;
+        [SerializeField] private bool destroyAfterSuccess = false;
+        [SerializeField, Self] private BaseGameEntityComponent entity;
+        
+        
         public Description GetInfo =>  description;
         
         private bool _isExecuting;
@@ -38,14 +44,15 @@ namespace Arcatech.Interactions
             if (!IsAvailable) return;
             _currentCtx = ctx;
             ctx.Target = this;
-
+            ctx.State = InteractionState.Success;
             // 1. Условия
             foreach (var condition in _conditions)
             {
                 if (!condition.Check(ctx))
                 {
+                    ctx.State = InteractionState.Failure;
                     condition.PlayDenyEffects(ctx);
-                    ApplyPostEffects(InteractionStatus.Failure);
+                    ApplyPostEffects(ctx.State);
                     return;
                 }
             }
@@ -67,26 +74,32 @@ namespace Arcatech.Interactions
                 _executor.Cancel(_currentCtx);
         }
 
-        private void OnExecutorFinished(InteractionStatus status)
+        private void OnExecutorFinished(InteractionState state)
         {
-            ApplyPostEffects(status);
+            ApplyPostEffects(state);
             _isExecuting = false;
             SetPlayerLock(false);
             _currentCtx = null;
         }
 
-        private void ApplyPostEffects(InteractionStatus status)
+        private void ApplyPostEffects(InteractionState state)
         {
-            var list = status switch
+            var list = state switch
             {
-                InteractionStatus.Success => _successEffects,
-                InteractionStatus.Failure => _failureEffects,
-                InteractionStatus.Cancelled => _cancelEffects,
+                InteractionState.Success => _successEffects,
+                InteractionState.Failure => _failureEffects,
+                InteractionState.Cancelled => _cancelEffects,
                 _ => null
             };
-            _currentCtx.FinalStatus = status;
+            _currentCtx.State = state;
             if (list == null) return;
             foreach (var e in list) e.Play(_currentCtx);
+
+            if (state == InteractionState.Success && destroyAfterSuccess)
+            {
+                _currentCtx.Interactor.UnregisterInteractive(this);
+                gameObject.SetActive(false);
+            }
         }
 
         private void SetPlayerLock(bool locked)
@@ -94,7 +107,7 @@ namespace Arcatech.Interactions
             if (_currentCtx?.Interactor == null) return;
             var interactor = _currentCtx.Interactor;
             
-            interactor?.SetInteractionLock(locked);
+            interactor?.SetInteractionState(locked ? InteractionState.InProgress : InteractionState.Idle);
         }
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)

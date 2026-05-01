@@ -115,6 +115,7 @@ namespace Arcatech.Units
             {
                 _model.PickUpItem(item as Item);
             }
+            Debug.Log($"Picked up {amount} {item.Description.Title}");
         }
 
         public bool TryUseItem(ItemSO what, int amount)
@@ -125,10 +126,7 @@ namespace Arcatech.Units
                 Debug.Log($"{(ok? what +" found": "no item:")}");
                 return ok;
             }
-            else
-            {
-                return _model.DropItem(what);
-            }
+            return _model.DropItem(what);
         }
         #endregion
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Arcatech.Interactions
 {
-    [CreateAssetMenu(fileName = "New dummy condition",menuName = "Interactions/Condition/Dummy")]
+   // [CreateAssetMenu(fileName = "New dummy condition",menuName = "Interactions/Condition/Dummy")]
     public class DummyInteractionCondition : InteractionCondition
     {
         [SerializeField] private bool _result;

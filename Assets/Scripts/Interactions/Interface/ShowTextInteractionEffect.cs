@@ -13,15 +13,15 @@ namespace Arcatech.Interactions
 
         public override void Play(InteractionContext ctx)
         {
-            switch (ctx.FinalStatus)
+            switch (ctx.State)
             {
-                case InteractionStatus.Success:
+                case InteractionState.Success:
                     GameInterfaceManager.Instance.HandleDialoguePart(textSuccess, true);
                     break;
-                case InteractionStatus.Failure:
+                case InteractionState.Failure:
                     GameInterfaceManager.Instance.HandleDialoguePart(textFailure, true);
                     break;
-                case InteractionStatus.Cancelled:
+                case InteractionState.Cancelled:
                     GameInterfaceManager.Instance.HandleDialoguePart(textCancel, false);
                     break;
                 default:

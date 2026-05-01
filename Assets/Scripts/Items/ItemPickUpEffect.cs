@@ -5,16 +5,35 @@ using Arcatech.SaveSystem;
 using Arcatech.Texts;
 using Arcatech.Units;
 using com.cyborgAssets.inspectorButtonPro;
+using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Items
 {
-    public class ItemPickedUpInteraction : InteractionEventHandlerBase,ISavedProgressItem
+    [RequireComponent(typeof(BaseGameEntityComponent))]
+    public class ItemPickUpEffect : InteractionEffect, ISavedProgressItem
     {
+        [SerializeField, Self] private BaseGameEntityComponent _entity;
         [SerializeField] private ItemSO content;
         [SerializeField] private int count = 1;
         [SerializeField] private Transform billboard;
-        [SerializeField] private DialoguePart pickupMessage;
+        
+        
+        #region intraction
+        
+        public override void Play(InteractionContext ctx)
+        {
+            if (ctx.Interactor.Entity
+                .TryGetComponent(out EntityInventoryComponent component))
+            {
+                component.PickUpItem(TakeItem().BuildItem(ctx.Interactor.Entity), count);;
+                CollectibleUpdate();
+            }
+        }
+
+        
+        #endregion
+        
         public void PutItem(ItemSO item)
         {
             content = item;
@@ -25,7 +44,6 @@ namespace Arcatech.Items
             var r =  content;
             content = null; 
             if (billboard)  billboard.gameObject.SetActive(false);
-            if (pickupMessage) GameInterfaceManager.Instance.HandleDialoguePart(pickupMessage,true);
             return r;
         }
 
@@ -38,18 +56,6 @@ namespace Arcatech.Items
             renderer.material.mainTexture = picture.texture;
         }
 
-        public override void DoInteraction(bool success, IInteractor interactor)
-        {
-            // if (!success) return;
-            // if (interactor.InteractionContext.EntityComponent
-            //     .TryGetComponent(out EntityInventoryComponent component))
-            // {
-            //     component.PickUpItem(TakeItem().BuildItem(interactor.InteractionContext.EntityComponent), count);;
-            //     CollectibleUpdate();
-            // }
-            throw new NotImplementedException();
-        }
-
         private void Start()
         {
             if (content != null)
@@ -60,7 +66,7 @@ namespace Arcatech.Items
 
         #region  collectible
 
-        public string SavedItemID => entity.EntityID;
+        public string SavedItemID => _entity.EntityID;
         public bool ReadItemState { get; private set; }
         public void OnWriteItemState(bool state, LevelProgressManager manager)
         {
@@ -73,5 +79,6 @@ namespace Arcatech.Items
         }
         
         #endregion
+
     }
 }

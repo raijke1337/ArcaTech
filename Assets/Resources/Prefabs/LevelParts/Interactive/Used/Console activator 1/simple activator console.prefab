@@ -14,6 +14,9 @@ GameObject:
   - component: {fileID: 167911779277341174}
   - component: {fileID: 7086536197051980165}
   - component: {fileID: 6812349739351283333}
+  - component: {fileID: 7228844900646879824}
+  - component: {fileID: 1341966373663510508}
+  - component: {fileID: 9096410900744019217}
   m_Layer: 6
   m_Name: simple activator console
   m_TagString: Untagged
@@ -170,6 +173,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7228844900646879824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380161337935849466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9861cf096c4544538b64076b9365823f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractableComponent
+  _interactionPoint: {fileID: 0}
+  _conditions: []
+  _preExecuteEffects: []
+  _executor: {fileID: 1341966373663510508}
+  _successEffects:
+  - {fileID: 9096410900744019217}
+  _failureEffects: []
+  _cancelEffects: []
+  activationArea: {fileID: 8925110208279871842}
+  description: {fileID: 11400000, guid: f0f9fa6b9b1a2fa428d898533200ef07, type: 2}
+--- !u!114 &1341966373663510508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380161337935849466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
+--- !u!114 &9096410900744019217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380161337935849466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4a1195b418a4eaa82611d922872b2d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ShowTextInteractionEffect
+  textSuccess: {fileID: 11400000, guid: df1791599da76fc448c445c722326601, type: 2}
+  textFailure: {fileID: 11400000, guid: 9f80589ee1f20a74482a94712a0a8c55, type: 2}
+  textCancel: {fileID: 11400000, guid: d44ca4fe75ac77e4284c5d164c81d62a, type: 2}
 --- !u!1 &7077196090972435776
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,7 +248,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4614032763127599402}
@@ -218,7 +270,7 @@ GameObject:
   - component: {fileID: 5530246381986104708}
   - component: {fileID: 8925110208279871842}
   - component: {fileID: 5578144642214592679}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: activateArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}

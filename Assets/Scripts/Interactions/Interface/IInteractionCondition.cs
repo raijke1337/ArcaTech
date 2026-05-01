@@ -10,13 +10,13 @@ namespace Arcatech.Interactions
 
     public abstract class InteractionCondition : MonoBehaviour
     {
-        [SerializeField] private List<InteractionEffect> _denyEffects;
+        [SerializeField] private List<InteractionEffect> denyEffects;
 
         public abstract bool Check(InteractionContext ctx);
 
         public void PlayDenyEffects(InteractionContext ctx)
         {
-            foreach (var e in _denyEffects) e.Play(ctx);
+            foreach (var e in denyEffects) e.Play(ctx);
         }
     }
 }
