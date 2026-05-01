@@ -15,7 +15,10 @@ namespace Arcatech.Interactions
         private InteractableComponent _target;
         private InteractableComponent _active;
         
-        #region placeholder
+        #region default animation
+        /// <summary>
+        /// can be replaced using InteractionStatesInjectorComponent
+        /// </summary>
         [SerializeField] private SerializedStateTransition dummyActivate;
         private StateTransition _activate;
         public void Attach(IStateAugmentorReceiver machine)
@@ -30,12 +33,10 @@ namespace Arcatech.Interactions
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)
-        {
-        }
+        { }
 
         public void OnStateExited(UnitState state, StateMachineContext context)
-        {
-        }
+        { }
         
         #endregion
         public bool CanDoUnitCommand(UnitActionType type, out string info)

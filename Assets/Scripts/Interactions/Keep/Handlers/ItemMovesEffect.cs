@@ -8,14 +8,13 @@ using UnityEngine.Rendering.Universal;
 namespace Arcatech.Interactions
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public partial class ItemMovesInteraction : InteractionEventHandlerBase, IPausableComponent
+    public partial class ItemMovesEffect : InteractionEffect, IPausableComponent
     {
         [SerializeField] bool runFromEnable = true;
         [SerializeField] SerializedDOTweener tween;
         Tween cached;
         bool _pause = false;
         bool toggled = false;
-
 
         public bool Paused
         {
@@ -44,14 +43,15 @@ namespace Arcatech.Interactions
                 cached.Play(); 
             }
         }
-        public override void DoInteraction(bool success, IInteractor interactor)
+
+
+        public override void Play(InteractionContext ctx)
         {
-            if (!success) return;
+            if (ctx.State != InteractionState.Success) return;
             if (!runFromEnable) 
                 cached.Play();
             toggled = true;
         }
-        
     }
 
 }

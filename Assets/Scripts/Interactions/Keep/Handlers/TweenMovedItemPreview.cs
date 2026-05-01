@@ -7,7 +7,7 @@ namespace Arcatech.Interactions
 {
     using UnityEditor;
     using System.Reflection;
-    public partial class ItemMovesInteraction
+    public partial class ItemMovesEffect
     {
         // ===================== Editor Preview =====================
         [Header("Editor Preview")] [SerializeField]
