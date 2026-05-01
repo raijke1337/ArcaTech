@@ -17,13 +17,13 @@ namespace Arcatech.Interactions
 
         public override void OnInteractorEnter(IInteractor interactor)
         {
-            GameInterfaceManager.Instance.HandleDialoguePart(onEnter, true);
+            GameInterfaceManager.Instance.ShowDialoguePart(onEnter, true);
             
         }
 
         public override void OnInteractorExit(IInteractor interactor)
         {
-            GameInterfaceManager.Instance.HandleDialoguePart(onExit, true);
+            GameInterfaceManager.Instance.ShowDialoguePart(onExit, true);
         }
     }
 }

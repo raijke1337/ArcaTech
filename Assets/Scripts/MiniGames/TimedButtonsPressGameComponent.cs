@@ -8,20 +8,7 @@ using UnityEngine.UI;
 
 namespace Arcatech.MiniGames
 {
-
-    public abstract class MiniGameBase : MonoBehaviour
-    {
-        public abstract void StartGame();
-        // Events
-        public delegate void GameCompleteDelegate(bool result);
-        public event GameCompleteDelegate OnGameCompleteResult;
-
-        protected void ReportResult(bool result)
-        {
-            OnGameCompleteResult?.Invoke(result);
-        }
-    }
-public class TimedButtonsPressGameComponent : MiniGameBase
+    public class TimedButtonsPressGameComponent : MiniGameBase
 {
     [System.Serializable]
     public class ButtonIconConfig
@@ -566,7 +553,15 @@ public class TimedButtonsPressGameComponent : MiniGameBase
 
         gameActive = false;
         StopAllCoroutines();
-
+        InteractionState finish;
+        if (result)
+        {
+            finish = InteractionState.Success;
+        }
+        else
+        {
+            finish = InteractionState.Failure;
+        }
         // Финальная анимация
         if (result)
         {
@@ -579,7 +574,7 @@ public class TimedButtonsPressGameComponent : MiniGameBase
 
         DOVirtual.DelayedCall(0.5f, () =>
         {
-            ReportResult(result);
+            ReportResult(finish);
             DisableGame();
         });
     }
@@ -651,7 +646,7 @@ public class TimedButtonsPressGameComponent : MiniGameBase
 
         DOVirtual.DelayedCall(0.3f, () =>
         {
-            ReportResult(false);
+            ReportResult(InteractionState.Cancelled);
             DisableGame();
         });
     }

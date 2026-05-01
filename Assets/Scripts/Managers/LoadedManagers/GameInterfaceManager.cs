@@ -60,7 +60,7 @@ namespace Arcatech.Managers
         }
         
         #region game dialogues and texts
-        public void HandleDialoguePart(DialoguePart dialogue, bool show)
+        public void ShowDialoguePart(DialoguePart dialogue, bool show)
         {
             if (!dialogue) return;
             _text.gameObject.SetActive(show);

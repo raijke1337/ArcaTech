@@ -1,31 +1,20 @@
 ﻿using System;
 using Arcatech.Managers;
 using Arcatech.Texts;
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
 namespace Arcatech.Interactions
 {
     public class ShowTextInteractionEffect : InteractionEffect
     {
-        [SerializeField] DialoguePart textSuccess;
-        [SerializeField] DialoguePart textFailure;
-        [SerializeField] DialoguePart textCancel;
+        [SerializeField] private SerializedDictionary<InteractionState, DialoguePart> texts;
 
         public override void Play(InteractionContext ctx)
         {
-            switch (ctx.State)
+            if (texts != null && texts.TryGetValue(ctx.State, out DialoguePart txt))
             {
-                case InteractionState.Success:
-                    GameInterfaceManager.Instance.HandleDialoguePart(textSuccess, true);
-                    break;
-                case InteractionState.Failure:
-                    GameInterfaceManager.Instance.HandleDialoguePart(textFailure, true);
-                    break;
-                case InteractionState.Cancelled:
-                    GameInterfaceManager.Instance.HandleDialoguePart(textCancel, false);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                GameInterfaceManager.Instance.ShowDialoguePart(txt,true);
             }
         }
     }

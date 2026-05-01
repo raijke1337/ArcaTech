@@ -8,8 +8,10 @@ namespace Arcatech.SaveSystem
 {
     public class SaveManager : GenericLazySingleton<SaveManager>
     {
+        
         [SerializeField] SaveService service;
         [SerializeField] readonly int SaveVersion = 2;
+        [SerializeField] private bool showDebugs = false;
         private GameData _gameData;
         
         public GameData GetGameData
@@ -28,10 +30,10 @@ namespace Arcatech.SaveSystem
 
         void Initialize()
         {
-            Debug.Log("Initializing SaveManager");
+            if (showDebugs) Debug.Log("Initializing SaveManager");
             if (service == null)
             {
-                Debug.LogError("No save load service asset selected!");
+                if (showDebugs) Debug.LogError("No save load service asset selected!");
                 return;
             }
 
@@ -42,13 +44,13 @@ namespace Arcatech.SaveSystem
                     {
                         Debug.LogError($"Version {_gameData.version} not equal to Version {SaveVersion}");
                     }
-                    Debug.Log("Load Success");
+                    if (showDebugs) Debug.Log("Load Success");
                     break;
                 case LoadDataResult.HashFail:
                     Debug.LogError("Hash Fail! Can't load data.");
                     break;
                 case LoadDataResult.Missing:
-                    Debug.Log("Missing Save! Creating new.");
+                    if (showDebugs) Debug.Log("Missing Save! Creating new.");
                     _gameData = new GameData()
                     {
                         version = SaveVersion,

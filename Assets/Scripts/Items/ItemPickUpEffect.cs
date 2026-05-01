@@ -13,7 +13,7 @@ namespace Arcatech.Items
     [RequireComponent(typeof(BaseGameEntityComponent))]
     public class ItemPickUpEffect : InteractionEffect, ISavedProgressItem
     {
-        [SerializeField, Self] private BaseGameEntityComponent _entity;
+        private BaseGameEntityComponent _entity;
         [SerializeField] private ItemSO content;
         [SerializeField] private int count = 1;
         [SerializeField] private Transform billboard;
@@ -66,7 +66,14 @@ namespace Arcatech.Items
 
         #region  collectible
 
-        public string SavedItemID => _entity.EntityID;
+        public string SavedItemID
+        {
+            get
+            {
+                if (_entity == null) _entity = GetComponent<BaseGameEntityComponent>();
+                return _entity.EntityID;
+            }
+        }
         public bool ReadItemState { get; private set; }
         public void OnWriteItemState(bool state, LevelProgressManager manager)
         {

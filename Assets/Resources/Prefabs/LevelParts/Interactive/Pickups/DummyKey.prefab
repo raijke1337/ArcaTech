@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 5923635334488011330}
   - component: {fileID: 9161550653830420109}
   - component: {fileID: 7807487161984706014}
+  - component: {fileID: 5907143268600554704}
   m_Layer: 6
   m_Name: DummyKey
   m_TagString: Untagged
@@ -114,19 +115,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9861cf096c4544538b64076b9365823f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractableComponent
-  _interactionPoint: {fileID: 0}
-  _conditions: []
-  _preExecuteEffects: []
-  _executor: {fileID: 6215770114506928207}
-  _successEffects:
-  - {fileID: 5923635334488011330}
-  - {fileID: 4784070580617683845}
-  _failureEffects: []
-  _cancelEffects: []
-  activationArea: {fileID: 4740861867446518017}
-  description: {fileID: 11400000, guid: 3011e969cc9283f479841c6e39780580, type: 2}
-  destroyAfterSuccess: 0
   entity: {fileID: 1647004558200709559}
+  trigger: {fileID: 5907143268600554704}
+  conditions: []
+  preExecuteEffects: []
+  executor: {fileID: 6215770114506928207}
+  successEffects:
+  - {fileID: 4784070580617683845}
+  - {fileID: 5923635334488011330}
+  failureEffects: []
+  cancelEffects: []
+  destroyAfterSuccess: 0
 --- !u!65 &897531696086615196
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -253,7 +252,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92eb99bc95b294f4e9e8f7eb1d175275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Items.ItemPickUpEffect
-  _entity: {fileID: 1647004558200709559}
   content: {fileID: 11400000, guid: 3386f4b9bbddabb4c8ac845eaeb4d77c, type: 2}
   count: 1
   billboard: {fileID: 0}
@@ -317,6 +315,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.GlowOutlinePickerComponent
   _r: {fileID: 8370584429713593227}
+--- !u!114 &5907143268600554704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4714043517577227366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d648679973b6421ba965c903fc77b17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ManualInteractionTrigger
+  triggerTrackerComponent: {fileID: 4740861867446518017}
+  interactableComponent: {fileID: 3555756990035200253}
+  description: {fileID: 11400000, guid: 3011e969cc9283f479841c6e39780580, type: 2}
 --- !u!1 &7175023294981739629
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,9 +374,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4a1195b418a4eaa82611d922872b2d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ShowTextInteractionEffect
-  textSuccess: {fileID: 11400000, guid: db33d705536bce646bca6809d6088bb7, type: 2}
-  textFailure: {fileID: 0}
-  textCancel: {fileID: 0}
+  texts:
+    _serializedList:
+    - Key: 3
+      Value: {fileID: 11400000, guid: df1791599da76fc448c445c722326601, type: 2}
 --- !u!1001 &1660904219811269938
 PrefabInstance:
   m_ObjectHideFlags: 0

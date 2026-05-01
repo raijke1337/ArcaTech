@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Arcatech.Triggers;
 using Arcatech.Units;
 using AYellowpaper.SerializedCollections;
 using KBCore.Refs;
@@ -8,9 +9,9 @@ using UnityEngine;
 
 namespace Arcatech.Interactions
 {
-    public class InteractionStatesInjectorComponent : ValidatedMonoBehaviour, IStateAugmentor
+    public class InteractionStatesInjectorComponent : ValidatedMonoBehaviour, IStateAugmentor, ITriggerNotificationReceiver
     {
-        
+        [SerializeField] private TriggerTrackerComponent activeArea;
         [SerializeField] SerializedDictionary<InteractionState,SerializedStateTransition> stateTransitions;
         private Dictionary<InteractionState, StateTransition> _transitions;
 
@@ -21,12 +22,17 @@ namespace Arcatech.Interactions
             {
                 _transitions[pair.Key] = pair.Value.Build();
             }
+            activeArea?.RegisterReceiver(this);
+        }
+
+        private void OnDisable()
+        {
+            activeArea?.UnregisterReceiver(this);
         }
 
         #region State Augmentor
         public void Attach(IStateAugmentorReceiver machine)
         {
-            machine.RegisterAugmentor(this);
             foreach (var pair in _transitions)
             {
                 machine.AddTransition(pair.Value);
@@ -35,7 +41,6 @@ namespace Arcatech.Interactions
 
         public void Detach(IStateAugmentorReceiver machine)
         {
-            machine.UnregisterAugmentor(this);
             foreach (var pair in _transitions)
             {
                 machine.RemoveTransition(pair.Value);
@@ -49,5 +54,23 @@ namespace Arcatech.Interactions
         { }
         
         #endregion
+
+        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
+        {
+            if (triggerHitInfo.TryGetEntityTarget(out var target) &&
+                target.TryGetComponent(out IStateAugmentorReceiver receiver))
+            {
+                receiver.RegisterAugmentor(this);
+            }
+        }
+
+        public void TriggerExited(TriggerHitInfo triggerExitInfo)
+        {
+            if (triggerExitInfo.TryGetEntityTarget(out var target) &&
+                target.TryGetComponent(out IStateAugmentorReceiver receiver))
+            {
+                receiver.UnregisterAugmentor(this);
+            }
+        }
     }
 }

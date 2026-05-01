@@ -74,7 +74,7 @@ namespace Arcatech.Interactions
                     var ctx = new InteractionContext
                     {
                         Interactor = this,
-                        InteractionPoint = _target.InteractionPoint ? _target.InteractionPoint.position : transform.position
+                       // InteractionPoint = _target.InteractionPoint ? _target.InteractionPoint.position : transform.position
                     };
                     _active = _target;
                     _target.StartInteraction(ctx);
@@ -112,10 +112,6 @@ namespace Arcatech.Interactions
             _target = _inRange[0]; // для MVP; позже можно по angle/distance
         }
 
-        public void SetInteractionState(InteractionState state)
-        {
-            Debug.Log($"{state} in {entity}");
-            State = state;
-        }
+        public void SetInteractionState(InteractionState state) => State = state;
     }
 }

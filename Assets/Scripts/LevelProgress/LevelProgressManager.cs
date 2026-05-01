@@ -10,6 +10,8 @@ namespace Arcatech.SaveSystem
 {
     public class LevelProgressManager : GenericLazySingleton<LevelProgressManager>
     {
+
+        [SerializeField] private bool showDebugs = false;
         private string _currentLevelID;
         
         private LevelProgressData _currentProgress;
@@ -68,7 +70,7 @@ namespace Arcatech.SaveSystem
             }
             else
             {
-                Debug.Log("No player found");
+                if (showDebugs) Debug.Log("No player found");
             }
             _trackedItems = new List<ISavedProgressItem>(FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ISavedProgressItem>().ToArray());
         }
@@ -83,17 +85,17 @@ namespace Arcatech.SaveSystem
                 }
                 else
                 {
-                    Debug.LogWarning($"No record in save data for {item.SavedItemID}");
+                    if (showDebugs)   Debug.LogWarning($"No record in save data for {item.SavedItemID}");
                 }
             }
             _player.transform.position = _checkpointProgress.resumePosition.ToVector3();
-            Debug.Log("Write level state completed");
+            if (showDebugs) Debug.Log("Write level state completed");
         }
 
         public void SavedItemAnnounce(ISavedProgressItem item) => RecordItem(item);
         private void RecordItem(ISavedProgressItem item)
         {
-            Debug.Log($"Recording item state for {item.SavedItemID}");
+            if (showDebugs)  Debug.Log($"Recording item state for {item.SavedItemID}");
             
             _currentProgress.Completed[item.SavedItemID] = item.ReadItemState;
             
