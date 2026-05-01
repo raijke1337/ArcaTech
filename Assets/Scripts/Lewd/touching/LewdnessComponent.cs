@@ -15,7 +15,7 @@ namespace Arcatech.Lewding
         {
             machine.Context.InitEcchiContext(cfg);
             ctx = machine.Context.EcchiContext;
-            Debug.Log($"Ecchi OK");
+           // Debug.Log($"Ecchi OK");
         }
 
         public void Detach(IStateAugmentorReceiver machine)

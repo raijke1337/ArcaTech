@@ -1,4 +1,5 @@
-﻿using Arcatech.Items;
+﻿using System;
+using Arcatech.Items;
 using Arcatech.Units;
 using NUnit.Framework;
 using UnityEngine;
@@ -18,12 +19,13 @@ namespace Arcatech.Interactions
           //  Debug.Log(itemNeeded.ID);
         }
 
-        public override bool CheckCondition(IInteractor actor, IInteractive item)
+        public override bool Check(InteractionContext context)
         {
-            if (actor.InteractionContext.EntityComponent.TryGetComponent(out EntityInventoryComponent inventory))
-            {
-                return inventory.TryUseItem(itemNeeded,itemsConsumed);
-            }
+            // if (context.Interactor.EntityComponent.TryGetComponent(out EntityInventoryComponent inventory))
+            // {
+            //     return inventory.TryUseItem(itemNeeded,itemsConsumed);
+            // }
+            throw new NotImplementedException();
 
             return false;
         }

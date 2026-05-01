@@ -39,28 +39,29 @@ namespace Arcatech.Interactions
             }
         }
 
-        public override void DoInteraction(bool success, IInteractor interactor) 
+        public override void DoInteraction(bool success, IInteractor interactor)
         {
-            if (success)
-            {
-                foreach (var result in _listS)
-                {
-                    result.ProduceResult(interactor.InteractionContext.CurrentInteractive.GetBaseComponent,
-                        interactor.InteractionContext.EntityComponent,
-                        interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.position, 
-                        interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.rotation);
-                }
-            }
-            else
-            {
-                foreach (var result in _listF)
-                {
-                    result.ProduceResult(interactor.InteractionContext.CurrentInteractive.GetBaseComponent,
-                        interactor.InteractionContext.EntityComponent,
-                        interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.position,
-                        interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.rotation);
-                }
-            }
+            throw new NotImplementedException();
+            // if (success)
+            // {
+            //     foreach (var result in _listS)
+            //     {
+            //         result.ProduceResult(interactor.InteractionContext.CurrentInteractive.GetBaseComponent,
+            //             interactor.InteractionContext.EntityComponent,
+            //             interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.position, 
+            //             interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.rotation);
+            //     }
+            // }
+            // else
+            // {
+            //     foreach (var result in _listF)
+            //     {
+            //         result.ProduceResult(interactor.InteractionContext.CurrentInteractive.GetBaseComponent,
+            //             interactor.InteractionContext.EntityComponent,
+            //             interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.position,
+            //             interactor.InteractionContext.CurrentInteractive.GetBaseComponent.EffectSpawn.transform.rotation);
+            //     }
+            // }
         }
 
     }

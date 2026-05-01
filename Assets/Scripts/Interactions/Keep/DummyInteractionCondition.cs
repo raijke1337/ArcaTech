@@ -8,7 +8,7 @@ namespace Arcatech.Interactions
     {
         [SerializeField] private bool _result;
 
-        public override bool CheckCondition(IInteractor actor, IInteractive item)
+        public override bool Check(InteractionContext ctx)
         {
             return _result; 
         }

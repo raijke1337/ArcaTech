@@ -1,4 +1,5 @@
-﻿using Arcatech.Interactions;
+﻿using System;
+using Arcatech.Interactions;
 using Arcatech.Triggers;
 using KBCore.Refs;
 using Newtonsoft.Json.Serialization;
@@ -20,12 +21,13 @@ namespace Arcatech.SaveSystem
 
         public override void OnInteractorEnter(IInteractor interactor)
         {            
-            if (interactor.InteractionContext.EntityComponent.CompareTag("Player"))
-            {
-                Debug.Log("Secret Area found!");
-                ReadItemState = true;
-                LevelProgressManager.Instance.SavedItemAnnounce(this);
-            }
+            // if (interactor.InteractionContext.EntityComponent.CompareTag("Player"))
+            // {
+            //     Debug.Log("Secret Area found!");
+            //     ReadItemState = true;
+            //     LevelProgressManager.Instance.SavedItemAnnounce(this);
+            // }
+            throw new NotImplementedException();
         }
 
         public override void OnInteractorExit(IInteractor interactor)

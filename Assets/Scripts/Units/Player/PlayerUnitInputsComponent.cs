@@ -10,13 +10,11 @@ namespace Arcatech.Units.Control
 {
 
     [RequireComponent(typeof(PlayerAimingComponent))]
-    [RequireComponent(typeof(InteractionComponent))]
     public class PlayerUnitInputsComponent : UnitInputsComponent
     {
         [Space, Header("Required components")] [SerializeField, Anywhere]
         PlayerInputReaderObject _playerInputReader;
 
-        [SerializeField, Self] protected InteractionComponent _interaction;
         private IMove mover;
         
         protected override void ControllerStartBindings(bool enabling)

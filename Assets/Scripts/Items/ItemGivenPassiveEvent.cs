@@ -1,4 +1,5 @@
-﻿using Arcatech.Interactions;
+﻿using System;
+using Arcatech.Interactions;
 using Arcatech.Units;
 using UnityEngine;
 
@@ -10,11 +11,12 @@ namespace Arcatech.Items
         [SerializeField] private int count = 1;
         public override void OnInteractorEnter(IInteractor interactor)
         {
-            if (interactor.InteractionContext.EntityComponent
-                .TryGetComponent(out EntityInventoryComponent component))
-            {
-                component.PickUpItem(content.BuildItem(interactor.InteractionContext.EntityComponent), count);;
-            }
+            // if (interactor.InteractionContext.EntityComponent
+            //     .TryGetComponent(out EntityInventoryComponent component))
+            // {
+            //     component.PickUpItem(content.BuildItem(interactor.InteractionContext.EntityComponent), count);;
+            // }
+            throw new NotImplementedException();
         }
 
         public override void OnInteractorExit(IInteractor interactor)

@@ -40,13 +40,14 @@ namespace Arcatech.Items
 
         public override void DoInteraction(bool success, IInteractor interactor)
         {
-            if (!success) return;
-            if (interactor.InteractionContext.EntityComponent
-                .TryGetComponent(out EntityInventoryComponent component))
-            {
-                component.PickUpItem(TakeItem().BuildItem(interactor.InteractionContext.EntityComponent), count);;
-                CollectibleUpdate();
-            }
+            // if (!success) return;
+            // if (interactor.InteractionContext.EntityComponent
+            //     .TryGetComponent(out EntityInventoryComponent component))
+            // {
+            //     component.PickUpItem(TakeItem().BuildItem(interactor.InteractionContext.EntityComponent), count);;
+            //     CollectibleUpdate();
+            // }
+            throw new NotImplementedException();
         }
 
         private void Start()

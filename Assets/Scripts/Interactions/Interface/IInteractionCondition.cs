@@ -1,20 +1,22 @@
-﻿namespace Arcatech.Interactions
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+namespace Arcatech.Interactions
 {
     /// <summary>
     /// this interface is for checking if interaction can be performed
     /// it uses th strategy pattern
     /// </summary>
-    public interface IInteractionCondition
+
+    public abstract class InteractionCondition : MonoBehaviour
     {
-        public bool CheckCondition(IInteractor actor, IInteractive item);
+        [SerializeField] private List<InteractionEffect> _denyEffects;
+
+        public abstract bool Check(InteractionContext ctx);
+
+        public void PlayDenyEffects(InteractionContext ctx)
+        {
+            foreach (var e in _denyEffects) e.Play(ctx);
+        }
     }
-
-
-
-    public abstract class InteractionCondition : ScriptableObjectID, IInteractionCondition
-    {
-        public abstract bool CheckCondition(IInteractor actor, IInteractive item);
-    }
-    
-    
 }

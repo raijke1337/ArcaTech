@@ -1,4 +1,5 @@
 ﻿using Arcatech.Units;
+using UnityEngine;
 
 namespace Arcatech.Interactions
 {
@@ -7,8 +8,10 @@ namespace Arcatech.Interactions
     /// </summary>
     public interface IInteractor
     {
-        public InteractionContext InteractionContext { get; }
-        public void RegisterInteractiveItemInContext(IInteractive item);
-        public void UnregisterInteractiveItemFromContext(IInteractive item);
+        void SetInteractionLock(bool locked);
+        void RegisterInteractive(InteractableComponent interactive);
+        void UnregisterInteractive(InteractableComponent interactive);
+        InteractionState State { get; }
+        
     }
 }

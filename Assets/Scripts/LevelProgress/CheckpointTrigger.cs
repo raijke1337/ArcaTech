@@ -8,12 +8,12 @@ namespace Arcatech.SaveSystem
     {
         public override void OnInteractorEnter(IInteractor interactor)
         {
-            if (interactor.InteractionContext.EntityComponent.CompareTag("Player"))
-            {
-                Debug.Log("Checkpoint found!");
-                ReadItemState = true;
-                LevelProgressManager.Instance.SavedItemAnnounce(this);
-            }
+            // if (interactor.InteractionContext.EntityComponent.CompareTag("Player"))
+            // {
+            //     Debug.Log("Checkpoint found!");
+            //     ReadItemState = true;
+            //     LevelProgressManager.Instance.SavedItemAnnounce(this);
+            // }
         }
 
         public override void OnInteractorExit(IInteractor interactor)
