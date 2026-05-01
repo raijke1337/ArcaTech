@@ -61,22 +61,21 @@ namespace Arcatech.Interactions
         {
             if (type == UnitActionType.Use && wasSuccessful)
             {
-                var ctx = new InteractionContext
-                {
-                    Interactor = this,
-                    InteractionPoint = _target.InteractionPoint ? _target.InteractionPoint.position : transform.position
-                };
-                
-                State = InteractionState.InProgress;
                 if (_active != null && _active == _target)
                 {
+                    State = InteractionState.Cancelled;
                     // Повторное нажатие = запрос отмены (для коробки, длительных действий)
                     _active.CancelInteraction();
                     _active = null;
                 }
                 else if (_target != null && _target.IsAvailable)
                 {
-
+                    State = InteractionState.InProgress;
+                    var ctx = new InteractionContext
+                    {
+                        Interactor = this,
+                        InteractionPoint = _target.InteractionPoint ? _target.InteractionPoint.position : transform.position
+                    };
                     _active = _target;
                     _target.StartInteraction(ctx);
                 }
