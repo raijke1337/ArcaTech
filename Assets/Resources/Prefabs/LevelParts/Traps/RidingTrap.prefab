@@ -12,6 +12,12 @@ GameObject:
   - component: {fileID: 2480993537948169370}
   - component: {fileID: 497886796102328230}
   - component: {fileID: 5382489881343784907}
+  - component: {fileID: 5188397073432419906}
+  - component: {fileID: 7325086890342690990}
+  - component: {fileID: 3489710459707000557}
+  - component: {fileID: 8607490936245720098}
+  - component: {fileID: 4613528938217020378}
+  - component: {fileID: 9098423276230432965}
   m_Layer: 6
   m_Name: activationArea
   m_TagString: Untagged
@@ -99,6 +105,144 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+--- !u!114 &5188397073432419906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529343355703896895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.LittlePauseHelperComponent
+--- !u!114 &7325086890342690990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529343355703896895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
+  _pauser: {fileID: 5188397073432419906}
+  _rb: {fileID: 497886796102328230}
+  setKinematic: 1
+  _name: 
+  entitySide: 0
+  effectSpawn: {fileID: 218152377601681352}
+  destroyOnDeath: 1
+  timerToDestroy: 2
+  _showDebugs: 0
+  id: 2791028857:1168663069:695965847:710134362
+  AnnounceDead:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &3489710459707000557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529343355703896895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9861cf096c4544538b64076b9365823f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractableComponent
+  entity: {fileID: 7325086890342690990}
+  trigger: {fileID: 8607490936245720098}
+  conditions: []
+  preExecuteEffects:
+  - {fileID: 8668148161001257336}
+  executor: {fileID: 4613528938217020378}
+  successEffects:
+  - {fileID: 8668148161001257336}
+  failureEffects:
+  - {fileID: 8668148161001257336}
+  cancelEffects:
+  - {fileID: 8668148161001257336}
+  destroyAfterSuccess: 0
+--- !u!114 &8607490936245720098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529343355703896895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d648679973b6421ba965c903fc77b17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ManualInteractionTrigger
+  triggerTrackerComponent: {fileID: 5382489881343784907}
+  interactableComponent: {fileID: 3489710459707000557}
+  description: {fileID: 11400000, guid: 355b689aabbae2a4e8936ab4b3285b6a, type: 2}
+--- !u!114 &4613528938217020378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529343355703896895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e932322c16e4aff8e54bd98f72dfdbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.MiniGameExecutor
+  miniGamePrefab: {fileID: 767475047153395332, guid: e701f14db508a2a4fafa0af1a402dd79,
+    type: 3}
+--- !u!114 &9098423276230432965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529343355703896895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d98429605effd164e904647258488147, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.EntityMouseOverGlowComponent
+  entity: {fileID: 7325086890342690990}
+  outlineMaterial: {fileID: 0}
+  outlineColor: {r: 0, g: 1, b: 1, a: 1}
+  outlineWidth: 0.02
+  useGlow: 1
+  glowIntensity: 2
+  animateAppearance: 1
+  fadeInDuration: 0.2
+  fadeOutDuration: 0.15
+  fadeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _glows:
+  - {fileID: 3643338692038155660}
 --- !u!1001 &5257693330657128893
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -157,6 +301,61 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8646998198671857540, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6439038676807969522, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -89.98021
+      objectReference: {fileID: 0}
+    - target: {fileID: -6439038676807969522, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -0.000024315277
+      objectReference: {fileID: 0}
+    - target: {fileID: -4444319509149853214, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: -4444319509149853214, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 89.99997
+      objectReference: {fileID: 0}
+    - target: {fileID: -3072042249230626285, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0.0000018335558
+      objectReference: {fileID: 0}
+    - target: {fileID: -3072042249230626285, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -179.94678
+      objectReference: {fileID: 0}
+    - target: {fileID: -3072042249230626285, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -1.4128919e-12
+      objectReference: {fileID: 0}
+    - target: {fileID: -1185179990969634207, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -0.000015258788
+      objectReference: {fileID: 0}
+    - target: {fileID: -1185179990969634207, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 179.99997
+      objectReference: {fileID: 0}
+    - target: {fileID: -1185179990969634207, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -180
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
       propertyPath: m_Name
@@ -166,6 +365,46 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1470327481914572886, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0.0000018335558
+      objectReference: {fileID: 0}
+    - target: {fileID: 1470327481914572886, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 179.94678
+      objectReference: {fileID: 0}
+    - target: {fileID: 1470327481914572886, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 1.4128919e-12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2796807731296059723, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7806b0317f591cc42a35245be9796a49, type: 2}
+    - target: {fileID: 5182559327359083794, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182559327359083794, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -89.999954
+      objectReference: {fileID: 0}
+    - target: {fileID: 8106152516015400799, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 89.9802
+      objectReference: {fileID: 0}
+    - target: {fileID: 8106152516015400799, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0.00005925716
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -178,27 +417,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3093094779298942949}
+      addedObject: {fileID: 1354703530400188833}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4696270789125424658}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+      addedObject: {fileID: 8668148161001257336}
+    - targetCorrespondingSourceObject: {fileID: -8646998198671857540, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6302456142920395476}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e7e70ad92e8ada4899c1ae69545f351,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 9132516524397958007}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e7e70ad92e8ada4899c1ae69545f351,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5146814260567369411}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e7e70ad92e8ada4899c1ae69545f351,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8478489106564780181}
+      addedObject: {fileID: 3643338692038155660}
   m_SourcePrefab: {fileID: 100100000, guid: 1e7e70ad92e8ada4899c1ae69545f351, type: 3}
 --- !u!1 &4915254494474734828 stripped
 GameObject:
@@ -206,55 +433,29 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5257693330657128893}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &3093094779298942949
-BoxCollider:
+--- !u!95 &1354703530400188833
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4915254494474734828}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &4696270789125424658
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4915254494474734828}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &6302456142920395476
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4978321bf6b701b4da096bf88abcc4e0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8668148161001257336
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -263,105 +464,49 @@ MonoBehaviour:
   m_GameObject: {fileID: 4915254494474734828}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Script: {fileID: 11500000, guid: da0ceb5ee9114a94a57b279dc09798f1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.LittlePauseHelperComponent
---- !u!114 &9132516524397958007
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AnimatorControlEffect
+  _states:
+    _serializedList:
+    - Key: 1
+      Value: trapSEnter
+    - Key: 2
+      Value: trapSLoop
+    - Key: 4
+      Value: trapSExit
+    - Key: 3
+      Value: trapSExit
+    - Key: 5
+      Value: trapSExit
+--- !u!1 &5694982916123826625 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8646998198671857540, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+    type: 3}
+  m_PrefabInstance: {fileID: 5257693330657128893}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3643338692038155660
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4915254494474734828}
+  m_GameObject: {fileID: 5694982916123826625}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Script: {fileID: 11500000, guid: 61a640f2962f3da42898a51ab27e2c0b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
-  _pauser: {fileID: 6302456142920395476}
-  _rb: {fileID: 4696270789125424658}
-  setKinematic: 1
-  _name: Trap
-  entitySide: 2
-  effectSpawn: {fileID: 5727924822369850966}
-  destroyOnDeath: 1
-  timerToDestroy: 2
-  _showDebugs: 0
---- !u!114 &5146814260567369411
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4915254494474734828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d98429605effd164e904647258488147, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.EntityMouseOverGlowComponent
-  entity: {fileID: 9132516524397958007}
-  outlineMaterial: {fileID: 0}
-  outlineColor: {r: 0, g: 1, b: 1, a: 1}
-  outlineWidth: 0.02
-  useGlow: 1
-  glowIntensity: 2
-  animateAppearance: 1
-  fadeInDuration: 0.2
-  fadeOutDuration: 0.15
-  fadeCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _glows: []
---- !u!114 &8478489106564780181
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4915254494474734828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffa2e06f5c72926489bd70a5200d2cef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractiveEventsTriggerComponent
-  baseComp: {fileID: 9132516524397958007}
-  activationArea: {fileID: 5382489881343784907}
-  disappearWhenTriggered: 0
-  allowMultipleActivations: 0
-  itemDescription: {fileID: 0}
-  handlersActivationType: 0
-  useCooldown: 0
-  entityMouseOver: {fileID: 5146814260567369411}
-  interactionEventsOnThis: []
-  otherInteractionEvents: []
-  condition: {fileID: 11400000, guid: af1b740f6150d3847abaae36f70dcb37, type: 2}
-  interactStart: {fileID: 11400000, guid: 4f88d8ba734f89946acb4a26f0d45a7c, type: 2}
-  interactionSuccess: {fileID: 11400000, guid: 8c6902f6ad2654b46a6c417f0c9e5775, type: 2}
-  interactionFail: {fileID: 11400000, guid: 7130243591e58444dbefd6992373d4ba, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.GlowOutlinePickerComponent
+  _r: {fileID: 7937407332029690102}
 --- !u!4 &5727924822369850966 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+    type: 3}
+  m_PrefabInstance: {fileID: 5257693330657128893}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &7937407332029690102 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2796807731296059723, guid: 1e7e70ad92e8ada4899c1ae69545f351,
     type: 3}
   m_PrefabInstance: {fileID: 5257693330657128893}
   m_PrefabAsset: {fileID: 0}

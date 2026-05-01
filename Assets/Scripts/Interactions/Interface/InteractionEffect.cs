@@ -1,4 +1,5 @@
-﻿using KBCore.Refs;
+﻿using System;
+using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Interactions
