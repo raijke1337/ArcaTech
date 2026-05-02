@@ -22,6 +22,7 @@ namespace Arcatech.Interactions
         [SerializeField] private List<InteractionCondition> conditions;
         [SerializeField] private List<InteractionEffect> preExecuteEffects;
         [SerializeField] private InteractionExecutor executor;
+        [SerializeField] private List<InteractionEffect> duringExecuteEffects;
 
         [Header("Post Effects")] [SerializeField]
         private List<InteractionEffect> successEffects;
@@ -35,16 +36,16 @@ namespace Arcatech.Interactions
 
         public bool IsAvailable => !_isExecuting;
 
-        public void StartInteraction(InteractionContext ctx, bool onLoadOverride = false)
+        public void StartInteraction(InteractionContext ctx)
         {
             if (!IsAvailable) return;
             _currentCtx = ctx;
             ctx.Target = this;
-            ctx.State = InteractionState.Starting;
+          //  ctx.State = InteractionState.Starting;
+          // set when creating context
             // 1. Условия
             foreach (var condition in conditions)
             {
-                if (onLoadOverride) continue; // execute without checking on level load
                 if (!condition.Check(ctx))
                 {
                     ctx.State = InteractionState.Failure;
@@ -55,27 +56,31 @@ namespace Arcatech.Interactions
             }
 
             // 2. Эффекты перед стартом (текст "Нужно взломать дверь")
-            foreach (var e in preExecuteEffects) e.Play(ctx);
 
+            foreach (var e in preExecuteEffects) e.Play(ctx);
             // 3. Исполнение
             _isExecuting = true;
-            SetPlayerLock(true);
-
+            ctx.State = InteractionState.InProgress;
+            UpdateStateInInteractor(ctx.State);
             executor.Execute(ctx, OnExecutorFinished);
+            foreach (var e in duringExecuteEffects) e.Play(ctx);
         }
 
         public void CancelInteraction()
         {
             if (!_isExecuting) return;
+            _currentCtx.State = InteractionState.Cancelled;
+            UpdateStateInInteractor(InteractionState.Cancelled);
             if (executor.CanCancel)
                 executor.Cancel(_currentCtx);
+            _currentCtx.State = InteractionState.Idle;
+            UpdateStateInInteractor(InteractionState.Idle);
         }
 
         private void OnExecutorFinished(InteractionState state)
         {
             ApplyPostEffects(state);
             _isExecuting = false;
-            SetPlayerLock(false);
             _currentCtx = null;
         }
 
@@ -97,14 +102,15 @@ namespace Arcatech.Interactions
                 _currentCtx.Interactor.UnregisterInteractive(this);
                 if (destroyAfterSuccess) gameObject.SetActive(false);
             }
+            UpdateStateInInteractor(state);
         }
 
-        private void SetPlayerLock(bool locked)
+        private void UpdateStateInInteractor(InteractionState state)
         {
             if (_currentCtx?.Interactor == null) return;
             var interactor = _currentCtx.Interactor;
             
-            interactor?.SetInteractionState(locked ? InteractionState.InProgress : InteractionState.Idle);
+            interactor?.SetInteractionState(state);
         }
         
     }

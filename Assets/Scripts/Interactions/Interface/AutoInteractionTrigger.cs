@@ -32,6 +32,7 @@ namespace Arcatech.Interactions
                 var ctx = new InteractionContext
                 {
                     Interactor = useInitiatorAsInteractor ? component : null,
+                    State = InteractionState.Starting
                 };
                 interactableComponent.StartInteraction(ctx);
                 _hasTriggered = true;

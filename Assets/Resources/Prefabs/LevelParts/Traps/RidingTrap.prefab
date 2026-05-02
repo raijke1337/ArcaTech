@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 8607490936245720098}
   - component: {fileID: 4613528938217020378}
   - component: {fileID: 9098423276230432965}
+  - component: {fileID: 2094697122880911294}
   m_Layer: 6
   m_Name: activationArea
   m_TagString: Untagged
@@ -160,6 +161,8 @@ MonoBehaviour:
   preExecuteEffects:
   - {fileID: 8668148161001257336}
   executor: {fileID: 4613528938217020378}
+  duringExecuteEffects:
+  - {fileID: 8668148161001257336}
   successEffects:
   - {fileID: 8668148161001257336}
   failureEffects:
@@ -243,6 +246,27 @@ MonoBehaviour:
     m_RotationOrder: 4
   _glows:
   - {fileID: 3643338692038155660}
+--- !u!114 &2094697122880911294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529343355703896895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 119ef3ebc21a48d29b7ae41857b4379c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractionStatesInjectorComponent
+  activeArea: {fileID: 5382489881343784907}
+  stateTransitions:
+    _serializedList:
+    - Key: 1
+      Value: {fileID: 11400000, guid: 8f9e50b0e725c674285c1f38bce29a14, type: 2}
+    - Key: 2
+      Value: {fileID: 11400000, guid: 6d851f53a553bc74abed7ddc2f84b49e, type: 2}
+    - Key: 3
+      Value: {fileID: 11400000, guid: b9408f52c889c4149964795f58839830, type: 2}
 --- !u!1001 &5257693330657128893
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -254,17 +278,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 21.837425
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.1299996
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -29.911892
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
@@ -471,8 +495,6 @@ MonoBehaviour:
     _serializedList:
     - Key: 1
       Value: trapSEnter
-    - Key: 2
-      Value: trapSLoop
     - Key: 4
       Value: trapSExit
     - Key: 3

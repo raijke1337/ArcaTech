@@ -11,7 +11,7 @@ namespace Arcatech.Interactions
         void SetInteractionState(InteractionState state);
         void RegisterInteractive(InteractableComponent interactive);
         void UnregisterInteractive(InteractableComponent interactive);
-        InteractionState State { get; }
         BaseGameEntityComponent Entity { get; }
+        InteractionState State { get; }
     }
 }

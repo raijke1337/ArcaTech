@@ -1,4 +1,5 @@
-﻿using AYellowpaper.SerializedCollections;
+﻿using System;
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
 namespace Arcatech.Interactions
@@ -16,7 +17,9 @@ namespace Arcatech.Interactions
 
         public override void Play(InteractionContext ctx)
         {
-            _animator.Play(_states[ctx.State]);
+            ctx.Interactor.Entity.transform.position = ctx.Target.transform.position;   
+            if (_states.TryGetValue(ctx.State, out var anim)) _animator.Play(anim);
         }
+
     }
 }

@@ -70,10 +70,11 @@ namespace Arcatech.Interactions
                 }
                 else if (_target != null && _target.IsAvailable)
                 {
-                    State = InteractionState.InProgress;
+                    State = InteractionState.Starting;
                     var ctx = new InteractionContext
                     {
                         Interactor = this,
+                        State = InteractionState.Starting,
                        // InteractionPoint = _target.InteractionPoint ? _target.InteractionPoint.position : transform.position
                     };
                     _active = _target;
@@ -112,6 +113,10 @@ namespace Arcatech.Interactions
             _target = _inRange[0]; // для MVP; позже можно по angle/distance
         }
 
-        public void SetInteractionState(InteractionState state) => State = state;
+        public void SetInteractionState(InteractionState state)
+        {
+            Debug.Log($"State {state} in {entity.GetName}");
+            State = state;
+        }
     }
 }
