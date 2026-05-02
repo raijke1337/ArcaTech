@@ -95,14 +95,16 @@ namespace Arcatech.SaveSystem
         public void SavedItemAnnounce(ISavedProgressItem item) => RecordItem(item);
         private void RecordItem(ISavedProgressItem item)
         {
-            if (showDebugs)  Debug.Log($"Recording item state for {item.SavedItemID}");
+            if (showDebugs)  Debug.Log($"Recording item state {item.ReadItemState} for {item.SavedItemID}");
             
             _currentProgress.Completed[item.SavedItemID] = item.ReadItemState;
             
             if (item is CheckpointTrigger checkpoint)
             {
-                _checkpointProgress = new LevelProgressData(_currentProgress);
-                _checkpointProgress.resumePosition = checkpoint.transform.position.ToSerializable();
+                _checkpointProgress = new LevelProgressData(_currentProgress)
+                {
+                    resumePosition = checkpoint.transform.position.ToSerializable()
+                };
             }
         }
         

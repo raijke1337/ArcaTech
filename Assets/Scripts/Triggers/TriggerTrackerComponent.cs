@@ -13,8 +13,8 @@ namespace Arcatech.Triggers
         private readonly HashSet<ITriggerNotificationReceiver> _receivers = new();
         public bool Active { get; set; } = true;
         public void RegisterReceiver(ITriggerNotificationReceiver r) => _receivers.Add(r);
-        public void UnregisterReceiver(ITriggerNotificationReceiver r) => _receivers.Remove(r);
 
+        public void UnregisterReceiver(ITriggerNotificationReceiver r) => _receivers.Remove(r);
         #endregion
 
         [SerializeField, Self] private Collider triggerCollider;
@@ -51,11 +51,15 @@ namespace Arcatech.Triggers
 
         protected void OnTriggerEnter(Collider other)
         {
-           // Debug.Log($"Trigger {other.gameObject.name} entered");
+            // Debug.Log($"Trigger {other.gameObject.name} entered");
             if (!CanNotify() || other.isTrigger) return;
 
             var hitGeometry = CalculateHitGeometry(other);
-            foreach (var receiver in _receivers)
+    
+            // Создаём копию, чтобы избежать изменений во время итерации
+            var receiversCopy = new List<ITriggerNotificationReceiver>(_receivers);
+    
+            foreach (var receiver in receiversCopy)
             {
                 receiver.TriggerEntered(new TriggerHitInfo(
                     this,

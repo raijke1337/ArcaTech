@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Arcatech.Items
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class ItemPickUpEffect : InteractionEffect, ISavedProgressItem
+    public class ItemPickUpEffect : InteractionEffect
     {
         private BaseGameEntityComponent _entity;
         [SerializeField] private ItemSO content;
@@ -27,7 +27,6 @@ namespace Arcatech.Items
                 .TryGetComponent(out EntityInventoryComponent component))
             {
                 component.PickUpItem(TakeItem().BuildItem(ctx.Interactor.Entity), count);;
-                CollectibleUpdate();
             }
         }
 
@@ -63,29 +62,6 @@ namespace Arcatech.Items
                 SetBillboard(content.Description);
             }
         }
-
-        #region  collectible
-
-        public string SavedItemID
-        {
-            get
-            {
-                if (_entity == null) _entity = GetComponent<BaseGameEntityComponent>();
-                return _entity.EntityID;
-            }
-        }
-        public bool ReadItemState { get; private set; }
-        public void OnWriteItemState(bool state, LevelProgressManager manager)
-        {
-            if (state) gameObject.SetActive(false);
-        }
-        void CollectibleUpdate()
-        {
-            ReadItemState = true;
-            LevelProgressManager.Instance.SavedItemAnnounce(this);
-        }
-        
-        #endregion
 
     }
 }

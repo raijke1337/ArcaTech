@@ -6,15 +6,12 @@ namespace Arcatech.Interactions
 {
     public class AutoInteractionTrigger : InteractionTrigger
     {
-        [SerializeField,Self] TriggerTrackerComponent activationArea;
         [SerializeField] protected bool triggerOnce = true;
         [SerializeField] protected float cooldown;
         [SerializeField] protected bool useInitiatorAsInteractor = true;
 
         private float _lastTriggerTime = -999f;
         private bool _hasTriggered;
-
-
         public void ResetTrigger()
         {
             _hasTriggered = false;
@@ -35,9 +32,6 @@ namespace Arcatech.Interactions
                 var ctx = new InteractionContext
                 {
                     Interactor = useInitiatorAsInteractor ? component : null,
-                   // InteractionPoint = target.InteractionPoint 
-                    //    ? target.InteractionPoint.position 
-                    //    : transform.position
                 };
                 interactableComponent.StartInteraction(ctx);
                 _hasTriggered = true;

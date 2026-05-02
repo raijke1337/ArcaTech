@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Arcatech.Managers;
+using Arcatech.SaveSystem;
 using Arcatech.Texts;
 using Arcatech.Triggers;
 using KBCore.Refs;
@@ -16,7 +17,6 @@ namespace Arcatech.Interactions
     {
         
         [SerializeField, Self] private BaseGameEntityComponent entity;
-        
         [Header("Pipeline")] 
         [SerializeField,Self] protected InteractionTrigger trigger;
         [SerializeField] private List<InteractionCondition> conditions;
@@ -35,15 +35,16 @@ namespace Arcatech.Interactions
 
         public bool IsAvailable => !_isExecuting;
 
-        public void StartInteraction(InteractionContext ctx)
+        public void StartInteraction(InteractionContext ctx, bool onLoadOverride = false)
         {
             if (!IsAvailable) return;
             _currentCtx = ctx;
             ctx.Target = this;
-            ctx.State = InteractionState.Success;
+            ctx.State = InteractionState.Starting;
             // 1. Условия
             foreach (var condition in conditions)
             {
+                if (onLoadOverride) continue; // execute without checking on level load
                 if (!condition.Check(ctx))
                 {
                     ctx.State = InteractionState.Failure;
@@ -91,10 +92,10 @@ namespace Arcatech.Interactions
             if (list == null) return;
             foreach (var e in list) e.Play(_currentCtx);
 
-            if (state == InteractionState.Success && destroyAfterSuccess)
+            if (state == InteractionState.Success)
             {
                 _currentCtx.Interactor.UnregisterInteractive(this);
-                gameObject.SetActive(false);
+                if (destroyAfterSuccess) gameObject.SetActive(false);
             }
         }
 
@@ -105,5 +106,6 @@ namespace Arcatech.Interactions
             
             interactor?.SetInteractionState(locked ? InteractionState.InProgress : InteractionState.Idle);
         }
+        
     }
 }

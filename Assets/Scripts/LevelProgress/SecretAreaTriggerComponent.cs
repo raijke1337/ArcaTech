@@ -7,31 +7,14 @@ using UnityEngine;
 
 namespace Arcatech.SaveSystem
 {
-    public class SecretAreaTriggerComponent : PassiveInteractionHandlerBase, ISavedProgressItem
+    public class SecretAreaTriggerComponent : InteractionEffect
     {
-        public string SavedItemID => baseGameEntityComponent.EntityID;
-        public bool ReadItemState { get; private set; }
-        public void OnWriteItemState(bool state, LevelProgressManager manager)
+        public override void Play(InteractionContext ctx)
         {
-            if (state) // zone found. Can disable the handler
+            if (ctx.Interactor.Entity.CompareTag("Player"))
             {
-                gameObject.SetActive(false);
+                Debug.Log("Secret Area found!");
             }
-        }
-
-        public override void OnInteractorEnter(IInteractor interactor)
-        {            
-            // if (interactor.InteractionContext.EntityComponent.CompareTag("Player"))
-            // {
-            //     Debug.Log("Secret Area found!");
-            //     ReadItemState = true;
-            //     LevelProgressManager.Instance.SavedItemAnnounce(this);
-            // }
-            throw new NotImplementedException();
-        }
-
-        public override void OnInteractorExit(IInteractor interactor)
-        {
         }
     }
 }
