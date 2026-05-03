@@ -1,5 +1,53 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4150600658221178120
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7914146374694946753}
+  - component: {fileID: 456769838707845330}
+  m_Layer: 6
+  m_Name: '[ Text ]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7914146374694946753
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4150600658221178120}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9056334934206970525}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &456769838707845330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4150600658221178120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4a1195b418a4eaa82611d922872b2d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ShowTextInteractionEffect
+  texts:
+    _serializedList:
+    - Key: 3
+      Value: {fileID: 11400000, guid: 7c1c4c85cc9a82b4abf964bf9e0609a6, type: 2}
 --- !u!1 &6699262900707491017
 GameObject:
   m_ObjectHideFlags: 0
@@ -16,9 +64,10 @@ GameObject:
   - component: {fileID: 6867913903839420304}
   - component: {fileID: 8738833819163380097}
   - component: {fileID: 4922447346516799693}
-  - component: {fileID: 5161561086836014658}
-  - component: {fileID: 6889584575626301261}
-  - component: {fileID: 810288397577282250}
+  - component: {fileID: 6386900530009433559}
+  - component: {fileID: 2675361078386437783}
+  - component: {fileID: 6667891894578995311}
+  - component: {fileID: 4858178902369088579}
   m_Layer: 6
   m_Name: CheckPoint
   m_TagString: Untagged
@@ -40,6 +89,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8899873503860543816}
+  - {fileID: 7914146374694946753}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8664335190263510025
@@ -201,7 +251,7 @@ MonoBehaviour:
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &5161561086836014658
+--- !u!114 &6386900530009433559
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -210,17 +260,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 6699262900707491017}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 988cbdb62e8445b1a01312ef41942e2a, type: 3}
+  m_Script: {fileID: 11500000, guid: 9861cf096c4544538b64076b9365823f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.PassiveEventsTriggerComponent
-  baseComp: {fileID: 4922447346516799693}
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractableComponent
+  entity: {fileID: 4922447346516799693}
+  trigger: {fileID: 2675361078386437783}
+  conditions: []
+  preExecuteEffects: []
+  executor: {fileID: 6667891894578995311}
+  successEffects:
+  - {fileID: 4858178902369088579}
+  - {fileID: 456769838707845330}
+  failureEffects: []
+  cancelEffects: []
+  destroyAfterSuccess: 1
+--- !u!114 &2675361078386437783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6699262900707491017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 824e5129a5c54a8383d6efb2e8548309, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AutoInteractionTrigger
+  triggerTrackerComponent: {fileID: 6867913903839420304}
+  interactableComponent: {fileID: 6386900530009433559}
   activationArea: {fileID: 6867913903839420304}
-  disappearWhenTriggered: 1
-  allowMultipleActivations: 1
-  pausePlayerTime: 0
-  condition: {fileID: 11400000, guid: af1b740f6150d3847abaae36f70dcb37, type: 2}
-  handlers: []
---- !u!114 &6889584575626301261
+  triggerOnce: 1
+  cooldown: 0
+  useInitiatorAsInteractor: 1
+--- !u!114 &6667891894578995311
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -229,13 +301,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 6699262900707491017}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 827b824bfeda48aabbc604bca40f1f65, type: 3}
+  m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.DisplayTextPassiveEvent
-  baseGameEntityComponent: {fileID: 4922447346516799693}
-  onEnter: {fileID: 11400000, guid: 7c1c4c85cc9a82b4abf964bf9e0609a6, type: 2}
-  onExit: {fileID: 0}
---- !u!114 &810288397577282250
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
+--- !u!114 &4858178902369088579
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -247,7 +316,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5033c1d5173c415daef0176de03e6620, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.CheckpointTrigger
-  baseGameEntityComponent: {fileID: 4922447346516799693}
 --- !u!1001 &8902491395032539278
 PrefabInstance:
   m_ObjectHideFlags: 0

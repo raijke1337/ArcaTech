@@ -1,0 +1,45 @@
+﻿using Arcatech.Managers;
+using Arcatech.Texts;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace Arcatech.Interactions
+{
+    public class ManualInteractionTrigger : InteractionTrigger, ITargetable
+    {
+        public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
+        {
+            if (triggerHitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
+            {
+                interactor.RegisterInteractive(interactableComponent);
+            }
+        }
+
+        public override void TriggerExited(TriggerHitInfo triggerExitInfo)
+        {
+            if (triggerExitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
+            {
+                interactor.UnregisterInteractive(interactableComponent);
+            }
+        }
+        
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            GameInterfaceManager.Instance?.NotifyTargetable(this,true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            GameInterfaceManager.Instance?.NotifyTargetable(this,false);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            GameInterfaceManager.Instance?.NotifyTargetable(this,false);
+        }
+
+        [Space,SerializeField] Description description;
+        public Description GetInfo => description;
+    }
+}

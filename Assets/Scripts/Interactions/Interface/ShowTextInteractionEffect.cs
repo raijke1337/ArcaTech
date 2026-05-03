@@ -1,0 +1,21 @@
+﻿using System;
+using Arcatech.Managers;
+using Arcatech.Texts;
+using AYellowpaper.SerializedCollections;
+using UnityEngine;
+
+namespace Arcatech.Interactions
+{
+    public class ShowTextInteractionEffect : InteractionEffect
+    {
+        [SerializeField] private SerializedDictionary<InteractionState, DialoguePart> texts;
+
+        public override void Play(InteractionContext ctx)
+        {
+            if (texts != null && texts.TryGetValue(ctx.State, out DialoguePart txt))
+            {
+                GameInterfaceManager.Instance.ShowDialoguePart(txt,true);
+            }
+        }
+    }
+}

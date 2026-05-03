@@ -13,7 +13,7 @@ namespace Arcatech.Items
         
         [SerializeField] Description description;        
         [Space] public int MaxStack = 1;
-        [SerializeField] public ItemPickedUpInteraction worldItemContainerPrefab;
+        [SerializeField] public ItemPickUpEffect worldItemContainerPrefab;
 
         public virtual Item BuildItem(BaseGameEntityComponent owner)
         {

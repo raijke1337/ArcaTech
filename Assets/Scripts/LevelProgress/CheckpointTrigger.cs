@@ -4,29 +4,39 @@ using UnityEngine;
 
 namespace Arcatech.SaveSystem
 {
-    public class CheckpointTrigger : PassiveInteractionHandlerBase, ISavedProgressItem
+    [RequireComponent(typeof(BaseGameEntityComponent))]
+    public class CheckpointTrigger : InteractionEffect, ISavedProgressItem
     {
-        public override void OnInteractorEnter(IInteractor interactor)
+        private BaseGameEntityComponent baseGameEntityComponent;
+        public string SavedItemID
         {
-            if (interactor.InteractionContext.EntityComponent.CompareTag("Player"))
+            get
+            {
+                if (baseGameEntityComponent == null)
+                {
+                    baseGameEntityComponent = GetComponent<BaseGameEntityComponent>();
+                }
+                return baseGameEntityComponent.EntityID;
+            }
+        }
+        public bool ReadItemState { get; private set; }
+        public void OnWriteItemState(bool state, LevelProgressManager manager)
+        {
+            ReadItemState = state;
+            if (state)
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
+        public override void Play(InteractionContext ctx)
+        {
+            if (ctx.Interactor == null) return; // on level load
+            if (ctx.Interactor.Entity.CompareTag("Player"))
             {
                 Debug.Log("Checkpoint found!");
                 ReadItemState = true;
                 LevelProgressManager.Instance.SavedItemAnnounce(this);
-            }
-        }
-
-        public override void OnInteractorExit(IInteractor interactor)
-        {
-        }
-
-        public string SavedItemID => baseGameEntityComponent.EntityID;
-        public bool ReadItemState { get; private set; }
-        public void OnWriteItemState(bool state, LevelProgressManager manager)
-        {
-            if (state)
-            {
-                gameObject.SetActive(false);
             }
         }
     }

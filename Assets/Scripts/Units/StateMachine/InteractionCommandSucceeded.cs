@@ -1,4 +1,5 @@
-﻿using Arcatech.Interactions;
+﻿using System;
+using Arcatech.Interactions;
 using UnityEngine;
 
 namespace Arcatech.Units
@@ -9,12 +10,15 @@ namespace Arcatech.Units
         public bool resultIs = true;
         public override bool CanTransition(StateMachineContext ctx)
         {
-            if (ctx.Interactor == null) return false;
             
-            bool hasR = ctx.Interactor.InteractionContext.HasInteractionResult(out var result);
-            //Debug.Log($"Peek result: available {hasR}, result: {result}");
-            if (!hasR)  return false;
-            return result == resultIs;
+            throw new NotImplementedException();
+            return false;
+            // if (ctx.Interactor == null) return false;
+            //
+            // bool hasR = ctx.Interactor.InteractionContext.HasInteractionResult(out var result);
+            // //Debug.Log($"Peek result: available {hasR}, result: {result}");
+            // if (!hasR)  return false;
+            // return result == resultIs;
         }
     }
 }
