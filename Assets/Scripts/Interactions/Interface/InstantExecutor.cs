@@ -9,7 +9,7 @@ namespace Arcatech.Interactions
         [SerializeField] private bool willComplete = true;
         public override void Execute(InteractionContext ctx, UnityAction<InteractionState> onComplete)
         {
-            if (!willComplete) return;
+            if (!willComplete) onComplete?.Invoke(InteractionState.Failure);
             onComplete?.Invoke(InteractionState.Success);
         }
     }

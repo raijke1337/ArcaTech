@@ -22,12 +22,12 @@ namespace Arcatech.Interactions
             base.OnValidate();
             Assert.IsNotNull(triggerTrackerComponent);
         }
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             triggerTrackerComponent.RegisterReceiver(this);
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             triggerTrackerComponent.UnregisterReceiver(this);
         }

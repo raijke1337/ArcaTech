@@ -75,7 +75,6 @@ namespace Arcatech.Interactions
                     {
                         Interactor = this,
                         State = InteractionState.Starting,
-                       // InteractionPoint = _target.InteractionPoint ? _target.InteractionPoint.position : transform.position
                     };
                     _active = _target;
                     _target.StartInteraction(ctx);

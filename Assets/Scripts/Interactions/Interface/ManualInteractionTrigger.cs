@@ -33,7 +33,12 @@ namespace Arcatech.Interactions
             GameInterfaceManager.Instance?.NotifyTargetable(this,false);
         }
 
-        
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            GameInterfaceManager.Instance?.NotifyTargetable(this,false);
+        }
+
         [Space,SerializeField] Description description;
         public Description GetInfo => description;
     }
