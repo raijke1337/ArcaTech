@@ -7,5 +7,15 @@ namespace Arcatech.Interactions
         public IInteractor Interactor;
         public InteractableComponent Target;
         public InteractionState State;
+
+        /// <summary>
+        /// can use in case pooling is implemented
+        /// </summary>
+        public void Reset()
+        {
+            Interactor = null;
+            Target = null;
+            State = InteractionState.Idle;
+        }
     }
 }

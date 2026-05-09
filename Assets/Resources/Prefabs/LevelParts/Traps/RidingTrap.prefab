@@ -160,6 +160,7 @@ MonoBehaviour:
   conditions: []
   preExecuteEffects:
   - {fileID: 8668148161001257336}
+  - {fileID: 6033968259380026931}
   executor: {fileID: 4613528938217020378}
   duringExecuteEffects:
   - {fileID: 8668148161001257336}
@@ -263,10 +264,54 @@ MonoBehaviour:
     _serializedList:
     - Key: 1
       Value: {fileID: 11400000, guid: 8f9e50b0e725c674285c1f38bce29a14, type: 2}
-    - Key: 2
-      Value: {fileID: 11400000, guid: 6d851f53a553bc74abed7ddc2f84b49e, type: 2}
-    - Key: 3
-      Value: {fileID: 11400000, guid: b9408f52c889c4149964795f58839830, type: 2}
+--- !u!1 &6896445010380273428
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3713905204321439461}
+  - component: {fileID: 6033968259380026931}
+  m_Layer: 6
+  m_Name: '[Text]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3713905204321439461
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6896445010380273428}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5727924822369850966}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6033968259380026931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6896445010380273428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4a1195b418a4eaa82611d922872b2d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ShowTextInteractionEffect
+  texts:
+    _serializedList:
+    - Key: 1
+      Value: {fileID: 11400000, guid: 7b576d902efec134bbd7eec8613cbcd5, type: 2}
 --- !u!1001 &5257693330657128893
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -437,6 +482,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 218152377601681352}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1e7e70ad92e8ada4899c1ae69545f351,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3713905204321439461}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e7e70ad92e8ada4899c1ae69545f351,
         type: 3}
@@ -501,6 +550,7 @@ MonoBehaviour:
       Value: trapSExit
     - Key: 5
       Value: trapSExit
+  interactorPlace: {fileID: 5727924822369850966}
 --- !u!1 &5694982916123826625 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8646998198671857540, guid: 1e7e70ad92e8ada4899c1ae69545f351,

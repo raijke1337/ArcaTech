@@ -7,7 +7,7 @@ namespace Arcatech.MiniGames
     public abstract class MiniGameBase : MonoBehaviour
     {
         public abstract void StartGame();
-        
+        public abstract void EndGame();
         public UnityEvent<InteractionState> OnGameCompleteResult;
 
         /// <summary>
@@ -19,5 +19,12 @@ namespace Arcatech.MiniGames
             OnGameCompleteResult?.Invoke(result);
             OnGameCompleteResult?.RemoveAllListeners();
         }
+    }
+
+    [CreateAssetMenu(fileName = "MiniGameBase", menuName = "Game/MiniGame Package")]
+    public class MiniGame : ScriptableObject
+    {
+        public MiniGameBase prefab;
+        
     }
 }

@@ -30,13 +30,15 @@ namespace Arcatech.Managers
         [SerializeField] private GameObject _pause;
         [SerializeField,Child] private ItemCardComponent inspectItemCard;
         [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
+        [SerializeField] public Transform miniGame;
+        
         private Sequence tooltipSeq;
 
         /// <summary>
         /// called by inputs
         /// </summary>
         EventBinding<PauseToggleEvent> _pauseToggleBind;
-
+        
 
 
         private void OnEnable()
@@ -71,6 +73,7 @@ namespace Arcatech.Managers
         
         public void NotifyTargetable(ITargetable targetable, bool show)
         {
+            if (!floatingTooltip) return;
             if (!show)
             {
                FadeOut(floatingTooltip.transform);

@@ -259,6 +259,11 @@ namespace Arcatech.MiniGames
         StartCoroutine(GameLoopWithDelay());
     }
 
+    public override void EndGame()
+    {
+        CancelGame();
+    }
+
     private IEnumerator GameLoopWithDelay()
     {
         // Ждем один кадр, чтобы Layout полностью инициализировался

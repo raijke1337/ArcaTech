@@ -4,24 +4,22 @@ using UnityEngine;
 
 namespace Arcatech.Interactions
 {
-    public class SwitchCameraPassiveEvent : PassiveInteractionHandlerBase
+    public class SwitchCameraPassiveEvent : InteractionEffect
     {
         [SerializeField] private CinemachineCamera cameraToActivate;
         [SerializeField] private float cameraTime = 2f;
-        public override void OnInteractorEnter(IInteractor interactor)
-        {
-            StartCoroutine(CameraRoutine());
-        }
 
-        public override void OnInteractorExit(IInteractor interactor)
-        {
-        }
 
         IEnumerator CameraRoutine()
         {
             cameraToActivate.gameObject.SetActive(true);
             yield return new WaitForSeconds(cameraTime);
             cameraToActivate.gameObject.SetActive(false);
+        }
+
+        public override void Play(InteractionContext ctx)
+        {
+            StartCoroutine(CameraRoutine());
         }
     }
 }

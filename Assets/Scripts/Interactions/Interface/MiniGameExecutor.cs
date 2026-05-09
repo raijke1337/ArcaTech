@@ -13,12 +13,19 @@ namespace Arcatech.Interactions
     {
         [SerializeField] MiniGameBase miniGamePrefab;
         private  MiniGameBase _miniGame;
+        public override bool CanCancel => true;
 
         public override void Execute(InteractionContext ctx, UnityAction<InteractionState> onComplete)
         {
-            _miniGame = Instantiate(miniGamePrefab,GameInterfaceManager.Instance.transform);
+            _miniGame = Instantiate(miniGamePrefab,GameInterfaceManager.Instance.miniGame);
             _miniGame.OnGameCompleteResult.AddListener(onComplete);
             _miniGame.StartGame();
+        }
+
+        public override void Cancel(InteractionContext ctx)
+        {
+            base.Cancel(ctx);
+            _miniGame.EndGame();
         }
     }
 

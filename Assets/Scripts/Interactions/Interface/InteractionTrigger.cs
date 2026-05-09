@@ -31,6 +31,5 @@ namespace Arcatech.Interactions
         {
             triggerTrackerComponent.UnregisterReceiver(this);
         }
-
     }
 }

@@ -8,8 +8,6 @@ namespace Arcatech.Units
     public class SerializedStateTransition : ScriptableObject
     {
         public int Priority;
-       // [Header("Command transitions have higher priority than non-command ones")]
-      //  public bool IsCommandTransition;
         public SerializedStateTransitionCondition[] conditions = new SerializedStateTransitionCondition[0];
         public SerializedUnitState nextState;
         public SerializedActionResult[] onTransition = new SerializedActionResult[0];
