@@ -40,7 +40,7 @@ namespace Arcatech.Puzzles
             _pairs = new Dictionary<Pair<IconTileComp>, Sprite>();
 
             List<IconTileComp> _unassignedTiles = new List<IconTileComp>();
-            List<Sprite> _sprites = new List<Sprite> (GameUIManager.Instance.GetMatch2Sprites);
+            List<Sprite> _sprites = new List<Sprite> (GameGraphicsHoster.Instance.GetMatch2Sprites);
 
             int total = _settings.Pairs * 2;
             for (int i = 0; i <total; i++)

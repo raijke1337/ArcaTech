@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: 1341966373663510508}
   - component: {fileID: 9096410900744019217}
   - component: {fileID: 1179461438761161344}
+  - component: {fileID: 6930355973907076612}
+  - component: {fileID: 8797119062236906899}
   m_Layer: 6
   m_Name: Basic Activator Console
   m_TagString: Untagged
@@ -40,6 +42,7 @@ Transform:
   m_Children:
   - {fileID: 8851939999306628541}
   - {fileID: 5751982660882400901}
+  - {fileID: 727235539182978840}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &3766538266554840988
@@ -111,7 +114,6 @@ MonoBehaviour:
   destroyOnDeath: 0
   timerToDestroy: 2
   _showDebugs: 0
-  id: 1428252186:1301811262:1357146496:1358099349
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -189,12 +191,17 @@ MonoBehaviour:
   entity: {fileID: 167911779277341174}
   trigger: {fileID: 1179461438761161344}
   conditions: []
-  preExecuteEffects: []
+  preExecuteEffects:
+  - {fileID: 9096410900744019217}
   executor: {fileID: 1341966373663510508}
+  duringExecuteEffects:
+  - {fileID: 9096410900744019217}
   successEffects:
   - {fileID: 9096410900744019217}
-  failureEffects: []
-  cancelEffects: []
+  failureEffects:
+  - {fileID: 9096410900744019217}
+  cancelEffects:
+  - {fileID: 9096410900744019217}
   destroyAfterSuccess: 0
 --- !u!114 &1341966373663510508
 MonoBehaviour:
@@ -208,6 +215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
+  willComplete: 1
 --- !u!114 &9096410900744019217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,6 +236,7 @@ MonoBehaviour:
       Value: {fileID: 11400000, guid: 9f80589ee1f20a74482a94712a0a8c55, type: 2}
     - Key: 5
       Value: {fileID: 11400000, guid: d44ca4fe75ac77e4284c5d164c81d62a, type: 2}
+  blockUntilTextCompletes: 0
 --- !u!114 &1179461438761161344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,7 +251,165 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ManualInteractionTrigger
   triggerTrackerComponent: {fileID: 8925110208279871842}
   interactableComponent: {fileID: 7228844900646879824}
+  id: {fileID: 8797119062236906899}
   description: {fileID: 11400000, guid: f0f9fa6b9b1a2fa428d898533200ef07, type: 2}
+--- !u!114 &6930355973907076612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380161337935849466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 119ef3ebc21a48d29b7ae41857b4379c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractionStatesInjectorComponent
+  activeArea: {fileID: 8925110208279871842}
+  stateTransitions:
+    _serializedList:
+    - Key: 1
+      Value: {fileID: 11400000, guid: 1d88dd4e9998f25438b50c1fdd962226, type: 2}
+--- !u!114 &8797119062236906899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380161337935849466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.SaveObjectID
+  uniqueId: 
+--- !u!1 &4683387661540627805
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 727235539182978840}
+  - component: {fileID: 1775309262196665706}
+  - component: {fileID: 312827114797401935}
+  m_Layer: 6
+  m_Name: Spot Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &727235539182978840
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4683387661540627805}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.70710593, y: -0, z: 0.0000021159647, w: 0.7071078}
+  m_LocalPosition: {x: 0, y: 5.64, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3867859755564038322}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!108 &1775309262196665706
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4683387661540627805}
+  m_Enabled: 1
+  serializedVersion: 12
+  m_Type: 0
+  m_Color: {r: 1, g: 0.62840414, b: 0, a: 1}
+  m_Intensity: 10
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 30
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 1
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!114 &312827114797401935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4683387661540627805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &7077196090972435776
 GameObject:
   m_ObjectHideFlags: 0

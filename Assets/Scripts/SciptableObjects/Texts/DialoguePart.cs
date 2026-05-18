@@ -9,6 +9,7 @@ namespace Arcatech.Texts
     [CreateAssetMenu(fileName = "New Dialogue part part", menuName = "Game/Dialogues/Dialogue")]
     public class DialoguePart : ScriptableObject
     {
+        public bool IsForcedDialogue = false;
         public DialogueCharacter Character;
         [SerializeField] string[] DialogueContents;
         public DialoguePart NextDialogue;

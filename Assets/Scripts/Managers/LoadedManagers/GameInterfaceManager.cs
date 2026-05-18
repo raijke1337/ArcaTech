@@ -62,12 +62,14 @@ namespace Arcatech.Managers
         }
         
         #region game dialogues and texts
-        public void ShowDialoguePart(DialoguePart dialogue, bool show)
+        public void ShowDialoguePart(DialoguePart dialogue)
         {
             if (!dialogue) return;
-            _text.gameObject.SetActive(show);
+            _text.gameObject.SetActive(true);
             _text.ShowDialogue(dialogue);
         }
+
+        public bool IsDialogueShowing => _text.gameObject.activeSelf;
         
         #endregion
         
@@ -135,8 +137,6 @@ namespace Arcatech.Managers
 
 
         #region menus
-        
-        
         
         public void ShowPauseMenu(PauseToggleEvent isPause)
         {

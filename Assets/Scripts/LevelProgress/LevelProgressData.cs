@@ -5,15 +5,21 @@ using UnityEngine;
 
 namespace Arcatech.SaveSystem
 {
+    public enum ProgressItemState
+    {
+        Default,
+        Completed,
+        Failed
+    }
+    
     [Serializable]
     public class LevelProgressData : ISaveable
     {
         public string levelID;
-        public Dictionary<string, bool> Completed = new();
+        public Dictionary<string, ProgressItemState> ProgressItemStates = new();
         public SerializableVector3 resumePosition;
         public LevelProgressData()
-        {
-        }
+        {}
 
         public LevelProgressData(LevelProgressData other)
         {
@@ -21,9 +27,9 @@ namespace Arcatech.SaveSystem
 
             levelID = other.levelID;
             resumePosition = other.resumePosition;
-            Completed = other.Completed != null
-                ? other.Completed.ToDictionary(pair => pair.Key, pair => pair.Value)
-                : new Dictionary<string, bool>();
+            ProgressItemStates = other.ProgressItemStates != null
+                ? other.ProgressItemStates.ToDictionary(pair => pair.Key, pair => pair.Value)
+                : new Dictionary<string, ProgressItemState>();
         }
         
         public void PopulateSaveData(GameData data)
@@ -45,20 +51,20 @@ namespace Arcatech.SaveSystem
                 data.levelRecords.Add(new LevelProgressData
                 {
                     levelID = levelID,
-                    Completed = new Dictionary<string, bool>(Completed),
+                    ProgressItemStates = new Dictionary<string, ProgressItemState>(ProgressItemStates),
                     resumePosition = resumePosition
                 });
             }
             else
             {
-                existing.Completed ??= new Dictionary<string, bool>();
+                existing.ProgressItemStates ??= new Dictionary<string, ProgressItemState>();
 
                 // Snapshot the pairs so mutations don’t affect the enumerator.
-                var updates = Completed?.ToArray() ?? Array.Empty<KeyValuePair<string, bool>>();
+                var updates = ProgressItemStates?.ToArray() ?? Array.Empty<KeyValuePair<string, ProgressItemState>>();
 
                 foreach (var kvp in updates)
                 {
-                    existing.Completed[kvp.Key] = kvp.Value;
+                    existing.ProgressItemStates[kvp.Key] = kvp.Value;
                 }
                 
                 existing.resumePosition = resumePosition;

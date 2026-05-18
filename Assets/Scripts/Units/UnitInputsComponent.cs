@@ -29,7 +29,7 @@ namespace Arcatech
             {
                 if (!v.CanDoUnitCommand(type, out string info))
                 {
-                    if (stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] Command fail {type} in {v}.{info} at {Time.time}.");
+                    if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] Command fail {type} in {v}.{info} at {Time.time}.");
                     foreach (var p in _commandPerformers)
                     {
                         p.DoUnitCommand(type, false);

@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 9161550653830420109}
   - component: {fileID: 7807487161984706014}
   - component: {fileID: 5907143268600554704}
+  - component: {fileID: 4150197037249165678}
   m_Layer: 6
   m_Name: Pickup_Key
   m_TagString: Untagged
@@ -120,6 +121,7 @@ MonoBehaviour:
   conditions: []
   preExecuteEffects: []
   executor: {fileID: 6215770114506928207}
+  duringExecuteEffects: []
   successEffects:
   - {fileID: 4784070580617683845}
   - {fileID: 5923635334488011330}
@@ -203,6 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
+  willComplete: 1
 --- !u!114 &438787011601951740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,7 +239,6 @@ MonoBehaviour:
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
-  id: 1056315902:1163437079:112463287:176547882
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -330,6 +332,19 @@ MonoBehaviour:
   triggerTrackerComponent: {fileID: 4740861867446518017}
   interactableComponent: {fileID: 3555756990035200253}
   description: {fileID: 11400000, guid: 3011e969cc9283f479841c6e39780580, type: 2}
+--- !u!114 &4150197037249165678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4714043517577227366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0648d19678744c59b375d232c87a414, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.PersistentID
+  _uniqueID: 350bc02288ec4b3f
 --- !u!1 &7175023294981739629
 GameObject:
   m_ObjectHideFlags: 0
@@ -378,6 +393,7 @@ MonoBehaviour:
     _serializedList:
     - Key: 3
       Value: {fileID: 11400000, guid: df1791599da76fc448c445c722326601, type: 2}
+  blockUntilTextCompletes: 0
 --- !u!1001 &1660904219811269938
 PrefabInstance:
   m_ObjectHideFlags: 0

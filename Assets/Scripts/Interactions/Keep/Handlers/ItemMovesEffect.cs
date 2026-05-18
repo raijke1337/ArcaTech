@@ -1,15 +1,16 @@
 ﻿using Arcatech.Units;
 using DG.Tweening;
-using NUnit.Framework;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 namespace Arcatech.Interactions
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
     public partial class ItemMovesEffect : InteractionEffect, IPausableComponent
     {
+        
+        // TODO: this whole part is now in "Item moves with Tween".
+        // remove duplication
+        
         [SerializeField] bool runFromEnable = true;
         [SerializeField] SerializedDOTweener tween;
         Tween cached;

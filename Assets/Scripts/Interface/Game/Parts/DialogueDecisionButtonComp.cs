@@ -16,7 +16,7 @@ namespace Arcatech.Texts
             set
             {
                 _text.text = value.Title;
-                _text.font = GameUIManager.Instance.GetFont(FontType.Text);
+                _text.font = GameGraphicsHoster.Instance.GetFont(FontType.Text);
                 _txt = value;   
             }
         }

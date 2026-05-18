@@ -10,7 +10,7 @@ namespace Arcatech
     /// <summary>
     /// new component that defines any game entity
     /// </summary>
-    [RequireComponent(typeof(Rigidbody), typeof(Collider), typeof(LittlePauseHelperComponent))]
+    [RequireComponent(typeof(Rigidbody), typeof(LittlePauseHelperComponent))]
     public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IInvulnerability
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
@@ -29,18 +29,12 @@ namespace Arcatech
         
         [Space, SerializeField] protected bool _showDebugs = false;
         public Transform EffectSpawn => effectSpawn;
-        
         List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>> _effectsTakerComponents;
 
-        
         public string GetName =>  _name;
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
-        private Collider Collider { get; set; }
-        
-        
-        [SerializeField, ReadOnlyText] private string id;
-        public string EntityID => id;
+
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -49,12 +43,10 @@ namespace Arcatech
             {
                 effectSpawn = transform;
             }
-            if (string.IsNullOrEmpty(id)) id = SerializableGuid.NewGuid().ToString();
         }
 
         private void OnEnable()
         {
-            Collider = GetComponent<Collider>();
             _rb.isKinematic = setKinematic;
             _effectsTakerComponents = new List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>>(GetComponentsInChildren<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>>());
         }
@@ -87,7 +79,6 @@ namespace Arcatech
         {
             if (ShowingDebugs) Debug.Log($"{GetName} {(value ? "dead" : "resurrected")}, called by: {comp.KilledBy}");
             _killed = value;
-            Collider.isTrigger = value;
             AnnounceDead?.Invoke(this);
             if (_killed && destroyOnDeath)
             {

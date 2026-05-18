@@ -1,43 +1,48 @@
-﻿using DG.Tweening;
+﻿using Arcatech;
+using DG.Tweening;
 using UnityEngine;
+
 namespace Arcatech
 {
     [CreateAssetMenu(fileName = "tweenSO_movement_", menuName = "Tweening/Movement Preset")]
     public class MovementTweenPreset : SerializedDOTweener
     {
-        [Header("Movement Settings")]
-        public Vector3 targetPosition;
-       // public bool useLocalPosition = true;
-        public bool isRelative = false;  // If true, adds to current position
-        public bool snapping = false;    // Snap to integer values
+        [Header("Movement Settings")] public Vector3 targetPosition;
+        public bool isRelative = false;
+        public bool snapping = false;
 
-        [Header("Timing")]
-        public float duration = 1f;
+        [Header("Timing")] public float duration = 1f;
         public float delay = 0f;
 
-        [Header("Easing")]
-        public bool useCustomCurve = false;
+        [Header("Easing")] public bool useCustomCurve = false;
         public AnimationCurve customCurve = AnimationCurve.Linear(0, 0, 1, 1);
-        public Ease easeType = Ease.OutQuad;
+        public Ease easeType = Ease.InOutSine; // InOutSine лучше для плавного движения
 
-        [Header("Loop Settings")]
-        public int loops = 0;  // 0 = no loop, -1 = infinite
-        public LoopType loopType = LoopType.Restart;
+        [Header("Loop Settings")] public int loops = -1; // -1 = бесконечно
+        public LoopType loopType = LoopType.Yoyo;
 
-        [Header("Callbacks")]
-        public bool useOnComplete = false;
+        [Header("Callbacks")] public bool useOnComplete = false;
         public UnityEngine.Events.UnityEvent onCompleteEvent;
 
         protected override Tween Build(Transform target)
         {
             Tween tween;
-            tween = target.GetComponent<Rigidbody>().DOMove(targetPosition, duration, snapping)
-                .SetRelative(isRelative)
+
+            if (target.TryGetComponent(out Rigidbody rb))
+            {
+                tween = rb.DOMove(targetPosition, duration, snapping);
+            }
+            else
+            {
+                tween = target.DOMove(targetPosition, duration, snapping);
+            }
+
+            tween.SetRelative(isRelative)
                 .SetDelay(delay)
-                .SetLoops(loops, loopType);
+                .SetLoops(loops, loopType)
+                .SetAutoKill(false) // НЕ убивать автоматически
+                .SetUpdate(UpdateType.Normal, true); // Работать даже если Time.timeScale = 0
 
-
-            // Set easing
             if (useCustomCurve)
             {
                 tween.SetEase(customCurve);
@@ -47,7 +52,6 @@ namespace Arcatech
                 tween.SetEase(easeType);
             }
 
-            // Add callbacks if needed
             if (useOnComplete && onCompleteEvent != null)
             {
                 tween.OnComplete(() => onCompleteEvent.Invoke());

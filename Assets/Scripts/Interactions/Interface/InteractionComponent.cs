@@ -54,7 +54,7 @@ namespace Arcatech.Interactions
             {
                 if (_state == value) return;
                 _state = value;
-                Debug.Log($"[{entity.GetName}] State = {value}");
+                if (entity.ShowingDebugs) Debug.Log($"[{entity.GetName}] Interaction State = {value}");
                 StateChanged?.Invoke(value);
             }
         }

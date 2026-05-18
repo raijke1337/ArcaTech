@@ -42,27 +42,7 @@ namespace Arcatech
            var g = Guid.NewGuid();
             return new SerializableGuid(g);
         }
-        public static SerializableGuid FromHexString(string hexString)
-        {
-            if (hexString.Length != 32)
-            {
-                return Empty;
-            }
-
-            return new SerializableGuid
-            (
-                Convert.ToUInt32(hexString.Substring(0, 8), 16),
-                Convert.ToUInt32(hexString.Substring(8, 8), 16),
-                Convert.ToUInt32(hexString.Substring(16, 8), 16),
-                Convert.ToUInt32(hexString.Substring(24, 8), 16)
-            );
-        }
-
-        public string ToHexString()
-        {
-            return $"{Part1:X8}{Part2:X8}{Part3:X8}{Part4:X8}";
-        }
-
+        
         public Guid ToGuid()
         {
             var bytes = new byte[16];

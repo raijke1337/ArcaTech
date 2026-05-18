@@ -23,7 +23,8 @@ namespace Arcatech.SaveSystem
     public interface ISavedProgressItem
     {
         public string SavedItemID { get; }
-        public bool ReadItemState { get; }
-        public void OnWriteItemState(bool state, LevelProgressManager manager);
+        public ProgressItemState ReadItemState { get; }
+        public void ApplySaveState(ProgressItemState state, LevelProgressManager ctx);
+        public string Name { get; }
     }
 }

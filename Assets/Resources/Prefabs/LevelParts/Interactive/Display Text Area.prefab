@@ -64,7 +64,6 @@ GameObject:
   - component: {fileID: 5947406123470694086}
   - component: {fileID: 291358447390153180}
   - component: {fileID: 2208630765820750090}
-  - component: {fileID: 1848299371356144237}
   - component: {fileID: 3357102818650165533}
   - component: {fileID: 1005627346370064262}
   m_Layer: 6
@@ -87,8 +86,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4659095739159929577}
   - {fileID: 2983879361195105374}
+  - {fileID: 957827934420503375}
+  - {fileID: 6384075706616896428}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &6668812081841661467
@@ -207,7 +207,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AutoInteractionTrigger
   triggerTrackerComponent: {fileID: 8390706416827097626}
   interactableComponent: {fileID: 2208630765820750090}
-  activationArea: {fileID: 8390706416827097626}
   triggerOnce: 1
   cooldown: 0
   useInitiatorAsInteractor: 1
@@ -228,27 +227,12 @@ MonoBehaviour:
   conditions: []
   preExecuteEffects: []
   executor: {fileID: 1005627346370064262}
+  duringExecuteEffects: []
   successEffects:
   - {fileID: 6163540335266317471}
   failureEffects: []
   cancelEffects: []
   destroyAfterSuccess: 1
---- !u!114 &1848299371356144237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5877487407430005226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4a1195b418a4eaa82611d922872b2d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ShowTextInteractionEffect
-  texts:
-    _serializedList:
-    - Key: 3
-      Value: {fileID: 11400000, guid: e82ff22f2ba22ba4aad11545912f4362, type: 2}
 --- !u!114 &3357102818650165533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,7 +247,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AutoInteractionTrigger
   triggerTrackerComponent: {fileID: 8390706416827097626}
   interactableComponent: {fileID: 2208630765820750090}
-  activationArea: {fileID: 8390706416827097626}
   triggerOnce: 1
   cooldown: 0
   useInitiatorAsInteractor: 1
@@ -279,7 +262,103 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
---- !u!1001 &4663797818620907075
+  willComplete: 1
+--- !u!1001 &956432120226722911
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7840350066785753601}
+    m_Modifications:
+    - target: {fileID: 1639247540807124, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_Name
+      value: SM_Icon_SpeechBubble_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1639247540807124, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 23099813753732080, guid: 58df0da85d616cd41ab7a55c6bdd6b75,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 866f8d6edbdc2af418ba24cfee82fe33, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1639247540807124, guid: 58df0da85d616cd41ab7a55c6bdd6b75,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1150515235391836555}
+  m_SourcePrefab: {fileID: 100100000, guid: 58df0da85d616cd41ab7a55c6bdd6b75, type: 3}
+--- !u!1 &954832463899480459 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1639247540807124, guid: 58df0da85d616cd41ab7a55c6bdd6b75,
+    type: 3}
+  m_PrefabInstance: {fileID: 956432120226722911}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1150515235391836555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954832463899480459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aa955ee457a4a4ea22b6a70b44ac42c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ItemMovesWithTween
+  tween: {fileID: 11400000, guid: d80a491355f87e548b7bd3048f93df99, type: 2}
+--- !u!4 &957827934420503375 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4238189220314896, guid: 58df0da85d616cd41ab7a55c6bdd6b75,
+    type: 3}
+  m_PrefabInstance: {fileID: 956432120226722911}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6379778247971059462
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -336,9 +415,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5fb125617629fb64386fdafd5ec4a612, type: 3}
---- !u!4 &4659095739159929577 stripped
+--- !u!4 &6384075706616896428 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4870304741321898, guid: 5fb125617629fb64386fdafd5ec4a612,
     type: 3}
-  m_PrefabInstance: {fileID: 4663797818620907075}
+  m_PrefabInstance: {fileID: 6379778247971059462}
   m_PrefabAsset: {fileID: 0}
