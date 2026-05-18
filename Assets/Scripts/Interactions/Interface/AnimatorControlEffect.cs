@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Arcatech.SaveSystem;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
@@ -29,6 +30,12 @@ namespace Arcatech.Interactions
             StopWaiting();
             _blockingComplete = true;
         }
+
+        public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        {
+            // noop
+        }
+
         public override void Play(InteractionContext ctx)
         {
             _blockingComplete = false;

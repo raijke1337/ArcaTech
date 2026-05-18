@@ -16,5 +16,10 @@ namespace Arcatech.SaveSystem
                 Debug.Log("Secret Area found!");
             }
         }
+
+        public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        {
+            if (stateToLoad ==  ProgressItemState.Completed) gameObject.SetActive(false);
+        }
     }
 }

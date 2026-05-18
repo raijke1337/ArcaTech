@@ -1,4 +1,5 @@
 ﻿using System;
+using Arcatech.SaveSystem;
 using KBCore.Refs;
 using UnityEngine;
 
@@ -18,5 +19,7 @@ namespace Arcatech.Interactions
         /// Вызывается при принудительной отмене взаимодействия.
         /// </summary>
         public virtual void OnCancelled() { }
+
+        public abstract void OnLoadLevelState(ProgressItemState stateToLoad);
     }
 }

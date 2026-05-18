@@ -1,4 +1,5 @@
-﻿using Arcatech.Units;
+﻿using Arcatech.SaveSystem;
+using Arcatech.Units;
 using DG.Tweening;
 using UnityEngine;
 
@@ -37,7 +38,8 @@ namespace Arcatech.Interactions
         }
         private void OnEnable()
         {
-            cached = tween.GetTween(transform).Pause(); 
+            cached ??= tween.GetTween(transform).Pause();
+            
             if (runFromEnable)
             {
                 toggled = true;
@@ -52,6 +54,14 @@ namespace Arcatech.Interactions
             if (!runFromEnable) 
                 cached.Play();
             toggled = true;
+        }
+
+        public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        {
+            if (stateToLoad != ProgressItemState.Completed) return;
+            toggled = true;
+            cached ??= tween.GetTween(transform).Pause();
+            cached.Play();
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Arcatech.Managers;
+using Arcatech.SaveSystem;
 using Arcatech.Texts;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
@@ -22,5 +23,9 @@ namespace Arcatech.Interactions
         }
 
         public override bool IsBlockingComplete => !GameInterfaceManager.Instance.IsDialogueShowing;
+        public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        {
+            // noop 
+        }
     }
 }

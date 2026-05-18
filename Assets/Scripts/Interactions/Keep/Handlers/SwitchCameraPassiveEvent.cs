@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Arcatech.SaveSystem;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -20,6 +21,11 @@ namespace Arcatech.Interactions
         public override void Play(InteractionContext ctx)
         {
             StartCoroutine(CameraRoutine());
+        }
+
+        public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        {
+            //noop
         }
     }
 }

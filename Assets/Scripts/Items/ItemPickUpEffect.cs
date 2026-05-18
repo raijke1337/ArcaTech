@@ -30,7 +30,11 @@ namespace Arcatech.Items
             }
         }
 
-        
+        public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        {
+            // noop
+        }
+
         #endregion
         
         public void PutItem(ItemSO item)

@@ -6,16 +6,6 @@ namespace Arcatech.SaveSystem
 {
     public class CheckpointTrigger : InteractionEffect
     {
-        public bool ReadItemState { get; private set; }
-        public void OnWriteItemState(bool state, LevelProgressManager manager)
-        {
-            ReadItemState = state;
-            if (state)
-            {
-                gameObject.SetActive(false);
-            }
-        }
-
         public override void Play(InteractionContext ctx)
         {
             if (ctx.Interactor == null) return; // on level load
@@ -23,6 +13,11 @@ namespace Arcatech.SaveSystem
             {
                 LevelProgressManager.Instance.OnCheckPointReached(this);
             }
+        }
+
+        public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        {
+            if (stateToLoad ==  ProgressItemState.Completed) gameObject.SetActive(false);
         }
     }
 }

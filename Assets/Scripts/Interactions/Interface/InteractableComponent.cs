@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Arcatech.SaveSystem;
 using KBCore.Refs;
 using UnityEngine;
 
@@ -8,8 +10,8 @@ namespace Arcatech.Interactions
     /// <summary>
     /// item to be interacted with
     /// </summary>
-    [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class InteractableComponent : ValidatedMonoBehaviour
+    [RequireComponent(typeof(BaseGameEntityComponent), typeof(SaveObjectID))]
+    public class InteractableComponent : ValidatedMonoBehaviour, ISavedProgressItem
     {
         [SerializeField, Self] private BaseGameEntityComponent entity;
 
@@ -211,5 +213,38 @@ namespace Arcatech.Interactions
         {
             _currentCtx?.Interactor?.SetInteractionState(state);
         }
+
+
+        [SerializeField, Self] private SaveObjectID id;
+        public string SavedItemID => id.UniqueId;
+        public string Name => entity.GetName;
+
+        private ProgressItemState _currentState = ProgressItemState.Default;
+
+        public ProgressItemState ReadItemState
+        {
+            get =>  _currentState;
+            set
+            {
+                _currentState = value;
+                LevelProgressManager.Instance.SavedItemAnnounce(this);
+            }
+        }
+        public void ApplySaveState(ProgressItemState state, LevelProgressManager ctx)
+        {
+            switch (state)
+            {
+                case ProgressItemState.Completed:
+                    foreach (var effect in successEffects.ToList())
+                    {
+                        effect.OnLoadLevelState(state);
+                    }
+                    break;
+                default:
+                    Debug.Log($"NYI state {state} load in {entity.GetName}");
+                    break;
+            }
+        }
+
     }
 }
