@@ -32,7 +32,8 @@ namespace Arcatech.Items
 
         public override void OnLoadLevelState(ProgressItemState stateToLoad)
         {
-            // noop
+            if (stateToLoad == ProgressItemState.Completed)
+                gameObject.SetActive(false);
         }
 
         #endregion

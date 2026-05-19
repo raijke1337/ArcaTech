@@ -46,65 +46,65 @@ namespace Arcatech.UI
         {
             Debug.Log($"load {model} into {this}");
 
-            _inventoryModel = model;
-            //clean up
-            foreach (var tile in _equipsTiles.Values)
-            {
-                tile.Item = null;
-                tile.IconClickedEvent -= IconTileClicked;
-            }
-            foreach (var tile in _inventoryTiles)
-            {
-                tile.Item = null;
-                tile.IconClickedEvent -= IconTileClicked;
-            }
-
-            if (_hldTile != null)
-            {
-                _hldTile.HighLightToggle();
-                _hldTile = null;
-            }
-
-            //draw
-            foreach (Equipment equip in model.ListEquipped)
-            {
-                _equipsTiles[equip.Slot].Item = equip;
-                _equipsTiles[equip.Slot].IconClickedEvent += IconTileClicked;
-            }
-            var inve = model.ListInventory;
-
-            int placedTiles = _inventoryTiles.Count;
-
-            int counter = 0;
-            while (counter < placedTiles && counter < inve.Count())
-            {
-                _inventoryTiles[counter].gameObject.SetActive(true);
-                _inventoryTiles[counter].IconClickedEvent += IconTileClicked;
-                _inventoryTiles[counter].Item = inve.ToArray()[counter];
-                counter++;
-            }
-
-            if (counter == placedTiles)
-            // case : not enough tiles
-            {
-                while (counter < inve.Count())
-                {
-                    var tile = Instantiate(_tilePreset, _tileParent);
-                    tile.Item = inve.ToArray()[counter];
-                    _inventoryTiles.Add(tile);
-                    tile.IconClickedEvent += IconTileClicked;
-                    counter++;
-                }
-            }
-            //case : some tiles left : deactivate the empty ones
-            if (counter == inve.Count())
-            {
-                while (counter < _inventoryTiles.Count)
-                {
-                    _inventoryTiles[counter].gameObject.SetActive(false);
-                    counter++;
-                }
-            }
+            // _inventoryModel = model;
+            // //clean up
+            // foreach (var tile in _equipsTiles.Values)
+            // {
+            //     tile.Item = null;
+            //     tile.IconClickedEvent -= IconTileClicked;
+            // }
+            // foreach (var tile in _inventoryTiles)
+            // {
+            //     tile.Item = null;
+            //     tile.IconClickedEvent -= IconTileClicked;
+            // }
+            //
+            // if (_hldTile != null)
+            // {
+            //     _hldTile.HighLightToggle();
+            //     _hldTile = null;
+            // }
+            //
+            // //draw
+            // foreach (Equipment equip in model.ListEquipped)
+            // {
+            //     _equipsTiles[equip.Slot].Item = equip;
+            //     _equipsTiles[equip.Slot].IconClickedEvent += IconTileClicked;
+            // }
+            // var inve = model.ListInventory;
+            //
+            // int placedTiles = _inventoryTiles.Count;
+            //
+            // int counter = 0;
+            // while (counter < placedTiles && counter < inve.Count())
+            // {
+            //     _inventoryTiles[counter].gameObject.SetActive(true);
+            //     _inventoryTiles[counter].IconClickedEvent += IconTileClicked;
+            //     _inventoryTiles[counter].Item = inve.ToArray()[counter];
+            //     counter++;
+            // }
+            //
+            // if (counter == placedTiles)
+            // // case : not enough tiles
+            // {
+            //     while (counter < inve.Count())
+            //     {
+            //         var tile = Instantiate(_tilePreset, _tileParent);
+            //         tile.Item = inve.ToArray()[counter];
+            //         _inventoryTiles.Add(tile);
+            //         tile.IconClickedEvent += IconTileClicked;
+            //         counter++;
+            //     }
+            // }
+            // //case : some tiles left : deactivate the empty ones
+            // if (counter == inve.Count())
+            // {
+            //     while (counter < _inventoryTiles.Count)
+            //     {
+            //         _inventoryTiles[counter].gameObject.SetActive(false);
+            //         counter++;
+            //     }
+            // }
         }
 
         #region item operations

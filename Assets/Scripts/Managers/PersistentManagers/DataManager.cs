@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Usables;
 using TMPro.EditorUtilities;
+using UnityEditor;
 using UnityEngine;
 
 namespace Arcatech.Managers
@@ -35,32 +36,6 @@ namespace Arcatech.Managers
         }
 
 
-
-        #endregion
-
-
-        #region external checks
-        bool _newGame = true;
-        public bool IsNewGame
-        {
-            get
-            {
-                Debug.Log("TODO: new game check");
-                return _newGame;
-            }
-            set
-            {
-                _newGame = value;
-            }
-        }
-
-        //internal UnitInventoryContainer GetPlayerSaveEquips
-        //{
-        //    get
-        //    {
-        //        return new UnitInventoryContainer(_loadedSave.Inventory);
-        //    }
-        //}
         public List <SceneContainer> GetAvailableLevels
         {
             get
@@ -74,11 +49,14 @@ namespace Arcatech.Managers
                 return null;
             }
         }
-        
         #endregion
+
+        
 
         #region items
 
+        private Dictionary<string, ItemSO> _itemsData;
+        
         public Item MakeItem(ItemSO config, BaseGameEntityComponent owner)
         {
             return config switch
@@ -89,6 +67,28 @@ namespace Arcatech.Managers
             };
         }
 
+        public Item MakeItem(string id, BaseGameEntityComponent owner)
+        {
+            if (_itemsData == null)
+            {
+                _itemsData = new Dictionary<string, ItemSO>();
+                var found = Resources.FindObjectsOfTypeAll(typeof(ItemSO)) as ItemSO[];
+                if (found == null)
+                {
+                    Debug.LogError($"No ItemSO found for ID {id}! Failed to init database.");
+                    return null;
+                }
+                foreach (var item in found)
+                {
+                    _itemsData[item.ID.ToString()] = item;
+                }
+                Debug.Log($"Init items database. Total items: {_itemsData.Count}");
+            }
+            
+            return MakeItem(_itemsData[id], owner);
+        }
+
+        
         #endregion
         
     }

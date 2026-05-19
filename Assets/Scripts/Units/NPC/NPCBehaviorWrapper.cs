@@ -1,3 +1,4 @@
+using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units.Control;
@@ -11,7 +12,8 @@ namespace Arcatech.Units
 {
     [RequireComponent(typeof(BehaviorGraphAgent),typeof(NavMeshAgent),typeof(UnitInputsComponent))]
     [RequireComponent(typeof(BaseGameEntityComponent),typeof(EntityStatsComponent))]
-    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>,IKillableComponent,IPausableComponent,IMove
+    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>,IKillableComponent,IPausableComponent,IMove,
+        ISavedProgressItem
     {
         [SerializeField,Self]protected NavMeshAgent agent;
         [SerializeField,Self]protected BehaviorGraphAgent behavior;
@@ -83,8 +85,11 @@ namespace Arcatech.Units
         public void SetKilled(IKillerComponent component, bool value)
         {
             agent.isStopped = value;
+            ReadItemState = value ? ProgressItemState.Completed : ProgressItemState.Default;
+            
             if (!behavior) return;
             if (value) behavior.End(); else behavior.Restart();
+            
         }
         
         private bool _paused;
@@ -120,6 +125,29 @@ namespace Arcatech.Units
         {
             get => animator.applyRootMotion;
             set => animator.applyRootMotion = value;
+        }
+
+        public string SavedItemID => entity.GetID;
+        public void ApplySaveState(ProgressItemState state, LevelProgressManager ctx)
+        {
+            if (state == ProgressItemState.Completed)
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
+        public string Name => entity.GetName;
+
+        private ProgressItemState _currentState = ProgressItemState.Default;
+
+        public ProgressItemState ReadItemState
+        {
+            get =>  _currentState;
+            set
+            {
+                _currentState = value;
+                LevelProgressManager.Instance.SavedItemAnnounce(this);
+            }
         }
     }
 }

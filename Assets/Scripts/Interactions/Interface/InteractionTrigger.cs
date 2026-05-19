@@ -14,8 +14,7 @@ namespace Arcatech.Interactions
     {
         [SerializeField] protected TriggerTrackerComponent triggerTrackerComponent;
         [SerializeField,Self] protected InteractableComponent interactableComponent;
-
-
+        
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -23,7 +22,7 @@ namespace Arcatech.Interactions
         }
         public abstract void TriggerEntered(TriggerHitInfo triggerHitInfo);
         public abstract void TriggerExited(TriggerHitInfo triggerExitInfo);
-        
+
         protected virtual void Start()
         {
             triggerTrackerComponent.RegisterReceiver(this);

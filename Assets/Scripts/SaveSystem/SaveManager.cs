@@ -10,7 +10,7 @@ namespace Arcatech.SaveSystem
     {
         
         [SerializeField] SaveService service;
-        [SerializeField] readonly int SaveVersion = 2;
+        [SerializeField,ReadOnlyText] int saveVersion = 3;
         [SerializeField] private bool showDebugs = false;
         private GameData _gameData;
         
@@ -40,9 +40,9 @@ namespace Arcatech.SaveSystem
             switch (service.TryLoadData(out _gameData))
             {
                 case LoadDataResult.Success:
-                    if (_gameData.version != SaveVersion)
+                    if (_gameData.version != saveVersion)
                     {
-                        Debug.LogError($"Version {_gameData.version} not equal to Version {SaveVersion}");
+                        Debug.LogError($"Version {_gameData.version} not equal to Version {saveVersion}");
                     }
                     if (showDebugs) Debug.Log("Load Success");
                     break;
@@ -53,7 +53,7 @@ namespace Arcatech.SaveSystem
                     if (showDebugs) Debug.Log("Missing Save! Creating new.");
                     _gameData = new GameData()
                     {
-                        version = SaveVersion,
+                        version = saveVersion,
                         timestamp = DateTime.Now.ToString(CultureInfo.InvariantCulture)
                     };
                     service.SaveData(_gameData);

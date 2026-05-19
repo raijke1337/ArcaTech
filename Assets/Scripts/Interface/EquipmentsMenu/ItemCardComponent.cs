@@ -122,7 +122,7 @@ namespace Arcatech.UI
         {
             if (ItemHeld is Equipment e)
             {
-                _model.EquipItem(e, out _);
+                _model.EquipEquipment(e, out _);
                 ViewChangedInventory?.Invoke();
             }
         }

@@ -1,6 +1,7 @@
 ﻿using Arcatech.Stats;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -12,36 +13,34 @@ namespace Arcatech.Items
     [Serializable]
     public class UnitInventoryModel
     {
+        private bool _initialized = false;
+        Dictionary<Item,int> _inventory;
+        Dictionary<ItemSlot, Equipment> _equipments;
 
-        #region serialize
+        public IReadOnlyList<Equipment> ListEquipped => _equipments.Values.ToList().AsReadOnly();
 
-       [SerializeField] [ReadOnlyText] string status = "not init";
-
-        #endregion
-
-       
-        bool initialized = false;
-        List<Item> inventory;
-        Dictionary<ItemSlot, Equipment> equipments;
-
-        public IReadOnlyList<Equipment> ListEquipped => equipments.Values.ToList().AsReadOnly();
-        public IReadOnlyList<Item> ListInventory => inventory.AsReadOnly();
+        public IReadOnlyDictionary<Item, int> ListInventory
+        {
+            get
+            {
+                 var readOnlyDictionary =  new ReadOnlyDictionary<Item, int>(_inventory);
+                 return readOnlyDictionary;
+            }
+        }
         public event UnityAction ModelUpdatedEvent = delegate { };
 
         public UnitInventoryModel(IEntityItemsList items, BaseGameEntityComponent o)
         {
 
-            inventory = new();
-            equipments = new();
-            
-            status = $"No items loaded!";
+            _inventory = new();
+            _equipments = new();
             
             if (items == null) return;
             
             PickUpItems(items.GetInventory(o));
-            Dictionary<ItemSlot, List<Equipment>> temporaryDict = new();
             
-
+            
+            Dictionary<ItemSlot, List<Equipment>> temporaryDict = new();
             foreach (Equipment e in items.GetEquipment(o))
             {
                 if (!temporaryDict.ContainsKey(e.Slot))
@@ -61,70 +60,77 @@ namespace Arcatech.Items
                 {
                     if (i == randomIndex)
                     {
-                        EquipItem(pair.Value[i],out _);
+                        EquipEquipment(pair.Value[i],out _);
                     }
                     else
                     {
-                        PickUpItem(pair.Value[i]);
+                        PickUpItem(pair.Value[i],1);
                     }
                 }
             }
             
             // for example small bots have different items that they equip but with the same stats
-
-            status = $"items loaded";
-            initialized = true;
+            _initialized = true;
             ModelUpdatedEvent.Invoke();
         }
         
-        public void PickUpItem(Item item)
+        public void PickUpItem(Item item, int count)
         {
-            inventory.Add(item);
-            if (initialized) 
-            {ModelUpdatedEvent.Invoke();}
+            _inventory.Add(item,count);
+            if (_initialized)
+            {
+                ModelUpdatedEvent.Invoke();
+            }
         }
-
-        public void PickUpItems(IEnumerable<Item> items)
+        public void PickUpItems(IDictionary<Item,int> items)
         {
-            foreach (Item item in items) PickUpItem(item);
+            foreach (var p in items) PickUpItem(p.Key,p.Value);
         }
-
-
-        public bool HasItem(ItemSO item)
-        {
-            return inventory.FirstOrDefault(t => t.ID == item.ID) != null;
-        }
-        public bool DropItem(Item item)
+        public bool HasItem(ItemSO item,int amount)
         {
             if (item == null) return false;
-            if (inventory.Contains(item))
-            {
-                inventory.Remove(item);
-                return true;
-            }
-
-            return false;
+            var neededID = item.ID; 
+            return SearchInventory(neededID,amount);
         }
-    
-    public bool DropItem(ItemSO item)
+
+        public bool HasItem(Item item, int amount)
         {
-            var it = inventory.First(t => t.ID == item.ID);
-            return DropItem(it);    
+            if (item == null) return false;
+            var neededID = item.ID; 
+            return SearchInventory(neededID,amount);
         }
 
+        public bool HasItem (string id, int amount) => SearchInventory(id,amount);
+        private bool SearchInventory(string id, int amount)
+        {
+            var list = _inventory.Keys.ToList();
+            var found = list.FirstOrDefault(x => x.ID == id);
+            if (found == null) return false;
+            return _inventory[found] >= amount;
+        }
+        
+        public bool UseItem(ItemSO item,int amount)
+        {
+            if (!HasItem(item,amount)) return false;
+            var neededID = item.ID; 
+            var itemInQuestion = _inventory.Keys.First(x => x.ID == neededID);
+            _inventory[itemInQuestion] -= amount;
+            if (_inventory[itemInQuestion] == 0) _inventory.Remove(itemInQuestion);
+            return true;
+        }
 
-        public void EquipItem (Equipment toEquip, out Equipment dropped)
+        public void EquipEquipment (Equipment toEquip, out Equipment dropped)
         {
             dropped = null;
 
-            if (equipments.TryGetValue(toEquip.Slot, out var drop))
+            if (_equipments.TryGetValue(toEquip.Slot, out var drop))
             {
-                equipments.Remove(toEquip.Slot);
+                _equipments.Remove(toEquip.Slot);
                 drop.OnUnequip();
                 dropped = drop;
             }
-            equipments[toEquip.Slot] = toEquip;
-            if (initialized) ModelUpdatedEvent.Invoke();
+            _equipments[toEquip.Slot] = toEquip;
+            if (_initialized) ModelUpdatedEvent.Invoke();
         }
         
         /// <summary>
@@ -135,7 +141,7 @@ namespace Arcatech.Items
         {
 
             var list =  new List<IEquipmentStatsProvider>();
-            foreach (var equipment in equipments.Values)
+            foreach (var equipment in _equipments.Values)
             {
                 list.Add(equipment);
             }

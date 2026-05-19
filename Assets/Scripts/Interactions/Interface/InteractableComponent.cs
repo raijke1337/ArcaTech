@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.SaveSystem;
@@ -10,7 +11,7 @@ namespace Arcatech.Interactions
     /// <summary>
     /// item to be interacted with
     /// </summary>
-    [RequireComponent(typeof(BaseGameEntityComponent), typeof(SaveObjectID))]
+    [RequireComponent(typeof(BaseGameEntityComponent))]
     public class InteractableComponent : ValidatedMonoBehaviour, ISavedProgressItem
     {
         [SerializeField, Self] private BaseGameEntityComponent entity;
@@ -35,8 +36,9 @@ namespace Arcatech.Interactions
         private InteractionContext _currentCtx;
         private int _executionId; // защита от stale callbacks
 
-        public bool IsAvailable => !_isExecuting && executor != null;
-
+        private bool _listening = false; // activated after load level condition
+        public bool IsAvailable => !_isExecuting && _listening && executor  != null;
+        
         private void OnDisable()
         {
             if (_isExecuting)
@@ -183,6 +185,19 @@ namespace Arcatech.Interactions
                 InteractionState.Cancelled => cancelEffects,
                 _ => null
             };
+            switch (state)
+            {
+
+                case InteractionState.Success:
+                    ReadItemState = ProgressItemState.Completed;
+                    break;
+                case InteractionState.Failure:
+                    ReadItemState = ProgressItemState.Failed;
+                    break;
+                default:
+                    ReadItemState = default;
+                    break;
+            }
 
             if (_currentCtx != null)
             {
@@ -214,9 +229,7 @@ namespace Arcatech.Interactions
             _currentCtx?.Interactor?.SetInteractionState(state);
         }
 
-
-        [SerializeField, Self] private SaveObjectID id;
-        public string SavedItemID => id.UniqueId;
+        public string SavedItemID => entity.GetID;
         public string Name => entity.GetName;
 
         private ProgressItemState _currentState = ProgressItemState.Default;
@@ -241,7 +254,7 @@ namespace Arcatech.Interactions
                     }
                     break;
                 default:
-                    Debug.Log($"NYI state {state} load in {entity.GetName}");
+                    _listening = true;
                     break;
             }
         }

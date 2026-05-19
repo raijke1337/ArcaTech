@@ -13,7 +13,7 @@ namespace Arcatech.Items
     {
         protected ItemSO Config;
         public BaseGameEntityComponent Owner { get; }
-        public SerializableGuid ID { get; }
+        public string ID { get; }
         public Item(ItemSO cfg, BaseGameEntityComponent ow)
         {
             Owner = ow;

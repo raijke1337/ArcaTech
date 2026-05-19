@@ -5,13 +5,11 @@ namespace Arcatech
     [Serializable]
     public abstract class ScriptableObjectID : ScriptableObject
     {
-        protected virtual void Awake()
+        void Awake()
         {
-            ID = SerializableGuid.NewGuid();
+            if (String.IsNullOrEmpty(ID)) ID = Guid.NewGuid().ToString();
         }
 
-        public SerializableGuid ID { get; private set; }
+        [ReadOnlyText] public string ID;
     }
-
-
 }

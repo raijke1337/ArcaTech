@@ -2,11 +2,6 @@
 using UnityEngine;
 namespace Arcatech
 {
-
-
-
-
-
     /// <summary>
     /// Represents a globally unique identifier (GUID) that is serializable with Unity and usable in game scripts.
     /// </summary>

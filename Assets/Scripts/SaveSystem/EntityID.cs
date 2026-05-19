@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Arcatech.SaveSystem
 {
-    public class SaveObjectID : MonoBehaviour
+    public class EntityID : MonoBehaviour
     {
         
         [SerializeField]

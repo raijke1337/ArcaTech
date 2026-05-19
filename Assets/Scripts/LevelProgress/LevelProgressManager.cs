@@ -15,11 +15,12 @@ namespace Arcatech.SaveSystem
         [SerializeField] private bool showDebugs = false;
         private string _currentLevelID;
         
-        private LevelProgressData _currentProgress;
+        [SerializeField] private LevelProgressData _currentProgress;
         private LevelProgressData _checkpointProgress;
         
         
         private List<ISavedProgressItem> _trackedItems;
+        private List<ISaveable> _saveables;
         private BaseGameEntityComponent _player;
         
         protected void OnEnable()
@@ -78,6 +79,7 @@ namespace Arcatech.SaveSystem
             {
                 Debug.Log($"Item {item.SavedItemID}, {item.Name}");
             }
+            _saveables = new List<ISaveable>(FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ISaveable>());
         }
 
         private void WriteLevel()
@@ -104,6 +106,10 @@ namespace Arcatech.SaveSystem
             {
                 resumePosition = trigger.transform.position.ToSerializable()
             };
+            foreach (var saveable in _saveables)
+            {
+                saveable.NotifyForUpdate();
+            }
         }
         public void SavedItemAnnounce(ISavedProgressItem item) => RecordItem(item);
         private void RecordItem(ISavedProgressItem item)

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Arcatech.Interactions
 {
-    public class InteractionStatesInjectorComponent : ValidatedMonoBehaviour, IStateAugmentor, ITriggerNotificationReceiver
+    public class InteractionStatesInjectorComponent : MonoBehaviour, IStateAugmentor, ITriggerNotificationReceiver
     {
         [SerializeField] private TriggerTrackerComponent activeArea;
         [SerializeField] SerializedDictionary<InteractionState,SerializedStateTransition> stateTransitions;

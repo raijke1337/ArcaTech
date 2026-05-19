@@ -1,7 +1,11 @@
-﻿using Arcatech.Items;
+﻿using System;
+using Arcatech.Items;
 using KBCore.Refs;
 using System.Collections.Generic;
+using System.Linq;
 using Arcatech.SaveSystem;
+using com.cyborgAssets.inspectorButtonPro;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 
 namespace Arcatech.Units
@@ -13,27 +17,44 @@ namespace Arcatech.Units
     /// model is deserialized from saves or loaded from a preset SO.
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class EntityInventoryComponent : ValidatedMonoBehaviour
+    public class EntityInventoryComponent : ValidatedMonoBehaviour, ISaveable
     {
+        [ProButton]
+        public void DEBUG_WriteItems()
+        {
+            foreach (var inv in _model.ListInventory)
+            {
+                Debug.Log(inv.ToString());
+            }
+        }
+        
+        
+        
         [Self, SerializeField] BaseGameEntityComponent baseGameEntity;
-        [Space, Header("Items list"), SerializeField] protected UnitItemsSO defaultEquips;
 
+        [Space, Header("Items list"), SerializeField]
+        protected UnitItemsSO defaultEquips;
 
+        [SerializeField] private bool useSaveSystem = false;
         private List<IUnitInventoryView> _views;
         [SerializeField] private UnitInventoryModel _model;
 
         private void OnEnable()
         {
             _views = new();
-            _model = new UnitInventoryModel(defaultEquips,baseGameEntity);
+            IEntityItemsList itemsData = defaultEquips;
+            if (useSaveSystem)
+            {
+                var data = SaveManager.Instance.GetGameData;
+                data.TryGetInventoryForEntity(baseGameEntity.GetID, out itemsData);
+            }
+            _model = new UnitInventoryModel(itemsData, baseGameEntity);
+            
             var views = gameObject.GetComponentsInChildren<IUnitInventoryView>();
-
             foreach (var view in views)
             {
                 SetModelView(view);
             }
-                
-            //SetModelView(_model.casterComponent);
             _model.ModelUpdatedEvent += RefreshViews;
         }
 
@@ -56,20 +77,13 @@ namespace Arcatech.Units
             {
                 view.RefreshView(_model);
             }
-            
+
         }
-
-
-        //user uses view to control model
-        // model display in view
-        // view shows info for user
 
         #region setup
 
-/// <summary>
-/// views attached to same gameobject are found automatically
-/// </summary>
-/// <param name="view"></param>
+        // views attached to same gameobject are found automatically
+
         public void SetModelView(IUnitInventoryView view)
         {
             if (view != null)
@@ -101,20 +115,21 @@ namespace Arcatech.Units
             if (item is Equipment e)
             {
                 // equip new or replace equipped
-                _model.EquipItem(e, out var un);
-                if (un != null) 
+                _model.EquipEquipment(e, out var un);
+                if (un != null)
                 {
                     // something was dropped
                     var box = un.PackItem;
-                    box.transform.position = transform.position+transform.forward;
+                    box.transform.position = transform.position + transform.forward;
                     box.gameObject.SetActive(true);
                     Destroy(un.DisplayItem.gameObject);
                 }
             }
             else
             {
-                _model.PickUpItem(item as Item);
+                _model.PickUpItem(item as Item, amount);
             }
+
             Debug.Log($"Picked up {amount} {item.Description.Title}");
         }
 
@@ -122,15 +137,50 @@ namespace Arcatech.Units
         {
             if (amount == 0)
             {
-                bool ok = _model.HasItem(what);
-                Debug.Log($"{(ok? what +" found": "no item:")}");
+                bool ok = _model.HasItem(what, amount);
                 return ok;
             }
-            return _model.DropItem(what);
+
+            return _model.UseItem(what, amount);
         }
+
         #endregion
 
+        /// <summary>
+        /// called by levelprogress mgr on checkpoint reached
+        /// </summary>
+        public void NotifyForUpdate()
+        {
+            SaveManager.Instance.UpdateData(this);
+        }
 
+        public void PopulateSaveData(GameData data)
+        {
+            if (!useSaveSystem) return;
+            string entityID = baseGameEntity.GetID;
+            IReadOnlyDictionary<Item, int> inv = _model.ListInventory;
+            IReadOnlyList<Equipment> equips = _model.ListEquipped;
+
+            Dictionary<string, int> savedInventory = new();
+            foreach (var pair in inv)
+            {
+                savedInventory[pair.Key.ID.ToString()] = pair.Value;
+            }
+            
+            List<string> equipsToSave = new();
+            foreach (var pair in equips)
+            {
+                equipsToSave.Add(pair.ID.ToString());
+            }
+            
+            SavedEntityInventory save = new();
+            save.EntityID = entityID;
+            save.EntityEquipmentIDs =  equipsToSave;
+            save.EntityItemIDs = savedInventory.Keys.ToArray();
+            save.EntityItemsCount = savedInventory.Values.ToArray();
+            
+            data.AddOrUpdateInventory(save);
+        }
     }
 
 }

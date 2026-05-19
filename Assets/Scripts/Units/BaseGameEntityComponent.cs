@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Units;
 using KBCore.Refs;
@@ -10,14 +11,14 @@ namespace Arcatech
     /// <summary>
     /// new component that defines any game entity
     /// </summary>
-    [RequireComponent(typeof(Rigidbody), typeof(LittlePauseHelperComponent))]
+    [RequireComponent(typeof(Rigidbody), typeof(LittlePauseHelperComponent),typeof(EntityID))]
     public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IInvulnerability
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
-        /// <summary>
-        /// use this to pause.
-        /// </summary>
-        public LittlePauseHelperComponent Pauser => _pauser;
+
+        
+        
+        [SerializeField, Self] private EntityID id;
         [SerializeField, Self] Rigidbody _rb;
         [SerializeField] private bool setKinematic = true;
         
@@ -31,9 +32,17 @@ namespace Arcatech
         public Transform EffectSpawn => effectSpawn;
         List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>> _effectsTakerComponents;
 
+
+        /// <summary>
+        /// use this to pause.
+        /// </summary>
+        public LittlePauseHelperComponent Pauser => _pauser;
+
+        public string GetID => id.UniqueId;
         public string GetName =>  _name;
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
+        
 
         protected override void OnValidate()
         {

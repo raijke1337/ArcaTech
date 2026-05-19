@@ -61,6 +61,7 @@ GameObject:
   - component: {fileID: 3802263417554443642}
   - component: {fileID: 8901849775099056064}
   - component: {fileID: 2823741154691146949}
+  - component: {fileID: 7468206928761182299}
   m_Layer: 6
   m_Name: PlayerTails
   m_TagString: Player
@@ -163,6 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pauser: {fileID: 922206793911062045}
+  id: {fileID: 7468206928761182299}
   _rb: {fileID: 2167097149289569406}
   setKinematic: 1
   _name: Tails
@@ -171,7 +173,6 @@ MonoBehaviour:
   destroyOnDeath: 0
   timerToDestroy: 2
   _showDebugs: 0
-  id: 3286598170:1186580239:1773309345:3509273578
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -227,8 +228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseGameEntity: {fileID: 3366141834993022237}
   defaultEquips: {fileID: 11400000, guid: 00b9c3121edc84543aa3f98d4e0881de, type: 2}
-  _model:
-    status: 
+  useSaveSystem: 1
 --- !u!114 &5399239475824375360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -542,6 +542,19 @@ MonoBehaviour:
   entity: {fileID: 3366141834993022237}
   dummyActivate: {fileID: 11400000, guid: 23ad2f0d77f5707439abc451134d0db6, type: 2}
   _state: 0
+--- !u!114 &7468206928761182299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142820635933682374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
+  uniqueId: 
 --- !u!1 &2377191398624668387
 GameObject:
   m_ObjectHideFlags: 0
@@ -2082,6 +2095,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0.061378457
       objectReference: {fileID: 0}
+    - target: {fileID: -6483264446968523145, guid: 58d085e289960c64a86b658ad13fc0dd,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -6207193090530259524, guid: 58d085e289960c64a86b658ad13fc0dd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2361,6 +2379,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0.3527187
+      objectReference: {fileID: 0}
+    - target: {fileID: -4391260015710441040, guid: 58d085e289960c64a86b658ad13fc0dd,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -4145373212183267933, guid: 58d085e289960c64a86b658ad13fc0dd,
         type: 3}
@@ -3006,6 +3029,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.05681187
+      objectReference: {fileID: 0}
+    - target: {fileID: 464682023547433330, guid: 58d085e289960c64a86b658ad13fc0dd,
+        type: 3}
+      propertyPath: 'm_BlendShapeWeights.Array.data[0]'
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 464682023547433330, guid: 58d085e289960c64a86b658ad13fc0dd,
+        type: 3}
+      propertyPath: 'm_BlendShapeWeights.Array.data[1]'
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 658689967997702607, guid: 58d085e289960c64a86b658ad13fc0dd,
         type: 3}
@@ -3682,6 +3715,16 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0.0038561672
       objectReference: {fileID: 0}
+    - target: {fileID: 4359643514749367932, guid: 58d085e289960c64a86b658ad13fc0dd,
+        type: 3}
+      propertyPath: 'm_BlendShapeWeights.Array.data[0]'
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 4359643514749367932, guid: 58d085e289960c64a86b658ad13fc0dd,
+        type: 3}
+      propertyPath: 'm_BlendShapeWeights.Array.data[1]'
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 4470441844611919273, guid: 58d085e289960c64a86b658ad13fc0dd,
         type: 3}
       propertyPath: m_Name
@@ -4021,6 +4064,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.060455617
+      objectReference: {fileID: 0}
+    - target: {fileID: 6240607381459103007, guid: 58d085e289960c64a86b658ad13fc0dd,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6467103987566739863, guid: 58d085e289960c64a86b658ad13fc0dd,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6632619663446060464, guid: 58d085e289960c64a86b658ad13fc0dd,
         type: 3}

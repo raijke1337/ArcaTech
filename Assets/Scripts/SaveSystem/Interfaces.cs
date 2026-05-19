@@ -18,6 +18,7 @@ namespace Arcatech.SaveSystem
     public interface ISaveable
     {
         public void PopulateSaveData(GameData data);
+        public void NotifyForUpdate();
     }
 
     public interface ISavedProgressItem

@@ -70,5 +70,8 @@ namespace Arcatech.SaveSystem
                 existing.resumePosition = resumePosition;
             }
         }
+
+        public void NotifyForUpdate()
+        { }
     }
 }
