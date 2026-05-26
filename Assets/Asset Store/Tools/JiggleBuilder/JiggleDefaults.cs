@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
-using UnityEngine;
 using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 
 namespace JigglePhysics {
 public static class JiggleDefaults {

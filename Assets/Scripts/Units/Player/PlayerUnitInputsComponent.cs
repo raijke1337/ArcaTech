@@ -1,6 +1,4 @@
-using System;
 using Arcatech.EventBus;
-using Arcatech.Interactions;
 using Arcatech.Scenes.Cameras;
 using KBCore.Refs;
 using UnityEngine;

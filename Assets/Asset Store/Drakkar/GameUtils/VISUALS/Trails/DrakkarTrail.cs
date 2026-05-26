@@ -1,12 +1,10 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
-using System.Runtime.CompilerServices;
-using Unity.IL2CPP.CompilerServices;
 #if DRAKKAR_EVENTS
 using Drakkar.Events;
 #endif
 #if UNITY_EDITOR
-using UnityEngine.Profiling;
 using UnityEditor;
 #endif
 using static Drakkar.GameUtils.DrakkarTrail;

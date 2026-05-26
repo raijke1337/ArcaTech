@@ -1,10 +1,10 @@
 using System;
 using Unity.AI.Navigation;
 using Unity.Behavior;
-using UnityEngine;
-using Action = Unity.Behavior.Action;
 using Unity.Properties;
+using UnityEngine;
 using UnityEngine.AI;
+using Action = Unity.Behavior.Action;
 using Random = UnityEngine.Random;
 
 [Serializable, GeneratePropertyBag]

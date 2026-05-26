@@ -1,5 +1,3 @@
-using System;
-using Arcatech.Stats;
 using DG.Tweening;
 using KBCore.Refs;
 using TMPro;

@@ -1,5 +1,4 @@
 ﻿using Arcatech.Texts;
-using UnityEngine;
 
 namespace Arcatech.UI
 {

@@ -1,7 +1,6 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using Arcatech.EventBus;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.EventSystems;

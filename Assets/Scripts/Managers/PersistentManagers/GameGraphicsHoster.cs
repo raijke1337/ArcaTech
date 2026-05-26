@@ -1,6 +1,6 @@
-using AYellowpaper.SerializedCollections;
 using System;
 using System.Collections.Generic;
+using AYellowpaper.SerializedCollections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;

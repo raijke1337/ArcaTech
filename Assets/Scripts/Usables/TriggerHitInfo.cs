@@ -1,6 +1,5 @@
 ﻿using System;
 using Arcatech.Triggers;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Arcatech

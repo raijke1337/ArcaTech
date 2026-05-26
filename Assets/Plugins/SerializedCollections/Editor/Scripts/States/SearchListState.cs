@@ -1,8 +1,8 @@
-using AYellowpaper.SerializedCollections.Editor.Search;
 using System.Collections.Generic;
+using System.Linq;
+using AYellowpaper.SerializedCollections.Editor.Search;
 using UnityEditor;
 using UnityEngine;
-using System.Linq;
 
 namespace AYellowpaper.SerializedCollections.Editor.States
 {

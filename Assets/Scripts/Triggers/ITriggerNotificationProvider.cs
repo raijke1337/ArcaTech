@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Arcatech.Triggers
+﻿namespace Arcatech.Triggers
 {
     public interface ITriggerNotificationProvider
     {

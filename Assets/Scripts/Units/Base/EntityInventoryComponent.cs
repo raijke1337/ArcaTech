@@ -1,11 +1,9 @@
-﻿using System;
-using Arcatech.Items;
-using KBCore.Refs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Items;
 using Arcatech.SaveSystem;
 using com.cyborgAssets.inspectorButtonPro;
-using UnityEditor.TerrainTools;
+using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Units

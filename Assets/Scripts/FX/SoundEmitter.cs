@@ -1,5 +1,5 @@
-﻿using Arcatech.Managers;
-using System.Collections;
+﻿using System.Collections;
+using Arcatech.Managers;
 using UnityEngine;
 
 namespace Arcatech.Effects

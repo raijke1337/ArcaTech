@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using com.cyborgAssets.inspectorButtonPro;
+using com.cyborgAssets.internalIBP;
+using com.cyborgAssets.internalIBPEditor;
 //using DefaultNamespace;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using com.cyborgAssets.inspectorButtonPro;
-using com.cyborgAssets.internalIBP;
-using com.cyborgAssets.internalIBPEditor;
 
 namespace com.cyborgAssets.internalIBPProPrem
 {

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Arcatech.Interactions;
-using Arcatech.Units;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;

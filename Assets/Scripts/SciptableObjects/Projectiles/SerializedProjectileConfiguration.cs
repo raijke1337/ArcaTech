@@ -1,6 +1,5 @@
-using Arcatech.Actions;
 using UnityEngine;
-using UnityEngine.Assertions;
+
 namespace Arcatech.Items.Projectiles
 {
     [CreateAssetMenu(fileName = "projectile_", menuName = "Projectiles/Projectile")]

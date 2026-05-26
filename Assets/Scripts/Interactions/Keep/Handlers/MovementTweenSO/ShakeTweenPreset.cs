@@ -1,7 +1,7 @@
 ﻿namespace Arcatech.Interactions
 {
-    using UnityEngine;
     using DG.Tweening;
+    using UnityEngine;
 
     [CreateAssetMenu(fileName = "tweenSO_shaking_", menuName = "Tweening/Shaking Preset")]
     public class ShakeTweenPreset : SerializedDOTweener

@@ -1,8 +1,6 @@
 using System;
-using Arcatech.Managers;
 using Arcatech.Texts;
 using Arcatech.UI;
-using UnityEditor;
 using UnityEngine;
 
 namespace Arcatech.Items

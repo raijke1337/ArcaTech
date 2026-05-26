@@ -1,11 +1,7 @@
-﻿using Arcatech.Triggers;
-using Arcatech.Units;
-using System;
+﻿using System;
 using Arcatech.Items;
-using Arcatech.Stats;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Arcatech.Usables
 {

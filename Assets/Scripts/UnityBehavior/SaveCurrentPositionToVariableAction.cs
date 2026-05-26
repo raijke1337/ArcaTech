@@ -1,8 +1,8 @@
 using System;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "Save current position to variable", story: "[Agent] saves current position to [variable]", category: "Action/Navigation", id: "35357863d3415eb1faed89daae80f8c2")]

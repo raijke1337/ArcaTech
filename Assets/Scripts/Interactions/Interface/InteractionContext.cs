@@ -5,7 +5,7 @@ namespace Arcatech.Interactions
     public class InteractionContext
     {
         public IInteractor Interactor;
-        public InteractableComponent Target;
+        public BaseGameEntityComponent Target;
         public InteractionState State;
 
         /// <summary>

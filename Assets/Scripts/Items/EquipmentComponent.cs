@@ -1,8 +1,5 @@
-﻿using System;
-using Arcatech.Units;
-using CartoonFX;
+﻿using Arcatech.Units;
 using Drakkar.GameUtils;
-using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Items

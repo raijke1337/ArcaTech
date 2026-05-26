@@ -1,9 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Arcatech.Stats;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
-using System;
-using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 
 

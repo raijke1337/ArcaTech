@@ -28,12 +28,12 @@ namespace Arcatech.Interactions
         public void Attach(IStateAugmentorReceiver machine)
         {
             _activate ??= dummyActivate.Build();
-            machine.AddTransition(_activate);
+            if (_activate != null) machine.AddTransition(_activate);
         }
 
         public void Detach(IStateAugmentorReceiver machine)
         {
-            machine.RemoveTransition(_activate);
+            if (_activate != null) machine.RemoveTransition(_activate);
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)

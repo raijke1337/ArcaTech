@@ -1,6 +1,6 @@
-﻿using Arcatech.Items;
+﻿using System.Collections.Generic;
+using Arcatech.Items;
 using AYellowpaper.SerializedCollections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcatech.Units

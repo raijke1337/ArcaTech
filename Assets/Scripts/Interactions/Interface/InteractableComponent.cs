@@ -15,7 +15,7 @@ namespace Arcatech.Interactions
     public class InteractableComponent : ValidatedMonoBehaviour, ISavedProgressItem
     {
         [SerializeField, Self] private BaseGameEntityComponent entity;
-
+        public BaseGameEntityComponent Entity => entity;
         [Header("Pipeline")] [SerializeField, Self]
         protected InteractionTrigger trigger;
 
@@ -60,7 +60,7 @@ namespace Arcatech.Interactions
         private IEnumerator RunPipeline(InteractionContext ctx)
         {
             _currentCtx = ctx;
-            ctx.Target = this;
+            ctx.Target = entity;
 
             // ─── 1. Conditions ───
             foreach (var condition in conditions)

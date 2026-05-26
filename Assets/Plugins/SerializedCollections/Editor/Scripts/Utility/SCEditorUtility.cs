@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEditor;
-using System.Linq;
-using AYellowpaper.SerializedCollections.Editor.Data;
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using AYellowpaper.SerializedCollections.Editor.Data;
+using UnityEditor;
+using UnityEngine;
 
 namespace AYellowpaper.SerializedCollections.Editor
 {

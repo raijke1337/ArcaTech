@@ -1,9 +1,9 @@
 using System;
+using com.cyborgAssets.internalIBP;
 //using DefaultNamespace;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using com.cyborgAssets.internalIBP;
 
 namespace com.cyborgAssets.internalIBPEditor
 {

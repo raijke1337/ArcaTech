@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine.Events;
+﻿using UnityEngine.Events;
 
 namespace Arcatech.Items
 {

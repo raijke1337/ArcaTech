@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using com.cyborgAssets.inspectorButtonPro;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using com.cyborgAssets.inspectorButtonPro;
 
 namespace com.cyborgAssets.internalIBPEditor
 {

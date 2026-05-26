@@ -1,7 +1,7 @@
 using System;
 using Unity.Behavior;
-using UnityEngine;
 using Unity.Properties;
+using UnityEngine;
 
 #if UNITY_EDITOR
 [CreateAssetMenu(menuName = "Behavior/Event Channels/EnterCombatEventChannel")]

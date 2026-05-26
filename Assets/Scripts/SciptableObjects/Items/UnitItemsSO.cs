@@ -1,11 +1,9 @@
-using Arcatech.Managers;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Arcatech.SaveSystem;
+using Arcatech.Managers;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
-using UnityEngine.Assertions;
+
 namespace Arcatech.Items
 {
     [Serializable]

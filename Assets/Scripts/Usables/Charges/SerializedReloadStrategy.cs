@@ -1,5 +1,4 @@
 ﻿using Arcatech.Units;
-using Unity.AppUI.UI;
 using UnityEngine;
 
 namespace Arcatech.Usables

@@ -1,10 +1,10 @@
-using Arcatech.Units;
 using System;
 using System.Collections.Generic;
+using Arcatech.Units;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "GetRequiredComponents", story: "[Agent] performs GetComponent for [Wrapper], finds [Allies]", category: "Action/Game", id: "f4ea2558cada2b00920b05bcd4caee94")]

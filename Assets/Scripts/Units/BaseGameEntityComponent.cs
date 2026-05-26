@@ -15,14 +15,16 @@ namespace Arcatech
     public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IInvulnerability
     {
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
-
-        
-        
+       
+        [Space, SerializeField] string _name;
         [SerializeField, Self] private EntityID id;
+        
+        
+        
         [SerializeField, Self] Rigidbody _rb;
         [SerializeField] private bool setKinematic = true;
         
-        [Space, SerializeField] string _name;
+
         [SerializeField] Side entitySide;
         [SerializeField] Transform effectSpawn;
         [SerializeField] private bool destroyOnDeath = true;
@@ -42,7 +44,7 @@ namespace Arcatech
         public string GetName =>  _name;
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
-        
+        public void AssignName(string n) => _name = n;
 
         protected override void OnValidate()
         {

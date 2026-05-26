@@ -1,5 +1,4 @@
-﻿using System;
-using Arcatech.Units.Control;
+﻿using Arcatech.Units.Control;
 using UnityEngine;
 
 namespace Arcatech.Actions

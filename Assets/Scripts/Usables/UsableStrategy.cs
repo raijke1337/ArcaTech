@@ -4,7 +4,6 @@ using Arcatech.Stats;
 using Arcatech.Texts;
 using Arcatech.UI;
 using Arcatech.Units;
-using UnityEngine;
 
 namespace Arcatech.Usables
 {

@@ -1,7 +1,7 @@
 
+using System;
 using Arcatech.Items;
 using AYellowpaper.SerializedCollections;
-using System;
 using UnityEngine;
 namespace Arcatech.UI
 {

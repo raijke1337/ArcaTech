@@ -1,5 +1,5 @@
-using com.cyborgAssets.internalIBP;
 using System;
+using com.cyborgAssets.internalIBP;
 using Object = UnityEngine.Object;
 
 namespace com.cyborgAssets.inspectorButtonPro

@@ -1,12 +1,8 @@
-using System;
-using Arcatech.EventBus;
-using Arcatech.Items;
-using Arcatech.Scenes;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Items;
+using Arcatech.Scenes;
 using Arcatech.Usables;
-using TMPro.EditorUtilities;
-using UnityEditor;
 using UnityEngine;
 
 namespace Arcatech.Managers

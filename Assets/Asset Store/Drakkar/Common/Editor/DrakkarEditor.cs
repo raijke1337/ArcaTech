@@ -1,13 +1,12 @@
 #if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
-using System.Runtime.CompilerServices;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Resources;
+using UnityEditor;
+using UnityEngine;
 
 namespace Drakkar
 {

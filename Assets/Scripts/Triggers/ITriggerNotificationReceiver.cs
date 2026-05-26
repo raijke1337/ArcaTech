@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-
-namespace Arcatech.Triggers
+﻿namespace Arcatech.Triggers
 {
     public interface ITriggerNotificationReceiver
     {

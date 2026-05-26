@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Arcatech.Items.Projectiles
+﻿namespace Arcatech.Items.Projectiles
 {
     using UnityEngine;
 

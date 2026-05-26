@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CartoonFX;
-using DG.Tweening;
 using UnityEngine;
 
 namespace Arcatech.Interactions

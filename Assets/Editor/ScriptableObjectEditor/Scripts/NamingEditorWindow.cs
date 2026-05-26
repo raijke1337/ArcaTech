@@ -1,6 +1,6 @@
+using Agent.Assembly;
 using UnityEditor;
 using UnityEngine;
-using Agent.Assembly;
 
 namespace Agent.SOE
 {

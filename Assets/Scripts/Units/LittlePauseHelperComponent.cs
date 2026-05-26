@@ -1,8 +1,8 @@
 ﻿using System.Collections;
-using Arcatech.EventBus;
-using Arcatech.Units;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.EventBus;
+using Arcatech.Units;
 using UnityEngine;
 namespace Arcatech
 {

@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using Arcatech.Interactions;
-using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Units.Control

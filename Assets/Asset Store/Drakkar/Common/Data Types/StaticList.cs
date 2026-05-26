@@ -1,8 +1,6 @@
-﻿using UnityEngine;
-using Unity.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Drakkar
 {

@@ -2,11 +2,11 @@
 // File: ItemSOEditor.cs
 
 using Arcatech.Items;
-using UnityEngine;
-using UnityEditor;
 using Arcatech.Texts;
 using Arcatech.Texts.Editor;
 using Arcatech.Usables;
+using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(ItemSO), true)]
 [CanEditMultipleObjects]

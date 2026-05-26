@@ -1,9 +1,7 @@
-using Arcatech.Texts;
 using System;
-using System.Security.Cryptography;
+using Arcatech.Texts;
 using Arcatech.UI;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Arcatech.Items
 {

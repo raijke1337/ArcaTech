@@ -1,8 +1,8 @@
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using Arcatech.Usables;
+using UnityEditor;
+using UnityEngine;
 
 public class SerializedUsableStrategiesWindow : EditorWindow
 {

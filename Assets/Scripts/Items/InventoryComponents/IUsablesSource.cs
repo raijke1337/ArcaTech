@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Arcatech.Usables;
 
 namespace Arcatech.Items
 {

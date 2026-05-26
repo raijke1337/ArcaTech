@@ -1,6 +1,6 @@
+using System;
 using Arcatech.Stats;
 using Arcatech.Units;
-using System;
 using Unity.Behavior;
 using UnityEngine;
 

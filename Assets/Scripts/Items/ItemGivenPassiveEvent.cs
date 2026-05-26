@@ -1,6 +1,5 @@
 ﻿using System;
 using Arcatech.Interactions;
-using Arcatech.Units;
 using UnityEngine;
 
 namespace Arcatech.Items

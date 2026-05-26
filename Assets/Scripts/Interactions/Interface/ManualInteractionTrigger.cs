@@ -1,4 +1,5 @@
-﻿using Arcatech.Managers;
+﻿using System;
+using Arcatech.Managers;
 using Arcatech.Texts;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -31,6 +32,11 @@ namespace Arcatech.Interactions
         public void OnPointerExit(PointerEventData eventData)
         {
             GameInterfaceManager.Instance?.NotifyTargetable(this,false);
+        }
+
+        private void OnEnable()
+        {
+            interactableComponent.Entity.AssignName(GetInfo.Title);
         }
 
         protected override void OnDisable()

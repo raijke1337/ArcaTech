@@ -1,9 +1,9 @@
 using System;
 using Arcatech.Units;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "Queue input action", story: "[Wrapper] uses [inputAction], wait [Timer]", category: "Action/Game", id: "ad61333688a7a94462659bcbe4546dfd")]

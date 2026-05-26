@@ -4,12 +4,9 @@ using Arcatech.EventBus;
 using Arcatech.Interactions;
 using Arcatech.Texts;
 using Arcatech.UI;
-using Arcatech.Units;
-using Arcatech.Units.Control;
 using DG.Tweening;
 using KBCore.Refs;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace Arcatech.Managers

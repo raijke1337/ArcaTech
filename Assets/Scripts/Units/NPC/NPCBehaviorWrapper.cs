@@ -1,6 +1,5 @@
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
-using Arcatech.Triggers;
 using Arcatech.Units.Control;
 using KBCore.Refs;
 using NUnit.Framework;

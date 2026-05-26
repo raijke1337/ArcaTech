@@ -1,9 +1,9 @@
 using System;
 using Unity.Behavior;
-using UnityEngine;
-using Action = Unity.Behavior.Action;
 using Unity.Properties;
+using UnityEngine;
 using UnityEngine.AI;
+using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "Reset navigation", story: "[Agent] resets NavMeshAgent destination point", category: "Action/Navigation", id: "d9df3f64654cbaaef998ca7ae1d34ab8")]

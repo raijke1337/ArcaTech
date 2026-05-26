@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(Readme))]
 [InitializeOnLoad]

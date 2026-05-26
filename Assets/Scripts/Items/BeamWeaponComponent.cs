@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
 using Arcatech.Triggers;
-using Arcatech.Usables; // For System.Array.Sort
+using Arcatech.Usables;
+using UnityEngine; // For System.Array.Sort
 
 namespace Arcatech.Items
 {

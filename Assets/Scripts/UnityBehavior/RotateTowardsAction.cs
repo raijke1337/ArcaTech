@@ -1,8 +1,8 @@
 using System;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "Rotate towards", story: "[Agent] rotates to face [Target] with [angle] tolerance, at [speed] degress per second, sets [Animator] [value] to cross product", category: "Action/Navigation", id: "0c7894569c4abed86e570e722cb32237")]

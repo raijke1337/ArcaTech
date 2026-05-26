@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEditor;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using Agent.Assembly;
+using UnityEditor;
+using UnityEngine;
 
 namespace Agent.SOE
 {

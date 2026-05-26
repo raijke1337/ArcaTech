@@ -1,5 +1,5 @@
-using Arcatech.EventBus;
 using System;
+using Arcatech.EventBus;
 using UnityEngine;
 using UnityEngine.Audio;
 

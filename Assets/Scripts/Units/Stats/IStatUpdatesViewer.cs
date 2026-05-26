@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Arcatech.Stats
+﻿namespace Arcatech.Stats
 {
     public interface IStatUpdatesViewer
     {

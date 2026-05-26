@@ -1,10 +1,8 @@
-﻿using Arcatech.Stats;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using UnityEditor;
-using UnityEngine;
+using Arcatech.Stats;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 

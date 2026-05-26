@@ -1,6 +1,5 @@
 ﻿using Arcatech.Items;
 using KBCore.Refs;
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 

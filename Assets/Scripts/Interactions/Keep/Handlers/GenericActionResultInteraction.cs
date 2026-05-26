@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Arcatech.Actions;
-using Arcatech.Items;
-using NUnit.Framework;
 using UnityEngine;
 
 namespace Arcatech.Interactions

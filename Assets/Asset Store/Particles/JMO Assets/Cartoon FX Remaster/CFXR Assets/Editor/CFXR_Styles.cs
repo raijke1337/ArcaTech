@@ -3,8 +3,8 @@
 // (c) 2012-2020 Jean Moreno
 //--------------------------------------------------------------------------------------------------------------------------------
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 // GUI Styles and UI methods
 

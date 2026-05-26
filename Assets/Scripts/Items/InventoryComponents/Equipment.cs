@@ -1,5 +1,5 @@
-using Arcatech.Stats;
 using System.Collections.Generic;
+using Arcatech.Stats;
 using UnityEngine;
 namespace Arcatech.Items
 {

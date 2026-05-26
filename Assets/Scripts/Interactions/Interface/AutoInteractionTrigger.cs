@@ -1,48 +1,45 @@
-﻿using Arcatech.SaveSystem;
-using Arcatech.Triggers;
-using KBCore.Refs;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Arcatech.Interactions
 {
     public class AutoInteractionTrigger : InteractionTrigger
     {
-        [SerializeField] protected bool triggerOnce = true;
-        [SerializeField] protected float cooldown;
-        [SerializeField] protected bool useInitiatorAsInteractor = true;
+        
+        [SerializeField,Header("Unassigned = apply to all")] Side affectedSide = Side.Unassigned;
 
-        private float _lastTriggerTime = -999f;
-        private bool _hasTriggered;
-        public void ResetTrigger()
-        {
-            _hasTriggered = false;
-            _lastTriggerTime = -999f;
-        }
 
+        
+        
         public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             if (interactableComponent == null) return;
-            if (triggerOnce && _hasTriggered) return;
-            if (Time.time < _lastTriggerTime + cooldown) return;
+            if (triggerOnce && HasTriggered) return;
+            if (Time.time < LastTriggerTime + cooldown) return;
             if (!interactableComponent.IsAvailable) return;
             if (!triggerHitInfo.TryGetEntityTarget(out var initiator)) return;
-            // TODO: extend activation to npcs
-            if (initiator.CompareTag("Player") &&
-                initiator.TryGetComponent(out InteractionComponent component))
+            if (affectedSide!=Side.Unassigned && initiator.GetEntitySide != affectedSide) return;
+            
+
+            initiator.TryGetComponent(out InteractionComponent component);
+            var ctx = new InteractionContext
             {
-                var ctx = new InteractionContext
-                {
-                    Interactor = useInitiatorAsInteractor ? component : null,
-                    State = InteractionState.Starting
-                };
-                interactableComponent.StartInteraction(ctx);
-                _hasTriggered = true;
-                _lastTriggerTime = Time.time;
-            }
+                Interactor = component,
+                State = InteractionState.Starting
+            };
+            
+            interactableComponent.StartInteraction(ctx);
+            HasTriggered = true;
+            LastTriggerTime = Time.time;
         }
 
         public override void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
+            
+        }
+
+        private void Update()
+        {
+            // todo add multiple activations
         }
     }
 }

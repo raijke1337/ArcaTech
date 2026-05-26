@@ -3,11 +3,11 @@
 // (c) 2012-2020 Jean Moreno
 //--------------------------------------------------------------------------------------------------------------------------------
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEngine;
 
 // Custom material inspector for Stylized FX shaders
 // - organize UI using comments in the shader code

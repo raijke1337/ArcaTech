@@ -1,8 +1,4 @@
-﻿using System;
-using Arcatech.Interactions;
-using Arcatech.Triggers;
-using KBCore.Refs;
-using Newtonsoft.Json.Serialization;
+﻿using Arcatech.Interactions;
 using UnityEngine;
 
 namespace Arcatech.SaveSystem

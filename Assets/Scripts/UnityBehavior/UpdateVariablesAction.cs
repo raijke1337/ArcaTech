@@ -2,9 +2,9 @@ using System;
 using Arcatech.Stats;
 using Arcatech.Units;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "Update variables", story: "[Agent] updates variables: [Knockdown] status, [Stamina] value", category: "Action/Game/Player", id: "04d470dbebb82ec6cfa8d6b3efeef103")]

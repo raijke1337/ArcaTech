@@ -1,9 +1,4 @@
-﻿using Arcatech.Stats;
-using Arcatech.Triggers;
-using CartoonFX;
-using UnityEngine;
-
-namespace Arcatech.EventBus
+﻿namespace Arcatech.EventBus
 {
     public interface IEvent { }
 

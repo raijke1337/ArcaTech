@@ -1,6 +1,5 @@
 using KBCore.Refs;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Arcatech.Interactions
 {

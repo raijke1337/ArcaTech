@@ -1,9 +1,7 @@
-﻿using System;
-using Arcatech.Items;
+﻿using Arcatech.Items;
 using Arcatech.Units;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Arcatech.Interactions
 {

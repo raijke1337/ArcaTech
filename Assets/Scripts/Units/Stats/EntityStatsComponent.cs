@@ -1,10 +1,8 @@
 using System;
-using Arcatech.Items;
-using Arcatech.Units;
 using System.Collections.Generic;
 using System.Linq;
-using KBCore.Refs;
-using UnityEditorInternal;
+using Arcatech.Items;
+using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Events;
 

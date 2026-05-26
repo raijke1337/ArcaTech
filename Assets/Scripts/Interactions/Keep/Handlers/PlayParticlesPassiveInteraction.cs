@@ -1,8 +1,7 @@
 ﻿using Arcatech.Effects;
+using Arcatech.EventBus;
 using CartoonFX;
 using UnityEngine;
-
-using Arcatech.EventBus;
 
 namespace Arcatech.Interactions
 {

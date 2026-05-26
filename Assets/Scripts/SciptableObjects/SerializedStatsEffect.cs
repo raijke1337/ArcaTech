@@ -1,7 +1,3 @@
-using System;
-using Arcatech.Actions;
-using UnityEngine;
-using UnityEngine.Assertions;
 namespace Arcatech.Triggers
 {
     // [CreateAssetMenu(fileName = "New Serialized Stats change effect", menuName = "Actions/Stat Change trigger cfg")]

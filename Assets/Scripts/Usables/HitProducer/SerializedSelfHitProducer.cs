@@ -1,10 +1,7 @@
 ﻿using System;
 using Arcatech.Items;
-using Arcatech.Triggers;
-using Arcatech.UI;
 using Arcatech.Units;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Arcatech.Usables
 {

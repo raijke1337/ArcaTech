@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Arcatech.Items;
-using UnityEngine.Assertions;
 using AYellowpaper.SerializedCollections;
-using System.Linq;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
 
 namespace Arcatech.UI

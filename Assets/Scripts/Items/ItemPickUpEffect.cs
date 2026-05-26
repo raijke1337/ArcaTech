@@ -1,11 +1,7 @@
-using System;
 using Arcatech.Interactions;
-using Arcatech.Managers;
 using Arcatech.SaveSystem;
 using Arcatech.Texts;
 using Arcatech.Units;
-using com.cyborgAssets.inspectorButtonPro;
-using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Items

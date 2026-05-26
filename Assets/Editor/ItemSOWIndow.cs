@@ -1,13 +1,12 @@
 // Place in Editor folder
 // File: ItemDatabaseWindow.cs
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
-using Arcatech.Texts;
 using Arcatech.Usables;
+using UnityEditor;
+using UnityEngine;
 
 public class ItemDatabaseWindow : EditorWindow
 {

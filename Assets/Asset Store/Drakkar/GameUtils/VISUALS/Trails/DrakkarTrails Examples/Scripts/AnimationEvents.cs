@@ -1,5 +1,5 @@
-using UnityEngine;
 using Drakkar.GameUtils;
+using UnityEngine;
 
 namespace Drakkar.Examples
 {

@@ -32,5 +32,17 @@ namespace Arcatech.Interactions
         {
             triggerTrackerComponent.UnregisterReceiver(this);
         }
+        
+                
+        public void ResetTrigger()
+        {
+            HasTriggered = false;
+            LastTriggerTime = -999f;
+        }
+        
+        protected float LastTriggerTime = -999f;
+        protected bool HasTriggered;
+        [SerializeField] protected bool triggerOnce = true;
+        [SerializeField] protected float cooldown;
     }
 }

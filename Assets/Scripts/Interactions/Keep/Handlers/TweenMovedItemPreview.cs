@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using UnityEditor;
-using System.Reflection;
 using UnityEngine;
 
 namespace Arcatech.Interactions
 {
-    using UnityEditor;
     using System.Reflection;
+    using UnityEditor;
     public partial class ItemMovesEffect
     {
         // ===================== Editor Preview =====================

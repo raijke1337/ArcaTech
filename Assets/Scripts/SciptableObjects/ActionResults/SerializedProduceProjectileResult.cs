@@ -1,10 +1,4 @@
-﻿using Arcatech.EventBus;
-using Arcatech.Items;
-using System;
-using UnityEngine;
-using UnityEngine.Assertions;
-
-namespace Arcatech.Actions
+﻿namespace Arcatech.Actions
 {
     /// <summary>
     /// DEPRECIATED (hopefully)

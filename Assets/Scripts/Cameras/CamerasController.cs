@@ -1,4 +1,3 @@
-using System;
 using Arcatech.EventBus;
 using Unity.Cinemachine;
 using UnityEngine;

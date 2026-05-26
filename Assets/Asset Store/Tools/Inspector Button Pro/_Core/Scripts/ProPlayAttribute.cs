@@ -1,5 +1,5 @@
-using com.cyborgAssets.internalIBP;
 using System;
+using com.cyborgAssets.internalIBP;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

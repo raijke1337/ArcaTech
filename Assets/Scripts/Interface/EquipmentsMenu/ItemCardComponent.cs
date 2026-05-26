@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Arcatech.Items;
-using Arcatech.Texts;
 using Arcatech.Units;
 using com.cyborgAssets.inspectorButtonPro;
 using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;

@@ -1,7 +1,6 @@
-using System;
-using Arcatech.Items;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Items;
 using UnityEngine;
 namespace Arcatech.UI
 {
