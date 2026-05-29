@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Arcatech.Stats;
+using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
@@ -32,8 +33,12 @@ namespace Arcatech.Items
 
             _inventory = new();
             _equipments = new();
-            
-            if (items == null) return;
+
+            if (items == null)
+            {
+                Debug.LogWarning($"Items list is null! Failed to initialize model!" );
+                return;
+            }
             
             PickUpItems(items.GetInventory(o));
             
@@ -121,9 +126,8 @@ namespace Arcatech.Items
         {
             dropped = null;
 
-            if (_equipments.TryGetValue(toEquip.Slot, out var drop))
+            if (_equipments.Remove(toEquip.Slot, out var drop))
             {
-                _equipments.Remove(toEquip.Slot);
                 drop.OnUnequip();
                 dropped = drop;
             }

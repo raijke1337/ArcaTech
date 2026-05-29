@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Arcatech.Items.Projectiles
 {
@@ -96,17 +95,5 @@ namespace Arcatech.Items.Projectiles
             init = false;
             BehaviorCompleted = false;
         }
-    }
-
-
-[Serializable]
-    public struct BaseProjectileSettings
-    {
-        [Min(0.1f)]
-        public float maxFlightDistance;
-        [Min(0)]
-        public float baseSpeed; 
-        public AnimationCurve speedCurve;
-        public float MaxFlightTime => maxFlightDistance/baseSpeed;
     }
 }
