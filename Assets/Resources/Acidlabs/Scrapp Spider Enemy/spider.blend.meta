@@ -1,30 +1,29 @@
 fileFormatVersion: 2
-guid: d602fc388cee25a4d92b6fea78e3bf90
+guid: 75be1745c306c994fb911d8036d8143b
 ModelImporter:
-  serializedVersion: 20200
-  internalIDToNameTable:
+  serializedVersion: 24200
+  internalIDToNameTable: []
+  externalObjects:
   - first:
-      74: 4038725264942677363
-    second: Bot|attack
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glow
+    second: {fileID: 2100000, guid: 866f8d6edbdc2af418ba24cfee82fe33, type: 2}
   - first:
-      74: 5528343801178875129
-    second: Bot|damage
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: metal.bright
+    second: {fileID: 2100000, guid: a46d156a798b2754d945d8f8848752b3, type: 2}
   - first:
-      74: 7336676059003478697
-    second: Bot|dead
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: metal.bright.enemy
+    second: {fileID: 2100000, guid: 6aab3cdb0b047104bb2043aa243d2749, type: 2}
   - first:
-      74: 1215537866225964191
-    second: Bot|death
-  - first:
-      74: 9170369320272864560
-    second: Bot|idle
-  - first:
-      74: -5216414910340286016
-    second: Bot|moveF
-  - first:
-      74: 6538925328265038849
-    second: Bot|special
-  externalObjects: {}
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: metal.dark
+    second: {fileID: 2100000, guid: 7806b0317f591cc42a35245be9796a49, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -35,9 +34,8 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -53,18 +51,18 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Bot|attack
-      takeName: Bot|attack
-      internalID: 0
-      firstFrame: 0
-      lastFrame: 47
+      name: ScrapSpiderIdle
+      takeName: Scene
+      internalID: -623603649343465320
+      firstFrame: 1
+      lastFrame: 48
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -80,20 +78,20 @@ ModelImporter:
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+      additiveReferencePoseFrame: 1
     - serializedVersion: 16
-      name: Bot|damage
-      takeName: Bot|damage
-      internalID: 0
-      firstFrame: 0
-      lastFrame: 47
+      name: ScrapSpiderMove
+      takeName: Scene
+      internalID: -1609281748187839663
+      firstFrame: 49
+      lastFrame: 72
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -109,13 +107,13 @@ ModelImporter:
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+      additiveReferencePoseFrame: 1
     - serializedVersion: 16
-      name: Bot|death
-      takeName: Bot|death
-      internalID: 0
-      firstFrame: 0
-      lastFrame: 39
+      name: ScrapSpiderAttack1
+      takeName: Scene
+      internalID: 5690475035124461754
+      firstFrame: 73
+      lastFrame: 96
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -138,13 +136,13 @@ ModelImporter:
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+      additiveReferencePoseFrame: 1
     - serializedVersion: 16
-      name: Bot|idle
-      takeName: Bot|idle
-      internalID: 0
-      firstFrame: 0
-      lastFrame: 47
+      name: ScrapSpiderAttack2
+      takeName: Scene
+      internalID: 8527267456721176387
+      firstFrame: 97
+      lastFrame: 121
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -167,13 +165,13 @@ ModelImporter:
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+      additiveReferencePoseFrame: 1
     - serializedVersion: 16
-      name: Bot|moveF
-      takeName: Bot|moveF
-      internalID: 0
-      firstFrame: 0
-      lastFrame: 47
+      name: ScrapSpiderSpecialStart
+      takeName: Scene
+      internalID: -8539665621930229424
+      firstFrame: 120
+      lastFrame: 144
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -196,13 +194,42 @@ ModelImporter:
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+      additiveReferencePoseFrame: 1
     - serializedVersion: 16
-      name: Bot|special
-      takeName: Bot|special
-      internalID: 0
-      firstFrame: 0
-      lastFrame: 47
+      name: ScrapSpiderSpecialLoop
+      takeName: Scene
+      internalID: -8206857311389296499
+      firstFrame: 145
+      lastFrame: 192
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 1
+    - serializedVersion: 16
+      name: ScrapSpiderDead
+      takeName: Scene
+      internalID: -4885119122951247324
+      firstFrame: 193
+      lastFrame: 216
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -225,7 +252,7 @@ ModelImporter:
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+      additiveReferencePoseFrame: 1
     isReadable: 0
   meshes:
     lODScreenPercentages: []
@@ -234,10 +261,12 @@ ModelImporter:
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
+    nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
@@ -249,6 +278,10 @@ ModelImporter:
     skinWeightsMode: 0
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
@@ -259,6 +292,7 @@ ModelImporter:
     secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -291,6 +325,8 @@ ModelImporter:
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
   additionalBone: 0
   userData: 
   assetBundleName: 

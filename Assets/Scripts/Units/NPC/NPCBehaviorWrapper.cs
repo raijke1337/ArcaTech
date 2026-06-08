@@ -19,7 +19,7 @@ namespace Arcatech.Units
         [SerializeField,Self]protected BaseGameEntityComponent entity;
         [SerializeField,Self]protected UnitInputsComponent unitInputs;
         [SerializeField,Self]protected EntityStatsComponent stats;
-        [SerializeField,Self]protected Animator animator;
+        [SerializeField,Child]protected Animator animator;
 
         [Header("Units group")] [SerializeField]
         private string unitsGroupID = "default";
@@ -73,10 +73,10 @@ namespace Arcatech.Units
         public bool ApplyEffect(AppliedStatsDeltaEffect effect,BaseGameEntityComponent source)
         {
             if (!behavior) return true;
-            if (source == null) return true;
+            if (!source) return true;
             if (source.GetEntitySide != entity.GetEntitySide && source.GetEntitySide != Side.Unassigned)
             {
-                combatEventChannel.SendEventMessage(true);
+                combatEventChannel?.SendEventMessage(true);
             }
             return true;
         }
