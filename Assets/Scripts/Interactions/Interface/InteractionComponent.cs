@@ -27,6 +27,7 @@ namespace Arcatech.Interactions
 
         public void Attach(IStateAugmentorReceiver machine)
         {
+            if (!dummyActivate) return;
             _activate ??= dummyActivate.Build();
             if (_activate != null) machine.AddTransition(_activate);
         }

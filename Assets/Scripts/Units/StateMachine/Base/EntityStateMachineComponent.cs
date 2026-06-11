@@ -18,8 +18,9 @@ namespace Arcatech.Units
         public BaseGameEntityComponent GetMainEntity => gameEntity;
 
         [Space, Header("States")] 
-        [SerializeField] SerializedUnitState startingState;
+        [SerializeField] SerializedUnitState defaultState;
 
+        private UnitState _defaultState;
         [SerializeField] public bool verboseDebugs = false;
 
         [SerializeField] StateMachineContext _context;
@@ -33,7 +34,10 @@ namespace Arcatech.Units
         UnitActionType _pendingAction = UnitActionType.None;
 
         bool HasPendingCommand => _pendingAction != UnitActionType.None;
-
+        [Space, Header("Command buffering")]
+        [SerializeField, Tooltip("Max seconds a command may stay buffered before it is auto-cancelled. <= 0 disables the timeout.")]
+        float _commandBufferTimeout = 0.5f;
+        float _pendingCommandStamp = -1f;
         // ----- augmentor system ------------------------------------------------------
 
         List<IStateAugmentor> _activeAugmentors = new();
@@ -76,7 +80,8 @@ namespace Arcatech.Units
                 PendingCommand = UnitActionType.None
             };
 
-            _currentState = startingState.Build();
+            _defaultState = defaultState.Build();
+            _currentState = _defaultState;
             _context.CurrentState = _currentState;
             _context.Owner = gameEntity;
             _context.Aimers = GetComponentsInChildren<IAim>();
@@ -93,18 +98,77 @@ namespace Arcatech.Units
             
             _currentState.EnterState(_context, animator);
         }
-
+        
+        
+        const int kMaxChain = 8;
         void Update()
         {
             if (Paused || _killed) return;
 
-            _currentState?.UpdateState(_context,animator,Time.deltaTime);
+            _currentState?.UpdateState(_context, animator, Time.deltaTime);
 
             int safety = 0;
-            const int kMaxChain = 8;
             while (safety++ < kMaxChain)
             {
                 if (!TransitionsInUpdate()) break;
+            }
+            TickCommandTimeout();
+
+            // No valid transition was found this frame.
+            // If the current state has finished, fall back to the default state.
+            TryFallbackToDefault();
+        }
+        void TryFallbackToDefault()
+        {
+            if (Paused || _killed) return;
+            if (_currentState == null || _defaultState == null) return;
+            if (ReferenceEquals(_currentState, _defaultState)) return;
+
+            // НЕ сбрасываемся, если есть забуференная команда — пусть она отработает.
+           // if (HasPendingCommand) return;
+
+            if (!_currentState.HasCompleted(_context)) return;
+            if (PickBestTransition(out _) != null) return;
+
+            ResetToDefaultState();
+        }
+        void ResetToDefaultState()
+        {
+            if (verboseDebugs && GetMainEntity != null && GetMainEntity.ShowingDebugs)
+                Debug.Log($"[{name}] No valid transition & state finished -> reset to default '{_defaultState.StateName}'.");
+
+            // Mirror the exit/enter flow used by CommitTransition so augmentors stay in sync.
+            _currentState?.ExitState(_context, animator);
+
+            foreach (var aug in _activeAugmentors.ToArray())
+                aug.OnStateExited(_currentState, _context);
+
+            _currentState = _defaultState;
+            _context.CurrentState = _currentState;
+            _currentState.EnterState(_context, animator);
+
+            foreach (var aug in _activeAugmentors.ToArray())
+                aug.OnStateEntered(_currentState, _context);
+
+            // IMPORTANT: a fallback to default is NOT a command rejection.
+            // Keep any buffered command alive so it can be re-evaluated from the
+            // default state next frame, instead of completing it as failure.
+            if (!HasPendingCommand)
+                _context.ClearCommand();
+            // else: leave the command buffered. Do NOT call CompletePendingCommand(false).
+        }
+        void TickCommandTimeout()
+        {
+            if (!HasPendingCommand) return;
+            if (_commandBufferTimeout <= 0f) return;          // timeout disabled
+            if (_pendingCommandStamp < 0f) return;            // no valid stamp
+
+            if (Time.time - _pendingCommandStamp >= _commandBufferTimeout)
+            {
+                if (verboseDebugs && GetMainEntity != null && GetMainEntity.ShowingDebugs)
+                    Debug.Log($"[{name}] Command '{_pendingAction}' timed out after {_commandBufferTimeout:0.##}s -> cancelled.");
+
+                CompletePendingCommand(false);   // legitimate rejection: command never became valid
             }
         }
 
@@ -145,6 +209,25 @@ namespace Arcatech.Units
             return committed;
         }
 
+        // void CacheCommandContext(UnitActionType actionType,
+        //     IEnumerable<IUnitCommandPerformer> performers)
+        // {
+        //     // Cancel any previous buffered command before storing a new one.
+        //     if (HasPendingCommand)
+        //         CompletePendingCommand(false);
+        //
+        //     _pendingAction = actionType;
+        //     _pendingPerformers.Clear();
+        //
+        //     if (performers == null) return;
+        //     foreach (var p in performers)
+        //     {
+        //         if (p == null) continue;
+        //         if (!_pendingPerformers.Contains(p))
+        //             _pendingPerformers.Add(p);
+        //     }
+        // }
+        
         void CacheCommandContext(UnitActionType actionType,
             IEnumerable<IUnitCommandPerformer> performers)
         {
@@ -155,15 +238,32 @@ namespace Arcatech.Units
             _pendingAction = actionType;
             _pendingPerformers.Clear();
 
-            if (performers == null) return;
-            foreach (var p in performers)
+            if (performers != null)
             {
-                if (p == null) continue;
-                if (!_pendingPerformers.Contains(p))
-                    _pendingPerformers.Add(p);
+                foreach (var p in performers)
+                {
+                    if (p == null) continue;
+                    if (!_pendingPerformers.Contains(p))
+                        _pendingPerformers.Add(p);
+                }
             }
+
+            // Stamp the moment this command entered the buffer (for timeout).
+            _pendingCommandStamp = Time.time;
         }
 
+        // void CompletePendingCommand(bool success)
+        // {
+        //     if (!HasPendingCommand) return;
+        //
+        //     foreach (var performer in _pendingPerformers)
+        //         performer?.DoUnitCommand(_pendingAction, success);
+        //
+        //     _pendingPerformers.Clear();
+        //     _pendingAction = UnitActionType.None;
+        //     _context.ClearCommand();
+        // }
+        
         void CompletePendingCommand(bool success)
         {
             if (!HasPendingCommand) return;
@@ -173,6 +273,7 @@ namespace Arcatech.Units
 
             _pendingPerformers.Clear();
             _pendingAction = UnitActionType.None;
+            _pendingCommandStamp = -1f;          // <-- reset stamp
             _context.ClearCommand();
         }
 
@@ -268,7 +369,7 @@ namespace Arcatech.Units
             _candidates.Clear();
             if (_currentState == null) return;
 
-            bool canExit = _currentState.CanExitState(animator);
+            bool canExit = _currentState.CanExitState(_context);
 
             foreach (var t in _currentState.Transitions ?? Array.Empty<StateTransition>())
             {
@@ -282,6 +383,8 @@ namespace Arcatech.Units
             foreach (var g in _addedTransitions)
             {
                 if (g == null || g.NextState == null) continue;
+                // Skip transitions that lead into the state we're already in.
+                if (g.NextState.StateName == _currentState.StateName) continue;
                 if (!g.CanTransition(_context)) continue;
                 if (!canExit && !g.CanOverrideMinimumStateTime) continue;
                 if (!_currentState.TransitionMinTimeInStateSatisfied(animator, g.ExitNormalizedTime)) continue;
@@ -317,17 +420,31 @@ namespace Arcatech.Units
                 .FirstOrDefault();
 
             if (best.tr == null) return null;
-
             wasLocal = best.local;
             return best.tr;
         }
 
         // ---------------------------------------------------------------------
-        public bool Paused { get; set; }
+        public bool Paused
+        {
+            get => _paused;
+            set
+            {
+                if (_paused && !value && HasPendingCommand)
+                {
+                    // Resuming: don't count paused time against the command.
+                    _pendingCommandStamp = Time.time;
+                }
+                _paused = value;
+            }
+        }
+        bool _paused;
 
         public void SetKilled(IKillerComponent comp, bool value)
         {
             _killed = value;
+            if (value && HasPendingCommand)
+                CompletePendingCommand(false);   // resets stamp internally
             _context.PendingCommand = UnitActionType.None;
         }
     }

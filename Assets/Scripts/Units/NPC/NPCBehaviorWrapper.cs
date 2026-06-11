@@ -1,3 +1,4 @@
+using System;
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
@@ -21,12 +22,13 @@ namespace Arcatech.Units
         [SerializeField,Self]protected EntityStatsComponent stats;
         [SerializeField,Child]protected Animator animator;
 
+        
         [Header("Units group")] [SerializeField]
         private string unitsGroupID = "default";
 
         
         private BlackboardReference bbref;
-        private readonly string combatEventChannelName = "EnterCombatEventChannel";
+        private readonly string combatEventChannelName = "CombatState";
         private readonly string selfRef = "Wrapper";
         
         EnterCombatEventChannel combatEventChannel;
@@ -70,6 +72,7 @@ namespace Arcatech.Units
                 bbref.SetVariableValue(selfRef,this);
             }
         }
+        
         public bool ApplyEffect(AppliedStatsDeltaEffect effect,BaseGameEntityComponent source)
         {
             if (!behavior) return true;
@@ -123,7 +126,13 @@ namespace Arcatech.Units
         public bool UseRootMotion
         {
             get => animator.applyRootMotion;
-            set => animator.applyRootMotion = value;
+            set
+            {
+                animator.applyRootMotion = value;
+                agent.updatePosition = !value;
+                agent.updateRotation = !value;
+                if (value) agent.velocity = Vector3.zero;
+            }
         }
 
         public string SavedItemID => entity.GetID;

@@ -44,11 +44,25 @@ namespace Arcatech.Triggers
 
             var r = GetComponentsInChildren<ITriggerNotificationReceiver>();
             foreach (var r2 in r) RegisterReceiver(r2);
+            if (_receivers.Count == 0) Active = false;
         }
 
         private bool CanNotify() =>
             Active && _receivers.Count > 0;
 
+
+        public void AreaCast(ITriggerNotificationReceiver receiver)
+        {
+            var found = Physics.OverlapBox(triggerCollider.bounds.center, 
+                triggerCollider.bounds.extents/2, 
+                transform.rotation,
+                _valid);
+            foreach (var box in found)
+            {
+                OnTriggerEnter(box);
+            }
+        }
+        
         protected void OnTriggerEnter(Collider other)
         {
             // Debug.Log($"Trigger {other.gameObject.name} entered");
@@ -177,6 +191,7 @@ namespace Arcatech.Triggers
         {
             // Draw trigger bounds first
             Gizmos.color = _receivers.Count == 0 ? Color.gray : Color.blue;
+            if (Active) Gizmos.color = Color.white;
             DrawTriggerBounds();
 
             // Draw recent hit visualizations

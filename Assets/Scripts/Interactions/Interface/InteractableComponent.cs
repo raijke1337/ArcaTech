@@ -49,6 +49,8 @@ namespace Arcatech.Interactions
         {
             if (!IsAvailable) return;
 
+            if (!ctx.Target && !ctx.Interactor.Entity) return;
+            
             // Инвалидируем старый execution и блокируем новый
             _executionId++;
             StopAllCoroutines();
@@ -59,6 +61,7 @@ namespace Arcatech.Interactions
 
         private IEnumerator RunPipeline(InteractionContext ctx)
         {
+            
             _currentCtx = ctx;
             ctx.Target = entity;
 

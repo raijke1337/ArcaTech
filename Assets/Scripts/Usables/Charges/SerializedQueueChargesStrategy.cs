@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Arcatech.Usables
 {
     [CreateAssetMenu(fileName = "charges_", menuName = "Usables/Charges/Queue", order = 2)]
-    public class SerializedQueueChargesStrategy : SerializedChargesStrategy
+    public class SerializedQueueChargesStrategy : SerializedGenericCooldownStrategy
     {
 
         [Min(1)] public int maxCharges = 3;

@@ -18,9 +18,16 @@ namespace Arcatech.Units
 
         public int animatorLayer = 0;
         public float crossfadeTime = 0.1f;
-        [Header("State will not exit unless the time has passed or the transition overrides this")]
+        
+        
+        
+        [Header("State Exit Conditions")]
         [Range(0,1)]public float minTimeInStateNormalized = 0f;
-
+        [Space, Header("State will be 'finished' at this normalizedTime, unless looping")]
+        [Range(0,1)] public float timeOfStateFinishedNormalized = 1f;
+        [SerializeField] SerializedStateTransitionCondition[] exitConditions;
+        
+        
         [Header("Gameplay locks")] public bool allowsMovement = true;
         public bool allowsAiming = true;
         public bool invulnerable = false;
@@ -53,14 +60,16 @@ namespace Arcatech.Units
             int animHash = string.IsNullOrEmpty(animatorStateName) ? 0 : Animator.StringToHash(animatorStateName);
 
             // Construct a placeholder UnitState with empty transitions (we'll fill them next).
-            
-            
+
+
             var placeholder = new UnitState(
                 name: stateDisplayName,
                 animatorHash: animHash,
                 crossfadeTime: crossfadeTime,
                 animatorLayer: animatorLayer,
                 minNormalizedTime: minTimeInStateNormalized,
+                finishedTime: timeOfStateFinishedNormalized,
+                exitConditions:exitConditions,
                 isRootMotionState:rootMotionEnabled,
                 allowsMove: allowsMovement,
                 allowsAim: allowsAiming,

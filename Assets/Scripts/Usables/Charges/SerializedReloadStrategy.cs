@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Arcatech.Usables
 {
     [CreateAssetMenu(fileName = "charges_", menuName = "Usables/Charges/Reload ammo",order = 1)]
-    public class SerializedReloadStrategy : SerializedChargesStrategy
+    public class SerializedReloadStrategy : SerializedGenericCooldownStrategy
     {
         public int usesToReload = 3;
         public float reloadTime = 3f;

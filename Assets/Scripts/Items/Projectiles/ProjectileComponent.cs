@@ -89,6 +89,9 @@ namespace Arcatech.Items.Projectiles
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)=> _receiver = receiver;
         public void UnregisterReceiver(ITriggerNotificationReceiver receiver) => _receiver = null;
-
+        public void AreaCast(ITriggerNotificationReceiver receiver)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

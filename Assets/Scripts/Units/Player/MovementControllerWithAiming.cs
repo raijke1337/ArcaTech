@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Arcatech.Units.Control
 {
-
     [RequireComponent(typeof(EntityStateMachineComponent))]
     public class MovementControllerWithAiming : Character, IMove, IPausableComponent, IJump, IAim, IUnitCommandValidator
     {

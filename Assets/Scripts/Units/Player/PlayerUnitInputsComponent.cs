@@ -39,6 +39,8 @@ namespace Arcatech.Units.Control
             if (type == UnitActionType.Movement)
             {
                 UpdateCachedInputVector(ctx);
+                if (mover.ActualMovementVelocity<= 0.1f) // some magic number. create a new movement input command
+                                                         // only if the player is not actually moving already
                 RequestCombatAction(type);
             }
             else 

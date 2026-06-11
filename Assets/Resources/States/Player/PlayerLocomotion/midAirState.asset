@@ -15,15 +15,18 @@ MonoBehaviour:
   stateDisplayName: Midair
   animatorStateName: MidAirState
   animatorLayer: 0
-  crossfadeTime: 0.5
+  crossfadeTime: 0.2
   minTimeInStateNormalized: 0
+  timeOfStateFinishedNormalized: 0
+  exitConditions:
+  - {fileID: 11400000, guid: 47763158d18b5514596e0b28ed51092d, type: 2}
   allowsMovement: 1
   allowsAiming: 0
   invulnerable: 0
   rootMotionEnabled: 0
-  transitions:
-  - {fileID: 11400000, guid: 982e976629fc28c41a65a492d48990a8, type: 2}
-  - {fileID: 11400000, guid: 3aeb98c864803b941bf1da67f1290c51, type: 2}
+  transitions: []
   onEnterActions: []
+  onNormalizedTimeActions:
+    _serializedList: []
   onExitActions:
   - {fileID: 11400000, guid: 0dac7ed6bc2d1924ebd991ac2f91e521, type: 2}

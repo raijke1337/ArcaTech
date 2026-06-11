@@ -12,6 +12,8 @@ namespace Arcatech.UI
         private Dictionary<UnitActionType, IconContainerUIScript> _usablesD;
         public void LoadIcons(Dictionary<UnitActionType,IUsable> usables)
         {
+            if (usables.Count == 0) return;
+            
             if (_usablesD == null)
             {
                 //first use
@@ -53,8 +55,9 @@ namespace Arcatech.UI
 
         }
         public void HandlePlayerAction(UnitActionType action,bool success)
-        { 
-           
+        {
+            if (_usablesD == null) return;
+            
             var k = _usablesD.FirstOrDefault(t=>t.Key == action);
             if (k.Value != null)
             {

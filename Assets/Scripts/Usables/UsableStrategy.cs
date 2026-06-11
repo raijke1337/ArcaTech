@@ -14,7 +14,6 @@ namespace Arcatech.Usables
             GetStateTransition = config.useStateTransition.Build();
             Description = config.description;
             GetCost = config.settings.useCost;
-            IconDrawType = config.settings.charge.drawType;
             _owner =  owner;
             _equipment = equipment;
             DrawStrategy = config.settings.drawItemsStrategy;

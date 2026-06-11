@@ -22,6 +22,7 @@ namespace Arcatech.Interactions
 
         public override void Play(InteractionContext ctx)
         {
+            
             foreach (var result in _dict[ctx.State])
             {
                 result.ProduceResult(ctx.Target, ctx.Interactor.Entity,

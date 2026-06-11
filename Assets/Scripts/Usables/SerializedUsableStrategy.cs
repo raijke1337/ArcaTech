@@ -26,7 +26,7 @@ namespace Arcatech.Usables
     [Serializable]
     public struct GenericUsableConfig
     {
-        [SerializeField] public SerializedChargesStrategy charge;
+        [SerializeField] public SerializedGenericCooldownStrategy charge;
         [SerializeField] public AppliedStatsDeltaEffect useCost;
         [SerializeField] public DrawItemsStrategy drawItemsStrategy;
     }

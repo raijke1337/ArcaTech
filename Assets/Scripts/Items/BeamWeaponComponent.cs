@@ -328,5 +328,10 @@ namespace Arcatech.Items
                 _receivers.Remove(receiver);
             }
         }
+
+        public void AreaCast(ITriggerNotificationReceiver receiver)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

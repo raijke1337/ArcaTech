@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Arcatech.Stats;
+using Arcatech.Triggers;
 using Arcatech.Units;
 using Arcatech.Usables;
 using KBCore.Refs;
@@ -20,18 +21,20 @@ namespace Arcatech.Items
 
         public event UnityAction ViewChangedInventory;
         [SerializeField,Self] EntityInventoryComponent entityInventory;
-        [SerializeField, Self] private EntityStateMachineComponent _stateUnit;
-
+        [SerializeField, Self] private EntityStateMachineComponent stateUnit;
+        [SerializeField,Child] private TriggerTrackerComponent meleeHitbox;
+        
+        public TriggerTrackerComponent HitArea => meleeHitbox;
         private EntityStatsComponent _stats;
         
         Dictionary<UnitActionType, IUsable> _usables;
         private IUsable _currentUsable;
         public Dictionary<UnitActionType,IUsable> GetUsables => _usables;
-
-        private void Awake()
+        
+        private void Awake() 
         {
             _usables = new();
-            _stats =  GetComponent<EntityStatsComponent>();
+            _stats = GetComponent<EntityStatsComponent>();
         }
 
         public void RefreshView(UnitInventoryModel model)
@@ -41,7 +44,7 @@ namespace Arcatech.Items
             {
                 foreach (var usable in _usables.Values)
                 {
-                    _stateUnit.RemoveTransition(usable.GetStateTransition);
+                    stateUnit.RemoveTransition(usable.GetStateTransition);
                 }
             }
 
@@ -61,7 +64,7 @@ namespace Arcatech.Items
 
             foreach (var usable in _usables.Values)
             {
-                _stateUnit.AddTransition(usable.GetStateTransition);
+                stateUnit.AddTransition(usable.GetStateTransition);
             }
 
             _redraw = true;
@@ -120,7 +123,7 @@ namespace Arcatech.Items
 
         public void PrepareCommand(UnitActionType type)
         {
-            if (_stateUnit.GetMainEntity.ShowingDebugs && _stateUnit.verboseDebugs)  Debug.Log($"[Usables] {Time.time} Prepare {type}");
+            if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs)  Debug.Log($"[Usables] {Time.time} Prepare {type}");
             if (!_usables.TryGetValue(type, out var usable)) return;
             _currentUsable = usable;
         }
@@ -130,7 +133,7 @@ namespace Arcatech.Items
             if (type is UnitActionType.Movement or UnitActionType.Jump or UnitActionType.Use) return;
 
 
-            if (_stateUnit.GetMainEntity.ShowingDebugs && _stateUnit.verboseDebugs)
+            if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs)
             {
                 Debug.Log($"[Usables] {Time.time} Do {type} success={wasSuccessful}, usable={_currentUsable?.Description.Title ?? "null"}");
             }
@@ -144,12 +147,12 @@ namespace Arcatech.Items
                 _currentDrawItemStrategy = _usables[type].DrawStrategy;
                 _redraw = true;
             }
-            _stats.ApplyEffect(_usables[type].GetCost,_stateUnit.GetMainEntity);
+            _stats.ApplyEffect(_usables[type].GetCost,stateUnit.GetMainEntity);
       }
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)
         {
-            if (_stateUnit.GetMainEntity.ShowingDebugs && _stateUnit.verboseDebugs) Debug.Log($"[Usables] {Time.time}Notify {notifyType} in {_currentUsable?.Description.Title}");
+         //   if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs) Debug.Log($"[Usables] {Time.time}Notify {notifyType} in {_currentUsable?.Description.Title}");
             _currentUsable?.Notify(notifyType);
             if (notifyType == StateMachineNotifyType.EndUse) _currentUsable = null;
         }

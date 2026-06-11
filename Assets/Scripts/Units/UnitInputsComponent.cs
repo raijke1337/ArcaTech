@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using Arcatech.Interactions;
 using Arcatech.Items;
 using Arcatech.Units;
+using Arcatech.Units.Control;
 using KBCore.Refs;
 using UnityEngine;
 namespace Arcatech
@@ -9,7 +11,7 @@ namespace Arcatech
     /// <summary>
     /// class that handles inputs from Behavior tree or player commands
     /// </summary>
-    [RequireComponent (typeof(EntityStateMachineComponent))]
+    [RequireComponent (typeof(EntityStateMachineComponent),typeof(InteractionComponent),typeof(LocomotionStateInjector))]
     public class UnitInputsComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent
     {
         private List <IUnitCommandValidator> _commandValidators;

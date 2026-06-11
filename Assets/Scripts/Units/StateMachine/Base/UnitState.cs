@@ -10,7 +10,6 @@ namespace Arcatech.Units
     {
         public override string ToString() => StateName;
         public string StateName { get; }
-        public float TimeInState => _stateTimer.GetTime;
         private readonly StopwatchTimer _stateTimer;
         public bool AllowsAiming { get; }
         public bool AllowsMovement { get; }
@@ -19,6 +18,7 @@ namespace Arcatech.Units
         public StateTransition[] Transitions { get; private set; }
         private ActionResult[] OnEnterState { get; }
         private ActionResult[] OnExitState { get; }
+        private SerializedStateTransitionCondition[] exitConditions;
         
         readonly NormalizedActionBlock[] _normalizedActionSchedule;
         int _nextActionIndex;
@@ -28,18 +28,21 @@ namespace Arcatech.Units
         private readonly int _animatorLayer;
         
         readonly float _crossfadeTime;
+        private readonly float _finishedTime;
 
         /// <summary>
         /// until this time is reached, state will not exit (no transition is valid)
         /// </summary>
         private readonly float _minNormalizedTimeInState;
-
+        public float TimeInState => _stateTimer.GetTime;
         
         public UnitState(
             string name,
             int animatorHash = 0,
             float crossfadeTime = 0.1f,
             float minNormalizedTime = 0f,
+            float finishedTime = 1f,
+            SerializedStateTransitionCondition[] exitConditions = null,
             int animatorLayer = 0,
             bool allowsMove = true,
             bool allowsAim = true,
@@ -75,7 +78,7 @@ namespace Arcatech.Units
             OnExitState = onExit?.Length > 0
                 ? onExit.Select(a => a.Deserialize()).ToArray()
                 : Array.Empty<ActionResult>();
-
+            this.exitConditions = exitConditions ?? Array.Empty<SerializedStateTransitionCondition>();
             _minNormalizedTimeInState = minNormalizedTime;
 
             if (onNormalizedTime != null && onNormalizedTime.Count > 0)
@@ -93,7 +96,7 @@ namespace Arcatech.Units
                 _normalizedActionSchedule = Array.Empty<NormalizedActionBlock>();
             }
             _stateTimer = new StopwatchTimer();
-
+            _finishedTime = finishedTime;
         }
 
         internal void InternalSetTransitions(StateTransition[] transitions)
@@ -182,18 +185,56 @@ namespace Arcatech.Units
             _stateTimer.Stop();
 
         }
-
-        public bool CanExitState(Animator animator)
+        /// <summary>
+        /// Returns true ONLY if this is a non-looping clip that has played to its end.
+        /// Looping states (run, idle, etc.) never "finish" on their own.
+        /// </summary>
+        public bool HasCompleted(StateMachineContext context)
         {
-            if (_minNormalizedTimeInState <= 0f) return true;
+            if (_animatorHash == 0) return false;
+            if (context.Animator == null) return false;
 
-            if (TryGetAnimatorProgress(animator, out float normalized))
-                return normalized >= _minNormalizedTimeInState;
+            var layer = _animatorLayer;
 
-            // Fallback: use real time since enter so we don't get stuck forever.
-            return _stateTimer.GetTime >= (_minNormalizedTimeInState * 0.1f); // or some small grace
+            // Use the state info that actually matches our hash.
+            AnimatorStateInfo info;
+            if (context.Animator.GetCurrentAnimatorStateInfo(layer).shortNameHash == _animatorHash)
+            {
+                info = context.Animator.GetCurrentAnimatorStateInfo(layer);
+            }
+            else if (context.Animator.IsInTransition(layer) &&
+                     context.Animator.GetNextAnimatorStateInfo(layer).shortNameHash == _animatorHash)
+            {
+                info = context.Animator.GetNextAnimatorStateInfo(layer);
+            }
+            else
+            {
+                // Animator isn't on our clip -> we can't claim it finished.
+                return false;
+            }
+
+            // Looping clips only finish when the exit condition is satisfied (e.g. locomotion)
+            if (info.loop)
+            {
+                foreach (var cond in exitConditions)
+                {
+                    if (!cond.CanTransition(context)) return false;
+                }
+            }
+
+            // Non-looping clip: finished once it reaches the end.
+            return info.normalizedTime >= _finishedTime;
         }
 
+        public bool CanExitState(StateMachineContext ctx)
+        {
+            if (_minNormalizedTimeInState <= 0f) return true;
+            if (TryGetAnimatorProgress(ctx.Animator, out float normalized))
+                return normalized >= _minNormalizedTimeInState;
+
+            // Fallback: real time since enter so we don't get stuck forever.
+            return _stateTimer.GetTime >= (_minNormalizedTimeInState * 0.1f);
+        }
         public bool TransitionMinTimeInStateSatisfied(Animator animator, float timeNormalized)
         {
             timeNormalized = Mathf.Clamp01(timeNormalized);
@@ -233,7 +274,7 @@ namespace Arcatech.Units
             }
             return false; // Animator isn’t on our clip yet.
         }
-        
+
         readonly struct NormalizedActionBlock
         {
             public readonly float Time;
