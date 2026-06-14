@@ -127,6 +127,10 @@ GameObject:
   - component: {fileID: 2994465113029622796}
   - component: {fileID: 5148202008020930969}
   - component: {fileID: 217542056313371836}
+  - component: {fileID: 5701565967324514046}
+  - component: {fileID: 5691952451691057331}
+  - component: {fileID: 3916644926092555660}
+  - component: {fileID: 4201277184077725860}
   m_Layer: 6
   m_Name: Scrap Spider
   m_TagString: Untagged
@@ -287,7 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: f278e210-d2b6-42aa-abaf-f04ce95f6c94
+  uniqueId: 
 --- !u!114 &7980303944722158138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,6 +367,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.EntityStatsComponent
   startingConfig: {fileID: 11400000, guid: 96e9149187430bf4d8be1fa0ccbd7b0d, type: 2}
   preserveCurrentRatioOnMaxChange: 1
+  entity: {fileID: 7980303944722158138}
 --- !u!65 &4402103615095325175
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -539,6 +544,54 @@ MonoBehaviour:
   entityInventory: {fileID: 8888167219805702888}
   stateUnit: {fileID: 2716290302120897781}
   meleeHitbox: {fileID: 6492887663456275960}
+--- !u!114 &5701565967324514046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9022434418627609629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8597cec00a0f4b4cb1ef20239abddc9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EntityEffectController
+--- !u!114 &5691952451691057331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9022434418627609629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c6806341f744b849274a1ef8605a8b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.ModifierAggregator
+--- !u!114 &3916644926092555660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9022434418627609629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b165e7837d0242c88ecc5153a44b4562, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.EntityStatusComponent
+--- !u!114 &4201277184077725860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9022434418627609629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9acb5ed58c7439884307c40a843da0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.EffectsReceiverComponent
 --- !u!1001 &8119439542017666702
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Arcatech;
 using Arcatech.Units;
 using Arcatech.Usables.Effects;
@@ -33,7 +34,6 @@ public class EntityEffectController : MonoBehaviour, IPausableComponent, IKillab
     
     {
         if (_killed) return;
-        Debug.Log($"Adding effect {instance}");
         _active.TryGetValue(instance.Key, out var sameKey);
 
         var decision = _stacking.Resolve(sameKey, instance.StackType, instance.MaxStacks);
@@ -58,6 +58,12 @@ public class EntityEffectController : MonoBehaviour, IPausableComponent, IKillab
         }
     }
 
+    public bool HasEffect(string ID, out ActiveEffectInstance instance)
+    {
+        instance = _flat.FirstOrDefault(t => t.EffectId == ID);
+        return instance != null;
+    }
+    
     private void RefreshExisting(List<ActiveEffectInstance> sameKey, Vector3 place, Quaternion placeRot)
     {
         // Refresh the most-recent live instance under this key.
