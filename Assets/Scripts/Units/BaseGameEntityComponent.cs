@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Units;
+using Arcatech.Usables.Effects;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Events;
@@ -14,6 +15,7 @@ namespace Arcatech
     [RequireComponent(typeof(Rigidbody), typeof(LittlePauseHelperComponent),typeof(EntityID))]
     public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IInvulnerability
     {
+        
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
        
         [Space, SerializeField] string _name;
@@ -32,9 +34,8 @@ namespace Arcatech
         
         [Space, SerializeField] protected bool _showDebugs = false;
         public Transform EffectSpawn => effectSpawn;
-        List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>> _effectsTakerComponents;
 
-
+        
         /// <summary>
         /// use this to pause.
         /// </summary>
@@ -59,26 +60,7 @@ namespace Arcatech
         private void OnEnable()
         {
             _rb.isKinematic = setKinematic;
-            _effectsTakerComponents = new List<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>>(GetComponentsInChildren<IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>>());
         }
-
-        
-        #region applied usable effects
-
-        public bool ApplyStatsEffect(BaseAppliedEffect effect,BaseGameEntityComponent source)
-        {
-            if (Invulnerable) return false;
-            if (effect is AppliedStatsDeltaEffect statsDelta)
-            {
-                foreach (var v in _effectsTakerComponents)
-                {
-                    v.ApplyEffect(statsDelta, source);
-                }
-            }
-            return true;
-        }
-
-        #endregion
         
         public bool Invulnerable { get; set; }
         
@@ -86,6 +68,7 @@ namespace Arcatech
         bool _killed = false;
         public UnityEvent<BaseGameEntityComponent> AnnounceDead;
 
+        public bool Paused { get; set; }
         public void SetKilled(IKillerComponent comp, bool value)
         {
             if (ShowingDebugs) Debug.Log($"{GetName} {(value ? "dead" : "resurrected")}, called by: {comp.KilledBy}");
@@ -96,7 +79,5 @@ namespace Arcatech
                 Destroy(gameObject, timerToDestroy);
             }
         }
-        public bool Paused { get; set; }
-
     }
 }

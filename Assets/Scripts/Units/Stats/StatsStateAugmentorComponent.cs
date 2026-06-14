@@ -1,4 +1,5 @@
 ﻿using Arcatech.Units;
+using Arcatech.Usables.Effects;
 using KBCore.Refs;
 using UnityEngine;
 

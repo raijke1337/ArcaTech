@@ -6,6 +6,7 @@ using Arcatech.Effects;
 using Arcatech.EventBus;
 using Arcatech.Items;
 using Arcatech.Units;
+using Arcatech.Usables.Effects;
 using CartoonFX;
 using UnityEngine;
 
@@ -81,7 +82,6 @@ namespace Arcatech.Usables
            
            _effectApplier.ApplyEffects(_owner,info,_results,_equipment.EffectSpawn.transform.position);
         }
-
 
         
         public void OnChangeUsableState(StateMachineNotifyType notifyType)

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
 using Arcatech.Units;
+using Arcatech.Usables.Effects;
+using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,24 +14,26 @@ namespace Arcatech.Stats
     /// new component to handle the current stats and their changes on any game entity
     /// also uses stat change strategies to affect the rest of components
     /// </summary>
-    public class EntityStatsComponent : MonoBehaviour, IUnitInventoryView, IPausableComponent,
-        IKillableComponent, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>, IKillerComponent
+    public class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
+        IKillableComponent, IStatReceiver, IKillerComponent, IInvulnerability,IShieldReceiver
     {
-        
+
         [Header("Config")] [SerializeField] private BaseStatsConfig startingConfig;
         [SerializeField] private bool preserveCurrentRatioOnMaxChange = true;
-        
+        [SerializeField, Self] BaseGameEntityComponent entity;
+
         private readonly Dictionary<ResourceStatType, StatRuntime> stats = new();
         private readonly Dictionary<SourceKey, List<StatModifier>> liveEquipMaxModifiers = new();
-        
+
         private bool init = false;
+
         private void Awake()
         {
             if (init) return;
             InitializeFromConfig();
             TryGetComponent(out _aug);
         }
-        
+
         private struct SourceKey : IEquatable<SourceKey>
         {
             public readonly object source;
@@ -71,8 +75,8 @@ namespace Arcatech.Stats
             public object sourceRef;
             public int stacks = 1;
             public List<StatModifier> persistentMaxMods = new();
-            
-            
+
+
             public BaseAppliedEffect Effect;
         }
 
@@ -112,12 +116,13 @@ namespace Arcatech.Stats
         }
 
         #region inventory
+
         public event UnityAction ViewChangedInventory;
 
         public void RefreshView(UnitInventoryModel model)
         {
             if (!init) InitializeFromConfig();
-            
+
             RemoveAllEquipmentContributions();
 
 //            Debug.Log("Refresh view");
@@ -127,7 +132,7 @@ namespace Arcatech.Stats
                 foreach (var provider in model.EnumerateProviders())
                 {
 //                    Debug.Log($"provider {provider}");
-                    
+
                     var key = new SourceKey(provider, itemIndex++);
                     ApplyEquipmentProvider(provider, key);
                 }
@@ -136,8 +141,8 @@ namespace Arcatech.Stats
             RecomputeConditionalFlags();
             RecalculateAllMaxAndClampCurrent();
         }
-        
-        
+
+
         private void ApplyEquipmentProvider(IEquipmentStatsProvider provider, SourceKey key)
         {
             // 1) Persistent Max modifiers (null-safe)
@@ -186,9 +191,10 @@ namespace Arcatech.Stats
         }
 
         #endregion
-        
+
         #region apply
-        public bool ApplyEffect(AppliedStatsDeltaEffect eff, BaseGameEntityComponent s)
+
+        public bool ApplyCost(AppliedStatsDeltaEffect eff, BaseGameEntityComponent s)
         {
             if (eff == null) return false;
 
@@ -237,11 +243,90 @@ namespace Arcatech.Stats
             return true;
         }
 
+        #region NEW
+
+        public bool Invulnerable { get; set; }
+
+        public bool ApplyInstantDelta(StatDelta delta, BaseGameEntityComponent source, EffectKey key)
+        {
+            if (Invulnerable) return false;
+
+            // Shield interception: only for incoming damage (negative Current delta).
+            if (delta.target == StatTarget.Current && delta.amount < 0f && _shields.Count > 0)
+            {
+                float damage = -delta.amount;             // positive magnitude
+                damage = AbsorbThroughShields(delta.stat, damage);
+                delta.amount = -damage;                   // remaining damage back to negative
+            }
+
+            var localKey = new SourceKey(source, key.SourceId?.GetHashCode() ?? 0);
+            ApplyDelta(delta, source, localKey);
+            return true;
+        }
+
+        #region shields
+
+        private readonly List<ShieldBuffer> _shields = new();
+
+// called by AbsorbShieldResult on each shield tick
+        public void AddOrTopUpShield(EffectKey key, ResourceStatType stat, float topUp,
+            float coefficient, float absorbLimit, float bufferLifetime)
+        {
+            Debug.Log($"Shield apply {stat} {topUp}");
+            var buf = _shields.Find(b => b.Key.Equals(key) && b.Stat == stat);
+            if (buf == null)
+            {
+                buf = new ShieldBuffer(key, stat, coefficient, absorbLimit, bufferLifetime);
+                _shields.Add(buf);
+            }
+            buf.TopUp(topUp, bufferLifetime);
+            NotifyShieldViewers();   // <-- notify
+        }
+
+// снятие (RemoveShields):
+        public void RemoveShields(EffectKey key)
+        {
+            int removed = _shields.RemoveAll(b => b.Key.Equals(key));
+            if (removed > 0) NotifyShieldViewers();  
+        }
+
+// in Update(): tick buffer lifetimes and sweep expired
+        private void TickShields(float dt)
+        {
+            bool changed = false;
+            for (int i = _shields.Count - 1; i >= 0; i--)
+            {
+                _shields[i].Tick(dt);
+                if (_shields[i].IsExpired) { _shields.RemoveAt(i); changed = true; }
+            }
+            if (changed) NotifyShieldViewers();        // <-- buffer(s) expired
+        }
+        private float AbsorbThroughShields(ResourceStatType stat, float damage)
+        {
+            // FIFO: oldest buffer spent first.
+            bool changed = false;
+            for (int i = 0; i < _shields.Count && damage > 0f; i++)
+            {
+                if (_shields[i].Stat == stat)
+                {
+                    float before = _shields[i].Current;
+                    damage = _shields[i].Absorb(damage);
+                    if (!Mathf.Approximately(before, _shields[i].Current)) changed = true;
+                }
+            }
+            if (changed) NotifyShieldViewers();        // <-- shield absorbed damage
+            return damage;
+        }
         #endregion
+
+        #endregion
+
+        #endregion
+
         private void Update()
         {
             if (_killed || Paused) return;
-            
+
             float dt = Time.deltaTime;
             float now = Time.time;
             bool anyAppliedTicks = false;
@@ -296,6 +381,7 @@ namespace Arcatech.Stats
                 RecalculateAllMaxAndClampCurrent();
             }
 
+            TickShields(Time.deltaTime);
             CheckKillCondition();
         }
 
@@ -388,7 +474,7 @@ namespace Arcatech.Stats
             object contributionSource)
         {
             var sr = EnsureStat(stat);
-            float delta = newCurrent - sr.current;  
+            float delta = newCurrent - sr.current;
             if (Mathf.Abs(delta) <= 0.000001f) return;
             sr.current = newCurrent;
             UpdateViewers(stat, sr.current, sr.max, delta, contributionSource);
@@ -421,6 +507,7 @@ namespace Arcatech.Stats
             if (HasStat(stat)) value = stats[stat].current;
             return HasStat(stat);
         }
+
         public float GetMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.max : 0f;
         public float GetBaseMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.baseMax : 0f;
 
@@ -479,17 +566,34 @@ namespace Arcatech.Stats
         private void StartViewer(IStatUpdatesViewer viewer)
         {
             foreach (var stat in stats)
-            {
-                viewer.HandleStatsUpdate(stat.Key,stat.Value.current,stat.Value.max,0,null);
-            }
+                viewer.HandleStatsUpdate(stat.Key, stat.Value.current, stat.Value.max, 0, null);
+
+            // initialize shield display
+            float total = 0f;
+            for (int i = 0; i < _shields.Count; i++) total += _shields[i].Current;
+            viewer.SetShieldValue(total);
         }
+
         private void UpdateViewers(ResourceStatType type, float current, float max, float delta,
             object contributionSource)
         {
             foreach (var v in statUpdatesViewers)
-            {
                 v.HandleStatsUpdate(type, current, max, delta, contributionSource);
-            }
+        }
+        private float _lastNotifiedShield = -1f;
+
+        private void NotifyShieldViewers()
+        {
+            float total = 0f;
+            for (int i = 0; i < _shields.Count; i++)
+                total += _shields[i].Current;
+
+            // avoid spamming viewers when nothing changed
+            if (Mathf.Approximately(total, _lastNotifiedShield)) return;
+            _lastNotifiedShield = total;
+
+            foreach (var v in statUpdatesViewers)
+                v.SetShieldValue(total);
         }
 
         #endregion
@@ -500,7 +604,7 @@ namespace Arcatech.Stats
         {
             if (group.IsEmpty) return true;
             if (!init) InitializeFromConfig();
-            
+
 
             bool result = group.requireAll;
             foreach (var c in group.statConditions)
@@ -583,12 +687,13 @@ namespace Arcatech.Stats
         }
 
         private bool _killed;
-        public bool CheckStatsConditionGroup(ConditionGroup group) =>  EvaluateConditionGroup(group);
-        
-        
+        public bool CheckStatsConditionGroup(ConditionGroup group) => EvaluateConditionGroup(group);
+
+
         #region failsafe for no state augmentor kill condition
 
         private StatsStateAugmentorComponent _aug;
+
         private void CheckKillCondition()
         {
             if (_aug) return;
@@ -597,15 +702,16 @@ namespace Arcatech.Stats
                 var killables = GetComponentsInChildren<IKillableComponent>(true);
                 foreach (var k in killables)
                 {
-                    k.SetKilled(this,true);
+                    k.SetKilled(this, true);
                 }
 
                 Debug.Log($"placeholder kill {name}");
                 if (TryGetComponent<Animator>(out var animator)) animator.Play("Dead");
             }
         }
+
         public string KilledBy => "Stats 0 hp";
-        
+
         #endregion
     }
 }

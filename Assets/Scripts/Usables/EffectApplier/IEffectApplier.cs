@@ -2,6 +2,8 @@
 using Arcatech.Actions;
 using Arcatech.Effects;
 using Arcatech.EventBus;
+using Arcatech.Usables.Effects;
+using ArcaTech.Usables.Effects;
 using CartoonFX;
 using UnityEngine;
 
@@ -17,6 +19,7 @@ namespace Arcatech.Usables
     {
         public abstract IEffectApplier Deserialize(CFXR_Effect applicationEffect);
     }
+    
 
     public abstract class EffectApplier : IEffectApplier
     {
@@ -25,10 +28,10 @@ namespace Arcatech.Usables
         {
             _onApplication = new ParticlesEvent (applicationEffect);
         }
-
+    
         public abstract void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects,
             Vector3 origin);
-
+    
         protected void PlayApplicationParticles(Vector3 position)
         {
             _onApplication.Place = position;

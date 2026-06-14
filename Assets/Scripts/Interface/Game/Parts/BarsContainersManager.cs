@@ -31,7 +31,11 @@ namespace Arcatech.UI
             if (!bar.gameObject.activeSelf) bar.gameObject.SetActive(true);
             bar.UpdateValue(statCurrent, statMax, statDelta);
         }
-        
+
+        public void SetShieldValue(float currentValue)
+        {
+        }
+
         private void InitBars()
         {
             if (!init)

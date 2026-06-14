@@ -2,6 +2,7 @@ using System;
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
+using Arcatech.Usables.Effects;
 using KBCore.Refs;
 using NUnit.Framework;
 using Unity.Behavior;
@@ -61,6 +62,19 @@ namespace Arcatech.Units
         #endregion
         
         
+
+        private float _startSpeed;
+        private float _mult = 1f;
+
+        public float SpeedMultiplier
+        {
+            get => _mult;
+            set
+            {
+                _mult = value;
+                Debug.Log($"Speed mult for {entity.name}: {value} NYI");
+            }
+        }
         protected void Start()
         {
             if (behavior)
@@ -134,6 +148,7 @@ namespace Arcatech.Units
                 if (value) agent.velocity = Vector3.zero;
             }
         }
+
 
         public string SavedItemID => entity.GetID;
         public void ApplySaveState(ProgressItemState state, LevelProgressManager ctx)
