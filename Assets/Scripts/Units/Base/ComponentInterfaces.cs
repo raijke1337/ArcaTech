@@ -1,4 +1,5 @@
 ﻿using Arcatech.Stats;
+using Arcatech.Usables.Effects;
 
 namespace Arcatech.Units
 {
@@ -17,14 +18,7 @@ namespace Arcatech.Units
     {
         public string KilledBy { get; }
     }
-    
-    /// <summary>
-    /// called in stat update strategy by statsComp and maybe more
-    /// </summary>
-    public interface IStunnableComponent
-    {
-        public bool Stunned { get; set; }
-    }
+
 /// <summary>
 /// called by the pause helper on base entity
 /// </summary>

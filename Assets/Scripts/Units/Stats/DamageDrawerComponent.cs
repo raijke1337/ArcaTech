@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Arcatech.Managers;
 using Arcatech.Units;
+using Arcatech.Usables.Effects;
 using KBCore.Refs;
 using UnityEngine;
 

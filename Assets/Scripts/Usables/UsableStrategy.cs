@@ -4,6 +4,7 @@ using Arcatech.Stats;
 using Arcatech.Texts;
 using Arcatech.UI;
 using Arcatech.Units;
+using Arcatech.Usables.Effects;
 
 namespace Arcatech.Usables
 {
@@ -11,7 +12,7 @@ namespace Arcatech.Usables
     {
         public UsableStrategy(SerializedUsableStrategy config, BaseGameEntityComponent owner, EquipmentComponent equipment)
         {
-            GetStateTransition = config.useStateTransition.Build();
+            GetStateTransition = config.useStateTransition?.Build();
             Description = config.description;
             GetCost = config.settings.useCost;
             _owner =  owner;

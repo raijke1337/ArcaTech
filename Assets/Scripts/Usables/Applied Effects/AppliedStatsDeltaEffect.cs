@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Arcatech.Stats;
 using UnityEngine;
 
-namespace Arcatech.Stats
+namespace Arcatech.Usables.Effects
 {
-    [CreateAssetMenu(fileName = "usableEffect_stats_", menuName = "Applied Effects/Stats delta")]
+    [CreateAssetMenu(fileName = "usableEffect_stats_", menuName = "Usable/Applied Effects/Stats delta")]
     public class AppliedStatsDeltaEffect : BaseAppliedEffect
     {
         [Header("Instant delta")]

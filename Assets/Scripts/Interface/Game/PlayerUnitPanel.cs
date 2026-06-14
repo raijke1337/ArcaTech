@@ -3,6 +3,7 @@ using Arcatech.Stats;
 using Arcatech.Units;
 using DG.Tweening;
 using KBCore.Refs;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -17,7 +18,7 @@ namespace Arcatech.UI
         [SerializeField] protected float _shakeAtHealthDelta = 0.1f;
         [SerializeField] protected Image _dmgGlow;
         [SerializeField] Color glowColor = Color.red;
-        
+        [SerializeField] private TextMeshProUGUI _text;
         
         /// <summary>
         /// not called in this component
@@ -97,6 +98,11 @@ namespace Arcatech.UI
             {
                 _dmgGlow.DOFade(1, 0.3f).OnComplete(() => _dmgGlow.DOFade(0, 0.3f));
             }
+        }
+
+        public void SetShieldValue(float currentValue)
+        {
+            _text.text = currentValue.ToString("0");
         }
 
         #endregion

@@ -1,95 +1,88 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Arcatech.Stats;
+using Arcatech.Usables.Effects;
+using ArcaTech.Usables.Effects;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 namespace Arcatech.Actions
 {
-    [CreateAssetMenu(fileName = "applyStat_", menuName = "Actions/Action Result/Apply Stat Change", order = 3)]
+    [CreateAssetMenu(fileName = "usable_AR_effects_", menuName = "Usable/Apply Usable Effects Action Result")]
     public class SerializedApplyUsableEffectsResult : SerializedActionResult
     {
 
-        [SerializeField] SerializedDictionary<TargetingType, AppliedStatsDeltaEffect[]> StatChanges;
+        [SerializeField,FormerlySerializedAs("StatChanges")] SerializedDictionary<TargetingType, BaseAppliedEffect[]> effects;
+
         public override ActionResult Deserialize()
         {
-            return new ApplyStatChangeEffectResult(StatChanges);
+            return new ApplyUsableEffectsResult(effects);
         }
 
         private void OnValidate()
         {
-            Assert.IsNotNull(StatChanges);
-            Assert.IsTrue(StatChanges.Count > 0);
-            var firstKey = StatChanges.Keys.FirstOrDefault();
-            Assert.IsNotNull(StatChanges[firstKey]);
-            Assert.IsTrue(StatChanges[firstKey].Length>0);
+            Assert.IsNotNull(effects);
+            Assert.IsTrue(effects.Count > 0);
+            var firstKey = effects.Keys.FirstOrDefault();
+            Assert.IsNotNull(effects[firstKey]);
+            Assert.IsTrue(effects[firstKey].Length > 0);
         }
 
         public override string ToString()
         {
-            return $"apply effects result total {StatChanges.Count}";
+            return $"apply effects result total {effects.Count}";
         }
     }
-    public class ApplyStatChangeEffectResult : ActionResult
+
+        /// <summary>
+    /// Applies ANY BaseAppliedEffect kind via the EffectFactory + EntityEffectController.
+    /// Renamed from ApplyStatChangeEffectResult — it is no longer stat-specific.
+    /// </summary>
+    public class ApplyUsableEffectsResult : ActionResult
     {
-        Dictionary <TargetingType, AppliedStatsDeltaEffect[]> _effs; 
-        public ApplyStatChangeEffectResult(SerializedDictionary<TargetingType, AppliedStatsDeltaEffect[]> cfg)
+        private readonly Dictionary<TargetingType, BaseAppliedEffect[]> _effs;
+        private readonly ITargetSelector _selector;
+        private readonly EffectFactory _factory;
+
+        public ApplyUsableEffectsResult(
+            SerializedDictionary<TargetingType, BaseAppliedEffect[]> cfg,
+            ITargetSelector selector = null,
+            EffectFactory factory = null)
         {
-            _effs = cfg; 
-        }
-        private bool TryPickEffectTarget(TargetingType targetType, BaseGameEntityComponent source, BaseGameEntityComponent target, out BaseGameEntityComponent finalTarget)
-        {
-            finalTarget = null;
-            switch (targetType)
-            {
-                case TargetingType.None:
-                    break;
-                case TargetingType.ApplyToSource:
-                    finalTarget = source;
-                    return true;
-                case TargetingType.ApplyToEnemyTarget:
-                    if (target == source) return false;
-                    if (target.GetEntitySide != source.GetEntitySide && source.GetEntitySide != Side.Unassigned)
-                        finalTarget = target;
-                    return true;
-                case TargetingType.ApplyToAlliedTarget:
-                    if (target == source) return false;
-                    if (target.GetEntitySide == source.GetEntitySide)
-                        finalTarget = target;
-                    break;
-                case TargetingType.ApplyToAnyTargetExceptSource:
-                    if (target == source) return false;
-                    finalTarget = target;
-                    break;
-                case TargetingType.ApplyToAnyTarget:
-                    finalTarget = target;
-                    break;
-            }
-            if (finalTarget == null) return false;
-            return true;
+            _effs = cfg;
+            _selector = selector ?? new TargetSelector();
+            _factory = factory ?? new EffectFactory();
         }
 
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
-            Quaternion placeRot)
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target,
+            Vector3 place, Quaternion placeRot)
         {
-            bool result = true;
+            bool any = false;
             foreach (var type in _effs.Keys)
             {
-                if (TryPickEffectTarget(type, user, target, out var final))
-                {
-                    if (final==null) return false;
+                if (!_selector.TryPickTarget(type, user, target, out var final)) continue;
 
-                    foreach (var effect in _effs[type])
-                    {
-                        if (!final.ApplyStatsEffect(effect, user))
-                        {
-                            result = false;
-                        }
-                    }
+                // "Can effects be applied here?" == "does it have an EffectsReceiverComponent?"
+                if (!final.TryGetComponent<EffectsReceiverComponent>(out var receiver))
+                {
+                    Debug.Log($"[Eff] {final.name} has no EffectsReceiverComponent — not a valid effect target.");
+                    continue;
+                }
+
+                var defs = _effs[type];
+                if (defs == null) continue;
+                foreach (var def in defs)
+                {
+                    if (def == null) continue;
+                    var instance = _factory.Create(def, user);
+                    receiver.Controller.AddEffect(instance, user, receiver, place, placeRot);
+                    any = true;
                 }
             }
-            return result;
+
+            return any;
         }
     }
 }
+

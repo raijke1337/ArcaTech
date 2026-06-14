@@ -1,4 +1,5 @@
 ﻿using Arcatech.Stats;
+using Arcatech.Usables.Effects;
 
 namespace Arcatech
 {

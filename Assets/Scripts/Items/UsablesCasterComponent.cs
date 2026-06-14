@@ -44,6 +44,7 @@ namespace Arcatech.Items
             {
                 foreach (var usable in _usables.Values)
                 {
+                    if (usable.GetStateTransition != null)
                     stateUnit.RemoveTransition(usable.GetStateTransition);
                 }
             }
@@ -64,6 +65,7 @@ namespace Arcatech.Items
 
             foreach (var usable in _usables.Values)
             {
+                if (usable.GetStateTransition != null)
                 stateUnit.AddTransition(usable.GetStateTransition);
             }
 
@@ -147,7 +149,7 @@ namespace Arcatech.Items
                 _currentDrawItemStrategy = _usables[type].DrawStrategy;
                 _redraw = true;
             }
-            _stats.ApplyEffect(_usables[type].GetCost,stateUnit.GetMainEntity);
+            _stats.ApplyCost(_usables[type].GetCost,stateUnit.GetMainEntity);
       }
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)

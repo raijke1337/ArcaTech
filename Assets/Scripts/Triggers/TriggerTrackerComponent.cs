@@ -114,7 +114,7 @@ namespace Arcatech.Triggers
                 return (transform.position, Vector3.zero, Vector3.zero);
 
             var rb = other.attachedRigidbody;
-            var hitPosition = other.ClosestPoint(transform.position);
+            var hitPosition = other.bounds.center; //other.ClosestPoint(transform.position);
             var rawDirection = hitPosition - transform.position;
             var impactDirection = ResolveImpactDirection(rawDirection, rb);
             var hitNormal = -impactDirection;

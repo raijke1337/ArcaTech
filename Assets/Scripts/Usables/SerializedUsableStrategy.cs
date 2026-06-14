@@ -3,6 +3,7 @@ using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Texts;
 using Arcatech.Units;
+using Arcatech.Usables.Effects;
 using UnityEngine;
 
 namespace Arcatech.Usables

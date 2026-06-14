@@ -59,6 +59,10 @@ GameObject:
   - component: {fileID: 1089328251400730155}
   - component: {fileID: 879485535396539642}
   - component: {fileID: 1512215389844414232}
+  - component: {fileID: 4766870695843700000}
+  - component: {fileID: 609165953634478481}
+  - component: {fileID: 7739403192877342947}
+  - component: {fileID: 5597438670505072981}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -154,7 +158,7 @@ MonoBehaviour:
   _rb: {fileID: 3462004628895713185}
   setKinematic: 1
   entitySide: 1
-  effectSpawn: {fileID: 9072977092064414533}
+  effectSpawn: {fileID: 5626097245747225600}
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
@@ -175,7 +179,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.EntityStateMachineComponent
   gameEntity: {fileID: 3413998453285093005}
   animator: {fileID: 1832594871899646685}
-  defaultState: {fileID: 11400000, guid: d10fe2ef491ba60428ca2b7a94f1e0f8, type: 2}
+  defaultState: {fileID: 11400000, guid: 0feb9fd035117c14bbe6bb4a0cedc03f, type: 2}
   verboseDebugs: 0
   _context:
     PendingCommand: 0
@@ -362,6 +366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.EntityStatsComponent
   startingConfig: {fileID: 11400000, guid: e2b47cfeff3595443b82c62e8e54f55e, type: 2}
   preserveCurrentRatioOnMaxChange: 1
+  entity: {fileID: 3413998453285093005}
 --- !u!114 &2594953831469317237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,10 +429,14 @@ MonoBehaviour:
       _serializedList:
       - Key: 0
         Value: {fileID: 3397904609542414698}
+      - Key: 3
+        Value: {fileID: 3397904609542414698}
       - Key: 1
         Value: {fileID: 6156944969557555865}
       - Key: 2
         Value: {fileID: 2096164450646900490}
+      - Key: 4
+        Value: {fileID: 3397904609542414698}
   defaultItemsDrawStrat: {fileID: 11400000, guid: 9642c790993fcee4ebfa0ad78750b90c,
     type: 2}
 --- !u!114 &1089328251400730155
@@ -491,6 +500,54 @@ MonoBehaviour:
   _transitionsToAdd:
   - {fileID: 11400000, guid: a1396b0ed8ddadb428b3abc68d679d00, type: 2}
   - {fileID: 11400000, guid: 43a902c71f29a214eae4a30f149a53ab, type: 2}
+--- !u!114 &4766870695843700000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8597cec00a0f4b4cb1ef20239abddc9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EntityEffectController
+--- !u!114 &609165953634478481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c6806341f744b849274a1ef8605a8b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.ModifierAggregator
+--- !u!114 &7739403192877342947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b165e7837d0242c88ecc5153a44b4562, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.EntityStatusComponent
+--- !u!114 &5597438670505072981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9acb5ed58c7439884307c40a843da0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.EffectsReceiverComponent
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0

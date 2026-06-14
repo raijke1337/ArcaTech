@@ -1,5 +1,7 @@
 ﻿
+using System;
 using Arcatech.Items;
+using Arcatech.Usables.Effects;
 using ECM2;
 using UnityEngine;
 
@@ -8,9 +10,23 @@ namespace Arcatech.Units.Control
     [RequireComponent(typeof(EntityStateMachineComponent))]
     public class MovementControllerWithAiming : Character, IMove, IPausableComponent, IJump, IAim, IUnitCommandValidator
     {
-        
+ 
+        private float _startSpeed;
+        private float _mult = 1f;
+
+        public float SpeedMultiplier
+        {
+            get => _mult;
+            set
+            {
+                _mult = value;
+                Debug.Log($"Speed mult for {fsm.GetMainEntity.name}: {value} NYI");
+            }
+        }
+        private EntityStateMachineComponent fsm;
         public bool CanMove { get; set; }
         public bool UseRootMotion { get => useRootMotion; set => useRootMotion = value; }
+
         public Vector3 MovementVector
         {
             get => GetMovementDirection();
@@ -70,6 +86,7 @@ namespace Arcatech.Units.Control
         protected override void OnEnable()
         {
             base.OnEnable();
+            fsm = GetComponent<EntityStateMachineComponent>();
             fmI = Animator.StringToHash(fm);
             smI = Animator.StringToHash(sm);
             vmI = Animator.StringToHash(vm);
