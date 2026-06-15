@@ -14,5 +14,4 @@ public partial class ActionIsAvailableCondition : Condition
     {
         return Wrapper.Value.ActionAvailable(Action.Value);
     }
-
 }

@@ -13,7 +13,8 @@ namespace Arcatech.Units
 {
     [RequireComponent(typeof(BehaviorGraphAgent),typeof(NavMeshAgent),typeof(UnitInputsComponent))]
     [RequireComponent(typeof(BaseGameEntityComponent),typeof(EntityStatsComponent))]
-    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>,IKillableComponent,IPausableComponent,IMove,
+    [RequireComponent(typeof(EffectsReceiverComponent))]
+    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IKillableComponent,IPausableComponent,IMove,
         ISavedProgressItem
     {
         [SerializeField,Self]protected NavMeshAgent agent;
@@ -22,6 +23,7 @@ namespace Arcatech.Units
         [SerializeField,Self]protected UnitInputsComponent unitInputs;
         [SerializeField,Self]protected EntityStatsComponent stats;
         [SerializeField,Child]protected Animator animator;
+        [SerializeField,Child]protected EffectsReceiverComponent effectsReceiver;
 
         
         [Header("Units group")] [SerializeField]
@@ -86,18 +88,12 @@ namespace Arcatech.Units
                 bbref.SetVariableValue(selfRef,this);
             }
         }
-        
-        public bool ApplyEffect(AppliedStatsDeltaEffect effect,BaseGameEntityComponent source)
-        {
-            if (!behavior) return true;
-            if (!source) return true;
-            if (source.GetEntitySide != entity.GetEntitySide && source.GetEntitySide != Side.Unassigned)
-            {
-                combatEventChannel?.SendEventMessage(true);
-            }
-            return true;
-        }
 
+        public bool HasEffect(string ID)
+        {
+            return effectsReceiver.Controller.HasEffect(ID,out _);
+        }
+        
         public void SetKilled(IKillerComponent component, bool value)
         {
             agent.isStopped = value;
