@@ -2,7 +2,7 @@
 
 namespace Arcatech.Usables.Effects
 {
-    [CreateAssetMenu(fileName = "usableEffect_stun_", menuName = "Usable/Applied Effects/Stun")]
+    [CreateAssetMenu(fileName = "usableEffect_stun_", menuName = "Usables/Applied Effects/Stun")]
     public class AppliedStunEffect : BaseAppliedEffect
     {
         [Header("Stun")]

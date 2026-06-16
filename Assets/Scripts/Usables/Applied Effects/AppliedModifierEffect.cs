@@ -2,7 +2,7 @@
 
 namespace Arcatech.Usables.Effects
 {
-    [CreateAssetMenu(fileName = "usableEffect_modifier_", menuName = "Usable/Applied Effects/Modifier")]
+    [CreateAssetMenu(fileName = "usableEffect_modifier_", menuName = "Usables/Applied Effects/Modifier")]
     public class AppliedModifierEffect : BaseAppliedEffect
     {
         [Header("Modifier")]

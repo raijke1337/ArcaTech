@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Arcatech.Usables.Effects
 {
-    [CreateAssetMenu(fileName = "usableEffect_stats_", menuName = "Usable/Applied Effects/Stats delta")]
+    [CreateAssetMenu(fileName = "usableEffect_stats_", menuName = "Usables/Applied Effects/Stats delta")]
     public class AppliedStatsDeltaEffect : BaseAppliedEffect
     {
         [Header("Instant delta")]

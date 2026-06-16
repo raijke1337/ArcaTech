@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Arcatech.Usables.Effects
 {
-    [CreateAssetMenu(fileName = "usableEffect_shield_", menuName = "Usable/Applied Effects/Shield")]
+    [CreateAssetMenu(fileName = "usableEffect_shield_", menuName = "Usables/Applied Effects/Shield")]
     public class AppliedAbsorbShieldEffect : BaseAppliedEffect
     {
         [Header("Absorb shield")]

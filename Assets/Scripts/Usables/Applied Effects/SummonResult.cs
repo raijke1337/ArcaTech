@@ -2,7 +2,7 @@
 
 namespace Arcatech.Usables.Effects
 {
-    [CreateAssetMenu(fileName = "usableEffect_summon_", menuName = "Usable/Applied Effects/Summon")]
+    [CreateAssetMenu(fileName = "usableEffect_summon_", menuName = "Usables/Applied Effects/Summon")]
     public class AppliedSummonEffect : BaseAppliedEffect
     {
         [Header("Summon")]

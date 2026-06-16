@@ -9,12 +9,10 @@ using UnityEngine.Serialization;
 
 namespace Arcatech.Actions
 {
-    [CreateAssetMenu(fileName = "usable_AR_effects_", menuName = "Usable/Apply Usable Effects Action Result")]
+    [CreateAssetMenu(fileName = "usable_package_effects_", menuName = "Usables/Apply Usable Effects (Action Result)")]
     public class SerializedApplyUsableEffectsResult : SerializedActionResult
     {
-
         [SerializeField,FormerlySerializedAs("StatChanges")] SerializedDictionary<TargetingType, BaseAppliedEffect[]> effects;
-
         public override ActionResult Deserialize()
         {
             return new ApplyUsableEffectsResult(effects);
