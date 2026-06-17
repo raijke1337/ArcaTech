@@ -24,16 +24,6 @@ namespace Arcatech.Stats
         [Tooltip("Optional condition for this modifier to be active.")]
         public ConditionGroup condition;
     }
-
-    [Serializable]
-    public struct StatDelta // an instantaneous or per-tick delta to Current or Max
-    {
-        public ResourceStatType stat;
-        public StatTarget target;
-        public float amount; // Negative for damage, positive for healing/gain
-        public SerializedProduceFXResult onApply;
-    }
-
     [Serializable]
     public struct PeriodicDelta
     {
@@ -42,21 +32,12 @@ namespace Arcatech.Stats
         [Tooltip("Optional condition to apply this delta when it ticks.")]
         public ConditionGroup condition;
     }
-
-    public struct SourceKey : IEquatable<SourceKey>
+    [Serializable]
+    public struct StatDelta // an instantaneous or per-tick delta to Current or Max
     {
-        public readonly object source;
-        public readonly int id;
-
-        public SourceKey(object src, int id)
-        {
-            source = src; this.id = id;
-        }
-
-        public bool Equals(SourceKey other) => ReferenceEquals(source, other.source) && id == other.id;
-        public override bool Equals(object obj) => obj is SourceKey other && Equals(other);
-        public override int GetHashCode() => ((source?.GetHashCode() ?? 0) * 397) ^ id;
-        public override string ToString() => $"{source?.GetType().Name ?? "null"}#{id}";
+        public ResourceStatType stat;
+        public StatTarget target;
+        public float amount; // Negative for damage, positive for healing/gain
+        public SerializedProduceFXResult onApply;
     }
-
 }

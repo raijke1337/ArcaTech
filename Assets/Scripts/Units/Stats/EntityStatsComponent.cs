@@ -89,24 +89,27 @@ namespace Arcatech.Stats
         {
             stats.Clear();
 
-            if (startingConfig != null)
-            {
-                foreach (var rs in startingConfig.resources)
-                {
-                    var st = new StatRuntime
-                    {
-                        baseMax = Mathf.Max(0f, rs.baseMax),
-                        minClamp = rs.minClampCurrent,
-                        maxClamp = rs.maxClampCurrent
-                    };
-                    st.max = st.baseMax;
-                    float startCurrent = rs.setStartCurrentAsPercentOfMax
-                        ? Mathf.Clamp01(rs.startPercent) * st.max
-                        : rs.startCurrent;
-                    st.current = Mathf.Clamp(startCurrent, st.minClamp, Mathf.Max(st.maxClamp, st.max));
-                    stats[rs.stat] = st;
-                }
-            }
+            // TODO: implement the standard values logic
+            // TODO: BaseStatsConfig is an IEquipmentStatsProvider now
+            
+            // if (startingConfig != null)
+            // {
+            //     foreach (var rs in startingConfig.resources)
+            //     {
+            //         var st = new StatRuntime
+            //         {
+            //             baseMax = Mathf.Max(0f, rs.baseMax),
+            //             minClamp = rs.minClampCurrent,
+            //             maxClamp = rs.maxClampCurrent
+            //         };
+            //         st.max = st.baseMax;
+            //         float startCurrent = rs.setStartCurrentAsPercentOfMax
+            //             ? Mathf.Clamp01(rs.startPercent) * st.max
+            //             : rs.startCurrent;
+            //         st.current = Mathf.Clamp(startCurrent, st.minClamp, Mathf.Max(st.maxClamp, st.max));
+            //         stats[rs.stat] = st;
+            //     }
+            // }
 
             liveEquipMaxModifiers.Clear();
             periodic.Clear();
