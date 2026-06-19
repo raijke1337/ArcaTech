@@ -1,6 +1,5 @@
 ﻿using Arcatech.Triggers;
 using Arcatech.Units;
-using Drakkar.GameUtils;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,7 +20,6 @@ namespace Arcatech.Items.Projectiles
         #endregion
 
         [SerializeField, Self] private BaseGameEntityComponent entity;
-        [SerializeField] private DrakkarTrail trail;
         public BaseGameEntityComponent Entity => entity;
 
         ProjectileBehavior _behavior;
@@ -78,13 +76,7 @@ namespace Arcatech.Items.Projectiles
         public bool Active
         {
             get => _col.Active;
-            set
-            {
-                _col.Active = value;
-                if (!trail) return;
-                if (value) trail.Begin();
-                else trail.End();
-            }
+            set => _col.Active = value;
         }
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)=> _receiver = receiver;

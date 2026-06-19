@@ -1,5 +1,5 @@
-﻿using Arcatech.Units;
-using Drakkar.GameUtils;
+﻿using System;
+using Arcatech.Units;
 using UnityEngine;
 
 namespace Arcatech.Items
@@ -7,9 +7,9 @@ namespace Arcatech.Items
     public class EquipmentComponent : MonoBehaviour,IUsableComponent
     {
         [SerializeField] private Transform spawner;
+        [SerializeField] private ParticleSystem particle;
         public Transform EffectSpawn => spawner;
         private EquipmentAnimator _equipmentAnimator;
-        [SerializeField] DrakkarTrail _trail;
         
         protected void OnEnable()
         {
@@ -19,30 +19,35 @@ namespace Arcatech.Items
                 spawner = transform;
             }
             TryGetComponent(out _equipmentAnimator);
+            if (!particle) particle = GetComponentInChildren<ParticleSystem>();
+            if (particle)
+            {
+                particle.Stop();
+            }
         }
 
 
         public void OnChangeUsableState(StateMachineNotifyType notifyType)
-        {
+        { 
+            if (_equipmentAnimator) _equipmentAnimator.OnChangeUsableState(notifyType);
             switch (notifyType)
             {
+                case StateMachineNotifyType.NoNotify:
+                    break;
                 case StateMachineNotifyType.Starting:
-                {
-                    if (_trail) _trail.Begin();
                     break;
-                }
-                case StateMachineNotifyType.EndUse:
-                {
-                    if (_trail) _trail.End();
-                    break;
-                }
                 case StateMachineNotifyType.Use:
-                {
-                    //if (useParticleEffect)  useParticleEffect.Play(); 
+                    particle?.Play();
                     break;
-                }
+                case StateMachineNotifyType.EndUse:
+                    particle?.Stop();
+                    break;
+                case StateMachineNotifyType.Cancel:
+                    particle?.Stop();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(notifyType), notifyType, null);
             }
-            if (_equipmentAnimator) _equipmentAnimator.OnChangeUsableState(notifyType);
         }
     }
 }

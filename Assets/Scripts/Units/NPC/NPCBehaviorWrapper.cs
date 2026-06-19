@@ -24,7 +24,7 @@ namespace Arcatech.Units
         [SerializeField, Self] protected EntityStatsComponent stats;
         [SerializeField, Child] protected Animator animator;
         [SerializeField, Child] protected EffectsReceiverComponent effectsReceiver;
-
+        private Rigidbody _rigidbody;
 
 
         #region BLACKBOARD actions
@@ -188,7 +188,30 @@ namespace Arcatech.Units
                 }
             }
         }
-        
+        [Header("Impulse Settings")]
+
+        [Tooltip("Горизонтальная скорость (м/с), сообщаемая импульсом ±1 (додж игрока).")]
+        [SerializeField] private float _impulseSpeed = 8f;
+
+        [Tooltip("Сколько секунд снимать привязку к земле после импульса, чтобы додж отрывал от пола.")]
+        [SerializeField] private float _impulseGroundConstraintPause = 0.15f;
+        public void ApplyImpulse(Vector3 impulse)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ApplyImpulse(float impulseRelative)
+        {
+            if (Paused) return;
+
+            float t = Mathf.Clamp(impulseRelative, -1f, 1f);
+            if (Mathf.Approximately(t, 0f)) return;
+
+            Vector3 worldImpulse = transform.forward * (t * _impulseSpeed);
+            _rigidbody.AddForce(worldImpulse,ForceMode.Impulse);
+            
+        }
+
         private void Initialize()
         {
             if (m_IsInitialized) return;
@@ -214,6 +237,8 @@ namespace Arcatech.Units
                 Debug.LogWarning($"[SpeedController] Переменные 'NonCombatMS' и 'CombatMS' не найдены в доске на {gameObject.name}. " +
                                  $"Убедитесь, что граф инициализирован и доска подключена.");
             }
+            
+            _rigidbody = GetComponent<Rigidbody>();
         }
         private void ApplySpeedMultiplier()
         {

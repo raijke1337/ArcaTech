@@ -225,7 +225,7 @@ namespace Arcatech.Units.Control
         }
 
         /// <summary>
-        /// Додж игрока: импульс относительно forward игрока.
+        /// Додж игрока: импульс относительно moveDir игрока.
         /// -1 = полный назад, 0 = нет, +1 = полный вперёд.
         /// Добавляется к текущей боковой скорости — бегущий юнит тормозит трением, а не телепортируется.
         /// </summary>
@@ -236,7 +236,7 @@ namespace Arcatech.Units.Control
             float t = Mathf.Clamp(impulseRelative, -1f, 1f);
             if (Mathf.Approximately(t, 0f)) return;
 
-            Vector3 worldImpulse = transform.forward * (t * _impulseSpeed);
+            Vector3 worldImpulse = MovementVector * (t * _impulseSpeed);
 
             LaunchCharacter(
                 launchVelocity:           worldImpulse,

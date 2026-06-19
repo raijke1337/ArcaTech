@@ -173,6 +173,9 @@ MonoBehaviour:
   - rid: 4741284592624861940
   - rid: 4741284592624861941
   - rid: 4741284592624861942
+  - rid: 8356651649112735937
+  - rid: 8356651649112735938
+  - rid: 8356651649112735939
   m_OriginalGraph: {fileID: 5059491024574770053, guid: 4d822d3f69c29a047bab76545e01449b,
     type: 2}
   m_IsInitialised: 0
@@ -218,6 +221,33 @@ MonoBehaviour:
         Name: IdleSubgraph
         m_Value: {fileID: 3918541972323933621, guid: 767bcebf8eebc9b41a8094c267b0a938,
           type: 2}
+    - rid: 8356651649112735937
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 14723716665040572627
+          m_Value1: 1218175297620437066
+        Name: NonCombatMS
+        m_Value: 1
+    - rid: 8356651649112735938
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 690650667857688880
+          m_Value1: 17757057881102539962
+        Name: CombatMS
+        m_Value: 2
+    - rid: 8356651649112735939
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 15965788084526628365
+          m_Value1: 2548947139970400954
+        Name: BehaviorUpdateInterval
+        m_Value: 0.5
 --- !u!195 &3092874308524416317
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -265,7 +295,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &4070838589394688615
 MonoBehaviour:
@@ -291,7 +321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: 11a57a3d-2ceb-466e-9997-c6d821297f3e
 --- !u!114 &7980303944722158138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,7 +437,9 @@ MonoBehaviour:
   unitInputs: {fileID: 8578375123324444576}
   stats: {fileID: 4852089638860173258}
   animator: {fileID: 1132627040064762127}
-  unitsGroupID: default
+  effectsReceiver: {fileID: 4201277184077725860}
+  _impulseSpeed: 8
+  _impulseGroundConstraintPause: 0.15
 --- !u!114 &2090891045002044803
 MonoBehaviour:
   m_ObjectHideFlags: 0

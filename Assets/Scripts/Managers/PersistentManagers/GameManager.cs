@@ -25,7 +25,7 @@ namespace Arcatech.Managers
         }
         #endregion
        
-        [SerializeField] private MenuPrefabControllerComp _mainMenuPrefab;
+      //  [SerializeField] private MenuPrefabControllerComp _mainMenuPrefab;
         [SerializeField] private GameInterfaceManager gameInterfaceManagerPrefab;
 
         private void OnEnable()
@@ -33,21 +33,12 @@ namespace Arcatech.Managers
             DOTween.Init();
             _dataManager = DataManager.Instance;
 
-#if UNITY_EDITOR
-            Assert.IsNotNull(_mainScene);
-            Assert.IsNotNull(_equipsScene);
-            Assert.IsNotNull(_galleryScene);
-            Assert.IsNotNull(_newgameScene);
-            Assert.IsNotNull(_noEquipsLevel);
-            Assert.IsNotNull(_mainMenuPrefab);
-
             // for quicker load into debug level 
-#endif
             int sceneIndex = SceneManager.GetActiveScene().buildIndex;
             _currentLevel = _dataManager.GetSceneContainer(sceneIndex);
             if (_currentLevel == _mainScene)
             {
-                Instantiate(_mainMenuPrefab);
+              //  Instantiate(_mainMenuPrefab);
             }
         }
 
@@ -76,7 +67,7 @@ namespace Arcatech.Managers
 
             if (sc == _mainScene)
             {
-                Instantiate(_mainMenuPrefab);
+                //Instantiate(_mainMenuPrefab);
             }
 
             switch (sc.LevelType)
