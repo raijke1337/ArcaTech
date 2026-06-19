@@ -1,31 +1,37 @@
-﻿
-using System;
-using Arcatech.Items;
+﻿using Arcatech.Items;
 using Arcatech.Usables.Effects;
 using ECM2;
 using UnityEngine;
 
 namespace Arcatech.Units.Control
 {
-    [RequireComponent(typeof(EntityStateMachineComponent))]
+    [RequireComponent(typeof(BaseGameEntityComponent))]
     public class MovementControllerWithAiming : Character, IMove, IPausableComponent, IJump, IAim, IUnitCommandValidator
     {
- 
+        private BaseGameEntityComponent _baseGameEntityComponent;
+        private IModifierAggregator _agg;
         private float _startSpeed;
         private float _mult = 1f;
+
 
         public float SpeedMultiplier
         {
             get => _mult;
             set
             {
+                if (value.Equals(_mult)) return;
                 _mult = value;
-                Debug.Log($"Speed mult for {fsm.GetMainEntity.name}: {value} NYI");
+                maxWalkSpeed = _startSpeed * _mult;
             }
         }
-        private EntityStateMachineComponent fsm;
+
         public bool CanMove { get; set; }
-        public bool UseRootMotion { get => useRootMotion; set => useRootMotion = value; }
+
+        public bool UseRootMotion
+        {
+            get => useRootMotion;
+            set => useRootMotion = value;
+        }
 
         public Vector3 MovementVector
         {
@@ -40,14 +46,14 @@ namespace Arcatech.Units.Control
             get => isPaused;
             set => Pause(value);
         }
-        
-        public bool CanAim { get; set; }  = true;
-        
+
+        public bool CanAim { get; set; } = true;
+
         public Vector3 AimPosition { get; set; }
 
         protected override void CustomRotationMode(float deltaTime)
         {
-            if (CanAim) RotateTowards(AimPosition,deltaTime);
+            if (CanAim) RotateTowards(AimPosition, deltaTime);
             base.CustomRotationMode(deltaTime);
         }
 
@@ -61,65 +67,78 @@ namespace Arcatech.Units.Control
         {
             base.OnCharacterMovementUpdated(deltaTime);
             Animate();
+            if (_agg != null)
+            {
+                SpeedMultiplier = _agg.GetMultiplier(ModifierParam.MoveSpeed);
+            }
         }
-        
+
         #region Animate
- 
-         
-         // for animator hashes
-         private readonly string fm = "ForwardMove";
-         private readonly string sm = "SideMove";
-         private readonly string vm = "VerticalMove";
-         private readonly string dr = "DoStandingRotation";
-         private readonly string fV = "LinearVelocity";
-        
-         private int fmI;
-         private int smI;
-         private int vmI;
-         private int drI;
-         private int vI;
-        
-         private bool isStandingRotating;
-        
-         [Header("animator setting")] [SerializeField]
-         private float minCrossYToRotate = 0.15f;
+
+
+        // for animator hashes
+        private readonly string fm = "ForwardMove";
+        private readonly string sm = "SideMove";
+        private readonly string vm = "VerticalMove";
+        private readonly string dr = "DoStandingRotation";
+        private readonly string fV = "LinearVelocity";
+
+        private int fmI;
+        private int smI;
+        private int vmI;
+        private int drI;
+        private int vI;
+
+        private bool isStandingRotating;
+
+        [Header("animator setting")] [SerializeField]
+        private float minCrossYToRotate = 0.15f;
+
         protected override void OnEnable()
         {
+            _baseGameEntityComponent = GetComponent<BaseGameEntityComponent>();
+            if (_baseGameEntityComponent.TryGetComponent<EffectsReceiverComponent>(out var receiverComponent))
+            {
+                receiverComponent.TryGetModifierAggregator(out _agg);
+            }
+
             base.OnEnable();
-            fsm = GetComponent<EntityStateMachineComponent>();
             fmI = Animator.StringToHash(fm);
             smI = Animator.StringToHash(sm);
             vmI = Animator.StringToHash(vm);
             drI = Animator.StringToHash(dr);
+
             vI = Animator.StringToHash(fV);
+            _startSpeed = maxWalkSpeed;
         }
 
 
         private Vector2 lastDotVector;
+
         private void Animate()
         {
             animator.SetFloat(vI, GetVelocity().magnitude);
             // Dot product of two vectors determines how much they are pointing in the same direction.
             // If the vectors are normalized (transform.forward and right are)
             // then the value will be between -1 and +1.
-        
+
             var fwd = transform.forward;
             var right = transform.right;
-        
+
             if (MovementVector != Vector3.zero)
-            {           
-        
-                
+            {
+
+
                 var x = Vector3.Dot(right, Vector3.Normalize(GetVelocity()));
                 var z = Vector3.Dot(fwd, Vector3.Normalize(GetVelocity()));
-           
+
                 lastDotVector.x = x;
                 lastDotVector.y = z;
-            
-        
+
+
                 animator.SetFloat(fmI, z);
-                animator.SetFloat(smI,x);
-                
+                animator.SetFloat(smI, x);
+
                 isStandingRotating = false;
                 animator.ResetTrigger(drI);
             }
@@ -127,23 +146,25 @@ namespace Arcatech.Units.Control
             {
                 animator.SetFloat(fmI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
                 animator.SetFloat(smI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
-        
+
                 var crossY = (Mathf.Abs(Vector3.Cross(fwd, AimPosition).y));
-        
-                if  (crossY > minCrossYToRotate && GetCharacterMovement().isGrounded)
+
+                if (crossY > minCrossYToRotate && GetCharacterMovement().isGrounded)
                 {
                     animator.SetTrigger(drI);
                     isStandingRotating = true;
                 }
+
                 if (crossY <= 0.01f) // finished rotation
                 {
                     isStandingRotating = false;
                 }
             }
+
             animator.SetFloat(vmI, GetVelocity().y);
 
         }
-        
+
         #endregion
 
         public bool CanDoUnitCommand(UnitActionType type, out string info)
@@ -153,7 +174,7 @@ namespace Arcatech.Units.Control
             {
                 case UnitActionType.Jump:
                     info += CanJump();
-                    return CanJump(); 
+                    return CanJump();
                 default:
                     info += "OK";
                     return true;
@@ -174,5 +195,56 @@ namespace Arcatech.Units.Control
                 if (value) Jump();
             }
         }
+
+
+
+        #region dodge/pushback
+
+        [Header("Impulse Settings")]
+
+        [Tooltip("Горизонтальная скорость (м/с), сообщаемая импульсом ±1 (додж игрока).")]
+        [SerializeField] private float _impulseSpeed = 8f;
+
+        [Tooltip("Сколько секунд снимать привязку к земле после импульса, чтобы додж отрывал от пола.")]
+        [SerializeField] private float _impulseGroundConstraintPause = 0.15f;
+
+        /// <summary>
+        /// Knockback / отдача от внешнего источника (взрыв, удар босса) в мировых координатах.
+        /// Заменяет текущую боковую скорость — knockback должен ощущаться резко и коммитить.
+        /// </summary>
+        public void ApplyImpulse(Vector3 impulse)
+        {
+            if (Paused || impulse.sqrMagnitude < 0.0001f) return;
+
+            LaunchCharacter(
+                launchVelocity:           impulse,
+                overrideVerticalVelocity: false,  // гравитацию и текущую вертикаль не трогаем
+                overrideLateralVelocity:  true);  // knockback перебивает боковую инерцию
+
+            PauseGroundConstraint(_impulseGroundConstraintPause);
+        }
+
+        /// <summary>
+        /// Додж игрока: импульс относительно forward игрока.
+        /// -1 = полный назад, 0 = нет, +1 = полный вперёд.
+        /// Добавляется к текущей боковой скорости — бегущий юнит тормозит трением, а не телепортируется.
+        /// </summary>
+        public void ApplyImpulse(float impulseRelative)
+        {
+            if (Paused) return;
+
+            float t = Mathf.Clamp(impulseRelative, -1f, 1f);
+            if (Mathf.Approximately(t, 0f)) return;
+
+            Vector3 worldImpulse = transform.forward * (t * _impulseSpeed);
+
+            LaunchCharacter(
+                launchVelocity:           worldImpulse,
+                overrideVerticalVelocity: false,
+                overrideLateralVelocity:  false);  // додж складывается с инерцией
+
+            PauseGroundConstraint(_impulseGroundConstraintPause);
+        }
+        #endregion
     }
 }

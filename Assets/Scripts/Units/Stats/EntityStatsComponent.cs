@@ -92,24 +92,35 @@ namespace Arcatech.Stats
             // TODO: implement the standard values logic
             // TODO: BaseStatsConfig is an IEquipmentStatsProvider now
             
-            // if (startingConfig != null)
-            // {
-            //     foreach (var rs in startingConfig.resources)
-            //     {
-            //         var st = new StatRuntime
-            //         {
-            //             baseMax = Mathf.Max(0f, rs.baseMax),
-            //             minClamp = rs.minClampCurrent,
-            //             maxClamp = rs.maxClampCurrent
-            //         };
-            //         st.max = st.baseMax;
-            //         float startCurrent = rs.setStartCurrentAsPercentOfMax
-            //             ? Mathf.Clamp01(rs.startPercent) * st.max
-            //             : rs.startCurrent;
-            //         st.current = Mathf.Clamp(startCurrent, st.minClamp, Mathf.Max(st.maxClamp, st.max));
-            //         stats[rs.stat] = st;
-            //     }
-            // }
+            if (startingConfig != null)
+            {
+                foreach (var rs in startingConfig.resources)
+                {
+                    var st = new StatRuntime
+                    {
+                        baseMax = Mathf.Max(0f, rs.Value.baseMax),
+                        minClamp = rs.Value.minClampCurrent,
+                        maxClamp = rs.Value.maxClampCurrent
+                    };
+                    st.max = st.baseMax;
+                    float startCurrent = rs.Value.setStartCurrentAsPercentOfMax
+                        ? Mathf.Clamp01(rs.Value.startPercent) * st.max
+                        : rs.Value.startCurrent;
+                    st.current = Mathf.Clamp(startCurrent, st.minClamp, Mathf.Max(st.maxClamp, st.max));
+                    stats[rs.Key] = st;
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"No stats assigned for {entity}! Creating default 100 hp.");
+                stats[ResourceStatType.Health] = new StatRuntime
+                {
+                    baseMax = 100,
+                    minClamp = 0,
+                    maxClamp = 100,
+                    max = 100
+                };
+            }
 
             liveEquipMaxModifiers.Clear();
             periodic.Clear();

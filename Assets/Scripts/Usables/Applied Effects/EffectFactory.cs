@@ -29,6 +29,7 @@ namespace Arcatech.Usables.Effects
                 case AppliedAbsorbShieldEffect shield: return new AbsorbShieldResult(shield);
                 case AppliedStunEffect stun:           return new StunResult(stun);
                 case AppliedSummonEffect summon:       return new SummonResult(summon);
+                case AppliedImpulseEffect impulse : return new ImpulseResult(impulse);
                 default:
                     Debug.LogError($"[EffectFactory] No mapping for {def.GetType().Name} — effect does nothing.");
                     return new NullEffectResult();

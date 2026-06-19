@@ -76,7 +76,7 @@ namespace Arcatech.SaveSystem
             _trackedItems = new List<ISavedProgressItem>(FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ISavedProgressItem>().ToArray());
             foreach (var item in _trackedItems)
             {
-                Debug.Log($"Item {item.SavedItemID}, {item.Name}");
+                if (showDebugs) Debug.Log($"Item {item.SavedItemID}, {item.Name}");
             }
             _saveables = new List<ISaveable>(FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ISaveable>());
         }
@@ -100,7 +100,7 @@ namespace Arcatech.SaveSystem
 
         public void OnCheckPointReached(CheckpointTrigger trigger)
         {
-            Debug.Log($"Checkpoint found! {trigger.name}");
+            if (showDebugs) Debug.Log($"Checkpoint found! {trigger.name}");
             _checkpointProgress = new LevelProgressData(_currentProgress)
             {
                 resumePosition = trigger.transform.position.ToSerializable()
