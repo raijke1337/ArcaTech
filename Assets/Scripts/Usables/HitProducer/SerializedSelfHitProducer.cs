@@ -1,5 +1,6 @@
 ﻿using System;
 using Arcatech.Items;
+using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace Arcatech.Usables
         }
     }
 
-    public class SelfHitProducer : HitProducer
+    public class SelfHitProducer : HitProducer, ITriggerNotificationProvider
     {
         private Collider _tgt;
         public SelfHitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedSelfHitProducer cfg) : base(owner, item,cfg)
@@ -34,7 +35,7 @@ namespace Arcatech.Usables
                 case StateMachineNotifyType.Starting:
                     break;
                 case StateMachineNotifyType.Use:
-                    HitCallback(new TriggerHitInfo(null, _tgt, Owner.EffectSpawn.position, Vector3.up,
+                    HitCallback(new TriggerHitInfo(this, _tgt, Owner.EffectSpawn.position, Vector3.up,
                         Vector3.up, Time.time));
                     break;
                 case StateMachineNotifyType.EndUse:
@@ -47,5 +48,14 @@ namespace Arcatech.Usables
             base.OnChangeUsableState(info);
         }
 
+        public bool Active { get => true; set => throw new NotImplementedException(); }
+        public void RegisterReceiver(ITriggerNotificationReceiver receiver)
+        { throw new NotImplementedException(); }
+
+        public void UnregisterReceiver(ITriggerNotificationReceiver receiver)
+        {throw new NotImplementedException(); }
+
+        public void AreaCast(ITriggerNotificationReceiver receiver)
+        {throw new NotImplementedException(); }
     }
 }

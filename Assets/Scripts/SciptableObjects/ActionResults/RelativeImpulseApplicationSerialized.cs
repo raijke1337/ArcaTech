@@ -32,7 +32,7 @@ namespace Arcatech.Actions
         {
             if (!init)
             {
-                if (user.TryGetComponent(out mover));
+                if (target.TryGetComponent(out mover));
             }
 
             if (mover == null) return false;

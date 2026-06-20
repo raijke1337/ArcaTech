@@ -27,10 +27,6 @@ namespace Arcatech.Units
                 _receivers = new List<IStateMachineNotificationReceiver>(user.GetComponentsInChildren<IStateMachineNotificationReceiver>());
             }
 
-            if (_receivers.Count == 0)
-            {
-                Debug.LogWarning($"No statement receivers found for {_type} in {nameof(StateMachineNotificationActionSO)}");
-            }
             foreach (var receiver in _receivers)
             {
                 receiver.StateMachineNotification(_type);

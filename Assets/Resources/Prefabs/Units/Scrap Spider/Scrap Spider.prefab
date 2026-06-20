@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 5691952451691057331}
   - component: {fileID: 3916644926092555660}
   - component: {fileID: 4201277184077725860}
+  - component: {fileID: 5036760355422192530}
   m_Layer: 6
   m_Name: Scrap Spider
   m_TagString: Untagged
@@ -292,7 +293,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
@@ -321,7 +322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 11a57a3d-2ceb-466e-9997-c6d821297f3e
+  uniqueId: 
 --- !u!114 &7980303944722158138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,7 +339,7 @@ MonoBehaviour:
   _name: Scrap Spider
   id: {fileID: 2823843714537644489}
   _rb: {fileID: 944089804924973816}
-  setKinematic: 1
+  setKinematic: 0
   entitySide: 2
   effectSpawn: {fileID: 40640390865327336}
   destroyOnDeath: 1
@@ -438,8 +439,6 @@ MonoBehaviour:
   stats: {fileID: 4852089638860173258}
   animator: {fileID: 1132627040064762127}
   effectsReceiver: {fileID: 4201277184077725860}
-  _impulseSpeed: 8
-  _impulseGroundConstraintPause: 0.15
 --- !u!114 &2090891045002044803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -624,6 +623,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9acb5ed58c7439884307c40a843da0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.EffectsReceiverComponent
+--- !u!114 &5036760355422192530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9022434418627609629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3254c267037b4c5fade4d0018738e12f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.ImpulseApplier
+  _verboseImpulseLogging: 1
+  _impulseSpeed: 8
+  _impulseDuration: 0.3
+  _impulseEndSpeed: 0.5
+  _warpSampleDistance: 2
 --- !u!1001 &8119439542017666702
 PrefabInstance:
   m_ObjectHideFlags: 0

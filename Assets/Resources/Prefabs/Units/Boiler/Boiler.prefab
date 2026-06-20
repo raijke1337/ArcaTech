@@ -102,7 +102,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!114 &4330460281106689524
 MonoBehaviour:
@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: 840d7f9d-f8e3-4688-94fd-43b400f52c58
 --- !u!114 &6222499059563901983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,7 +145,7 @@ MonoBehaviour:
   _name: Boiler
   id: {fileID: 4927733929998044020}
   _rb: {fileID: 2020214546167136041}
-  setKinematic: 1
+  setKinematic: 0
   entitySide: 2
   effectSpawn: {fileID: 2169831848283976518}
   destroyOnDeath: 1
@@ -449,7 +449,6 @@ MonoBehaviour:
   stats: {fileID: 1988780292251766204}
   animator: {fileID: 690720569971779641}
   effectsReceiver: {fileID: 7525482489532258903}
-  unitsGroupID: default
 --- !u!114 &5871166104221327915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -511,7 +510,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.EntityInventoryComponent
   baseGameEntity: {fileID: 6222499059563901983}
-  defaultEquips: {fileID: 0}
+  defaultEquips: {fileID: 11400000, guid: 65cb535157050ef42a4ec36a0c96ad45, type: 2}
   useSaveSystem: 0
 --- !u!114 &1493099341854540240
 MonoBehaviour:
@@ -725,6 +724,11 @@ PrefabInstance:
       propertyPath: InitialModule.startSpeed.minScalar
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 199326340111179614, guid: 1079997728c9a2d40864e5dd4cbacfc2,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -811,6 +815,11 @@ PrefabInstance:
     - target: {fileID: 198591566220847320, guid: 1079997728c9a2d40864e5dd4cbacfc2,
         type: 3}
       propertyPath: InitialModule.startSpeed.minScalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 199326340111179614, guid: 1079997728c9a2d40864e5dd4cbacfc2,
+        type: 3}
+      propertyPath: m_Materials.Array.size
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
