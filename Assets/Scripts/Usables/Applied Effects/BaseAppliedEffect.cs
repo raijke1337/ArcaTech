@@ -28,6 +28,9 @@ namespace Arcatech.Usables.Effects
         public StackType stackType;
         public int maxStacks = 99;
 
+        [Header("Effect")] public ParticleSystem graphics;
+
+        
         // NEW: common timing for every effect kind (design doc section "Б) Периодичностью")
         [Header("Periodicity")]
         public PeriodicityDefinition periodicity = new PeriodicityDefinition

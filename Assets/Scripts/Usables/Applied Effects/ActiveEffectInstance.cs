@@ -1,4 +1,6 @@
-﻿namespace Arcatech.Usables.Effects
+﻿using UnityEngine;
+
+namespace Arcatech.Usables.Effects
 {
     public sealed class ActiveEffectInstance
     {
@@ -18,8 +20,10 @@
         public int Stacks { get; internal set; } = 1;
         public bool IsFinished { get; private set; }
 
+        public ParticleSystem GetDisplayEffect { get; }
+
         public ActiveEffectInstance(EffectKey key, IEffectResult result, BaseGameEntityComponent source,
-            PeriodicityRunner runner, bool infinite, BaseAppliedEffect.StackType stackType, int MaxStacks)
+            PeriodicityRunner runner, bool infinite, BaseAppliedEffect.StackType stackType, int MaxStacks, ParticleSystem particleSystemPrefab)
         {
             Key = key;
             Result = result;
@@ -28,6 +32,7 @@
             _infinite = infinite;
             MaxStacks = MaxStacks;
             StackType = stackType;
+            GetDisplayEffect = particleSystemPrefab;
         }
 
         public void Tick(float dt, EffectContext ctx)

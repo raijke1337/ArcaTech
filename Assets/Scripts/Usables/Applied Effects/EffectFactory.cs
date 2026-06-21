@@ -17,7 +17,7 @@ namespace Arcatech.Usables.Effects
                 ? Mathf.Max(0f, def.durationSeconds)
                 : (def.infiniteDuration ? float.PositiveInfinity : Mathf.Max(0f, def.durationSeconds));
             var runner = new PeriodicityRunner(def.periodicity, runnerDuration);
-            return new ActiveEffectInstance(key, result, source, runner, def.infiniteDuration,def.stackType,def.maxStacks);
+            return new ActiveEffectInstance(key, result, source, runner, def.infiniteDuration,def.stackType,def.maxStacks,def.graphics);
         }
 
         private IEffectResult BuildResult(BaseAppliedEffect def)

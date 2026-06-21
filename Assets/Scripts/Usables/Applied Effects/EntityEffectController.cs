@@ -5,9 +5,11 @@ using Arcatech.Units;
 using Arcatech.Usables.Effects;
 using UnityEngine;
 
+
 public class EntityEffectController : MonoBehaviour, IPausableComponent, IKillableComponent
 {
     private readonly Dictionary<EffectKey, List<ActiveEffectInstance>> _active = new();
+    private readonly Dictionary<EffectKey, ParticleSystem> _activeParticles = new(); 
     private readonly List<ActiveEffectInstance> _flat = new();
     private readonly IStackingResolver _stacking = new StackingResolver();
     private BaseGameEntityComponent _owner;
@@ -81,7 +83,9 @@ public class EntityEffectController : MonoBehaviour, IPausableComponent, IKillab
         {
             list = new List<ActiveEffectInstance>();
             _active[instance.Key] = list;
+            if (instance.GetDisplayEffect)  _activeParticles[instance.Key] = Instantiate(instance.GetDisplayEffect,_owner.EffectSpawn,false);
         }
+        
         list.Add(instance);
         _flat.Add(instance);
     }
@@ -103,27 +107,21 @@ public class EntityEffectController : MonoBehaviour, IPausableComponent, IKillab
             if (_flat[i].IsFinished) RemoveAt(i);
     }
 
-    private void Remove(ActiveEffectInstance inst)
+    private void Remove(ActiveEffectInstance inst)   => RemoveInternal(inst);
+    private void RemoveAt(int flatIndex)             => RemoveInternal(_flat[flatIndex], flatIndex);
+    private void RemoveInternal(ActiveEffectInstance inst, int flatIndex = -1)
     {
-        _flat.Remove(inst);
+        if (flatIndex >= 0) _flat.RemoveAt(flatIndex);
+        else                _flat.Remove(inst);
+
         if (_active.TryGetValue(inst.Key, out var list))
         {
             list.Remove(inst);
             if (list.Count == 0) _active.Remove(inst.Key);
         }
-    }
 
-    private void RemoveAt(int flatIndex)
-    {
-        var inst = _flat[flatIndex];
-        _flat.RemoveAt(flatIndex);
-        if (_active.TryGetValue(inst.Key, out var list))
-        {
-            list.Remove(inst);
-            if (list.Count == 0) _active.Remove(inst.Key);
-        }
+        ReleaseParticle(inst.Key);   // всегда одна точка истины
     }
-
     public void SetKilled(IKillerComponent c, bool value)
     {
         _killed = value;
@@ -135,8 +133,13 @@ public class EntityEffectController : MonoBehaviour, IPausableComponent, IKillab
         _ctx.SetTarget(_receiver, _owner.transform.position, Quaternion.identity);
         for (int i = 0; i < _flat.Count; i++)
             _flat[i].ForceExpire(_ctx);
+
         _flat.Clear();
         _active.Clear();
+
+        foreach (var p in _activeParticles.Values)
+            if (p != null) Destroy(p.gameObject);
+        _activeParticles.Clear();
     }
 
     // ---- exposed for StackingResolver "total on target" counting (Step 5) ----
@@ -147,5 +150,15 @@ public class EntityEffectController : MonoBehaviour, IPausableComponent, IKillab
             if (string.Equals(kv.Key.EffectId, effectId, System.StringComparison.Ordinal))
                 n += kv.Value.Count;
         return n;
+    }
+    
+    
+    private void ReleaseParticle(EffectKey key)
+    {
+        if (_activeParticles.TryGetValue(key, out var p))
+        {
+            if (p != null) p.FadeOutAndDestroy(1);
+            _activeParticles.Remove(key);
+        }
     }
 }

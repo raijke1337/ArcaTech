@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 208211232779450952}
   - component: {fileID: 2341190631517381979}
   - component: {fileID: 2681025953516666007}
+  - component: {fileID: 4936519804115430375}
   m_Layer: 6
   m_Name: arca_hammer
   m_TagString: Untagged
@@ -100,7 +101,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collider: {fileID: 9104609740149324932}
+  triggerCollider: {fileID: 9104609740149324932}
+  cachedRigidbody: {fileID: 4936519804115430375}
+  _hitVisualizationDuration: 2
+  _hitSphereRadius: 0.1
+  _lineLength: 0.5
 --- !u!95 &2341190631517381979
 Animator:
   serializedVersion: 7
@@ -136,11 +141,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawner: {fileID: 6713517104212748397}
-  animator: {fileID: 2341190631517381979}
-  onDamaged: []
-  onKilled: []
-  animatorStateStartedTrigger: 
-  animatorStateExitTimeTrigger: 
+  particle: {fileID: 0}
+--- !u!54 &4936519804115430375
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322378502437355212}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &8030714190635475917
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,7 +178,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 871352085636831246}
-  - component: {fileID: 3024192032701665482}
   m_Layer: 0
   m_Name: trail
   m_TagString: Untagged
@@ -173,29 +200,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8269285218113624021}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3024192032701665482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8030714190635475917}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3351d65a5e49c64d9002bba88ce89a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Length: 0.5389062
-  Steps: 4
-  StepTime: 1
-  EndingSpeed: 4
-  Bounds: 1
-  Interpolation: 3
-  Edges: 0
-  Edge1: 0.5
-  Edge2: 0.666666
-  TrailMaterial: {fileID: 2100000, guid: 17eb36cb89a5b20499c80bf5daebaa39, type: 2}
-  Layer: 0
 --- !u!1 &9146033747052607947
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,6 +263,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -284,7 +290,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}

@@ -177,6 +177,7 @@ MonoBehaviour:
   - rid: 8356651649112735937
   - rid: 8356651649112735938
   - rid: 8356651649112735939
+  - rid: 4741284849461494093
   m_OriginalGraph: {fileID: 5059491024574770053, guid: 4d822d3f69c29a047bab76545e01449b,
     type: 2}
   m_IsInitialised: 0
@@ -222,6 +223,15 @@ MonoBehaviour:
         Name: IdleSubgraph
         m_Value: {fileID: 3918541972323933621, guid: 767bcebf8eebc9b41a8094c267b0a938,
           type: 2}
+    - rid: 4741284849461494093
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 631837554013951870
+          m_Value1: 13732984829432841113
+        Name: MeleeRange
+        m_Value: 1.5
     - rid: 8356651649112735937
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
         asm: Unity.Behavior}
@@ -230,7 +240,7 @@ MonoBehaviour:
           m_Value0: 14723716665040572627
           m_Value1: 1218175297620437066
         Name: NonCombatMS
-        m_Value: 1
+        m_Value: 0.8
     - rid: 8356651649112735938
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
         asm: Unity.Behavior}
@@ -239,7 +249,7 @@ MonoBehaviour:
           m_Value0: 690650667857688880
           m_Value1: 17757057881102539962
         Name: CombatMS
-        m_Value: 2
+        m_Value: 1.1
     - rid: 8356651649112735939
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
         asm: Unity.Behavior}
@@ -322,7 +332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: 0e125e9c-ee3b-4e94-a775-12624078d564
 --- !u!114 &7980303944722158138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -635,7 +645,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3254c267037b4c5fade4d0018738e12f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.ImpulseApplier
-  _verboseImpulseLogging: 1
   _impulseSpeed: 8
   _impulseDuration: 0.3
   _impulseEndSpeed: 0.5
