@@ -27,7 +27,7 @@ namespace Arcatech.Usables
                 .GetComponentInChildren<ITriggerNotificationProvider>(); // Assume pre-attached for melee;
             if (provider == null)
             {
-                Debug.LogError($"{item} has no hitbox for {item} to cast from!");
+                Debug.LogError($"{item.name} has no hitbox to cast from!");
                 return;
             }
             provider.Active = false;

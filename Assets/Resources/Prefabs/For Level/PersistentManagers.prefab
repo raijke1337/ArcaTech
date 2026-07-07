@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8102464926349693797}
-  - component: {fileID: 8102464926349693800}
   - component: {fileID: 8102464926349693803}
   - component: {fileID: 8102464926349693802}
   - component: {fileID: 8102464925495723806}
@@ -17,9 +16,6 @@ GameObject:
   - component: {fileID: 8102464925495723807}
   - component: {fileID: 4576216533406728223}
   - component: {fileID: 8102464925495723776}
-  - component: {fileID: 3231485611276433679}
-  - component: {fileID: 2864500779690670232}
-  - component: {fileID: 2351699518774529498}
   - component: {fileID: 6104867543945504151}
   m_Layer: 0
   m_Name: PersistentManagers
@@ -43,45 +39,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8102464926349693800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8102464926349693799}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01595255644ee754495b8772add0bd68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cursors:
-    _serializedList:
-    - Key: 0
-      Value: {fileID: 2555940965172109900, guid: 252d1f9f9eb6dfe46873735361f596d6,
-        type: 3}
-    - Key: 1
-      Value: {fileID: 2555940965172109900, guid: 252d1f9f9eb6dfe46873735361f596d6,
-        type: 3}
-    - Key: 2
-      Value: {fileID: 6555481737146133282, guid: 252d1f9f9eb6dfe46873735361f596d6,
-        type: 3}
-    - Key: 3
-      Value: {fileID: -3507967788200807427, guid: 252d1f9f9eb6dfe46873735361f596d6,
-        type: 3}
-  _fonts:
-    _serializedList:
-    - Key: 0
-      Value: {fileID: 11400000, guid: 2d1094862de91164ca168a654d4e1fd5, type: 2}
-    - Key: 1
-      Value: {fileID: 11400000, guid: 34a4a0c89db9414489be1315c76bc9f1, type: 2}
-    - Key: 2
-      Value: {fileID: 11400000, guid: c5421d755213ec9489b14c2688ce2231, type: 2}
-  _match2Pictures:
-  - {fileID: 21300000, guid: 44639cdcaafeaad46b51c75639eb58b9, type: 3}
-  - {fileID: 21300000, guid: 8fd687fdcc6d1f742b9f4a4d8cef6725, type: 3}
-  - {fileID: 21300000, guid: 5153334456f27544d9ce3744477e713d, type: 3}
-  - {fileID: 21300000, guid: ee4b77fd698c0f346b0904e9c2ee4993, type: 3}
 --- !u!114 &8102464926349693803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151,8 +108,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ce7180ba862ff743bf93394949f205f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mainMenuPrefab: {fileID: 1630084988138368169, guid: 68e960355551af84788cdb8581df6493,
-    type: 3}
   gameInterfaceManagerPrefab: {fileID: 1243103795978326481, guid: 5d28c2a47aa54d5498ba43640d7f8f9d,
     type: 3}
   _mainScene: {fileID: 11400000, guid: ba1c67d30b7547a44b5aad88d661e90d, type: 2}
@@ -217,49 +172,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SaveObject: 1
---- !u!114 &3231485611276433679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8102464926349693799}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d088f73d4d2f7694493ea80d35f89b7a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2864500779690670232
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8102464926349693799}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0984cf082085f0e429bf56329c69c7ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2351699518774529498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8102464926349693799}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 628557688023fba4b8e58d004aaacf45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PreUpdateSlots: 100
-  NormalUpdateSlots: 1000
-  PostUpdateSlots: 100
-  PreLateUpdateSlots: 30
-  LateUpdateSlots: 400
-  PostLateUpdateSlots: 30
-  FixedUpdateSlots: 10
 --- !u!114 &6104867543945504151
 MonoBehaviour:
   m_ObjectHideFlags: 0

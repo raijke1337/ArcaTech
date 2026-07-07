@@ -19,7 +19,7 @@ public partial class IncrementValueByDeltaTimeAction : Action
     {
         if (Bool.Value)  Value.Value += Time.deltaTime;
         else Value.Value -= Time.deltaTime;
-        return Status.Running;
+        return Status.Success;
     }
 
 }

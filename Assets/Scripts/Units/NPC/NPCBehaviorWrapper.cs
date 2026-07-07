@@ -96,6 +96,8 @@ namespace Arcatech.Units
             get => _canMove;
             set
             {
+                if (!agent.isOnNavMesh) return;
+                // to prevent errors caused by state switches during knockback
                 _canMove = value;
                 agent.isStopped = !value;
             }

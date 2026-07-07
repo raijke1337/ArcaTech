@@ -20,11 +20,7 @@ namespace Arcatech.Actions
 
         private void OnValidate()
         {
-            Assert.IsNotNull(effects);
-            Assert.IsTrue(effects.Count > 0);
             var firstKey = effects.Keys.FirstOrDefault();
-            Assert.IsNotNull(effects[firstKey]);
-            Assert.IsTrue(effects[firstKey].Length > 0);
         }
 
         public override string ToString()

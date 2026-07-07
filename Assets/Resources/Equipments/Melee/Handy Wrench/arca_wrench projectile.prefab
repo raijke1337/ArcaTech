@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 5495094405985039056}
   - component: {fileID: 5583655048206583044}
   - component: {fileID: 1139309180198338418}
-  - component: {fileID: 6478178242372315339}
+  - component: {fileID: 945350184138853082}
   m_Layer: 6
   m_Name: arca_wrench projectile
   m_TagString: Untagged
@@ -245,14 +245,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pauser: {fileID: 5495094405985039056}
+  _name: 
+  id: {fileID: 945350184138853082}
   _rb: {fileID: 6507032882160400354}
   setKinematic: 1
-  _name: 
   entitySide: 0
   effectSpawn: {fileID: 6698622227185165430}
   destroyOnDeath: 1
   timerToDestroy: 0
   _showDebugs: 0
+  AnnounceDead:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1139309180198338418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,8 +270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 5583655048206583044}
-  trail: {fileID: 6478178242372315339}
---- !u!114 &6478178242372315339
+--- !u!114 &945350184138853082
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -276,17 +279,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6322378502437355212}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3351d65a5e49c64d9002bba88ce89a9, type: 3}
+  m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GameUtils::Drakkar.GameUtils.DrakkarTrail
-  Length: 0.39063004
-  Steps: 4
-  StepTime: 0
-  EndingSpeed: 4
-  Bounds: 1
-  Interpolation: 0
-  Edges: 0
-  Edge1: 0.5
-  Edge2: 0.666666
-  TrailMaterial: {fileID: 0}
-  Layer: 0
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
+  uniqueId: 

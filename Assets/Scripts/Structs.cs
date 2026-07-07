@@ -23,14 +23,14 @@ namespace Arcatech
         RangedEmpty,
         Hidden,
         ArmatureRoot,
-        ShieldEmpty
+        BatteryEmpty
     }
     public enum ItemSlot
     {
         None,
         MeleeWeap,
         RangedWeap,
-        Shield,
+        Battery,
         Booster,
         Costume,
     }

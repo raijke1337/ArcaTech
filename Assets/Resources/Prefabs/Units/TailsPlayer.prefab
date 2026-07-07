@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 609165953634478481}
   - component: {fileID: 7739403192877342947}
   - component: {fileID: 5597438670505072981}
+  - component: {fileID: 3456940519033748238}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -337,7 +338,7 @@ MonoBehaviour:
   _standingDownwardForceScale: 1
   _camera: {fileID: 0}
   minCrossYToRotate: 0.15
-  _impulseSpeed: 8
+  _impulseSpeed: 20
   _impulseGroundConstraintPause: 0.15
 --- !u!114 &8462650149815504940
 MonoBehaviour:
@@ -428,7 +429,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.DamageDrawerComponent
   entity: {fileID: 3413998453285093005}
-  dotsDisplayInterval: 0.5
 --- !u!114 &6627545496501446189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -581,6 +581,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9acb5ed58c7439884307c40a843da0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.EffectsReceiverComponent
+--- !u!114 &3456940519033748238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35298c26bcf8446a96c3d39db0538fee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.StatsStateAugmentorComponent
+  stats: {fileID: 8341150968193856820}
+  stateMachine: {fileID: 5228831593658462585}
+  toKilledState: {fileID: 11400000, guid: aa806e69f163ab043a5541d5106fee78, type: 2}
+  toKnockDown: {fileID: 11400000, guid: aa2c57c1ff12e6d47b27770c3affa4b8, type: 2}
+  canBeInterrupted: 0
+  interruptCondition:
+    requireAll: 0
+    invert: 0
+    statConditions: []
+  toDamageInterrupt: {fileID: 0}
+  dmgFrontAnimatorParameter: DamageFront
+  dmgRightAnimatorParameter: DamageRight
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0

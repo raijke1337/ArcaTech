@@ -30,6 +30,8 @@ GameObject:
   - component: {fileID: 4331885020474676626}
   - component: {fileID: 1493099341854540240}
   - component: {fileID: 6999421415077459410}
+  - component: {fileID: 8174313999318445733}
+  - component: {fileID: 7970274244903579331}
   m_Layer: 6
   m_Name: Boiler
   m_TagString: Untagged
@@ -99,10 +101,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &4330460281106689524
 MonoBehaviour:
@@ -128,7 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 840d7f9d-f8e3-4688-94fd-43b400f52c58
+  uniqueId: 
 --- !u!114 &6222499059563901983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -510,7 +512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.EntityInventoryComponent
   baseGameEntity: {fileID: 6222499059563901983}
-  defaultEquips: {fileID: 11400000, guid: 65cb535157050ef42a4ec36a0c96ad45, type: 2}
+  defaultEquips: {fileID: 11400000, guid: b2a5c9fe0fcb2a7428c0953e3968517b, type: 2}
   useSaveSystem: 0
 --- !u!114 &1493099341854540240
 MonoBehaviour:
@@ -530,6 +532,12 @@ MonoBehaviour:
       _serializedList:
       - Key: 3
         Value: {fileID: 8912095832965318468}
+      - Key: 4
+        Value: {fileID: 8912095832965318468}
+      - Key: 2
+        Value: {fileID: 8912095832965318468}
+      - Key: 1
+        Value: {fileID: 8912095832965318468}
       - Key: 0
         Value: {fileID: 8912095832965318468}
   defaultItemsDrawStrat: {fileID: 11400000, guid: 0c8284373a6a2eb45b8a719e3880974e,
@@ -547,7 +555,45 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.DamageDrawerComponent
   entity: {fileID: 6222499059563901983}
-  dotsDisplayInterval: 0.5
+--- !u!114 &8174313999318445733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403902123692031551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35298c26bcf8446a96c3d39db0538fee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.StatsStateAugmentorComponent
+  stats: {fileID: 1988780292251766204}
+  stateMachine: {fileID: 3760732747768570767}
+  toKilledState: {fileID: 11400000, guid: aa806e69f163ab043a5541d5106fee78, type: 2}
+  toKnockDown: {fileID: 0}
+  canBeInterrupted: 0
+  interruptCondition:
+    requireAll: 0
+    invert: 0
+    statConditions: []
+  toDamageInterrupt: {fileID: 0}
+  dmgFrontAnimatorParameter: DamageFront
+  dmgRightAnimatorParameter: DamageRight
+--- !u!114 &7970274244903579331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403902123692031551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f0fb6fb52a41b64289165c1f54fb5ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Items.UsablesCasterComponent
+  entityInventory: {fileID: 4331885020474676626}
+  stateUnit: {fileID: 3760732747768570767}
+  meleeHitbox: {fileID: 8262120312093346573}
 --- !u!1 &2277832420876663728
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,169 +1,182 @@
-﻿using System;
+﻿using Arcatech.Units;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Arcatech.Units
+[RequireComponent(typeof(Rigidbody), typeof(NPCBehaviorWrapper))]
+public sealed class ImpulseApplier : MonoBehaviour, IPausableComponent
 {
-    [RequireComponent(typeof(Rigidbody), typeof(NPCBehaviorWrapper))]
+    private Rigidbody _rigidbody;
+    private NavMeshAgent agent;
+    private BehaviorGraphAgent behavior;
 
-    public sealed class ImpulseApplier : MonoBehaviour, IPausableComponent
+    private void Awake()
     {
-        private Rigidbody _rigidbody;
-        private NavMeshAgent agent;
-        private BehaviorGraphAgent behavior;
+        _rigidbody = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
+        behavior = GetComponent<BehaviorGraphAgent>();
+    }
 
-        private void Awake()
+    public bool Paused { get; set; }
+
+    [Space, Header("Impulse Settings")]
+    [SerializeField]
+    private float _impulseSpeed = 8f;
+
+    [SerializeField]
+    private float _impulseDuration = 0.3f;
+
+    [SerializeField]
+    private float _impulseEndSpeed = 0.5f;
+
+    [SerializeField]
+    private float _warpSampleDistance = 2f;
+    
+    [SerializeField]
+    [Tooltip("Увеличенный радиус для поиска точки, если первая попытка не удалась")]
+    private float _warpSampleDistanceExtended = 5f;
+
+    private bool _impulseActive;
+    private float _impulseTimeRemaining;
+    private bool _wasAgentEnabled;
+    private bool _wasUpdatePosition;
+    private bool _wasUpdateRotation;
+    private bool _wasRigidbodyUseGravity;
+    private Vector3 _lastKnownValidNavMeshPosition;
+
+    public void ApplyImpulse(Vector3 impulse)
+    {
+        BeginImpulse(impulse);
+    }
+
+    public void ApplyImpulse(float impulseRelative)
+    {
+        float t = Mathf.Clamp(impulseRelative, -1f, 1f);
+        Vector3 worldVelocity = transform.forward * (t * _impulseSpeed);
+        BeginImpulse(worldVelocity);
+    }
+
+    private void BeginImpulse(Vector3 worldVelocity)
+    {
+        if (_impulseActive)
         {
-            _rigidbody = GetComponent<Rigidbody>();
-            agent = GetComponent<NavMeshAgent>();
-            behavior = GetComponent<BehaviorGraphAgent>();
+            EndImpulse();
         }
 
-
-        public bool Paused { get; set; }
-
-        [Space, Header("Impulse Settings")]
-        [Tooltip("Горизонтальная скорость (м/с), сообщаемая импульсом ±1 (додж/отскок).")]
-        [SerializeField]
-        private float _impulseSpeed = 8f;
-
-        [Tooltip("Длительность импульса (сек). Агент включается обратно по истечении или при почти полной остановке.")]
-        [SerializeField]
-        private float _impulseDuration = 0.3f;
-
-        [Tooltip("Скорость (м/с), ниже которой импульс завершается досрочно.")] [SerializeField]
-        private float _impulseEndSpeed = 0.5f;
-
-        [Tooltip("Радиус поиска ближайшей точки NavMesh при восстановлении агента после импульса.")] [SerializeField]
-        private float _warpSampleDistance = 2f;
-
-// === Runtime state для handoff agent ↔ rigidbody ===
-        private bool _impulseActive;
-        private float _impulseTimeRemaining;
-        private bool _wasAgentEnabled;
-        private bool _wasUpdatePosition;
-        private bool _wasUpdateRotation;
-        private bool _wasRigidbodyUseGravity;
-
-        public void ApplyImpulse(Vector3 impulse)
+        // Сохраняем последнюю известную валидную позицию на NavMesh
+        if (agent.enabled && agent.isOnNavMesh)
         {
-            BeginImpulse(impulse);
+            _lastKnownValidNavMeshPosition = agent.transform.position;
         }
 
-        public void ApplyImpulse(float impulseRelative)
+        _wasAgentEnabled = agent.enabled;
+        _wasUpdatePosition = agent.updatePosition;
+        _wasUpdateRotation = agent.updateRotation;
+        _wasRigidbodyUseGravity = _rigidbody.useGravity;
+
+        if (_wasAgentEnabled && agent.isOnNavMesh)
         {
-            float t = Mathf.Clamp(impulseRelative, -1f, 1f);
-            Vector3 worldVelocity = transform.forward * (t * _impulseSpeed);
-            BeginImpulse(worldVelocity);
+            agent.isStopped = true;
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+            agent.enabled = false;
         }
 
-        private void BeginImpulse(Vector3 worldVelocity)
+        _rigidbody.useGravity = true;
+        SetRigidbodyVelocity(worldVelocity);
+
+        _impulseActive = true;
+        _impulseTimeRemaining = _impulseDuration;
+    }
+
+    private void LateUpdate()
+    {
+        if (!_impulseActive) return;
+
+        _impulseTimeRemaining -= Time.deltaTime;
+
+        float speed = GetRigidbodySpeed();
+        bool willEndThisFrame = _impulseTimeRemaining <= 0f || speed < _impulseEndSpeed;
+
+        if (willEndThisFrame)
         {
-            if (_impulseActive)
-            {
-                EndImpulse();
-            }
+            EndImpulse();
+        }
+    }
 
-            // Кешируем то, что собираемся временно переопределить
-            _wasAgentEnabled = agent.enabled;
-            _wasUpdatePosition = agent.updatePosition;
-            _wasUpdateRotation = agent.updateRotation;
-            _wasRigidbodyUseGravity = _rigidbody.useGravity;
-
-            // --- Отключаем агент ---
-            if (_wasAgentEnabled && agent.isOnNavMesh)
-            {
-                agent.isStopped = true;
-                agent.updatePosition = false;
-                agent.updateRotation = false;
-                agent.enabled = false;
-            }
-
-            // --- Передаём управление rigidbody ---
-            _rigidbody.useGravity = true;
-            SetRigidbodyVelocity(worldVelocity);
-
-            _impulseActive = true;
-            _impulseTimeRemaining = _impulseDuration;
+    private void EndImpulse()
+    {
+        if (!_impulseActive)
+        {
+            return;
         }
 
-        private void LateUpdate()
+        _impulseActive = false;
+
+        SetRigidbodyVelocity(Vector3.zero);
+        _rigidbody.angularVelocity = Vector3.zero;
+        _rigidbody.useGravity = _wasRigidbodyUseGravity;
+
+        if (!_wasAgentEnabled)
         {
-
-            if (!_impulseActive) return;
-
-            _impulseTimeRemaining -= Time.deltaTime;
-
-            float speed = GetRigidbodySpeed();
-            bool willEndThisFrame = _impulseTimeRemaining <= 0f || speed < _impulseEndSpeed;
-
-            if (willEndThisFrame)
-            {
-                EndImpulse();
-            }
+            return;
         }
 
+        agent.enabled = true;
 
-        private void EndImpulse()
+        if (!TryWarpAgentToNavMesh())
         {
-            if (!_impulseActive)
-            {
-                return;
-            }
-
-            _impulseActive = false;
-
-            // Гасим rigidbody
-            SetRigidbodyVelocity(Vector3.zero);
-            _rigidbody.angularVelocity = Vector3.zero;
-            _rigidbody.useGravity = _wasRigidbodyUseGravity;
-
-            if (!_wasAgentEnabled)
-            {
-                return;
-            }
-
-            // Включаем агент и ищем ближайшую точку навмеша
-            agent.enabled = true;
-          //  behavior.enabled = true;
-
-            Vector3 warpTarget = transform.position;
-            bool sampleOk = NavMesh.SamplePosition(transform.position, out NavMeshHit hit, _warpSampleDistance,
-                NavMesh.AllAreas);
-            if (sampleOk)
-            {
-                warpTarget = hit.position;
-            }
-
-            bool warpResult = agent.Warp(warpTarget);
-
-            agent.updatePosition = _wasUpdatePosition;
-            agent.updateRotation = _wasUpdateRotation;
-            bool shouldStop = Paused;
-            agent.isStopped = shouldStop;
-
-        }
-        
-        /// <summary>
-        /// Обёртка для совместимости с Unity 6+ (linearVelocity) и более старыми версиями (velocity).
-        /// </summary>
-        private void SetRigidbodyVelocity(Vector3 v)
-        {
-#if UNITY_6000_0_OR_NEWER
-            _rigidbody.linearVelocity = v;
-#else
-    _rigidbody.velocity = v;
-#endif
+            Debug.LogWarning($"[ImpulseApplier] Не удалось вернуть {gameObject.name} на NavMesh. " +
+                $"Агент отключен.", gameObject);
+            agent.enabled = false;
+            return;
         }
 
-        private float GetRigidbodySpeed()
+        agent.updatePosition = _wasUpdatePosition;
+        agent.updateRotation = _wasUpdateRotation;
+        agent.isStopped = Paused;
+    }
+
+    /// <summary>
+    /// Пытается переместить агента на NavMesh с увеличивающимся радиусом поиска
+    /// </summary>
+    private bool TryWarpAgentToNavMesh()
+    {
+        Vector3 currentPos = transform.position;
+
+        // Попытка 1: стандартный радиус от текущей позиции
+        if (NavMesh.SamplePosition(currentPos, out NavMeshHit hit, _warpSampleDistance, NavMesh.AllAreas))
         {
-#if UNITY_6000_0_OR_NEWER
-            return _rigidbody.linearVelocity.magnitude;
-#else
-    return _rigidbody.velocity.magnitude;
-#endif
+            agent.Warp(hit.position);
+            return true;
         }
+
+        // Попытка 2: увеличенный радиус от текущей позиции
+        if (NavMesh.SamplePosition(currentPos, out hit, _warpSampleDistanceExtended, NavMesh.AllAreas))
+        {
+            agent.Warp(hit.position);
+            Debug.LogWarning($"[ImpulseApplier] {gameObject.name} требовал расширенного поиска NavMesh", gameObject);
+            return true;
+        }
+
+        // Попытка 3: от последней известной валидной позиции
+        if (NavMesh.SamplePosition(_lastKnownValidNavMeshPosition, out hit, _warpSampleDistance, NavMesh.AllAreas))
+        {
+            agent.Warp(hit.position);
+            Debug.LogWarning($"[ImpulseApplier] {gameObject.name} возвращен на последнюю валидную позицию", gameObject);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void SetRigidbodyVelocity(Vector3 v)
+    {
+        _rigidbody.linearVelocity = v;
+    }
+
+    private float GetRigidbodySpeed()
+    {
+        return _rigidbody.linearVelocity.magnitude;
     }
 }

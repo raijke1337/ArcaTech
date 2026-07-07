@@ -26,12 +26,18 @@ namespace Arcatech.Stats
         private readonly Dictionary<SourceKey, List<StatModifier>> liveEquipMaxModifiers = new();
 
         private bool init = false;
+        private IDamageDrawer _damageDrawer;
 
         private void Awake()
         {
             if (init) return;
             InitializeFromConfig();
+        }
+
+        private void OnEnable()
+        {
             TryGetComponent(out _aug);
+            TryGetComponent(out _damageDrawer);
         }
 
         private struct SourceKey : IEquatable<SourceKey>
@@ -479,6 +485,17 @@ namespace Arcatech.Stats
                 float clampMax = sr.maxClamp > 0f ? Mathf.Min(sr.maxClamp, sr.max) : sr.max;
                 float newCurrent = Mathf.Clamp(sr.current + d.amount, sr.minClamp, clampMax);
                 float delta = newCurrent - sr.current;
+                
+                // NEW
+                if (delta < 0f  && _damageDrawer != null)
+                {
+                    float damageAmount = -delta;
+                    _damageDrawer.DrawResourceChange(damageAmount, isDamage: true, 
+                        durationOverride: null, type: d.stat);
+                }
+                
+                //END
+                
                 if (Mathf.Abs(delta) > 0.0001f)
                     SetCurrentInternal(d.stat, newCurrent, source, key.source);
             }
@@ -720,7 +737,7 @@ namespace Arcatech.Stats
                 }
 
                 Debug.Log($"placeholder kill {name}");
-                if (TryGetComponent<Animator>(out var animator)) animator.Play("Dead");
+                if (TryGetComponent<Animator>(out var animator)) animator.Play("Death");
             }
         }
 
