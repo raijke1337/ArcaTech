@@ -18,9 +18,9 @@ namespace Arcatech.Usables
         public bool reportOnHitEnter = true;
         public bool reportOnHitContinuous = true;
 
-        public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
+        public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item, bool indicate)
         {
-            return new BeamHitProducer(owner, item, this);
+            return new BeamHitProducer(owner, item, this,indicate);
         }
     }
 
@@ -33,7 +33,7 @@ namespace Arcatech.Usables
         private bool _beamActive;
 
         public BeamHitProducer(BaseGameEntityComponent owner, EquipmentComponent item,
-            SerializedBeamHitsProducer cfg) : base(owner, item, cfg)
+            SerializedBeamHitsProducer cfg,bool indicate) : base(owner, item, cfg,indicate)
         {
             _beamShooter = item.GetComponentInChildren<BeamWeaponComponent>();
             _beamShooter.Initialize(owner,item,cfg.beamConfig);

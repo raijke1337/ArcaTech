@@ -12,16 +12,16 @@ namespace Arcatech.Usables
     [CreateAssetMenu(fileName = "hitProducer_self_", menuName = "Usables/Hit Producer/Self target")]
     public class SerializedSelfHitProducer : SerializedHitProducer
     {
-        public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
+        public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item, bool indicateHitBox)
         {
-            return new SelfHitProducer(owner,item,this);
+            return new SelfHitProducer(owner,item,this,indicateHitBox);
         }
     }
 
     public class SelfHitProducer : HitProducer, ITriggerNotificationProvider
     {
         private Collider _tgt;
-        public SelfHitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedSelfHitProducer cfg) : base(owner, item,cfg)
+        public SelfHitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedSelfHitProducer cfg,bool indicateHitBox) : base(owner, item,cfg,indicateHitBox)
         {
             _tgt = owner.GetComponent<Collider>();
         }

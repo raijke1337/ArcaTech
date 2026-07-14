@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Arcatech.Managers;
+using Arcatech.Units;
+using DG.Tweening;
 using KBCore.Refs;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Arcatech.Triggers
 {
@@ -15,6 +19,7 @@ namespace Arcatech.Triggers
         public void RegisterReceiver(ITriggerNotificationReceiver r) => _receivers.Add(r);
 
         public void UnregisterReceiver(ITriggerNotificationReceiver r) => _receivers.Remove(r);
+
         #endregion
 
         [SerializeField, Self] private Collider triggerCollider;
@@ -36,7 +41,7 @@ namespace Arcatech.Triggers
         {
             triggerCollider.isTrigger = true;
             cachedRigidbody.isKinematic = true;
-            
+
             _valid = LayerMask.GetMask(DataManager.GameRules.ValidHitsLayer);
             _invalid = LayerMask.GetMask(DataManager.GameRules.InvalidHitsLayer);
 
@@ -53,8 +58,8 @@ namespace Arcatech.Triggers
 
         public void AreaCast(ITriggerNotificationReceiver receiver)
         {
-            var found = Physics.OverlapBox(triggerCollider.bounds.center, 
-                triggerCollider.bounds.extents/2, 
+            var found = Physics.OverlapBox(triggerCollider.bounds.center,
+                triggerCollider.bounds.extents / 2,
                 transform.rotation,
                 _valid);
             foreach (var box in found)
@@ -62,17 +67,17 @@ namespace Arcatech.Triggers
                 OnTriggerEnter(box);
             }
         }
-        
+
         protected void OnTriggerEnter(Collider other)
         {
             // Debug.Log($"Trigger {other.gameObject.name} entered");
             if (!CanNotify() || other.isTrigger) return;
 
             var hitGeometry = CalculateHitGeometry(other);
-    
+
             // Создаём копию, чтобы избежать изменений во время итерации
             var receiversCopy = new List<ITriggerNotificationReceiver>(_receivers);
-    
+
             foreach (var receiver in receiversCopy)
             {
                 receiver.TriggerEntered(new TriggerHitInfo(
@@ -105,7 +110,10 @@ namespace Arcatech.Triggers
         private void OnDisable()
         {
             _receivers.Clear();
+            _attackWarningTween?.Kill();
+            if (_attackWarningObject != null) _attackWarningObject.SetActive(false);
         }
+
 
         // Simplified: Assume impactDirection provides a reasonable normal for triggers
         private (Vector3 position, Vector3 direction, Vector3 normal) CalculateHitGeometry(Collider other)
@@ -158,7 +166,7 @@ namespace Arcatech.Triggers
             if (candidate.sqrMagnitude > ImpactDirectionEpsilon)
             {
                 // This one is used for hits on enemies
-              //  Debug.LogWarning($"Fallback to relative velocity of {candidate}");
+                //  Debug.LogWarning($"Fallback to relative velocity of {candidate}");
                 return -candidate.normalized;
             }
 
@@ -281,5 +289,169 @@ namespace Arcatech.Triggers
         }
 #endif
 
+        public void OnChangeUsableState(StateMachineNotifyType notification)
+        {
+            switch (notification)
+            {
+                case StateMachineNotifyType.NoNotify:
+                    break;
+                case StateMachineNotifyType.Starting:
+                    // show a red quad inside the lower bounds area (danger zone warning)
+                    ShowAttackWarning();
+                    break;
+                case StateMachineNotifyType.Use:
+                    // hide the quad
+                    HideAttackWarning();
+                    break;
+                case StateMachineNotifyType.EndUse:
+                    HideAttackWarning();
+                    break;
+                case StateMachineNotifyType.Cancel:
+                    HideAttackWarning();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(notification), notification, null);
+            }
+        }
+
+        #region warning
+
+        private GameObject _attackWarningObject;
+        private LineRenderer _attackWarningLine;
+        private Material _attackWarningMaterial;
+        private Tween _attackWarningTween;
+        private float _warningAlpha;
+
+        private static readonly int ColorID = Shader.PropertyToID("_Color");
+        private static readonly int BaseColorID = Shader.PropertyToID("_BaseColor");
+        
+        [SerializeField, Tooltip("Толщина линии контура")]
+        private float _warningLineWidth = 0.1f;
+
+        [SerializeField, Tooltip("Смещение контура над полом (избегаем z-fighting)")]
+        private float _warningFloorOffset = 0.02f;
+
+        [SerializeField, Tooltip("Длительность резкого fade-in, сек")]
+        private float _warningFadeInDuration = 0.12f;
+
+        [SerializeField, Tooltip("Длительность fade-out, сек")]
+        private float _warningFadeOutDuration = 0.25f;
+
+        
+        private void EnsureAttackWarningVisual()
+        {
+            if (_attackWarningObject != null) return;
+
+            _attackWarningObject = new GameObject("AttackWarningVisual");
+            _attackWarningObject.transform.SetParent(null);
+
+            _attackWarningLine = _attackWarningObject.AddComponent<LineRenderer>();
+            _attackWarningLine.useWorldSpace = true;
+            _attackWarningLine.loop = true; // замыкаем контур в прямоугольник
+            _attackWarningLine.positionCount = 4;
+            _attackWarningLine.widthMultiplier = _warningLineWidth;
+            _attackWarningLine.numCornerVertices = 2;
+            _attackWarningLine.numCapVertices = 2;
+            _attackWarningLine.shadowCastingMode = ShadowCastingMode.Off;
+            _attackWarningLine.receiveShadows = false;
+
+            // Sprites/Default нативно поддерживает startColor/endColor через vertex color —
+            // удобно для fade без доп. манипуляций с материалом.
+            var shader = Shader.Find("Sprites/Default")
+                         ?? Shader.Find("Universal Render Pipeline/Unlit")
+                         ?? Shader.Find("Unlit/Transparent")
+                         ?? Shader.Find("Standard");
+
+            _attackWarningMaterial = new Material(shader) { name = "AttackWarningMaterial_Instance" };
+            _attackWarningLine.sharedMaterial = _attackWarningMaterial;
+
+            ApplyWarningColor(new Color(1f, 0f, 0f, 0f));
+            _attackWarningObject.SetActive(false);
+        }
+        private void ApplyWarningColor(Color color)
+        {
+            if (_attackWarningLine != null)
+            {
+                _attackWarningLine.startColor = color;
+                _attackWarningLine.endColor = color;
+            }
+
+            // На случай, если шейдер не использует vertex color (URP Unlit и т.п.)
+            if (_attackWarningMaterial != null)
+            {
+                if (_attackWarningMaterial.HasProperty(BaseColorID))
+                    _attackWarningMaterial.SetColor(BaseColorID, color);
+                if (_attackWarningMaterial.HasProperty(ColorID))
+                    _attackWarningMaterial.SetColor(ColorID, color);
+            }
+        }
+        
+        private void UpdateAttackWarningTransform()
+        {
+            if (triggerCollider == null || _attackWarningLine == null) return;
+
+            var bounds = triggerCollider.bounds;
+            var floorY = bounds.min.y + _warningFloorOffset;
+            var center = bounds.center;
+            var halfX = bounds.extents.x;
+            var halfZ = bounds.extents.z;
+
+            _attackWarningLine.SetPosition(0, new Vector3(center.x - halfX, floorY, center.z - halfZ));
+            _attackWarningLine.SetPosition(1, new Vector3(center.x + halfX, floorY, center.z - halfZ));
+            _attackWarningLine.SetPosition(2, new Vector3(center.x + halfX, floorY, center.z + halfZ));
+            _attackWarningLine.SetPosition(3, new Vector3(center.x - halfX, floorY, center.z + halfZ));
+        }
+        private void ShowAttackWarning()
+        {
+            EnsureAttackWarningVisual();
+            UpdateAttackWarningTransform();
+            _attackWarningObject.SetActive(true);
+
+            _attackWarningTween?.Kill();
+            _attackWarningTween = DOTween.To(
+                    () => _warningAlpha,
+                    SetWarningAlpha,
+                    endValue: 1f,
+                    duration: _warningFadeInDuration)
+                .SetEase(Ease.OutExpo) // резкий, "вспыхивающий" вход
+                .SetTarget(this)
+                .SetLink(gameObject);
+        }
+
+        private void HideAttackWarning()
+        {
+            if (_attackWarningObject == null || !_attackWarningObject.activeSelf) return;
+
+            _attackWarningTween?.Kill();
+            _attackWarningTween = DOTween.To(
+                    () => _warningAlpha,
+                    SetWarningAlpha,
+                    endValue: 0f,
+                    duration: _warningFadeOutDuration)
+                .SetEase(Ease.InQuad)
+                .SetTarget(this)
+                .SetLink(gameObject)
+                .OnComplete(() => _attackWarningObject.SetActive(false));
+        }
+
+        private void SetWarningAlpha(float alpha)
+        {
+            _warningAlpha = alpha;
+            ApplyWarningColor(new Color(1f, 0f, 0f, alpha));
+        }
+        private void Update()
+        {
+            if (_attackWarningObject != null && _attackWarningObject.activeSelf)
+                UpdateAttackWarningTransform();
+        }
+
+        private void OnDestroy()
+        {
+            _attackWarningTween?.Kill();
+            if (_attackWarningMaterial != null) Destroy(_attackWarningMaterial);
+            if (_attackWarningObject != null) Destroy(_attackWarningObject);
+        }
+        
+        #endregion
     }
 }

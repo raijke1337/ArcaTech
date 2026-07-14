@@ -208,25 +208,6 @@ namespace Arcatech.Units
 
             return committed;
         }
-
-        // void CacheCommandContext(UnitActionType actionType,
-        //     IEnumerable<IUnitCommandPerformer> performers)
-        // {
-        //     // Cancel any previous buffered command before storing a new one.
-        //     if (HasPendingCommand)
-        //         CompletePendingCommand(false);
-        //
-        //     _pendingAction = actionType;
-        //     _pendingPerformers.Clear();
-        //
-        //     if (performers == null) return;
-        //     foreach (var p in performers)
-        //     {
-        //         if (p == null) continue;
-        //         if (!_pendingPerformers.Contains(p))
-        //             _pendingPerformers.Add(p);
-        //     }
-        // }
         
         void CacheCommandContext(UnitActionType actionType,
             IEnumerable<IUnitCommandPerformer> performers)
@@ -252,17 +233,6 @@ namespace Arcatech.Units
             _pendingCommandStamp = Time.time;
         }
 
-        // void CompletePendingCommand(bool success)
-        // {
-        //     if (!HasPendingCommand) return;
-        //
-        //     foreach (var performer in _pendingPerformers)
-        //         performer?.DoUnitCommand(_pendingAction, success);
-        //
-        //     _pendingPerformers.Clear();
-        //     _pendingAction = UnitActionType.None;
-        //     _context.ClearCommand();
-        // }
         
         void CompletePendingCommand(bool success)
         {

@@ -55,7 +55,6 @@ namespace Arcatech.Units
 
         private void Start()
         {
-
             Initialize();
         }
 

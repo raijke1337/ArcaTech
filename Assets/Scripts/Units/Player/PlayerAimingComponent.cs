@@ -9,9 +9,6 @@ namespace Arcatech.Units.Control
         public void SetKilled(IKillerComponent comp, bool value) => _killed = value;
 
         public bool Paused { get; set; } = false;
-
-        
-        
         
         private void Start()
         {
@@ -26,9 +23,7 @@ namespace Arcatech.Units.Control
             DoAiming();
         }
         
-
-
-        #region aiming
+        
 
         private Vector3 desiredLookDirection;
         private Vector3 _aimPosition;
@@ -64,7 +59,6 @@ namespace Arcatech.Units.Control
                 // Fallback: if no hit, keep previous direction or set to zero
                 desiredLookDirection = Vector3.zero;
 
-                // No update to _aimPosition
             }
             
 
@@ -77,24 +71,12 @@ namespace Arcatech.Units.Control
             desiredFlat.y = 0f;
             desiredFlat.Normalize();
 
-            // Calculate signed angle around the up axis (positive = clockwise when viewed from above)
-           // float signedAngle = Vector3.SignedAngle(currentFlat, desiredFlat, Vector3.up);
-           // animator.SetFloat(animatorSignedAngleHash, signedAngle);
-
-
             foreach (var aim in aimInterfaces)
             {
                 aim.AimPosition = desiredLookDirection;
             }
         }
 
-        private void OnDrawGizmos()
-        {
-            // Draw a sphere at the current aim position for visualization
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(_aimPosition, 0.1f);
-        }
-    #endregion
  
     }
 }

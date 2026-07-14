@@ -9,9 +9,9 @@ namespace Arcatech.Usables
     [CreateAssetMenu(fileName = "hitProducer_WeaponBox_", menuName = "Usables/Hit Producer/Weapon hitbox")]
     public class SerializedWeaponHitBoxHitProducer : SerializedHitProducer
     {
-        public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
+        public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item,bool indicateHitBox)
         {
-            return new WeaponHitboxHitProducer(owner, item,this);
+            return new WeaponHitboxHitProducer(owner, item,this,indicateHitBox);
         }
 
     }
@@ -20,7 +20,7 @@ namespace Arcatech.Usables
         {
             private ITriggerNotificationProvider provider; 
           
-            public WeaponHitboxHitProducer(BaseGameEntityComponent owner, EquipmentComponent item, SerializedHitProducer cfg) : base(owner,item,cfg)
+            public WeaponHitboxHitProducer(BaseGameEntityComponent owner, EquipmentComponent item, SerializedHitProducer cfg,bool i) : base(owner,item,cfg,i)
             {
             
             provider = item
@@ -34,30 +34,32 @@ namespace Arcatech.Usables
             provider.RegisterReceiver(this);
         }
 
-        public override void OnChangeUsableState(StateMachineNotifyType info)
-        {
-
-            base.OnChangeUsableState(info);
-            if (provider == null) return; 
-            switch (info)
+            public override void OnChangeUsableState(StateMachineNotifyType info)
             {
-                case StateMachineNotifyType.NoNotify:
-                    provider.Active = false;
-                    break;
-                case StateMachineNotifyType.Starting:
-                    provider.Active = true;
-                    break;
-                case StateMachineNotifyType.Use:
-                    provider.Active = true;
-                    break;
-                case StateMachineNotifyType.EndUse:
-                    provider.Active = false;
-                    break;
-                case StateMachineNotifyType.Cancel:
-                    provider.Active = false;
-                    break;
+
+                base.OnChangeUsableState(info);
+                if (provider == null) return; 
+                if (indicateHitBox) provider.OnChangeUsableState(info);
+                switch (info)
+                {
+                    case StateMachineNotifyType.NoNotify:
+                        provider.Active = false;
+                        break;
+                    case StateMachineNotifyType.Starting:
+                        provider.Active = true;
+                        break;
+                    case StateMachineNotifyType.Use:
+                        provider.Active = true;
+                        provider.AreaCast(this);
+                        break;
+                    case StateMachineNotifyType.EndUse:
+                        provider.Active = false;
+                        break;
+                    case StateMachineNotifyType.Cancel:
+                        provider.Active = false;
+                        break;
+                }
             }
-        }
         
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {

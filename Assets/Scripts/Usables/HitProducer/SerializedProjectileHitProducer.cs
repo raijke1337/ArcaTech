@@ -19,9 +19,10 @@ namespace Arcatech.Usables
         [SerializeField] public SerializedProjectileConfiguration projectile;
         [SerializeField] public ShootingConfig projectileShootingConfig;
         [Min(0)] public int projectilePoolSize = 32;
-        public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item)
+
+        public override IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item, bool indicateHitBox)
         {
-            return new ProjectileHitProducer(owner, item,this);
+            return new ProjectileHitProducer(owner, item,this,indicateHitBox);
         }
     }
 
@@ -42,7 +43,7 @@ namespace Arcatech.Usables
         private List<ProjectileComponent> _activeProjectiles = new();
 
         public ProjectileHitProducer(BaseGameEntityComponent owner, EquipmentComponent item,
-            SerializedProjectileHitProducer config) : base(owner, item, config)
+            SerializedProjectileHitProducer config,bool indicateHitBox) : base(owner, item, config,indicateHitBox)
         {
             _projectile = config.projectile;
             _shooting = config.projectileShootingConfig;

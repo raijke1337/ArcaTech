@@ -17,6 +17,7 @@ namespace Arcatech.Usables
     {
         [Header("Hit producer")]
         [SerializeField] public SerializedHitProducer hitProducer;
+        public bool hitboxWarning;
 
         [SerializeField] public bool proceedOnSelfHit; // continue the logic into applier on self hit (probably should stick to false) 
         // struct start
@@ -46,13 +47,17 @@ namespace Arcatech.Usables
         private readonly IEffectApplier _effectApplier;
         private readonly List<ActionResult> _results;
         private readonly bool _proceedOnSelfHit;
+        protected readonly bool indicateHitbox;
 
         private ParticlesEvent _particlesEventInvalidHit;
         
         public CompositeUsableApplication(BaseGameEntityComponent owner, EquipmentComponent equipment,
             UsableDataContainer config)
         {
-            _hitProducer = config.hitProducer.Deserialize(owner, equipment);
+            
+            indicateHitbox = config.hitboxWarning;
+            
+            _hitProducer = config.hitProducer.Deserialize(owner, equipment,indicateHitbox);
             _effectApplier = config.effectApplier.Deserialize(config.applicationEffect);
             _results = config.effects.Select(t => t.Deserialize()).ToList();
             _equipment = equipment;

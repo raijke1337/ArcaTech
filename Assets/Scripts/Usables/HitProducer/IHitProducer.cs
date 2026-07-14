@@ -18,7 +18,7 @@ namespace Arcatech.Usables
     {        
         [Min(0)] public int maxValidHitsPerUse = 1;
         
-        public abstract IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item);
+        public abstract IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item,bool indicateHitBox);
     }
 
     public abstract class HitProducer : IHitProducer
@@ -27,13 +27,15 @@ namespace Arcatech.Usables
         protected readonly EquipmentComponent Item;
         protected readonly BaseGameEntityComponent Owner;
 
+        protected readonly bool indicateHitBox;
         private int HitsThisUse;  
         
-        public HitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedHitProducer cfg)
+        public HitProducer(BaseGameEntityComponent owner, EquipmentComponent item,SerializedHitProducer cfg, bool indicateHitBox)
         {
             MaxHits = cfg.maxValidHitsPerUse;
             Owner = owner;
             Item = item;
+            this.indicateHitBox =  indicateHitBox;
         }
 
 

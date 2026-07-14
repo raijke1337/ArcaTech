@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Arcatech.Triggers;
+using Arcatech.Units;
 using Arcatech.Usables;
 using UnityEngine; // For System.Array.Sort
 
@@ -330,6 +331,11 @@ namespace Arcatech.Items
         }
 
         public void AreaCast(ITriggerNotificationReceiver receiver)
+        {
+            // noop
+        }
+
+        public void OnChangeUsableState(StateMachineNotifyType notification)
         {
             throw new System.NotImplementedException();
         }

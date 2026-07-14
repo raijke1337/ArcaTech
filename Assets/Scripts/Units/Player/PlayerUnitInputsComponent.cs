@@ -1,5 +1,4 @@
 using Arcatech.EventBus;
-using Arcatech.Scenes.Cameras;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -90,6 +89,26 @@ namespace Arcatech.Units.Control
             
             return AD + WS;
         }
-        
+
+        internal class IsoCamAdjust
+        {
+
+            public Vector3 Isoforward;
+            public Vector3 Isoright;
+
+            private void AdjustDirections()
+            {
+                if (Camera.main == null) return; // main menu
+                Isoforward = Camera.main.transform.forward;
+                Isoforward.y = 0;
+                Isoforward = Vector3.Normalize(Isoforward);
+                Isoright = Quaternion.Euler(new Vector3(0, 90, 0)) * Isoforward;
+            }
+
+            public IsoCamAdjust()
+            {
+                AdjustDirections();
+            }
+        }
     }
 }
