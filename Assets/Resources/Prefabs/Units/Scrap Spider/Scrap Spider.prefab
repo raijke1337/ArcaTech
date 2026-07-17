@@ -99,6 +99,10 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!1 &9022434418627609629
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,7 +225,7 @@ MonoBehaviour:
           m_Value0: 18272231276325048358
           m_Value1: 15042278031255216845
         Name: IdleSubgraph
-        m_Value: {fileID: 3918541972323933621, guid: 767bcebf8eebc9b41a8094c267b0a938,
+        m_Value: {fileID: -2594185013037641441, guid: 0d0a27ad063041b47a294e525d76ad56,
           type: 2}
     - rid: 4741284849461494093
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
@@ -332,7 +336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 0e125e9c-ee3b-4e94-a775-12624078d564
+  uniqueId: 
 --- !u!114 &7980303944722158138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -462,7 +466,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.DamageDrawerComponent
   entity: {fileID: 7980303944722158138}
-  dotsDisplayInterval: 0.5
 --- !u!114 &3446283097114562886
 MonoBehaviour:
   m_ObjectHideFlags: 0

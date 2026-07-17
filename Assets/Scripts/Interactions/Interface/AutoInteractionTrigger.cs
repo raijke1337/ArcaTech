@@ -6,10 +6,6 @@ namespace Arcatech.Interactions
     {
         
         [SerializeField,Header("Unassigned = apply to all")] Side affectedSide = Side.Unassigned;
-
-
-        
-        
         public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             if (interactableComponent == null) return;
@@ -37,9 +33,5 @@ namespace Arcatech.Interactions
             
         }
 
-        private void Update()
-        {
-            // todo add multiple activations
-        }
     }
 }

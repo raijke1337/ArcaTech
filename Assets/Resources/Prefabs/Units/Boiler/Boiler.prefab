@@ -32,6 +32,7 @@ GameObject:
   - component: {fileID: 6999421415077459410}
   - component: {fileID: 8174313999318445733}
   - component: {fileID: 7970274244903579331}
+  - component: {fileID: 4348430885236719412}
   m_Layer: 6
   m_Name: Boiler
   m_TagString: Untagged
@@ -130,7 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: d8308fb0-1ef4-4f00-9b07-d21ef9d55e40
+  uniqueId: 
 --- !u!114 &6222499059563901983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,7 +150,7 @@ MonoBehaviour:
   _rb: {fileID: 2020214546167136041}
   setKinematic: 0
   entitySide: 2
-  effectSpawn: {fileID: 2169831848283976518}
+  effectSpawn: {fileID: 8912095832965318468}
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
@@ -594,6 +595,25 @@ MonoBehaviour:
   entityInventory: {fileID: 4331885020474676626}
   stateUnit: {fileID: 3760732747768570767}
   meleeHitbox: {fileID: 8262120312093346573}
+--- !u!114 &4348430885236719412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403902123692031551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd437cf65684b7c9b1b4e8b6badeb2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SimpleEntityShadowComponent
+  shadowSize: 3
+  shadowOpacity: 0.5
+  shadowOffset: {x: 0, y: -0.1, z: 0}
+  shadowColor: {r: 0, g: 0, b: 0, a: 1}
+  followParent: 1
+  useGroundDetection: 1
+  maxRaycastDistance: 10
 --- !u!1 &2277832420876663728
 GameObject:
   m_ObjectHideFlags: 0

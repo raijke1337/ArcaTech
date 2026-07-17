@@ -45,6 +45,11 @@ namespace Arcatech.Interactions
                 CancelInteraction();
         }
 
+        private void Start()
+        {
+            _listening = true; // PLACEHOLDER
+        }
+
         public void StartInteraction(InteractionContext ctx)
         {
             if (!IsAvailable) return;

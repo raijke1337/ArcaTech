@@ -1,8 +1,9 @@
-﻿using Arcatech.SaveSystem;
+﻿using System;
+using Arcatech.SaveSystem;
 using Arcatech.Triggers;
 using KBCore.Refs;
-using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Arcatech.Interactions
 {
@@ -14,7 +15,12 @@ namespace Arcatech.Interactions
     {
         [SerializeField] protected TriggerTrackerComponent triggerTrackerComponent;
         [SerializeField,Self] protected InteractableComponent interactableComponent;
-        
+
+        [Space, Header("Timer")] [SerializeField]
+        [Tooltip("0 means doesn't expire"),Range(0,60)]private float expirationTime = 0f;
+        [SerializeField] bool destroyAfterExpiry = false;
+        private float _startTime;
+        private float _expireAt;
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -25,6 +31,8 @@ namespace Arcatech.Interactions
 
         protected virtual void Start()
         {
+            _startTime = Time.time;
+            if (expirationTime > 0) _expireAt =  _startTime + expirationTime;
             triggerTrackerComponent.RegisterReceiver(this);
         }
 
@@ -32,8 +40,18 @@ namespace Arcatech.Interactions
         {
             triggerTrackerComponent.UnregisterReceiver(this);
         }
-        
-                
+
+        private void Update()
+        {
+            if (Time.time > _expireAt)
+            {
+                triggerTrackerComponent.Active = false;
+                if (destroyAfterExpiry)
+                    gameObject.SetActive(false);
+            }
+        }
+
+
         public void ResetTrigger()
         {
             HasTriggered = false;

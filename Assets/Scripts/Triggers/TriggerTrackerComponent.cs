@@ -70,7 +70,7 @@ namespace Arcatech.Triggers
 
         protected void OnTriggerEnter(Collider other)
         {
-            // Debug.Log($"Trigger {other.gameObject.name} entered");
+          //  Debug.Log($"Trigger {other.gameObject.name} entered {name}");
             if (!CanNotify() || other.isTrigger) return;
 
             var hitGeometry = CalculateHitGeometry(other);

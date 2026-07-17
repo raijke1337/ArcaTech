@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 77c6292af1a54e64b9891b68798373b0, type: 3}
-  m_Name: usableEffect_stats_drone_beam_cost
+  m_Name: usableEffect_stats_drone_beam_dmg
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.AppliedStatsDeltaEffect
   ID: ae999ec1-0ea1-4434-b08a-8d6c222ad249
   description: {fileID: 0}
@@ -18,12 +18,21 @@ MonoBehaviour:
   durationSeconds: 3
   stackType: 0
   maxStacks: 99
+  graphics: {fileID: 0}
   periodicity:
     kind: 0
     oneShotMoment: 0
     ticks: 1
     intervalMode: 1
     offsetSeconds: 0
-  instantDeltas: []
+  instantDeltas:
+  - stat: 0
+    target: 0
+    amount: -5
+    onApply: {fileID: 0}
+  - stat: 2
+    target: 0
+    amount: -15
+    onApply: {fileID: 0}
   persistentModifiers: []
   periodicDeltas: []
