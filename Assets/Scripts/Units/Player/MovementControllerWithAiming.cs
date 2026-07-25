@@ -14,6 +14,15 @@ namespace Arcatech.Units.Control
         private float _mult = 1f;
 
 
+        #region aim
+        
+        public bool CanAim { get; set; } = true;
+
+        public Vector3 AimDirection { get; set; }
+        
+        #endregion
+
+        
         public float SpeedMultiplier
         {
             get => _mult;
@@ -47,13 +56,10 @@ namespace Arcatech.Units.Control
             set => Pause(value);
         }
 
-        public bool CanAim { get; set; } = true;
-
-        public Vector3 AimPosition { get; set; }
 
         protected override void CustomRotationMode(float deltaTime)
         {
-            if (CanAim) RotateTowards(AimPosition, deltaTime);
+            if (CanAim) RotateTowards(AimDirection, deltaTime);
             base.CustomRotationMode(deltaTime);
         }
 
@@ -81,13 +87,13 @@ namespace Arcatech.Units.Control
         private readonly string sm = "SideMove";
         private readonly string vm = "VerticalMove";
         private readonly string dr = "DoStandingRotation";
-        private readonly string fV = "LinearVelocity";
+        private readonly string linVeloc = "LinearVelocity";
 
         private int fmI;
         private int smI;
         private int vmI;
         private int drI;
-        private int vI;
+        private int linVelH;
 
         private bool isStandingRotating;
 
@@ -108,59 +114,144 @@ namespace Arcatech.Units.Control
             vmI = Animator.StringToHash(vm);
             drI = Animator.StringToHash(dr);
 
-            vI = Animator.StringToHash(fV);
+            linVelH = Animator.StringToHash(linVeloc);
             _startSpeed = maxWalkSpeed;
         }
 
-
-        private Vector2 lastDotVector;
-
+        // private void Animate()
+        // {
+        //     // LinearVelocity — модуль скорости (м/с), нужен для бленд-деревьев
+        //     animator.SetFloat(vI, characterMovement.speed);
+        //
+        //     if (MovementVector != Vector3.zero)
+        //     {
+        //         // forwardSpeed/sidewaysSpeed — это «проекция velocity на оси» в м/с.
+        //         // Делим на speed, чтобы получить нормализованный -1..1, как и было.
+        //         float speed = characterMovement.speed;
+        //         if (speed > 0.0001f)
+        //         {
+        //             float fwd = characterMovement.forwardSpeed  / speed;
+        //             float side = characterMovement.sidewaysSpeed / speed;
+        //             animator.SetFloat(fmI, fwd);
+        //             animator.SetFloat(smI, side);
+        //         }
+        //         else
+        //         {
+        //             animator.SetFloat(fmI, 0f);
+        //             animator.SetFloat(smI, 0f);
+        //         }
+        //
+        //         isStandingRotating = false;
+        //         animator.ResetTrigger(drI);
+        //     }
+        //     else
+        //     {
+        //         animator.SetFloat(fmI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
+        //         animator.SetFloat(smI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
+        //
+        //         Vector3 fwd = GetForwardVector();
+        //         var crossY = Mathf.Abs(Vector3.Cross(fwd, AimDirection).y);
+        //
+        //         if (ShouldRotateWhileStanding())
+        //         {
+        //             animator.SetTrigger(drI);
+        //             isStandingRotating = true;
+        //         }
+        //         if (crossY <= 0.01f)
+        //             isStandingRotating = false;
+        //     }
+        //
+        //     animator.SetFloat(vmI, characterMovement.velocity.y);
+        // }
         private void Animate()
         {
-            // LinearVelocity — модуль скорости (м/с), нужен для бленд-деревьев
-            animator.SetFloat(vI, characterMovement.speed);
+            UpdateMovementBlend();   // ForwardMove / SideMove
+            UpdateLinearSpeed();     // LinearVelocity
+            UpdateVerticalSpeed();   // VerticalMove
+            UpdateStandingRotation();// DoStandingRotation trigger
+        }
+        private void UpdateLinearSpeed()
+        {
+            // Используется в Speed-параметре бленд-дерева (Walk → Run)
+            animator.SetFloat(linVelH, characterMovement.speed);
+        }
 
-            if (MovementVector != Vector3.zero)
+        private void UpdateVerticalSpeed()
+        {
+            animator.SetFloat(vmI, characterMovement.velocity.y);
+        }
+        private void UpdateMovementBlend()
+        {
+            const float DAMP_TIME = 0.25f;
+            bool isMoving = MovementVector.sqrMagnitude > 0.0001f;
+    
+            if (isMoving)
             {
-                // forwardSpeed/sidewaysSpeed — это «проекция velocity на оси» в м/с.
-                // Делим на speed, чтобы получить нормализованный -1..1, как и было.
-                float speed = characterMovement.speed;
-                if (speed > 0.0001f)
+                if (characterMovement.speed > 0.0001f)
                 {
-                    float fwd = characterMovement.forwardSpeed  / speed;
-                    float side = characterMovement.sidewaysSpeed / speed;
-                    animator.SetFloat(fmI, fwd);
-                    animator.SetFloat(smI, side);
+                    animator.SetFloat(fmI,
+                        characterMovement.forwardSpeed / characterMovement.speed);
+                    animator.SetFloat(smI,
+                        characterMovement.sidewaysSpeed / characterMovement.speed);
                 }
                 else
                 {
                     animator.SetFloat(fmI, 0f);
                     animator.SetFloat(smI, 0f);
                 }
-
-                isStandingRotating = false;
-                animator.ResetTrigger(drI);
+        
+                // Активное движение всегда «съедает» поворот на месте
+                if (isStandingRotating)
+                {
+                    animator.ResetTrigger(drI);
+                    isStandingRotating = false;
+                }
             }
             else
             {
-                animator.SetFloat(fmI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
-                animator.SetFloat(smI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
-
-                Vector3 fwd = GetForwardVector();
-                var crossY = Mathf.Abs(Vector3.Cross(fwd, AimPosition).y);
-
-                if (crossY > minCrossYToRotate && IsGrounded)
-                {
-                    animator.SetTrigger(drI);
-                    isStandingRotating = true;
-                }
-                if (crossY <= 0.01f)
-                    isStandingRotating = false;
+                animator.SetFloat(fmI, 0f, DAMP_TIME, Time.deltaTime);
+                animator.SetFloat(smI,   0f, DAMP_TIME, Time.deltaTime);
             }
-
-            animator.SetFloat(vmI, characterMovement.velocity.y);
         }
 
+        private void UpdateStandingRotation()
+        {
+            // Условия старта поворота на месте:
+            // 1. Стоим на месте (UpdateMovementBlend это уже проверил)
+            // 2. На земле
+            // 3. Отклонение прицела от форварда превышает порог
+            if (!ShouldRotateWhileStanding()) return;
+    
+            float signedAngle = ComputeSignedAngleToAim();
+            if (ShouldRotateWhileStanding())
+            {
+                animator.SetTrigger(drI);
+                isStandingRotating = true;
+            }
+            if (signedAngle <= 0.01f)
+                isStandingRotating = false;
+        }
+        private float ComputeSignedAngleToAim()
+        {
+            Vector3 flatAim = AimDirection;
+            flatAim.y = 0f;
+    
+            if (flatAim.sqrMagnitude < 0.0001f) return 0f;
+    
+            return Vector3.SignedAngle(GetForwardVector(), flatAim.normalized, Vector3.up);
+        }
+        private bool ShouldRotateWhileStanding()
+        {
+            if (!IsGrounded) return false;
+            if (MovementVector != Vector3.zero) return false;
+    
+            // AimDirection — единичный вектор; угол между forward и направлением прицела
+            Vector3 flatAim = AimDirection; flatAim.y = 0;
+            float signedAngle = Vector3.SignedAngle(GetForwardVector(), flatAim, Vector3.up);
+            return Mathf.Abs(signedAngle) > minCrossYToRotate;
+        }
+        
+        
         #endregion
 
         public bool CanDoUnitCommand(UnitActionType type, out string info)
@@ -169,8 +260,9 @@ namespace Arcatech.Units.Control
             switch (type)
             {
                 case UnitActionType.Jump:
-                    info += CanJump();
-                    return CanJump();
+                    bool canJump = CanJump();
+                    info += canJump ? "OK" : "Cannot jump now";
+                    return canJump;
                 default:
                     info += "OK";
                     return true;
@@ -188,9 +280,13 @@ namespace Arcatech.Units.Control
             get => IsJumping();
             set
             {
-                if (value) Jump();
+                if (value && CanJump() && !Paused)
+                {
+                    Jump();
+                }
             }
         }
+    
 
 
 

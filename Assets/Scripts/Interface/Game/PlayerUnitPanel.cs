@@ -84,10 +84,8 @@ namespace Arcatech.UI
             if (!_usablesCasterComponent) return;
             usablesIcons.LoadIcons(_usablesCasterComponent.GetUsables);
         }
-
-
-        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta,
-            object changeSource)
+        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
+            BaseGameEntityComponent source)
         {
             if (stat != ResourceStatType.Health) return;
 
@@ -100,7 +98,7 @@ namespace Arcatech.UI
             }
         }
 
-        public void SetShieldValue(float currentValue)
+        public void SetShieldValue(ResourceStatType stat, float currentValue)
         {
             _text.text = currentValue.ToString("0");
         }

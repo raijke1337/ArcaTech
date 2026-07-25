@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Units;
 using UnityEngine;
+using Alchemy;
+using Alchemy.Inspector;
 
 namespace Arcatech.Usables.Effects
 {
@@ -20,6 +21,7 @@ namespace Arcatech.Usables.Effects
     /// </summary>
     public class EntityStatusComponent : MonoBehaviour, IStatusReceiver, IPausableComponent, IKillableComponent
     {
+        [HelpBox("Tracks status states (stun for now).")][LabelText("Custom Label")]
         private readonly Dictionary<EffectKey, float> _stunUntil = new(); // key -> world time end
         public bool Paused { get; set; }
         private bool _killed;

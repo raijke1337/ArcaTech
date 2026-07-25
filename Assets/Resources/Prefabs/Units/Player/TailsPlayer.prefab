@@ -95,6 +95,8 @@ GameObject:
   - component: {fileID: 7739403192877342947}
   - component: {fileID: 5597438670505072981}
   - component: {fileID: 3456940519033748238}
+  - component: {fileID: -367359324892275855}
+  - component: {fileID: 1962562224133234995}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -194,6 +196,7 @@ MonoBehaviour:
   destroyOnDeath: 0
   timerToDestroy: 2
   _showDebugs: 0
+  targetable: 1
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -353,6 +356,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.PlayerAimingComponent
   aimOffset: 0
+  entitiesLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  debugMode: 0
 --- !u!114 &2141420009144466885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -596,7 +603,6 @@ MonoBehaviour:
   stats: {fileID: 8341150968193856820}
   stateMachine: {fileID: 5228831593658462585}
   toKilledState: {fileID: 11400000, guid: aa806e69f163ab043a5541d5106fee78, type: 2}
-  toKnockDown: {fileID: 11400000, guid: aa2c57c1ff12e6d47b27770c3affa4b8, type: 2}
   canBeInterrupted: 0
   interruptCondition:
     requireAll: 0
@@ -605,6 +611,37 @@ MonoBehaviour:
   toDamageInterrupt: {fileID: 0}
   dmgFrontAnimatorParameter: DamageFront
   dmgRightAnimatorParameter: DamageRight
+--- !u!114 &-367359324892275855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478764249a224241b967839b72c17504, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.PlayerComponent
+--- !u!114 &1962562224133234995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a606df649f1f49ceafc72a38147ca5aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.TailsOverchargeModule
+  overChargeEnter: {fileID: 11400000, guid: 38b329a79d7265f46885a664eb31e2f8, type: 2}
+  energySpendEffects:
+  - {fileID: 11400000, guid: bdf1f81820d2274488cdf006e91024bf, type: 2}
+  overchargeLevelThreshold: 50
+  overchargeSpendFraction: 0.7
+  overchargeTimeWindow: 3
+  entity: {fileID: 3413998453285093005}
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0

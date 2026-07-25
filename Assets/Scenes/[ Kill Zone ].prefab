@@ -252,6 +252,10 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!114 &8067853612745654583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,6 +290,7 @@ MonoBehaviour:
   destroyOnDeath: 0
   timerToDestroy: 2
   _showDebugs: 0
+  targetable: 0
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -303,7 +308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Triggers.ActionResultApplicatorComponent
   actions:
     _serializedList:
-    - Key: 3
+    - Key: 1
       Value:
       - {fileID: 11400000, guid: e3b78952308dfe04192415e0fe03b36f, type: 2}
 --- !u!114 &4552144008683019678
@@ -356,7 +361,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AutoInteractionTrigger
   triggerTrackerComponent: {fileID: 7416433917416414385}
   interactableComponent: {fileID: 3811467452589451954}
-  triggerOnce: 1
+  expirationTime: 0
+  destroyAfterExpiry: 0
+  triggerOnce: 0
   cooldown: 0
   affectedSide: 0
 --- !u!114 &5606969491016008135

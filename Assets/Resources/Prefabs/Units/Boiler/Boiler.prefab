@@ -131,7 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: 3ad205a1-6da6-4eba-8f28-3f7441036c78
 --- !u!114 &6222499059563901983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,6 +154,7 @@ MonoBehaviour:
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
+  targetable: 1
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -279,6 +280,7 @@ MonoBehaviour:
   - rid: 4741284686816871002
   - rid: 4741284686816871003
   - rid: 4741284686816871004
+  - rid: 5078712839912292436
   m_OriginalGraph: {fileID: 5059491024574770053, guid: 4d822d3f69c29a047bab76545e01449b,
     type: 2}
   m_IsInitialised: 0
@@ -376,6 +378,15 @@ MonoBehaviour:
           m_Value1: 3576255219217327564
         Name: DeaggroRad
         m_Value: 12
+    - rid: 5078712839912292436
+      type: {class: 'BlackboardVariable`1[[UnitTier, Assembly-CSharp]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 14492765270942440497
+          m_Value1: 10339993054764499643
+        Name: Tier
+        m_Value: 2
     - rid: 8356651493746016256
       type: {class: 'BlackboardVariable`1[[Unity.Behavior.BehaviorGraph, Unity.Behavior]]',
         ns: Unity.Behavior, asm: Unity.Behavior}
@@ -571,7 +582,6 @@ MonoBehaviour:
   stats: {fileID: 1988780292251766204}
   stateMachine: {fileID: 3760732747768570767}
   toKilledState: {fileID: 11400000, guid: aa806e69f163ab043a5541d5106fee78, type: 2}
-  toKnockDown: {fileID: 0}
   canBeInterrupted: 0
   interruptCondition:
     requireAll: 0

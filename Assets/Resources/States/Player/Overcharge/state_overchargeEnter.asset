@@ -10,17 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cc8855ea334f124cb9b91bd0e05f722, type: 3}
-  m_Name: SharedDeadState
-  m_EditorClassIdentifier: 
-  stateDisplayName: Dead
-  animatorStateName: DeadState
+  m_Name: state_overchargeEnter
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.SerializedUnitState
+  stateDisplayName: Overcharge
+  animatorStateName: Overcharge
   animatorLayer: 0
   crossfadeTime: 0.1
-  minTimeInStateNormalized: 1
+  minTimeInStateNormalized: 0.3
+  timeOfStateFinishedNormalized: 0.31
+  exitConditions: []
   allowsMovement: 0
   allowsAiming: 0
   invulnerable: 1
   rootMotionEnabled: 0
   transitions: []
   onEnterActions: []
+  onNormalizedTimeActions:
+    _serializedList:
+    - Key: 0.1
+      Value:
+      - {fileID: 11400000, guid: 2f08975d319368b4aad2b8a33de43713, type: 2}
   onExitActions: []

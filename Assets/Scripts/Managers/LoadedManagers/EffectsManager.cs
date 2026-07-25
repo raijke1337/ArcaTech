@@ -9,9 +9,8 @@ namespace Arcatech.Managers
 {
     public partial class EffectsManager : GenericLazySingleton<EffectsManager>
     {
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             // Prewarm configured prefabs
             for (int i = 0; i < prewarm.Count; i++)
             {

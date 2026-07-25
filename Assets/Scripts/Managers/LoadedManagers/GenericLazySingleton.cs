@@ -23,10 +23,6 @@ namespace Arcatech.Managers
                 return instance;
 			}
 		}
-        protected virtual void Awake()
-        {
-
-        }
     }
 
 }

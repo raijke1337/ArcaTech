@@ -1,34 +1,41 @@
-using Arcatech.EventBus;
+using System;
+using Arcatech.Managers;
 using Unity.Cinemachine;
 using UnityEngine;
-namespace Arcatech.Managers
+
+[DefaultExecutionOrder(-500)]
+public class CamerasController : GenericLazySingleton<CamerasController>
 {
-    public class CamerasController : MonoBehaviour
+    [SerializeField] private CinemachineBrain _brain;
+    
+    private Camera _fallbackCamera;
+    private Camera _previousActiveCamera;
+
+    /// <summary>Событие вызывается при смене активной камеры (в том числе в первом кадре).</summary>
+    public event Action<Camera> OnActiveCameraChanged;
+
+    public Camera ActiveCamera { get; private set; }
+    
+    private void Awake()
     {
-        [SerializeField] private CinemachineCamera closeCam;
-
-        private EventBinding<CameraEvent> _camBind;
-        private void Start()
-        {
-            _camBind = new EventBinding<CameraEvent>(OnCameraEvent);
-            EventBus<CameraEvent>.Register(_camBind);
-        }
-        private void OnCameraEvent(CameraEvent cameraEvent)
-        {
-            // 1) activate close up camera
-            // 2) load the movement or orbiting settings into the camera
-        }
-
-        private void OnDisable()
-        {
-            EventBus<CameraEvent>.Deregister(_camBind);
-        }
+        if (_brain == null)
+            _brain = GetComponentInChildren<CinemachineBrain>();
+        
+        _fallbackCamera = Camera.main;
+        _previousActiveCamera = null;
     }
-    public struct CameraEvent : IEvent
+    
+    private void LateUpdate()
     {
-        // placeholder for global camera event calls
-        // start / end
-        // + movement path or settings
+        Camera newActiveCamera = _brain != null && _brain.OutputCamera != null 
+            ? _brain.OutputCamera 
+            : _fallbackCamera;
+
+        if (newActiveCamera != _previousActiveCamera)
+        {
+            ActiveCamera = newActiveCamera;
+            _previousActiveCamera = ActiveCamera;
+            OnActiveCameraChanged?.Invoke(ActiveCamera);
+        }
     }
 }
-

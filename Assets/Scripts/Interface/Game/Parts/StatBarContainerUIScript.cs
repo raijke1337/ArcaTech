@@ -61,5 +61,10 @@ namespace Arcatech.UI
                     onComplete += () => _background.DOColor(_baseBgColor, 0.1f).SetEase(Ease.InQuint).Play();
             }
         }
+
+        public void DrawShield(float value)
+        {
+            
+        }
     }
 }

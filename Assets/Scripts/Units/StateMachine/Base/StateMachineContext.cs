@@ -25,7 +25,7 @@ namespace Arcatech.Units
         public bool DeadState { get; set; }
         public bool InterruptQueued { get; set; }
         public bool InInteraction { get; set; } = false;
-
+        public bool OverchargeState { get; set; }
         public void ClearCommand()
         {
             PendingCommand = UnitActionType.None;

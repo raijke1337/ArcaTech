@@ -14,14 +14,14 @@ namespace Arcatech.Units
     [RequireComponent(typeof(BaseGameEntityComponent), typeof(EntityStatsComponent))]
     [RequireComponent(typeof(EffectsReceiverComponent))]
     public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IMove,
-        ISavedProgressItem
+        ISavedProgressItem, ITierProvider
     {
         [SerializeField, Self] protected NavMeshAgent agent;
         [SerializeField, Self] protected BehaviorGraphAgent behavior;
         [SerializeField, Self] protected BaseGameEntityComponent entity;
         [SerializeField, Self] protected UnitInputsComponent unitInputs;
         [SerializeField, Self] protected EntityStatsComponent stats;
-        [SerializeField, Child] protected Animator animator;
+        [SerializeField] protected Animator animator;
         [SerializeField, Child] protected EffectsReceiverComponent effectsReceiver;
 
         private ImpulseApplier _impulse;
@@ -57,7 +57,6 @@ namespace Arcatech.Units
         {
             Initialize();
         }
-
         public bool HasEffect(string ID)
         {
             return effectsReceiver.Controller.HasEffect(ID, out _);
@@ -113,13 +112,14 @@ namespace Arcatech.Units
 
         public bool UseRootMotion
         {
-            get => animator.applyRootMotion;
+            get => animator !=null && animator.applyRootMotion;
             set
             {
-                animator.applyRootMotion = value;
                 agent.updatePosition = !value;
                 agent.updateRotation = !value;
                 if (value) agent.velocity = Vector3.zero;
+                if (!animator) return;
+                animator.applyRootMotion = value;
             }
         }
 
@@ -146,6 +146,7 @@ namespace Arcatech.Units
         }
 
         public string Name => entity.GetName;
+        public BaseGameEntityComponent  Entity => entity;
 
         private ProgressItemState _currentState = ProgressItemState.Default;
 
@@ -195,7 +196,7 @@ namespace Arcatech.Units
         private void Initialize()
         {
             if (m_IsInitialized) return;
-
+            animator = GetComponent<Animator>();
             effectsReceiver.TryGetModifierAggregator(out _mods);
             // BehaviorGraphAgent.GetVariable автоматически ищет во всей иерархии черных досок, 
             // включая доп. ассеты (такие как EnemyData), подключенные к графу.
@@ -230,6 +231,19 @@ namespace Arcatech.Units
             m_CombatMSVar.Value = m_OriginalCombatMS * _speedMultiplier;
         }
 
+        public UnitTier GetTierInfo
+        {
+            get
+            {
+                bool hasTier = behavior.GetVariable<UnitTier>("Tier", out var tierVar);
+                return hasTier ? tierVar.Value : UnitTier.Unassigned;
+            }
+        }
+    }
+
+    public interface ITierProvider
+    {
+        public UnitTier GetTierInfo { get; }
     }
 }
 

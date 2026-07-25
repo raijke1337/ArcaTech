@@ -22,7 +22,7 @@ namespace Arcatech.SaveSystem
             }
         }
 
-        protected override void Awake()
+        protected void Awake()
         {
             if (_gameData == null) Initialize();
         }

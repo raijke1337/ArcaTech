@@ -1,4 +1,7 @@
-﻿using Arcatech.Units;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Arcatech.Units;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
 using UnityEngine;
@@ -9,20 +12,25 @@ namespace Arcatech.Stats
     /// moved the augment logic to this for clarity
     /// </summary>
     [RequireComponent(typeof(EntityStatsComponent),typeof(EntityStateMachineComponent))]
-    public class StatsStateAugmentorComponent : ValidatedMonoBehaviour, IStateAugmentor, IKillerComponent, IAppliedEffectsTakerComponent<AppliedStatsDeltaEffect>
+    public class StatsStateAugmentorComponent : ValidatedMonoBehaviour, IStateAugmentor, IKillerComponent
     {
         
         [SerializeField, Self]
         private EntityStatsComponent stats;
         [SerializeField,Self] EntityStateMachineComponent stateMachine;
         [SerializeField] private SerializedStateTransition toKilledState;
-        [SerializeField] private SerializedStateTransition toKnockDown;
+       // [SerializeField] private SerializedStateTransition toKnockDown;
         private StateTransition _toKilled;
-        private StateTransition _toKnockDown;
+    //   private StateTransition _toKnockDown;
         private UnitState _killState;
-        private UnitState _knockDownStart;
+      //  private UnitState _knockDownStart;
         
         private StateMachineContext _stateMachineCtx;
+        private List <IKillableComponent> _components;
+        private void Start()
+        {
+            _components = GetComponentsInChildren<IKillableComponent>().ToList();
+        }
 
         public void Attach(IStateAugmentorReceiver machine)
         {
@@ -30,17 +38,15 @@ namespace Arcatech.Stats
             {
                 _toKilled = toKilledState.Build();
                 machine.AddTransition(_toKilled);
-                
-                
                 _killState = _toKilled.NextState;
             }
 
-            if (toKnockDown != null)
-            {
-                _toKnockDown = toKnockDown.Build();
-                machine.AddTransition(_toKnockDown);
-                _knockDownStart = _toKnockDown.NextState;
-            }
+            // if (toKnockDown != null)
+            // {
+            //     _toKnockDown = toKnockDown.Build();
+            //     machine.AddTransition(_toKnockDown);
+            //     _knockDownStart = _toKnockDown.NextState;
+            // }
             //
             // if (_damageInterrupt != null)
             // {
@@ -55,19 +61,23 @@ namespace Arcatech.Stats
         public void Detach(IStateAugmentorReceiver machine)
         {
             if (_toKilled != null) machine.RemoveTransition(_toKilled);
-            if (_toKnockDown != null) machine.RemoveTransition(_toKnockDown);
-            if (_damageInterrupt!=null) machine.RemoveTransition(_damageInterrupt);
+          //  if (_toKnockDown != null) machine.RemoveTransition(_toKnockDown);
+       //     if (_damageInterrupt!=null) machine.RemoveTransition(_damageInterrupt);
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)
         {
-            if (state == _knockDownStart)
-            {
-                context.KnockDownState = true;
-            }
+            // if (state == _knockDownStart)
+            // {
+            //     context.KnockDownState = true;
+            // }
 
             if (state == _killState)
             {
+                foreach (var c in _components)
+                {
+                    c.SetKilled(this,true);
+                }
                 context.DeadState = true;
             }
 
@@ -79,7 +89,6 @@ namespace Arcatech.Stats
 
         public void OnStateExited(UnitState state, StateMachineContext context)
         {
-
             if (state == _killState)
             {
                 var killables = GetComponentsInChildren<IKillableComponent>(true);
@@ -95,19 +104,10 @@ namespace Arcatech.Stats
             }
         }
 
-        public string KilledBy => "Entered DeadState in StateMachine";
-        #region dmg take state
+        public string KilledBy => "Stats State Augmentor killed state condition satisfied";
+        #region dmg take state NYI
 
-        public bool ApplyEffect(AppliedStatsDeltaEffect effect, BaseGameEntityComponent source)
-        {
-            if (!canBeInterrupted) return false;
-            
-            if (stats.CheckStatsConditionGroup(interruptCondition))
-            {
-                
-            }
-            return true;
-        }
+
 
         [SerializeField] private bool canBeInterrupted = true;
         [SerializeField] private ConditionGroup interruptCondition;
@@ -131,6 +131,7 @@ namespace Arcatech.Stats
 
         
         #endregion
+
 
     }
 

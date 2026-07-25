@@ -22,7 +22,7 @@ namespace Arcatech.Items
         public event UnityAction ViewChangedInventory;
         [SerializeField,Self] EntityInventoryComponent entityInventory;
         [SerializeField, Self] private EntityStateMachineComponent stateUnit;
-        [SerializeField,Child] private TriggerTrackerComponent meleeHitbox;
+        [SerializeField] private TriggerTrackerComponent meleeHitbox;
         
         public TriggerTrackerComponent HitArea => meleeHitbox;
         private EntityStatsComponent _stats;
@@ -149,7 +149,7 @@ namespace Arcatech.Items
                 _currentDrawItemStrategy = _usables[type].DrawStrategy;
                 _redraw = true;
             }
-            _stats.ApplyCost(_usables[type].GetCost,stateUnit.GetMainEntity);
+            _stats.ApplyUsableCost(_usables[type].GetCost,stateUnit.GetMainEntity);
       }
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)

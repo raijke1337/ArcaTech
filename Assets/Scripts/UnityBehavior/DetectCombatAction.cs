@@ -1,4 +1,5 @@
 using System;
+using Arcatech;
 using Unity.Behavior;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
@@ -32,19 +33,27 @@ public partial class DetectCombatAction : Action
     
     protected override Status OnStart()
     {
+        
         StateChanged.Value = false;
 
         var self = Self.Value;
         var player = Player.Value;
-        if (self == null || player == null)
-            return Status.Success;     // нет данных — просто пропускаем тик, НЕ зависаем
+        
 
+        if (self == null || player == null)
+        {
+            Debug.LogWarning("[DetectCombat] Self or Player == null");
+            return Status.Success;
+        }
+
+        
         Vector3 toPlayer = player.transform.position - self.transform.position;
         float dist = toPlayer.magnitude;
         bool current = CombatState.Value;
 
         // желаемое состояние с гистерезисом (две границы)
         bool desired;
+
         if (!current)
         {
             bool inRange = dist <= AggroRadius.Value;
@@ -54,6 +63,13 @@ public partial class DetectCombatAction : Action
         else
         {
             desired = dist <= DeaggroRadius.Value; // в бою, пока не вышли за деаггро
+        }
+                
+        
+        if (player.TryGetComponent(out BaseGameEntityComponent bc) && !bc.EntityAlive)
+        {
+            desired = false;
+            // player dead, combat exit
         }
 
         // выдержка условия в течение AggroCooldown.
@@ -89,20 +105,19 @@ public partial class DetectCombatAction : Action
 
     private bool CanSee(GameObject self, GameObject player, Vector3 toPlayer, float dist)
     {
-        // 1) угол обзора
         float half = FieldOfViewAngle.Value * 0.5f;
         if (Vector3.Angle(self.transform.forward, toPlayer) > half)
             return false;
-        // 2) луч "вперёд" без препятствий
+
         if (Physics.Raycast(self.transform.position, toPlayer.normalized,
-                out RaycastHit hit, dist))
+                out RaycastHit hit, dist, Physics.DefaultRaycastLayers,
+                QueryTriggerInteraction.Ignore))       
         {
             return hit.collider.gameObject == player ||
                    hit.collider.transform.IsChildOf(player.transform);
         }
-        return true; // ничего не загородило
+        return true;
     }
-    
     protected override void OnEnd()
     {
     }

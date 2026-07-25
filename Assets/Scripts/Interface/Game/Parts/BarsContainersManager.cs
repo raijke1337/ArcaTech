@@ -4,8 +4,6 @@ using Arcatech.Stats;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
 using UnityEngine;
-
-
 namespace Arcatech.UI
 {
 
@@ -23,17 +21,33 @@ namespace Arcatech.UI
 
         private ResourceStatType[] _typesCached;
 
-        
-        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, object changeSource)
+        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
+            BaseGameEntityComponent source)
         {
             if (!init) InitBars();
             var bar = _barsDict[stat];
             if (!bar.gameObject.activeSelf) bar.gameObject.SetActive(true);
-            bar.UpdateValue(statCurrent, statMax, statDelta);
+            switch (changeType)
+            {
+                case EntityStatsComponent.ExpendType.None:
+                    break;
+                case EntityStatsComponent.ExpendType.UsableCost:
+                    bar.UpdateValue(statCurrent, statMax, statDelta);
+                    break;
+                case EntityStatsComponent.ExpendType.ActionResult:
+                    bar.UpdateValue(statCurrent, statMax, statDelta);
+                    break;
+                case EntityStatsComponent.ExpendType.Equipment:
+                    bar.UpdateValue(statCurrent, statMax, statDelta);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
+            }
         }
 
-        public void SetShieldValue(float currentValue)
+        public void SetShieldValue(ResourceStatType shieldStat, float currentValue)
         {
+            _barsDict[shieldStat].DrawShield(currentValue);
         }
 
         private void InitBars()

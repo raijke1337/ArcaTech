@@ -16,8 +16,8 @@ MonoBehaviour:
   animatorStateName: ShieldSpecial
   animatorLayer: 0
   crossfadeTime: 0.1
-  minTimeInStateNormalized: 1
-  timeOfStateFinishedNormalized: 1
+  minTimeInStateNormalized: 0.8
+  timeOfStateFinishedNormalized: 0.9
   exitConditions: []
   allowsMovement: 0
   allowsAiming: 0
@@ -26,8 +26,10 @@ MonoBehaviour:
   transitions: []
   onEnterActions:
   - {fileID: 11400000, guid: 72d1c083d2f38a84b995621c2a0df604, type: 2}
-  - {fileID: 11400000, guid: fdde9ea6688ca714480219264fbc70ac, type: 2}
   onNormalizedTimeActions:
-    _serializedList: []
+    _serializedList:
+    - Key: 0.5
+      Value:
+      - {fileID: 11400000, guid: fdde9ea6688ca714480219264fbc70ac, type: 2}
   onExitActions:
   - {fileID: 11400000, guid: 7e1a78a56914198449b58fc6886b0694, type: 2}
