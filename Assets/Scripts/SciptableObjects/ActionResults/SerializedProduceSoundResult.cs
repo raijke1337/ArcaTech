@@ -1,44 +1,28 @@
-﻿using Arcatech.Effects;
-using Arcatech.EventBus;
+﻿using Arcatech.Audio;
 using UnityEngine;
 
 namespace Arcatech.Actions
 {
-    [CreateAssetMenu(fileName = "New play sound result ", menuName = "Actions/Action Result/Produce sound effects")]
+    [CreateAssetMenu(fileName = "actionResult_PlaySound_", menuName = "Actions/Action Result/FX/Sound")]
     public class SerializedProduceSoundResult : SerializedActionResult
     {
-       
-        [SerializeField] SoundClipData[] sounds;
-        [SerializeField] bool RandomPitch = false;
+        [Header ("Plays as a 'regular' sound. UI/Music/etc - NYI")]
+        [SerializeField] SoundDefinition soundDefinition;
+
         public override ActionResult Deserialize()
         {
-            return new ProduceSoundResult(sounds,RandomPitch);
+            return new ProduceSoundResult(soundDefinition);
         }
     }
-
 
     public class ProduceSoundResult : ActionResult
     {
-        readonly SoundClipData[] sounds;
-        bool pitch;
-        public ProduceSoundResult(SoundClipData[] d, bool pitch)
+        private SoundDefinition s;
+        public ProduceSoundResult(SoundDefinition soundDefinition) => s = soundDefinition;
+        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place, Quaternion placeRot)
         {
-            sounds = d;
-            this.pitch = pitch;
-        }
-
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
-            Quaternion placeRot)
-        {
-            foreach (var s in sounds)
-            {
-                EventBus<SoundClipRequest>.Raise(new SoundClipRequest(s,pitch,place));
-            }
+            AudioEvents.Play(s, place);
             return true;
         }
     }
-
-
-
-
 }

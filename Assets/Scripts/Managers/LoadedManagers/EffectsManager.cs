@@ -7,7 +7,7 @@ using UnityEngine.Pool;
 
 namespace Arcatech.Managers
 {
-    public partial class EffectsManager : GenericLazySingleton<EffectsManager>
+    public class EffectsManager : GenericLazySingleton<EffectsManager>
     {
         protected void Awake()
         {
@@ -131,122 +131,18 @@ namespace Arcatech.Managers
 
         #endregion
         
-        
-        private EventBinding<SoundClipRequest> _playSoundEventBind;
-
+     
         private void Start()
         {
-            InitSoundPool();
             _placeParticleEventBind = new EventBinding<ParticlesEvent>(HandleEvent);
             EventBus<ParticlesEvent>.Register(_placeParticleEventBind);
-            
         }
+        
         private void OnDisable()
         {
             StopAllCoroutines();
             EventBus<ParticlesEvent>.Deregister(_placeParticleEventBind);
-            EventBus<SoundClipRequest>.Deregister(_playSoundEventBind);
         }
-
-
-
-
-        #region sound fx
-
-        IObjectPool<SoundEmitter> soundsPool;
-        readonly List<SoundEmitter> active = new List<SoundEmitter>();
-        //to stop all
-        public readonly Dictionary<SoundClipData, int> Counts = new Dictionary<SoundClipData, int>();
-        // how many instances of sound
-
-        [Space,Header("Sound effect settings")]
-        [SerializeField] SoundEmitter emitterPrefab;
-        [SerializeField] int maxSoundInstances = 30;
-
-
-        #region pool
-
-        [Space, Header("Sound pool settings")]
-        [SerializeField] bool collectionCheck = true;
-        [SerializeField] int defaultCapacity = 10;
-        [SerializeField] int maxSize = 100;
-
-
-        private void CreateSound(SoundClipRequest obj)
-        {
-            SoundsBuilder b = new SoundsBuilder(this).WithSoundData(obj.Data)
-                .WithPosition(obj.Place).
-                WithRandomPitch(obj.RandomPitch);
-            b.Play();
-        }
-
-
-        SoundEmitter CreateSoundEmitter()
-        {
-            var e = Instantiate(emitterPrefab);
-            e.gameObject.SetActive(false);
-            return e;
-        }
-        void OnTakeFromPool(SoundEmitter s)
-        {
-            s.gameObject.SetActive(true);
-            active.Add(s);
-        }
-
-        void OnDestroyPoolObject(SoundEmitter obj)
-        {
-            Destroy(obj.gameObject);
-        }
-
-        void OnReturnedToPool(SoundEmitter obj)
-        {
-            if (Counts.TryGetValue(obj.Data, out int c))
-            {
-                Counts[obj.Data] -= c > 0 ? 1 : 0;
-            }
-
-
-            obj.gameObject.SetActive(false);
-            active.Remove(obj);
-        }
-
-        void InitSoundPool()
-        {
-            soundsPool = new ObjectPool<SoundEmitter>(
-
-                CreateSoundEmitter,
-                OnTakeFromPool,
-                OnReturnedToPool,
-                OnDestroyPoolObject,
-                collectionCheck,
-                defaultCapacity,
-                maxSize);
-        }
-        #endregion
-
-        #region public
-
-        public SoundEmitter GetSound()
-        {
-            return soundsPool.Get();
-        }
-        public void ReturnSound(SoundEmitter s)
-        {
-            soundsPool.Release(s);
-        }
-
-        public bool CanPlaySound(SoundClipData data)
-        {
-            if (Counts.TryGetValue(data, out var count))
-            {
-                return count < maxSoundInstances;
-            }
-            else return true;
-        }
-
-        #endregion
-        #endregion
-
 
     }
 }

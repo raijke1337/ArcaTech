@@ -6,7 +6,6 @@ namespace Arcatech.Items
 
     public class Equipment : Item, IEquipmentStatsProvider
     {
-
         public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
         {
             mods = new List<StatModifier>(cfg.statModifiers);

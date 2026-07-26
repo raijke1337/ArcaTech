@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Arcatech.Units;
 using UnityEngine;
 
@@ -7,9 +8,9 @@ namespace Arcatech.Items
     public class EquipmentComponent : MonoBehaviour,IUsableComponent
     {
         [SerializeField] private Transform spawner;
-        [SerializeField] private ParticleSystem particle;
         public Transform EffectSpawn => spawner;
-        private EquipmentAnimator _equipmentAnimator;
+
+        private List<IEquipmentPart> _parts;
         
         protected void OnEnable()
         {
@@ -18,36 +19,11 @@ namespace Arcatech.Items
                 Debug.LogWarning($"Spawner not set in {this}");
                 spawner = transform;
             }
-            TryGetComponent(out _equipmentAnimator);
-            if (!particle) particle = GetComponentInChildren<ParticleSystem>();
-            if (particle)
-            {
-                particle.Stop();
-            }
+            _parts = GetComponentsInChildren<IEquipmentPart>().ToList();
         }
-
-
         public void OnChangeUsableState(StateMachineNotifyType notifyType)
-        { 
-            if (_equipmentAnimator) _equipmentAnimator.OnChangeUsableState(notifyType);
-            switch (notifyType)
-            {
-                case StateMachineNotifyType.NoNotify:
-                    break;
-                case StateMachineNotifyType.Starting:
-                    break;
-                case StateMachineNotifyType.Use:
-                    particle?.Play();
-                    break;
-                case StateMachineNotifyType.EndUse:
-                    particle?.Stop();
-                    break;
-                case StateMachineNotifyType.Cancel:
-                    particle?.Stop();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(notifyType), notifyType, null);
-            }
+        {
+            foreach (var part in _parts) part.TriggerState(notifyType);
         }
     }
 }

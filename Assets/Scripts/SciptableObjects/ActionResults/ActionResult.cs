@@ -21,5 +21,4 @@ namespace Arcatech.Actions
         public abstract bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target
             ,Vector3 place, Quaternion placeRot);
     }
-
 }

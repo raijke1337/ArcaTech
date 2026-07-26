@@ -1,4 +1,5 @@
-﻿using Arcatech.Triggers;
+﻿using System.Collections.Generic;
+using Arcatech.Triggers;
 using Arcatech.Units;
 using KBCore.Refs;
 using UnityEngine;
@@ -11,13 +12,7 @@ namespace Arcatech.Items.Projectiles
     public sealed class ProjectileComponent : ValidatedMonoBehaviour, IPausableComponent, ITriggerNotificationReceiver,
         ITriggerNotificationProvider
     {
-
-        #region projectilEvents
-
         public event UnityAction<ProjectileComponent> ProjectileFinished = delegate { };
-
-
-        #endregion
 
         [SerializeField, Self] private BaseGameEntityComponent entity;
         public BaseGameEntityComponent Entity => entity;
@@ -25,8 +20,7 @@ namespace Arcatech.Items.Projectiles
         ProjectileBehavior _behavior;
         TriggerTrackerComponent _col;
         
-        private BaseGameEntityComponent _owner;
-
+        private List<IEquipmentPart> _parts;
         ITriggerNotificationReceiver _receiver;
 
 
@@ -34,12 +28,13 @@ namespace Arcatech.Items.Projectiles
         {
             _col = GetComponent<TriggerTrackerComponent>();
             _col.RegisterReceiver(this);
+            _parts =  new List<IEquipmentPart>();
+            _parts.AddRange(GetComponentsInChildren<IEquipmentPart>());
         }
 
         public void Setup(BaseGameEntityComponent owner, SerializedProjectileBehavior behavior)
         {
             _behavior = behavior.Deserialize(owner);
-            _owner = owner;
         }
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
@@ -53,7 +48,6 @@ namespace Arcatech.Items.Projectiles
         void Update()
         {
             if (Paused) return;
-
             _behavior.UpdatePosition(Time.deltaTime, transform);
             if (_behavior.BehaviorCompleted)
             {
@@ -76,7 +70,15 @@ namespace Arcatech.Items.Projectiles
         public bool Active
         {
             get => _col.Active;
-            set => _col.Active = value;
+            set
+            {
+                _col.Active = value;
+                //Debug.Log($"{this} {(value? "Activating" : "Deactivating")}");
+                foreach (var part in _parts)
+                {
+                    part.TriggerState(value? StateMachineNotifyType.Use : StateMachineNotifyType.EndUse);
+                }
+            }
         }
 
         public void RegisterReceiver(ITriggerNotificationReceiver receiver)=> _receiver = receiver;
@@ -85,10 +87,9 @@ namespace Arcatech.Items.Projectiles
         {
             // noop
         }
-
         public void OnChangeUsableState(StateMachineNotifyType notification)
         {
-            // noop
+            // this is not called in current implementation
         }
     }
 }

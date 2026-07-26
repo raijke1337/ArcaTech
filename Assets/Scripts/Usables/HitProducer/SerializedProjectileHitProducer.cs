@@ -93,6 +93,7 @@ namespace Arcatech.Usables
             projectile.gameObject.SetActive(true);  
             projectile.Active = true;
             _activeProjectiles.Add(projectile);
+            
         }
 
         private void HandleProjectileExpiry(ProjectileComponent projectile)

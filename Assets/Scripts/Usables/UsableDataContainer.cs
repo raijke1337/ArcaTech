@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Actions;
+using Arcatech.Audio;
 using Arcatech.Effects;
 using Arcatech.EventBus;
 using Arcatech.Items;
@@ -24,12 +25,15 @@ namespace Arcatech.Usables
         [Header("Apply effects of hits")]
         [SerializeField] public SerializedEffectApplier effectApplier;
         [SerializeField] public CFXR_Effect applicationEffect;
+        [SerializeField] public SoundDefinition applicationSound;
         
         [Header("The effects to apply")]
         [SerializeField] public SerializedActionResult[] effects;
         // struct end
         // TODO!
         
+        
+        //Broken by switch to fixed trigger area?
         [Header("Visual")]
         [SerializeField] public CFXR_Effect onInvalidHit;
         
@@ -48,6 +52,7 @@ namespace Arcatech.Usables
         private readonly List<ActionResult> _results;
         private readonly bool _proceedOnSelfHit;
         protected readonly bool indicateHitbox;
+        private SoundDefinition _sound;
 
         private ParticlesEvent _particlesEventInvalidHit;
         
@@ -70,6 +75,7 @@ namespace Arcatech.Usables
             
             _hitProducer.EntityHit += HandleEntityHit;
             _hitProducer.EnvironmentHit += HandleEnvironmentHit;
+            _sound = config.applicationSound;
         }
 
         private void HandleEnvironmentHit(TriggerHitInfo arg0)
@@ -84,7 +90,7 @@ namespace Arcatech.Usables
            if (_owner.ShowingDebugs) Debug.Log("Valid hit");
            // do not call application for self hit (happens because of collider issues)
            if (info.TryGetEntityTarget(out var e) && e == _owner && !_proceedOnSelfHit) return;
-           
+           AudioEvents.Play(_sound);
            _effectApplier.ApplyEffects(_owner,info,_results,_equipment.EffectSpawn.transform.position);
         }
 

@@ -14,9 +14,10 @@ GameObject:
   - component: {fileID: 8102464925495723806}
   - component: {fileID: 3960432742461820630}
   - component: {fileID: 8102464925495723807}
-  - component: {fileID: 4576216533406728223}
   - component: {fileID: 8102464925495723776}
   - component: {fileID: 6104867543945504151}
+  - component: {fileID: 8701763222896216281}
+  - component: {fileID: 7104259217415572807}
   m_Layer: 0
   m_Name: PersistentManagers
   m_TagString: Untagged
@@ -128,12 +129,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prewarm: []
-  emitterPrefab: {fileID: 153249698424754343, guid: a606c6bdfaa79c0458f0fb1a76634478,
-    type: 3}
-  maxSoundInstances: 30
-  collectionCheck: 1
-  defaultCapacity: 10
-  maxSize: 100
 --- !u!114 &8102464925495723807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,19 +141,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ed7b160ebd48de43b0a2daff4e9e902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4576216533406728223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8102464926349693799}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1318a4edb693bcb47bce289a86a9929f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _mixer: {fileID: 24100000, guid: 925e4551c014b634ab183825acd53920, type: 2}
 --- !u!114 &8102464925495723776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,7 +161,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8102464926349693799}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b7841bff4ea45559a4edbe956b7f6db, type: 3}
   m_Name: 
@@ -187,3 +169,51 @@ MonoBehaviour:
   service: {fileID: 11400000, guid: a488e2bd51e2cc44faa4e727c428753d, type: 2}
   saveVersion: 3
   showDebugs: 0
+--- !u!114 &8701763222896216281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8102464926349693799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c8fc98b26e0410c97d06adbb509c530, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Audio.AudioService
+  emitterPrefab: {fileID: 4620526616040979445, guid: 54ac1499f1dcee142906ef4017247794,
+    type: 3}
+  mixer: {fileID: 24100000, guid: 925e4551c014b634ab183825acd53920, type: 2}
+  prewarmCount: 16
+  categoryGroups:
+  - Category: 0
+    MixerGroup: {fileID: 24300002, guid: 925e4551c014b634ab183825acd53920, type: 2}
+  - Category: 2
+    MixerGroup: {fileID: -8968678076387812642, guid: 925e4551c014b634ab183825acd53920,
+      type: 2}
+  - Category: 1
+    MixerGroup: {fileID: 3731592052060140355, guid: 925e4551c014b634ab183825acd53920,
+      type: 2}
+  - Category: 3
+    MixerGroup: {fileID: -8932274964421783934, guid: 925e4551c014b634ab183825acd53920,
+      type: 2}
+  - Category: 4
+    MixerGroup: {fileID: 6882266200112162905, guid: 925e4551c014b634ab183825acd53920,
+      type: 2}
+  - Category: 5
+    MixerGroup: {fileID: 7892467411716679206, guid: 925e4551c014b634ab183825acd53920,
+      type: 2}
+  musicSlotA: {fileID: 0}
+  musicSlotB: {fileID: 0}
+--- !u!114 &7104259217415572807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8102464926349693799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.LittlePauseHelperComponent

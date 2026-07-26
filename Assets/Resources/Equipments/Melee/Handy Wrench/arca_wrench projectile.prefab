@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 5583655048206583044}
   - component: {fileID: 1139309180198338418}
   - component: {fileID: 945350184138853082}
+  - component: {fileID: 315130287860967482}
   m_Layer: 6
   m_Name: arca_wrench projectile
   m_TagString: Untagged
@@ -193,6 +194,10 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!54 &6507032882160400354
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -254,6 +259,7 @@ MonoBehaviour:
   destroyOnDeath: 1
   timerToDestroy: 0
   _showDebugs: 0
+  targetable: 1
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -282,4 +288,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: f6cb3095-8e1f-4104-8737-6b6a0dcd1259
+--- !u!114 &315130287860967482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322378502437355212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4144a6f49c64db1993b29fecfbc8fe5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Items.EquipmentSounds
+  sounds:
+    _serializedList:
+    - Key: 2
+      Value: {fileID: 11400000, guid: 1854d09293040824e8935290f1fa50e0, type: 2}

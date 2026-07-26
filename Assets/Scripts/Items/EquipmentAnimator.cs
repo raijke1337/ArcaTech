@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Arcatech.Items
 {
     [RequireComponent(typeof(Animator))]
-    public class EquipmentAnimator : ValidatedMonoBehaviour,IUsableComponent
+    public class EquipmentAnimator : ValidatedMonoBehaviour,IEquipmentPart
     {
         [SerializeField,Self] Animator animator;
         [SerializeField] private SerializedDictionary<StateMachineNotifyType, string> _animatorStrings;
@@ -22,11 +22,10 @@ namespace Arcatech.Items
                 _hashes[pair.Key] = Animator.StringToHash(pair.Value);
             }
         }
-
-
-        public void OnChangeUsableState(StateMachineNotifyType notifyType)
+        
+        public void TriggerState(StateMachineNotifyType notification)
         {
-            if (_hashes.TryGetValue(notifyType, out var hash)) animator.SetTrigger(hash);
+            if (_hashes.TryGetValue(notification, out var hash)) animator.SetTrigger(hash);
         }
     }
 }

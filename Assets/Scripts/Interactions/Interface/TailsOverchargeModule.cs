@@ -10,6 +10,7 @@ namespace Arcatech.Stats
     [RequireComponent(typeof(EntityStatsComponent), typeof(UsablesCasterComponent))]
     public class TailsOverchargeModule : ValidatedMonoBehaviour, IUnitCommandPerformer, IStatUpdatesViewer, IStateAugmentor
     {
+        [SerializeField,Self] EntityStatsComponent statsComponent;
         [Header("Overcharge!")]
         [SerializeField] private SerializedStateTransition overChargeEnter;
         // Overcharge effects are applied in the State
@@ -41,7 +42,9 @@ namespace Arcatech.Stats
         // отслеживание "резкого расхода" энергии выше границы перегрузки
         private bool _windowActive;
         private float _windowStartTime;
-        private float _windowPeakEnergy;
+        private float _windowSpentAccumulator;
+
+        [SerializeField] private bool ShowingDebugs = false;
 
         private void Start()
         {
@@ -50,6 +53,7 @@ namespace Arcatech.Stats
             {
                 _onSpend[i] = energySpendEffects[i].Deserialize();
             }
+            statsComponent.RegisterStatsViewer((this));
         }
 
         public void PrepareCommand(UnitActionType type)
@@ -59,7 +63,7 @@ namespace Arcatech.Stats
             _pendingShortBuff = false;
             _pendingOverchargeTrigger = false;
 
-            Debug.Log($"[{nameof(TailsOverchargeModule)}] PrepareCommand: type={type}");
+            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] PrepareCommand: type={type}");
         }
 
         public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta,
@@ -68,7 +72,7 @@ namespace Arcatech.Stats
             if (!enabled) return;
             if (source != entity || stat != ResourceStatType.Energy || changeType != EntityStatsComponent.ExpendType.UsableCost)
             {
-                Debug.Log($"[{nameof(TailsOverchargeModule)}] Stats update ignored: stat={stat}, changeType={changeType}, source={source}");
+                if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Stats update ignored: stat={stat}, changeType={changeType}, source={source}");
                 return;
             }
 
@@ -77,14 +81,13 @@ namespace Arcatech.Stats
 
         private void HandleAbilityEnergySpent(float statCurrent, float statMax, float statDelta)
         {
-            
-            float energyBeforeSpend = statCurrent - statDelta; // statDelta отрицательный при трате
+            float energyBeforeSpend = statCurrent - statDelta;
 
-            Debug.Log($"[{nameof(TailsOverchargeModule)}] Ability energy spend: before={energyBeforeSpend}, after={statCurrent}, max={statMax}");
+            if (ShowingDebugs)Debug.Log($"[{nameof(TailsOverchargeModule)}] Ability energy spend: before={energyBeforeSpend}, after={statCurrent}, max={statMax}");
 
             if (energyBeforeSpend < overchargeLevelThreshold)
             {
-                Debug.Log($"[{nameof(TailsOverchargeModule)}] Below overcharge threshold ({overchargeLevelThreshold}) -> short buff pending");
+                if (ShowingDebugs)Debug.Log($"[{nameof(TailsOverchargeModule)}] Below overcharge threshold ({overchargeLevelThreshold}) -> short buff pending");
                 _pendingShortBuff = true;
                 _windowActive = false;
                 return;
@@ -94,21 +97,18 @@ namespace Arcatech.Stats
             {
                 _windowActive = true;
                 _windowStartTime = Time.time;
-                _windowPeakEnergy = energyBeforeSpend;
-                Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge tracking window (re)started, peak={_windowPeakEnergy}");
-            }
-            else if (energyBeforeSpend > _windowPeakEnergy)
-            {
-                _windowPeakEnergy = energyBeforeSpend;
-                Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge tracking window peak updated to {_windowPeakEnergy}");
+                _windowSpentAccumulator = 0f;
+                if (ShowingDebugs)Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge tracking window (re)started");
             }
 
-            float spentInWindow = _windowPeakEnergy - statCurrent;
-            Debug.Log($"[{nameof(TailsOverchargeModule)}] Spent in window: {spentInWindow} / needed {statMax * overchargeSpendFraction}");
+            float spentThisTick = -statDelta; // statDelta отрицательный
+            _windowSpentAccumulator += spentThisTick;
 
-            if (spentInWindow >= statMax * overchargeSpendFraction)
+            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Spent in window: {_windowSpentAccumulator} / needed {statMax * overchargeSpendFraction}");
+
+            if (_windowSpentAccumulator >= statMax * overchargeSpendFraction)
             {
-                Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge threshold reached -> overcharge pending");
+                if (ShowingDebugs)Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge threshold reached -> overcharge pending");
                 _pendingOverchargeTrigger = true;
                 _windowActive = false;
             }
@@ -117,7 +117,7 @@ namespace Arcatech.Stats
         public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
             if (!enabled) return;
-            Debug.Log($"[{nameof(TailsOverchargeModule)}] DoUnitCommand: type={type}, success={wasSuccessful}, pendingBuff={_pendingShortBuff}, pendingOvercharge={_pendingOverchargeTrigger}");
+            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] DoUnitCommand: type={type}, success={wasSuccessful}, pendingBuff={_pendingShortBuff}, pendingOvercharge={_pendingOverchargeTrigger}");
 
             if (wasSuccessful)
             {
@@ -138,7 +138,7 @@ namespace Arcatech.Stats
         [ProButton]
         public void ApplyShortBuff()
         {
-            Debug.Log($"[{nameof(TailsOverchargeModule)}] Applying short buff, effects count={_onSpend.Length}");
+            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Applying short buff, effects count={_onSpend.Length}");
             for (int i = 0; i < _onSpend.Length; i++)
             {
                 _onSpend[i].ProduceResult(entity, entity, entity.EffectSpawn.position, entity.EffectSpawn.rotation);
@@ -148,7 +148,7 @@ namespace Arcatech.Stats
         [ProButton]
         public void TriggerOvercharge()
         {
-            Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge triggered!");
+            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge triggered!");
             OverChargeReady = true;
             ToggleOverchargeState(true);
         }
@@ -180,14 +180,14 @@ namespace Arcatech.Stats
             {
                 ToggleOverchargeState(false);
                 OverChargeReady = false;
-                Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge state ended, flags reset");
+                if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge state ended, flags reset");
             }
         }
 
         private void ToggleOverchargeState(bool state)
         {
             _cachedContext.OverchargeState = state;
-            Debug.Log($"[{nameof(TailsOverchargeModule)}] ToggleOverchargeState -> {state}");
+            if (ShowingDebugs)  Debug.Log($"[{nameof(TailsOverchargeModule)}] ToggleOverchargeState -> {state}");
         }
     }
 }
