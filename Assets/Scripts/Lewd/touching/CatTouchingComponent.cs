@@ -1,10 +1,14 @@
+using System;
 using Arcatech.Units;
+using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Lewding
 {
-    public class CatTouchingComponent : MonoBehaviour, IStateAugmentor
+    [RequireComponent(typeof(LewdnessComponent))]
+    public class CatTouchingComponent : ValidatedMonoBehaviour, IStateAugmentor, ILewdComponent
     {
+        [SerializeField, Self] private LewdnessComponent comp;
         [SerializeField] private SerializedStateTransition headPat;
         [SerializeField, Range(0, 1f)] private float lewdGainOnHeadPat = 0.25f; 
         [Space]
@@ -21,7 +25,7 @@ namespace Arcatech.Lewding
         private StateTransition _toTouchChest;
         private StateTransition _toTouchBottom;
 
-        private LewdnessContext _cachedContextReference;
+        private LewdnessContext _lctx;
         
         private void Awake()
         {
@@ -35,9 +39,14 @@ namespace Arcatech.Lewding
                 }
         }
 
+        private void Start()
+        {
+            comp.Register(this);
+        }
+
         private void OnTouch(TouchZoneType place)
         {
-            _cachedContextReference.LastTouchCommand = place;
+            if (_lctx!=null) _lctx.LastTouchCommand = place;
         }
 
         public void Attach(IStateAugmentorReceiver machine)
@@ -45,8 +54,6 @@ namespace Arcatech.Lewding
             machine.AddTransition(_toHeadPat);
             machine.AddTransition(_toTouchChest);
             machine.AddTransition(_toTouchBottom);
-            
-            _cachedContextReference ??= machine.Context.EcchiContext;
         }
 
         public void Detach(IStateAugmentorReceiver machine)
@@ -85,5 +92,16 @@ namespace Arcatech.Lewding
             }
             context.EcchiContext.LastTouchCommand = TouchZoneType.None;
         }
+
+        public void Initialize(LewdnessContext context)
+        {
+            _lctx =  context;
+        }
     }
+
+    public interface ILewdComponent
+    {
+        public void Initialize(LewdnessContext context);
+    }
+    
 }

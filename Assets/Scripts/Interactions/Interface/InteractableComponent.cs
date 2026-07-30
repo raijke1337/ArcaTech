@@ -79,6 +79,7 @@ namespace Arcatech.Interactions
                     ctx.State = InteractionState.Failure;
                     condition.PlayDenyEffects(ctx);
                     yield return ExecuteBlockingEffects(null, ctx, InteractionState.Failure);
+                    _isExecuting = false;
                     ApplyPostEffects(InteractionState.Failure);
                     yield break;
                 }

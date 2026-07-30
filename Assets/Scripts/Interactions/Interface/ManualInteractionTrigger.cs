@@ -13,6 +13,7 @@ namespace Arcatech.Interactions
             if (triggerHitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
             {
                 interactor.RegisterInteractive(interactableComponent);
+                if (interactor.Entity.ShowingDebugs)Debug.Log($"{interactor.Entity.GetName} has entered trigger area {name}");
             }
         }
 
@@ -21,6 +22,7 @@ namespace Arcatech.Interactions
             if (triggerExitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
             {
                 interactor.UnregisterInteractive(interactableComponent);
+                if (interactor.Entity.ShowingDebugs) Debug.Log($"{interactor.Entity.GetName} has exited trigger are {name}");
             }
         }
         

@@ -135,6 +135,10 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!114 &6215770114506928207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,14 +177,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
   _pauser: {fileID: 438787011601951740}
+  _name: 
+  id: {fileID: 4251877210966973612}
   _rb: {fileID: 754868552308480928}
   setKinematic: 1
-  _name: 
   entitySide: 0
   effectSpawn: {fileID: 3064217163542892766}
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
+  targetable: 1
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -197,7 +203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Items.ItemPickUpEffect
   content: {fileID: 11400000, guid: 820a123828705fe4da32a9e3227bd98c, type: 2}
-  count: 100
+  count: 10
   billboard: {fileID: 0}
 --- !u!114 &9161550653830420109
 MonoBehaviour:
@@ -260,7 +266,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ManualInteractionTrigger
   triggerTrackerComponent: {fileID: 4740861867446518017}
   interactableComponent: {fileID: 3555756990035200253}
-  id: {fileID: 4251877210966973612}
+  expirationTime: 0
+  destroyAfterExpiry: 0
+  triggerOnce: 1
+  cooldown: 0
   description: {fileID: 11400000, guid: f928bef3d006085478c5b4d31d81239b, type: 2}
 --- !u!114 &5611294500172964572
 MonoBehaviour:

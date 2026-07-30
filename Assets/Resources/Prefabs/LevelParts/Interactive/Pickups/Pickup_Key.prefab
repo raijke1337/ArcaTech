@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 9161550653830420109}
   - component: {fileID: 7807487161984706014}
   - component: {fileID: 5907143268600554704}
-  - component: {fileID: 4150197037249165678}
+  - component: {fileID: 2139058721064851623}
   m_Layer: 6
   m_Name: Pickup_Key
   m_TagString: Untagged
@@ -127,7 +127,7 @@ MonoBehaviour:
   - {fileID: 5923635334488011330}
   failureEffects: []
   cancelEffects: []
-  destroyAfterSuccess: 0
+  destroyAfterSuccess: 1
 --- !u!65 &897531696086615196
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -193,6 +193,10 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!114 &6215770114506928207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,14 +235,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
   _pauser: {fileID: 438787011601951740}
+  _name: 
+  id: {fileID: 2139058721064851623}
   _rb: {fileID: 754868552308480928}
   setKinematic: 1
-  _name: 
   entitySide: 0
   effectSpawn: {fileID: 3064217163542892766}
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
+  targetable: 1
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -331,8 +337,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ManualInteractionTrigger
   triggerTrackerComponent: {fileID: 4740861867446518017}
   interactableComponent: {fileID: 3555756990035200253}
+  expirationTime: 0
+  destroyAfterExpiry: 0
+  triggerOnce: 1
+  cooldown: 0
   description: {fileID: 11400000, guid: 3011e969cc9283f479841c6e39780580, type: 2}
---- !u!114 &4150197037249165678
+--- !u!114 &2139058721064851623
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -341,10 +351,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4714043517577227366}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0648d19678744c59b375d232c87a414, type: 3}
+  m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.PersistentID
-  _uniqueID: 350bc02288ec4b3f
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
+  uniqueId: 
 --- !u!1 &7175023294981739629
 GameObject:
   m_ObjectHideFlags: 0

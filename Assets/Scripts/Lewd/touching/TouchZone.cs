@@ -12,13 +12,10 @@ namespace Arcatech.Lewding
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            Touch.Invoke(place);
-            Debug.Log("Clicked "+place);
+            Touch?.Invoke(place);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
-        {
-            Debug.Log("Entered "+place);
-        }
+        { }
     }
 }

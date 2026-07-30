@@ -74,7 +74,6 @@ namespace Arcatech.Actions
                     any = true;
                 }
             }
-
             return any;
         }
     }

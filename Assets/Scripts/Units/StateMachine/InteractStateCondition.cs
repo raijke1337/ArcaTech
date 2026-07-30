@@ -1,4 +1,5 @@
-﻿using Arcatech.Interactions;
+﻿using System;
+using Arcatech.Interactions;
 using UnityEngine;
 
 namespace Arcatech.Units
@@ -7,9 +8,22 @@ namespace Arcatech.Units
     public class InteractStateCondition : SerializedStateTransitionCondition
     {
         public InteractionState requiredState = InteractionState.InProgress;
+        [Header ("'OR' condition, overwrites the one above")]
+        public InteractionState[] requiredStates = Array.Empty<InteractionState>();
         public override bool CanTransition(StateMachineContext ctx)
         {
-            return ctx.Interactor != null && ctx.Interactor.State ==  requiredState;
+            if (ctx.Interactor == null) return false;
+
+            var current = ctx.Interactor.State;
+
+            if (requiredStates != null && requiredStates.Length > 0)
+            {
+                foreach (var s in requiredStates)
+                    if (s == current) return true;
+                return false;
+            }
+
+            return current == requiredState;
         }
     }
 }

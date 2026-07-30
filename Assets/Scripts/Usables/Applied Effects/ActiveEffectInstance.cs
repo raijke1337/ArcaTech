@@ -23,14 +23,14 @@ namespace Arcatech.Usables.Effects
         public ParticleSystem GetDisplayEffect { get; }
 
         public ActiveEffectInstance(EffectKey key, IEffectResult result, BaseGameEntityComponent source,
-            PeriodicityRunner runner, bool infinite, BaseAppliedEffect.StackType stackType, int MaxStacks, ParticleSystem particleSystemPrefab)
+            PeriodicityRunner runner, bool infinite, BaseAppliedEffect.StackType stackType, int maxStacks, ParticleSystem particleSystemPrefab)
         {
             Key = key;
             Result = result;
             Source = source;
             _runner = runner;
             _infinite = infinite;
-            MaxStacks = MaxStacks;
+            MaxStacks = maxStacks;
             StackType = stackType;
             GetDisplayEffect = particleSystemPrefab;
         }

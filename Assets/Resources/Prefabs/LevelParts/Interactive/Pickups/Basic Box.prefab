@@ -50,6 +50,7 @@ MonoBehaviour:
       Value: {fileID: 11400000, guid: df1791599da76fc448c445c722326601, type: 2}
     - Key: 4
       Value: {fileID: 11400000, guid: 11657bf39a41e7240936e6c10db04c77, type: 2}
+  blockUntilTextCompletes: 0
 --- !u!1 &4076609815380410053
 GameObject:
   m_ObjectHideFlags: 0
@@ -96,7 +97,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ItemInInventoryInteractionCondition
   denyEffects:
   - {fileID: 7903429953228082990}
-  itemsConsumed: 0
+  itemsConsumed: 1
   itemNeeded: {fileID: 11400000, guid: 3386f4b9bbddabb4c8ac845eaeb4d77c, type: 2}
 --- !u!1 &7735594828011522598
 GameObject:
@@ -120,6 +121,7 @@ GameObject:
   - component: {fileID: 4946006338248252410}
   - component: {fileID: 8156757486324064789}
   - component: {fileID: 2904987887053145934}
+  - component: {fileID: 7152817584857583273}
   m_Layer: 6
   m_Name: Basic Box
   m_TagString: Untagged
@@ -267,6 +269,10 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!114 &758128266206054426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,15 +298,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
   _pauser: {fileID: 758128266206054426}
+  _name: 
+  id: {fileID: 7152817584857583273}
   _rb: {fileID: 9022295661919408981}
   setKinematic: 1
-  _name: 
   entitySide: 0
   effectSpawn: {fileID: 532059767208104933}
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
-  id: 1542818031:1211343213:2334367873:3366148942
+  targetable: 1
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -322,12 +329,13 @@ MonoBehaviour:
   - {fileID: 1254061975127174855}
   preExecuteEffects: []
   executor: {fileID: 4946006338248252410}
+  duringExecuteEffects: []
   successEffects:
   - {fileID: 7903429953228082990}
   - {fileID: 8156757486324064789}
   failureEffects: []
   cancelEffects: []
-  destroyAfterSuccess: 0
+  destroyAfterSuccess: 1
 --- !u!114 &5148050270069898485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,6 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
+  willComplete: 1
 --- !u!114 &8156757486324064789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,8 +421,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92eb99bc95b294f4e9e8f7eb1d175275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Items.ItemPickUpEffect
-  content: {fileID: 11400000, guid: 820a123828705fe4da32a9e3227bd98c, type: 2}
-  count: 100
+  content: {fileID: 0}
+  count: 1
   billboard: {fileID: 0}
 --- !u!114 &2904987887053145934
 MonoBehaviour:
@@ -429,7 +438,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ManualInteractionTrigger
   triggerTrackerComponent: {fileID: 7810916253604783490}
   interactableComponent: {fileID: 628953209381491017}
+  expirationTime: 0
+  destroyAfterExpiry: 0
+  triggerOnce: 1
+  cooldown: 0
   description: {fileID: 11400000, guid: 6b4af0f4889ccb843bcce268780fdcf0, type: 2}
+--- !u!114 &7152817584857583273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7735594828011522598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
+  uniqueId: 
 --- !u!1 &8238251637142270540
 GameObject:
   m_ObjectHideFlags: 0

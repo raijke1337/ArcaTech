@@ -1,4 +1,4 @@
-﻿using KBCore.Refs;
+﻿
 using UnityEngine;
 
 namespace Arcatech.Usables.Effects

@@ -15,7 +15,7 @@ namespace Arcatech.Lewding
         {
             machine.Context.InitEcchiContext(cfg);
             ctx = machine.Context.EcchiContext;
-           // Debug.Log($"Ecchi OK");
+            Debug.Log($"Load Ecchi OK");
         }
 
         public void Detach(IStateAugmentorReceiver machine)
@@ -31,6 +31,8 @@ namespace Arcatech.Lewding
         public void OnStateExited(UnitState state, StateMachineContext context)
         {
         }
+
+        public void Register(ILewdComponent component) => component.Initialize(ctx);
     }
 [Serializable]
     public struct LewdnessSettings

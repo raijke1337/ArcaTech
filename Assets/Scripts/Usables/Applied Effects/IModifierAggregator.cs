@@ -25,6 +25,6 @@
         /// <summary> Live stack count for an effectId across all sources (on-target counting). </summary>
         int CountStacksByEffectId(ModifierParam param, string effectId);
     }
-    
+
     
 }

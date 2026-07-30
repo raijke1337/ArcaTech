@@ -130,6 +130,7 @@ MonoBehaviour:
     - Key: 2
       Value:
       - {fileID: 11400000, guid: 3f9d2e014ab89224c99c5d4908733602, type: 2}
+      - {fileID: 11400000, guid: 04c62ceb71167734d833898a982ef8db, type: 2}
 --- !u!114 &3430445988532077883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,6 +153,7 @@ MonoBehaviour:
   destroyOnDeath: 0
   timerToDestroy: 2
   _showDebugs: 0
+  targetable: 1
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -227,7 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 992d84ed-cc5b-4356-b188-c6017f221f9c
+  uniqueId: 
 --- !u!114 &6661715557969118391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,8 +268,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AutoInteractionTrigger
   triggerTrackerComponent: {fileID: 1052170491945983571}
   interactableComponent: {fileID: 6661715557969118391}
-  triggerOnce: 1
-  cooldown: 0
+  expirationTime: 0
+  destroyAfterExpiry: 0
+  triggerOnce: 0
+  cooldown: 1
   affectedSide: 1
 --- !u!114 &3211246182689599279
 MonoBehaviour:
@@ -308,7 +312,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7130150264856469088}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

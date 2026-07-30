@@ -48,6 +48,7 @@ MonoBehaviour:
     _serializedList:
     - Key: 3
       Value: {fileID: 11400000, guid: e82ff22f2ba22ba4aad11545912f4362, type: 2}
+  blockUntilTextCompletes: 1
 --- !u!1 &5877487407430005226
 GameObject:
   m_ObjectHideFlags: 0
@@ -64,8 +65,8 @@ GameObject:
   - component: {fileID: 5947406123470694086}
   - component: {fileID: 291358447390153180}
   - component: {fileID: 2208630765820750090}
-  - component: {fileID: 3357102818650165533}
   - component: {fileID: 1005627346370064262}
+  - component: {fileID: 3980834468791032702}
   m_Layer: 6
   m_Name: Display Text Area
   m_TagString: Untagged
@@ -129,6 +130,10 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!54 &8016685324157890910
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -181,15 +186,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
   _pauser: {fileID: 8924725522568266769}
+  _name: 
+  id: {fileID: 3980834468791032702}
   _rb: {fileID: 8016685324157890910}
   setKinematic: 1
-  _name: 
   entitySide: 0
   effectSpawn: {fileID: 7840350066785753601}
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
-  id: 997083312:1110385209:2089772730:1595166139
+  targetable: 1
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -207,9 +213,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AutoInteractionTrigger
   triggerTrackerComponent: {fileID: 8390706416827097626}
   interactableComponent: {fileID: 2208630765820750090}
+  expirationTime: 0
+  destroyAfterExpiry: 0
   triggerOnce: 1
   cooldown: 0
-  useInitiatorAsInteractor: 1
+  affectedSide: 0
 --- !u!114 &2208630765820750090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,23 +241,6 @@ MonoBehaviour:
   failureEffects: []
   cancelEffects: []
   destroyAfterSuccess: 1
---- !u!114 &3357102818650165533
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5877487407430005226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 824e5129a5c54a8383d6efb2e8548309, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AutoInteractionTrigger
-  triggerTrackerComponent: {fileID: 8390706416827097626}
-  interactableComponent: {fileID: 2208630765820750090}
-  triggerOnce: 1
-  cooldown: 0
-  useInitiatorAsInteractor: 1
 --- !u!114 &1005627346370064262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,6 +254,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
   willComplete: 1
+--- !u!114 &3980834468791032702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5877487407430005226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
+  uniqueId: 
 --- !u!1001 &956432120226722911
 PrefabInstance:
   m_ObjectHideFlags: 0

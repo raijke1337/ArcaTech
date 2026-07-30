@@ -29,7 +29,7 @@ namespace Arcatech.Interactions
         public abstract void TriggerEntered(TriggerHitInfo triggerHitInfo);
         public abstract void TriggerExited(TriggerHitInfo triggerExitInfo);
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             _startTime = Time.time;
             if (expirationTime > 0) _expireAt =  _startTime + expirationTime;
@@ -43,7 +43,7 @@ namespace Arcatech.Interactions
 
         private void Update()
         {
-            if (Time.time > _expireAt)
+            if (expirationTime > 0 && Time.time > _expireAt)
             {
                 triggerTrackerComponent.Active = false;
                 if (destroyAfterExpiry)

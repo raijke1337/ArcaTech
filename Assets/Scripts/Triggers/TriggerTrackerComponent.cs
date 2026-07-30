@@ -37,7 +37,7 @@ namespace Arcatech.Triggers
 
 
 
-        private void OnEnable()
+        private void Start()
         {
             triggerCollider.isTrigger = true;
             cachedRigidbody.isKinematic = true;
@@ -198,7 +198,7 @@ namespace Arcatech.Triggers
         private void OnDrawGizmos()
         {
             // Draw trigger bounds first
-            Gizmos.color = _receivers.Count == 0 ? Color.gray : Color.blue;
+            Gizmos.color = _receivers.Count == 0 ? Color.black : Color.blue;
             if (Active) Gizmos.color = Color.white;
             DrawTriggerBounds();
 
