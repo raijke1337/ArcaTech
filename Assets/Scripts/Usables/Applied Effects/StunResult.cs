@@ -15,19 +15,19 @@ namespace Arcatech.Usables.Effects
     /// OneShot -> one stun. Repeating -> several overlapping stun windows.
     /// Repetition from new hits is gated by StackType.None in the resolver.
     /// </summary>
-    public sealed class StunResult : IEffectResult
+    public sealed class StunResult : BaseResult
     {
         private readonly float _stunSeconds;
 
-        public StunResult(AppliedStunEffect cfg) => _stunSeconds = Mathf.Max(0f, cfg.stunSeconds);
+        public StunResult(AppliedStunEffect cfg)  : base(cfg) => _stunSeconds = Mathf.Max(0f, cfg.stunSeconds);
 
-        public void Apply(EffectContext ctx)
+        public override void Apply(EffectContext ctx)
         {
             if (ctx.Target == null || !ctx.TargetReceiver.TryGetStatusReceiver(out var c)) return;
             c.ApplyStun(ctx.Instance.Key, _stunSeconds);
         }
 
-        public void OnExpire(EffectContext ctx)
+        public override void OnExpire(EffectContext ctx)
         {
             // The stun state has its own timer in the status component; effect end
             // does not force-clear it (lets the last stun window finish naturally).

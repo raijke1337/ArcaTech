@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using KBCore.Refs;
@@ -27,9 +28,21 @@ namespace Arcatech.Items.Projectiles
         private void Awake()
         {
             _col = GetComponent<TriggerTrackerComponent>();
-            _col.RegisterReceiver(this);
             _parts =  new List<IEquipmentPart>();
             _parts.AddRange(GetComponentsInChildren<IEquipmentPart>());
+        }
+
+        private void OnEnable()
+        {
+            if (_col == null)
+                _col = GetComponent<TriggerTrackerComponent>();
+
+            _col.RegisterReceiver(this);
+        }
+        private void OnDisable()
+        {
+            if (_col != null)
+                _col.UnregisterReceiver(this);
         }
 
         public void Setup(BaseGameEntityComponent owner, SerializedProjectileBehavior behavior)
@@ -39,6 +52,7 @@ namespace Arcatech.Items.Projectiles
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
+         //   Debug.Log($"{name} projectile trigger reporting hit {triggerHitInfo.TargetCollider.gameObject.name}");
             _receiver?.TriggerEntered(triggerHitInfo);
             _behavior.NotifyCollision(triggerHitInfo);
         }

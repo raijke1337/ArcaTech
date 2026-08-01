@@ -28,6 +28,7 @@ namespace Arcatech.Usables
             }
                 
             provider.RegisterReceiver(this);
+            provider.Active = false;
         }
 
         public override void OnChangeUsableState(StateMachineNotifyType info)

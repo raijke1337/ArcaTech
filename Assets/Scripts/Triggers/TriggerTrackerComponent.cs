@@ -70,7 +70,7 @@ namespace Arcatech.Triggers
 
         protected void OnTriggerEnter(Collider other)
         {
-          //  Debug.Log($"Trigger {other.gameObject.name} entered {name}");
+           // Debug.Log($"TriggerTracker collision with {other.gameObject.name}");
             if (!CanNotify() || other.isTrigger) return;
 
             var hitGeometry = CalculateHitGeometry(other);
@@ -109,7 +109,7 @@ namespace Arcatech.Triggers
 
         private void OnDisable()
         {
-            _receivers.Clear();
+            //_receivers.Clear();
             _attackWarningTween?.Kill();
             if (_attackWarningObject != null) _attackWarningObject.SetActive(false);
         }
@@ -447,6 +447,7 @@ namespace Arcatech.Triggers
 
         private void OnDestroy()
         {
+            _receivers.Clear();
             _attackWarningTween?.Kill();
             if (_attackWarningMaterial != null) Destroy(_attackWarningMaterial);
             if (_attackWarningObject != null) Destroy(_attackWarningObject);

@@ -13,7 +13,7 @@ namespace Arcatech.Units
         public override bool CanTransition(StateMachineContext ctx)
         {
             return (ctx.DeadState == DeadStateIs && ctx.KnockDownState == KnockDownStateIs && ctx.InterruptQueued == DamageStateIs
-                && ctx.OverchargeState == OverChargeStateIs);
+                && ctx.OverchargeTriggerPending == OverChargeStateIs);
         }
     }
 }

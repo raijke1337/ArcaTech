@@ -25,7 +25,11 @@ namespace Arcatech.Units
         public bool DeadState { get; set; }
         public bool InterruptQueued { get; set; }
         public bool InInteraction { get; set; } = false;
-        public bool OverchargeState { get; set; }
+
+        // Разовый сигнал "нужно перейти в стейт перегрузки", а не "мы сейчас в перегрузке".
+        // Гасится модулем-владельцем сразу после того, как переход фактически произошёл.
+        public bool OverchargeTriggerPending { get; set; }
+
         public void ClearCommand()
         {
             PendingCommand = UnitActionType.None;

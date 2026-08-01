@@ -1,4 +1,5 @@
-﻿using Arcatech.Units;
+﻿using System.Linq;
+using Arcatech.Units;
 using UnityEngine;
 
 namespace Arcatech.Usables
@@ -6,9 +7,7 @@ namespace Arcatech.Usables
     [CreateAssetMenu(fileName = "charges_", menuName = "Usables/Charges/Queue", order = 2)]
     public class SerializedQueueChargesStrategy : SerializedGenericCooldownStrategy
     {
-
         [Min(1)] public int maxCharges = 3;
-        [Min(0f)] public float regenTime = 3f;
 
         public override BasicChargesStrategy Deserialize()
         {
@@ -18,46 +17,56 @@ namespace Arcatech.Usables
 
     public class ChargesQueueStrategy : BasicChargesStrategy
     {
-        private readonly int _maxCharges;
-        private readonly float _regenTime;
-
-        private int _available;
-
-        // Per-slot remaining times; 0 means the slot is available
+        // Пересчёт времени для каждого слота; 0 означает, что слот свободен
         private readonly float[] _cooldowns;
 
         public ChargesQueueStrategy(SerializedQueueChargesStrategy charges) : base(charges)
         {
-            _maxCharges = Mathf.Max(1, charges.maxCharges);
-            _regenTime = Mathf.Max(0f, charges.regenTime);
+            MaxCharges = charges.maxCharges;
+            CurrentCharges = MaxCharges;
 
-            _cooldowns = new float[_maxCharges];
-            _available = _maxCharges; // start full
+            _cooldowns = new float[MaxCharges];
+            for (int i = 0; i < MaxCharges; i++)
+            {
+                _cooldowns[i] = 0f;
+            }
         }
 
         public override void Tick(float delta)
         {
-            base.Tick(delta);
+            base.Tick(delta); // Вызываем базовый тик, если там есть глобальная логика
 
-            if (_available >= _maxCharges) return;
-
-            for (int i = 0; i < _cooldowns.Length; i++)
+            // Обновляем внутренние таймеры
+            for (int i = 0; i < MaxCharges; i++)
             {
                 if (_cooldowns[i] > 0f)
                 {
                     _cooldowns[i] -= delta;
-                    if (_cooldowns[i] <= 0f)
-                    {
-                        _cooldowns[i] = 0f;
-                        _available = Mathf.Min(_available + 1, _maxCharges);
-                    }
                 }
+            }
+
+            // 💡 ФИКС: Синхронизируем текущее количество зарядов с состоянием массива.
+            // UI зависит от свойства CurrentCharges, поэтому мы должны считать актуальное кол-во.
+            int freeSlotsCount = 0;
+            for (int i = 0; i < MaxCharges; i++)
+            {
+                if (_cooldowns[i] <= 0f)
+                {
+                    freeSlotsCount++;
+                }
+            }
+
+            // Обновляем свойство только если значение изменилось (оптимизация)
+            if (CurrentCharges != freeSlotsCount)
+            {
+                CurrentCharges = freeSlotsCount;
             }
         }
 
         protected override bool ReadyCheck()
         {
-            return _available > 0 && base.ReadyCheck();
+            // Способность готова, если есть ХОТЯ БЫ ОДИН свободный слот
+            return _cooldowns.Any(c => c <= 0f);
         }
 
         public override void OnChangeUsableState(StateMachineNotifyType notifyType)
@@ -68,23 +77,27 @@ namespace Arcatech.Usables
             {
                 case StateMachineNotifyType.Use:
                 {
-                    if (_available <= 0) break;
-
-                    // Consume one available charge and start its individual cooldown
-                    // Choose the first available slot (cooldown == 0)
-                    for (int i = 0; i < _cooldowns.Length; i++)
+                    // Находим индекс первого свободного слота
+                    int readyIndex = -1;
+                    for (int i = 0; i < MaxCharges; i++)
                     {
                         if (_cooldowns[i] <= 0f)
                         {
-                            if (_regenTime > 0f)
-                            {
-                                _cooldowns[i] = _regenTime;
-                                _available--;
-                            }
-
-                            // If regenTime == 0, the charge refills instantly; effectively no change
+                            readyIndex = i;
                             break;
                         }
+                    }
+
+                    // Потребляем заряд
+                    if (readyIndex != -1)
+                    {
+                        _cooldowns[readyIndex] = Cooldown;
+
+                        // Важно: здесь мы декрементируем CurrentCharges. 
+                        // Но так как UI читает его напрямую, а не через метод ReadyCheck,
+                        // ему критически важно, чтобы он возвращал правильное число при следующем кадре.
+                        // (Обновление до правильного значения произойдет на следующем кадре в Tick)
+                        CurrentCharges--;
                     }
 
                     break;
@@ -92,33 +105,5 @@ namespace Arcatech.Usables
             }
         }
 
-        public override float FillValue
-        {
-            get
-            {
-                // Only show progress when completely empty; otherwise ready (0 cover)
-                if (_available > 0) return 0f;
-
-                // If regen is instant, treat as ready
-                if (_regenTime <= 0f) return 0f;
-
-                // Find the soonest finishing charge and show remaining/total
-                float minRemaining = float.MaxValue;
-                for (int i = 0; i < _cooldowns.Length; i++)
-                {
-                    float t = _cooldowns[i];
-                    if (t > 0f && t < minRemaining) minRemaining = t;
-                }
-
-                // Inverted for UI cover: 1 = not ready, 0 = ready
-                // When empty: fill = remaining / regenTime
-                
-                var fill = Mathf.Clamp01(minRemaining / _regenTime);
-               // Debug.Log(fill);
-                return fill;
-            }
-        }
-
-        public override string DisplayText => _available.ToString();
     }
 }

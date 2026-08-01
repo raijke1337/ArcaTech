@@ -1,67 +1,161 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+
 namespace Arcatech.UI
 {
+    public static class UIReferences
+    {
+        public static readonly IReadOnlyDictionary<UnitActionType, string> Hotkeys =
+            new Dictionary<UnitActionType, string>
+            {
+                { UnitActionType.None, string.Empty },
+
+                { UnitActionType.Melee, "LMB" },
+                { UnitActionType.MeleeSkill, "Q" },
+
+                { UnitActionType.Ranged, "RMB" },
+                { UnitActionType.RangedSkill, "E" },
+
+                { UnitActionType.ShieldSkill, "R" },
+                { UnitActionType.DodgeSkill, "SHIFT" },
+                { UnitActionType.Jump, "SPACE" },
+                { UnitActionType.Use, "H" }
+            };
+    }
+
     public class PlayerBarUsablesIconsContainerManager : MonoBehaviour
     {
+        [Header("References")]
+        [SerializeField]
+        private IconContainerUIScript iconPrefab;
 
-        [SerializeField] private IconContainerUIScript _iconPrefab;
-        [SerializeField, Space] private Transform usablesParent;
+        [SerializeField]
+        private Transform usablesParent;
 
-        private Dictionary<UnitActionType, IconContainerUIScript> _usablesD;
-        public void LoadIcons(Dictionary<UnitActionType,IUsable> usables)
+        private readonly Dictionary<UnitActionType, IconContainerUIScript> usablesIcons =
+            new Dictionary<UnitActionType, IconContainerUIScript>();
+
+        public void LoadIcons(Dictionary<UnitActionType, IUsable> usables)
         {
-            if (usables.Count == 0) return;
             
-            if (_usablesD == null)
+            if (usables == null)
             {
-                //first use
-                _usablesD = new Dictionary<UnitActionType, IconContainerUIScript>();
-                foreach (var usable in usables)
-                {
-                    var icon = Instantiate(_iconPrefab,usablesParent);
-                    _usablesD[usable.Key] = icon;
-                    icon.AssignIcon(usable.Value);
-                }
+                HideAllIcons();
+                return;
             }
-            else
+            Debug.Log(
+                $"[Usables UI] Actions received: {string.Join(", ", usables.Keys)}",
+                this
+            );
+                
+            /*
+             * Скрываем иконки, для которых больше нет действия
+             * в текущем наборе экипировки / инвентаря.
+             *
+             * Layout Group не учитывает inactive-объекты,
+             * поэтому фон автоматически сузится.
+             */
+            foreach (var loadedIcon in usablesIcons)
             {
-                // do a check if some icons need to be hidden
-                foreach (var loaded in _usablesD.Keys)
+                bool actionStillExists = usables.ContainsKey(loadedIcon.Key);
+
+                if (!actionStillExists && loadedIcon.Value != null)
                 {
-                    if (usables.All(t => t.Key != loaded))
-                    {
-                        _usablesD[loaded].gameObject.SetActive(false);
-                    }
-                }
-                // do a change of existing ones
-                foreach (var usable in usables)
-                {
-                    // look if this action type already has an icon
-                    if (_usablesD.TryGetValue(usable.Key, out var icon1))
-                    {
-                        icon1.gameObject.SetActive(true); // in case it was disabled earlier
-                        icon1.AssignIcon(usable.Value);
-                    }
-                    else
-                    {
-                        var icon = Instantiate(_iconPrefab,usablesParent);
-                        _usablesD[usable.Key] = icon;
-                        icon.AssignIcon(usable.Value);
-                    }
+                    loadedIcon.Value.gameObject.SetActive(false);
                 }
             }
 
+            int iconIndex = 0;
+
+            foreach (var usablePair in usables)
+            {
+                UnitActionType actionType = usablePair.Key;
+                IUsable usable = usablePair.Value;
+
+                Debug.Log(
+                    $"[Usables UI] Processing: {actionType}; " +
+                    $"usable null: {usable == null}; " +
+                    $"runtime type: {(usable == null ? "null" : usable.GetType().Name)}",
+                    this
+                );
+
+                if (actionType == UnitActionType.None)
+                {
+                    continue;
+                }
+
+                if (usable == null)
+                {
+                    Debug.LogWarning(
+                        $"[Usables UI] Action {actionType} есть в Dictionary, но его IUsable = null. " +
+                        $"Иконка не будет создана.",
+                        this
+                    );
+
+                    continue;
+                }
+
+                IconContainerUIScript icon = GetOrCreateIcon(actionType);
+
+                icon.gameObject.SetActive(true);
+
+                icon.AssignIcon(usable)
+                    .WithHotkey(GetHotkey(actionType));
+
+                Debug.Log(
+                    $"[Usables UI] Icon ready: {actionType}; " +
+                    $"GameObject: {icon.gameObject.name}; " +
+                    $"Active: {icon.gameObject.activeSelf}",
+                    this
+                );
+
+                icon.transform.SetSiblingIndex(iconIndex);
+                iconIndex++;
+            }
         }
-        public void HandlePlayerAction(UnitActionType action,bool success)
+
+        public void HandlePlayerAction(UnitActionType action, bool success)
         {
-            if (_usablesD == null) return;
-            
-            var k = _usablesD.FirstOrDefault(t=>t.Key == action);
-            if (k.Value != null)
+            if (usablesIcons.TryGetValue(action, out IconContainerUIScript icon) &&
+                icon != null &&
+                icon.gameObject.activeInHierarchy)
             {
-                k.Value.OnUse(success);
+                icon.OnUse(success);
+            }
+        }
+
+        private IconContainerUIScript GetOrCreateIcon(UnitActionType actionType)
+        {
+            if (usablesIcons.TryGetValue(actionType, out IconContainerUIScript existingIcon) &&
+                existingIcon != null)
+            {
+                return existingIcon;
+            }
+
+            IconContainerUIScript newIcon = Instantiate(iconPrefab, usablesParent);
+
+            newIcon.name = $"Usable Icon [{actionType}]";
+
+            usablesIcons[actionType] = newIcon;
+
+            return newIcon;
+        }
+
+        private string GetHotkey(UnitActionType actionType)
+        {
+            return UIReferences.Hotkeys.TryGetValue(actionType, out string hotkey)
+                ? hotkey
+                : string.Empty;
+        }
+
+        private void HideAllIcons()
+        {
+            foreach (var iconPair in usablesIcons)
+            {
+                if (iconPair.Value != null)
+                {
+                    iconPair.Value.gameObject.SetActive(false);
+                }
             }
         }
     }

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Arcatech.Items
 {
     [Serializable, CreateAssetMenu(fileName = "item_", menuName = "Items/Just Item")]
-    public class ItemSO : ScriptableObjectID, IIconContent
+    public class ItemSO : ScriptableObjectID, IHasDescription
     {
         
         [SerializeField] Description description;        

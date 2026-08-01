@@ -69,12 +69,5 @@ namespace Arcatech.UI
             _barsDict[stat].SetColors(_statColors[stat]).
                 SetEaseMethod(_barsEaseMethod).SetFillTime(_barsEaseTime).SetBrightGlowAT(_barFlashTreschold);
         }
-        
-
-
-
-
-
-
     }
 }

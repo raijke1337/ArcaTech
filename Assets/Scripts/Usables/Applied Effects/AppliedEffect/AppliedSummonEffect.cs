@@ -19,18 +19,18 @@ namespace Arcatech.Usables.Effects
     /// Each tick spawns a wave (repeating -> multiple waves), per design doc.
     /// Summoned entities live by their own lifetime, not tied to this effect.
     /// </summary>
-    public sealed class SummonResult : IEffectResult
+    public sealed class SummonResult : BaseResult
     {
         private readonly BaseGameEntityComponent[] _prefabs;
         private readonly Vector3[] _offsets;
 
-        public SummonResult(AppliedSummonEffect cfg)
+        public SummonResult(AppliedSummonEffect cfg): base(cfg)
         {
             _prefabs = cfg.prefabs ?? System.Array.Empty<BaseGameEntityComponent>();
             _offsets = cfg.offsets ?? System.Array.Empty<Vector3>();
         }
 
-        public void Apply(EffectContext ctx)
+        public override void Apply(EffectContext ctx)
         {
             if (ctx.Target == null) return;
 
@@ -49,6 +49,6 @@ namespace Arcatech.Usables.Effects
             }
         }
 
-        public void OnExpire(EffectContext ctx) { }
+        public override void OnExpire(EffectContext ctx) { }
     }
 }

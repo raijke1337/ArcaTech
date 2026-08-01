@@ -31,20 +31,24 @@ namespace Arcatech.Usables.Effects
                 case AppliedSummonEffect summon:       return new SummonResult(summon);
                 default:
                     Debug.LogError($"[EffectFactory] No mapping for {def.GetType().Name} — effect does nothing.");
-                    return new NullEffectResult();
+                    return new NullEffectResult(def);
             }
         }
 
     }
 
     /// <summary> No-op fallback so a missing mapping never crashes the pipeline. </summary>
-    public sealed class NullEffectResult : IEffectResult
+    public sealed class NullEffectResult : BaseResult
     {
-        public void Apply(EffectContext ctx)
+        public NullEffectResult(BaseAppliedEffect def) : base(def)
         {
         }
 
-        public void OnExpire(EffectContext ctx)
+        public override void Apply(EffectContext ctx)
+        {
+        }
+
+        public override void OnExpire(EffectContext ctx)
         {
         }
     }

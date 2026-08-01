@@ -13,18 +13,22 @@ MonoBehaviour:
   m_Name: usableEffect_stats_debugDot
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.Effects.AppliedStatsDeltaEffect
   ID: 929b1008-3df7-4365-b89a-e1db22e5710c
-  description: {fileID: 0}
+  description: {fileID: 11400000, guid: f333033ce9481f746aa00c29ff80d73f, type: 2}
   infiniteDuration: 0
   durationSeconds: 3
-  stackType: 0
-  maxStacks: 99
+  stackType: 1
+  maxStacks: 1
   graphics: {fileID: 0}
   periodicity:
-    kind: 0
+    kind: 1
     oneShotMoment: 0
-    ticks: 1
+    ticks: 5
     intervalMode: 1
     offsetSeconds: 0
-  instantDeltas: []
+  instantDeltas:
+  - stat: 0
+    target: 0
+    amount: -5
+    onApply: {fileID: 11400000, guid: ba97cfdb65c99bd4c8d71cd3fbddeb21, type: 2}
   persistentModifiers: []
   periodicDeltas: []

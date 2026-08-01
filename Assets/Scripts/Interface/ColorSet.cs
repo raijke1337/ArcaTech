@@ -8,5 +8,7 @@ namespace Arcatech.UI
         public Color BaseColor;
         public Color PositiveColor;
         public Color NegativeColor;
+        public Sprite Pictogram;
+        public string ShortName;
     }
 }

@@ -16,7 +16,7 @@ namespace Arcatech.Usables.Effects
     /// NOTE: persistentModifiers and periodicDeltas are EQUIPMENT-ONLY channels
     /// (handled by EntityStatsComponent). Applied effects intentionally ignore them.
     /// </summary>
-    public sealed class StatChangeResult : IEffectResult
+    public sealed class StatChangeResult : BaseResult
     {
         private readonly IReadOnlyList<StatDelta> _instantDeltas;
 
@@ -24,7 +24,7 @@ namespace Arcatech.Usables.Effects
         private EffectsReceiverComponent _attackerReceiver;
         private BaseGameEntityComponent _cachedAttacker;
 
-        public StatChangeResult(AppliedStatsDeltaEffect cfg)
+        public StatChangeResult(AppliedStatsDeltaEffect cfg) : base(cfg)
         {
             _instantDeltas = cfg.instantDeltas != null
                 ? (IReadOnlyList<StatDelta>)cfg.instantDeltas
@@ -40,7 +40,7 @@ namespace Arcatech.Usables.Effects
 #endif
         }
 
-        public void Apply(EffectContext ctx)
+        public override void Apply(EffectContext ctx)
         {
             if (ctx.TargetReceiver == null) return;
             if (!ctx.TargetReceiver.TryGetStatReceiver(out var receiver)) return;
@@ -66,7 +66,7 @@ namespace Arcatech.Usables.Effects
             }
         }
 
-        public void OnExpire(EffectContext ctx)
+        public override void OnExpire(EffectContext ctx)
         {
             // Instant stat change has nothing persistent to revert.
         }

@@ -7,4 +7,10 @@ namespace Arcatech
     {
         public AppliedStatsDeltaEffect GetCost { get; }
     }
+
+
+    public struct ActionCost
+    {
+        
+    }
 }

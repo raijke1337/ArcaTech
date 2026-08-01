@@ -1,4 +1,6 @@
-﻿namespace Arcatech.Usables.Effects
+﻿using Arcatech.Texts;
+
+namespace Arcatech.Usables.Effects
 {
     /// <summary>
     /// Pure "what happens to the target" strategy.
@@ -17,7 +19,14 @@
         /// </summary>
         void OnExpire(EffectContext ctx);
     }
-    
+
+    public abstract class BaseResult : IEffectResult
+    {
+        public abstract void Apply(EffectContext ctx);
+        public abstract void OnExpire(EffectContext ctx);
+        public Description Description { get; }
+        public BaseResult(BaseAppliedEffect def) => Description =  def.description;
+    }
     
     
 }

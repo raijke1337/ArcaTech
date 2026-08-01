@@ -91,6 +91,7 @@ namespace Arcatech.Usables
             // Reset projectile state when retrieved from pool
             projectile.Reset();
             projectile.gameObject.SetActive(true);  
+            projectile.RegisterReceiver(this);
             projectile.Active = true;
             _activeProjectiles.Add(projectile);
             
@@ -99,17 +100,17 @@ namespace Arcatech.Usables
         private void HandleProjectileExpiry(ProjectileComponent projectile)
         {
             // Return projectile to pool instead of destroying
-            
             _projectilePool.Release(projectile);
         }
 
         private void OnProjectileRelease(ProjectileComponent projectile)
         {
-            // Clean up projectile when returned to pool
-            projectile.UnregisterReceiver(this);
             projectile.ProjectileFinished -= HandleProjectileExpiry;
+            projectile.UnregisterReceiver(this);
+
             projectile.Active = false;
             projectile.gameObject.SetActive(false);
+
             _activeProjectiles.Remove(projectile);
         }
 
@@ -118,6 +119,7 @@ namespace Arcatech.Usables
             // Destroy the projectile GameObject when pool is destroyed
             if (projectile != null && projectile.gameObject != null)
             {
+                projectile.UnregisterReceiver(this);
                 projectile.Entity.SetKilled(this,true);
             }
         }
@@ -195,7 +197,7 @@ namespace Arcatech.Usables
                 case StateMachineNotifyType.EndUse:
                     break;
                 case StateMachineNotifyType.Cancel:
-                    if (_shootingCor != null) Item.StopCoroutine(_shootingCor);
+                    if (_shootingCor != null) Owner.StopCoroutine(_shootingCor);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(info), info, null);
@@ -205,6 +207,7 @@ namespace Arcatech.Usables
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
+         //   Debug.Log($"Hit callback! {triggerHitInfo.TargetCollider.gameObject.name}");
             HitCallback(triggerHitInfo);
         }
 

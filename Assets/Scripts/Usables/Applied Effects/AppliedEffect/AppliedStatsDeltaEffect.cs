@@ -15,5 +15,9 @@ namespace Arcatech.Usables.Effects
 
         [Header("Periodic Deltas")]
         public List<PeriodicDelta> periodicDeltas = new();
+
+        public (ResourceStatType, int) PlaceholderData => 
+            (instantDeltas[0].stat,Mathf.Abs(Mathf.RoundToInt(instantDeltas[0].amount)));
+        
     }
 }

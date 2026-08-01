@@ -13,7 +13,8 @@ namespace Arcatech.UI
     public class PlayerUnitPanel : ValidatedMonoBehaviour, IUnitInventoryView, IStatUpdatesViewer, IUnitCommandPerformer
     {
         [SerializeField, Child] protected PlayerBarUsablesIconsContainerManager usablesIcons;
-        [SerializeField, Child] protected BarsContainersManager _bars;
+        [SerializeField, Child] protected BarsContainersManager barsManager;
+        [SerializeField, Child] protected OverchargeUIIndicator overcharge;
         [SerializeField, Self] protected RectTransform _rect;
         [SerializeField] protected float _shakeAtHealthDelta = 0.1f;
         [SerializeField] protected Image _dmgGlow;
@@ -27,7 +28,9 @@ namespace Arcatech.UI
 
         BaseGameEntityComponent _player;
         UsablesCasterComponent _usablesCasterComponent;
+        TailsOverchargeModule _tailsOverchargeModule;
 
+        
         private void Start()
         {
             _player = GameObject.FindWithTag("Player").GetComponent<BaseGameEntityComponent>();
@@ -36,7 +39,7 @@ namespace Arcatech.UI
                 var st = _player.GetComponent<EntityStatsComponent>();
                 if (st != null)
                 {
-                    st.RegisterStatsViewer(_bars);
+                    st.RegisterStatsViewer(barsManager);
                     st.RegisterStatsViewer(this);
                 }
                 else
@@ -64,6 +67,17 @@ namespace Arcatech.UI
                 {
                     Debug.LogWarning("Player has no usablesCaster component");
                 }
+                _tailsOverchargeModule = _player.GetComponent<TailsOverchargeModule>();
+                if (_tailsOverchargeModule != null)
+                {
+                    overcharge.SetDataSource(_tailsOverchargeModule);
+                }
+                else
+                {
+                    Debug.LogWarning("Player has no usablesCaster component");
+                }
+                
+                
                 var inputs = _player.GetComponent<UnitInputsComponent>();
                 inputs.RegisterCommandHandler(this);
             }

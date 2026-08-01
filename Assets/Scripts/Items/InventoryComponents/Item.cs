@@ -7,7 +7,7 @@ namespace Arcatech.Items
 {
     // coin, upgrade, key etc..
     [Serializable]
-    public class Item : IIconContent
+    public class Item : IHasDescription
     {
         protected ItemSO Config;
         public BaseGameEntityComponent Owner { get; }

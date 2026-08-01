@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using Arcatech.EventBus;
 using Arcatech.Interactions;
+using Arcatech.Stats;
 using Arcatech.Texts;
 using Arcatech.UI;
+using AYellowpaper.SerializedCollections;
 using DG.Tweening;
 using KBCore.Refs;
 using UnityEngine;
@@ -13,6 +15,8 @@ namespace Arcatech.Managers
 {
     public class GameInterfaceManager : ValidatedMonoBehaviour
     {
+
+        public static SerializedDictionary<ResourceStatType, Sprite> icons;
 
         public static GameInterfaceManager Instance;
         private void Awake()
@@ -29,7 +33,7 @@ namespace Arcatech.Managers
         [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
         [SerializeField] public Transform miniGame;
         
-        private Sequence tooltipSeq;
+
 
         /// <summary>
         /// called by inputs
@@ -82,8 +86,7 @@ namespace Arcatech.Managers
             FadeIn(floatingTooltip.transform);
         }
 
-        #region effects
-
+        private Sequence tooltipSeq;
         private void FadeIn(Transform window)
         {
             var cg = window.GetComponent<CanvasGroup>();
@@ -118,9 +121,6 @@ namespace Arcatech.Managers
                 .OnComplete(() => window.gameObject.SetActive(false));
 
         }
-        
-        #endregion
-
         private void OnDisable()
         {
             tooltipSeq?.Kill(false);
