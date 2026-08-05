@@ -12,9 +12,9 @@ namespace Arcatech.UI
         private const float HpPerSegment = 10f;
 
         [Header("Prefab settings")] [SerializeField]
-        private StatBarSegmentUIScript _segmentPrefab;
+        private StatBarSegmentUIScript segmentPrefab;
 
-        [SerializeField] private Transform _segmentsRoot;
+        [SerializeField] private Transform segmentsRoot;
         [SerializeField] private TextMeshProUGUI valueText;
         [SerializeField] private TextMeshProUGUI nameText;
         [SerializeField] private Image pictogram;
@@ -39,6 +39,7 @@ namespace Arcatech.UI
         private Tween _hpTween;
         private Tween _backgroundTween;
 
+        public RectTransform GetRectTransform => segmentsRoot.GetComponent<RectTransform>();
         #region Setup
 
         public StatBarContainerUIScript SetColors(ColorSet color)
@@ -123,7 +124,7 @@ namespace Arcatech.UI
             for (int i = 0; i < requiredSegmentCount; i++)
             {
                 StatBarSegmentUIScript segment =
-                    Instantiate(_segmentPrefab, _segmentsRoot);
+                    Instantiate(segmentPrefab, segmentsRoot);
 
                 _segments.Add(segment);
             }
@@ -237,8 +238,6 @@ namespace Arcatech.UI
 
         public void DrawShield(float value)
         {
-            // Щит лучше сделать отдельным рядом сегментов
-            // или отдельным экземпляром StatBarContainerUIScript.
         }
     }
 }

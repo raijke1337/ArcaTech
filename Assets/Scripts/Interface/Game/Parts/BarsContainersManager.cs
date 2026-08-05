@@ -69,5 +69,25 @@ namespace Arcatech.UI
             _barsDict[stat].SetColors(_statColors[stat]).
                 SetEaseMethod(_barsEaseMethod).SetFillTime(_barsEaseTime).SetBrightGlowAT(_barFlashTreschold);
         }
+        public StatBarContainerUIScript GetResourceBar(ResourceStatType stat)
+        {
+            if (!init)
+            {
+                InitBars();
+            }
+
+            return _barsDict[stat];
+        }
+        public bool TryGetResourceBar(
+            ResourceStatType stat,
+            out StatBarContainerUIScript bar)
+        {
+            if (!init)
+            {
+                InitBars();
+            }
+
+            return _barsDict.TryGetValue(stat, out bar);
+        }
     }
 }

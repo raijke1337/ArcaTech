@@ -14,12 +14,11 @@ namespace Arcatech.UI
     {
         [SerializeField, Child] protected PlayerBarUsablesIconsContainerManager usablesIcons;
         [SerializeField, Child] protected BarsContainersManager barsManager;
-        [SerializeField, Child] protected OverchargeUIIndicator overcharge;
+        [SerializeField, Child] protected OverchargeUIMain overcharge;
         [SerializeField, Self] protected RectTransform _rect;
         [SerializeField] protected float _shakeAtHealthDelta = 0.1f;
         [SerializeField] protected Image _dmgGlow;
         [SerializeField] Color glowColor = Color.red;
-        [SerializeField] private TextMeshProUGUI _text;
         
         /// <summary>
         /// not called in this component
@@ -68,13 +67,13 @@ namespace Arcatech.UI
                     Debug.LogWarning("Player has no usablesCaster component");
                 }
                 _tailsOverchargeModule = _player.GetComponent<TailsOverchargeModule>();
-                if (_tailsOverchargeModule != null)
+                if (_tailsOverchargeModule != null && barsManager.TryGetResourceBar(ResourceStatType.Energy, out var b))
                 {
                     overcharge.SetDataSource(_tailsOverchargeModule);
                 }
                 else
                 {
-                    Debug.LogWarning("Player has no usablesCaster component");
+                    Debug.LogWarning("Failed to setup overcharge plugin");
                 }
                 
                 
@@ -113,16 +112,13 @@ namespace Arcatech.UI
         }
 
         public void SetShieldValue(ResourceStatType stat, float currentValue)
-        {
-            _text.text = currentValue.ToString("0");
+        { // NYI
         }
 
         #endregion
 
         public void PrepareCommand(UnitActionType type)
-        {
-            
-        }
+        { }
 
         public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
