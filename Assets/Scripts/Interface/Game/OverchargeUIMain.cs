@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Arcatech.Stats;
 using DG.Tweening;
 using TMPro;
@@ -10,6 +11,7 @@ namespace Arcatech.UI
     public class OverchargeUIMain : MonoBehaviour
     {
         [SerializeField] private Image fill;
+        [SerializeField] private Image activatingFrame;
         [SerializeField] private TextMeshProUGUI text;
 
         private readonly Dictionary<OverchargeModuleState, string> stateTexts =
@@ -19,12 +21,13 @@ namespace Arcatech.UI
                 { OverchargeModuleState.Ready, "CAP" },
                 { OverchargeModuleState.InSpendWindow, "CHG" },
                 { OverchargeModuleState.Activation, "ACT" },
-                { OverchargeModuleState.Active, "ENG" } 
+                { OverchargeModuleState.Active, "ENG" }
             };
 
+        private const int Segments = 12;
+
         private TailsOverchargeModule overchargeModule;
-        
-        // Поля для корректного управления анимацией перехода
+
         private OverchargeModuleState _previousState = OverchargeModuleState.Idle;
         private bool _isHiding = false;
 
@@ -33,8 +36,7 @@ namespace Arcatech.UI
             overchargeModule = mod;
             text.text = "IDL";
             mod.OnUIUpdate += OnUpdate;
-            
-            // Инициализация
+
             fill.fillAmount = 0f;
             fill.gameObject.SetActive(false);
             _previousState = OverchargeModuleState.Idle;
@@ -45,8 +47,7 @@ namespace Arcatech.UI
         {
             if (overchargeModule != null)
                 overchargeModule.OnUIUpdate -= OnUpdate;
-                
-            // Важно: убиваем твины при отключении, чтобы избежать утечек и ошибок
+
             if (fill != null)
             {
                 fill.DOKill();
@@ -58,60 +59,110 @@ namespace Arcatech.UI
         private void OnUpdate(OverchargeUISnapshot data)
         {
             text.text = stateTexts[data.CurrentState];
-            Debug.Log(data.CurrentState);
+
             bool wasInSpendWindow = _previousState == OverchargeModuleState.InSpendWindow;
-            bool isNowInSpendWindow = data.CurrentState == OverchargeModuleState.InSpendWindow;
+            bool wasActive = _previousState == OverchargeModuleState.Active;
 
-            
-            
-            if (isNowInSpendWindow)
+            switch (data.CurrentState)
             {
-                // 1. СОСТОЯНИЕ: InSpendWindow (Накопление энергии)
-                if (_isHiding)
-                {
-                    // Если новое окно началось раньше, чем старое успело скрыться - прерываем скрытие
-                    fill.DOKill();
-                    _isHiding = false;
-                }
+                case OverchargeModuleState.InSpendWindow:
+                    ShowSpendProgress(data);
+                    break;
 
-                if (!fill.gameObject.activeSelf)
-                {
-                    fill.fillAmount = 0f; // Сбрасываем перед показом, чтобы не было визуального скачка
-                    fill.gameObject.SetActive(true);
-                }
-                
-                float targetFill = data.RequiredSpentEnergy > 0f 
-                    ? data.WindowSpentEnergy / data.RequiredSpentEnergy 
-                    : 0f;
-                    
-                fill.DOKill(); // Останавливаем предыдущую анимацию заполнения, чтобы начать новую от текущего значения
-                fill.DOFillAmount(targetFill, 0.5f);
+                case OverchargeModuleState.Ready:
+                case OverchargeModuleState.Activation:
+                    // Если только что вышли из InSpendWindow, шкала должна остаться видимой и заполненной на 100%
+                    if (wasInSpendWindow)
+                    {
+                        if (_isHiding)
+                        {
+                            fill.DOKill();
+                            _isHiding = false;
+                        }
+
+                        fill.gameObject.SetActive(true);
+                        fill.DOKill();
+                        fill.fillAmount = 1f; // Мгновенно заполняем на 100%
+                    }
+                    // Если не в цепочке InSpendWindow -> Ready/Activation, шкала остаётся скрытой
+                    break;
+
+                case OverchargeModuleState.Active:
+                    // Countdown запускаем ОДИН раз — в момент входа в состояние
+                    if (!wasActive)
+                        StartOverchargeCountdown(data);
+                    break;
+
+                case OverchargeModuleState.Idle:
+                default:
+                    // Только что вышли из InSpendWindow или Active -> плавно гасим
+                    if ((wasInSpendWindow || wasActive) && !_isHiding)
+                    {
+                        HideFillSmooth();
+                    }
+                    else if (fill.gameObject.activeSelf && !_isHiding)
+                    {
+                        fill.DOKill();
+                        fill.fillAmount = 0f;
+                        fill.gameObject.SetActive(false);
+                    }
+                    break;
             }
-            else if (wasInSpendWindow && !_isHiding)
-            {
-                // 2. ПЕРЕХОД: Только что вышли из InSpendWindow -> Запускаем плавный сброс
-                _isHiding = true;
-                fill.DOKill(); 
-                fill.DOFillAmount(0f, 0.5f).OnComplete(() => 
-                {
-                    // Скрываем объект только после завершения анимации
-                    fill.gameObject.SetActive(false);
-                    _isHiding = false;
-                });
-            }
-            else 
-            {
-                // 3. СОСТОЯНИЕ: Idle, Ready, Activation или Active
-                // Если fill активен, но мы не в процессе анимации скрытия (например, при инициализации) - выключаем мгновенно
-                if (fill.gameObject.activeSelf && !_isHiding)
-                {
-                    fill.DOKill();
-                    fill.fillAmount = 0f;
-                    fill.gameObject.SetActive(false);
-                }
-            }
+
+            activatingFrame.gameObject.SetActive(data.CurrentState == OverchargeModuleState.Activation);
 
             _previousState = data.CurrentState;
+        }
+
+        private void ShowSpendProgress(OverchargeUISnapshot data)
+        {
+            if (_isHiding)
+            {
+                fill.DOKill();
+                _isHiding = false;
+            }
+
+            if (!fill.gameObject.activeSelf)
+            {
+                fill.fillAmount = 0f;
+                fill.gameObject.SetActive(true);
+            }
+
+            float targetFill = data.RequiredSpentEnergy > 0f
+                ? data.WindowSpentEnergy / data.RequiredSpentEnergy
+                : 0f;
+
+            float quantized = Mathf.Ceil(targetFill * Segments) / Segments;
+
+            fill.DOKill();
+            fill.DOFillAmount(quantized, 0.5f);
+        }
+
+        private void StartOverchargeCountdown(OverchargeUISnapshot data)
+        {
+            if (_isHiding)
+            {
+                fill.DOKill();
+                _isHiding = false;
+            }
+
+            fill.gameObject.SetActive(true);
+            fill.DOKill();
+            fill.fillAmount = 1f;
+
+            float duration = Mathf.Max(data.OverchargeDuration, 0.01f);
+            fill.DOFillAmount(0f, duration).SetEase(Ease.Linear);
+        }
+
+        private void HideFillSmooth()
+        {
+            _isHiding = true;
+            fill.DOKill();
+            fill.DOFillAmount(0f, 0.5f).OnComplete(() =>
+            {
+                fill.gameObject.SetActive(false);
+                _isHiding = false;
+            });
         }
     }
 }

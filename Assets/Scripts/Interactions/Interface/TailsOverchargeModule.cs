@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Arcatech.Actions;
 using Arcatech.Items;
 using Arcatech.UI;
@@ -8,88 +7,120 @@ using com.cyborgAssets.inspectorButtonPro;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.PlayerLoop;
 
 namespace Arcatech.Stats
 {
     [RequireComponent(typeof(EntityStatsComponent), typeof(UsablesCasterComponent))]
-    public class TailsOverchargeModule : ValidatedMonoBehaviour, IUnitCommandPerformer, IStatUpdatesViewer, IStateAugmentor,IStateMachineNotificationReceiver
+    public class TailsOverchargeModule : ValidatedMonoBehaviour, IUnitCommandPerformer, IStatUpdatesViewer, IStateAugmentor, IStateMachineNotificationReceiver
     {
-        [SerializeField,Self] EntityStatsComponent statsComponent;
-        [Header("Overcharge!")]
-        [Tooltip("Длительность баффа перегрузки (сек.), который накладывает сам стейт. " +
-                 "Выставляется вручную и должна совпадать с реальной длительностью баффа.")]
-        [SerializeField] private float overchargeBuffDuration = 5f;
-        [SerializeField] private SerializedStateTransition overChargeEnter;
-        // Overcharge effects are applied in the State
-        private StateTransition _transition;
-        private bool _isActivationAnimating = false;
-        [SerializeField] private SerializedActionResult[] energySpendEffects;
-        // visual
-        private ActionResult[] _onSpend;
+        #region Configuration
 
-        [Header("Overcharge thresholds")]
-        [Tooltip("Уровень энергии, ниже которого трата энергии дает лишь короткий бафф")]
-        [SerializeField] private float overchargeLevelThreshold = 50f;
-
-        [Tooltip("Какая доля максимального запаса энергии должна быть потрачена в пределах окна, чтобы сработала перегрузка")]
-        [SerializeField, Range(0f, 1f)] private float overchargeSpendFraction = 0.7f;
-
-        [Tooltip("Длительность окна отслеживания резкого расхода энергии, сек.")]
-        [SerializeField] private float overchargeTimeWindow = 3f;
-
+        [SerializeField, Self] private EntityStatsComponent statsComponent;
         [SerializeField, Self] private BaseGameEntityComponent entity;
 
-        public bool OverchargeEngaged { get; private set; } = false;
-        private StateMachineContext _cachedContext;
+        [Header("Overcharge Settings")]
+        [Tooltip("Длительность баффа перегрузки (сек). Должна совпадать с реальной длительностью баффа в стейте.")]
+        [SerializeField] private float overchargeBuffDuration = 5f;
 
-        // выставляется в HandleStatsUpdate, применяется в DoUnitCommand — но только если команда успешна
+        [SerializeField] private SerializedStateTransition overChargeEnter;
+        [SerializeField] private SerializedActionResult[] energySpendEffects;
+
+        [Header("Thresholds")]
+        [Tooltip("Уровень энергии, ниже которого трата дает лишь короткий бафф")]
+        [SerializeField] private float overchargeLevelThreshold = 50f;
+
+        [Tooltip("Доля максимальной энергии, которую нужно потратить в окне для срабатывания перегрузки")]
+        [SerializeField, Range(0f, 1f)] private float overchargeSpendFraction = 0.7f;
+
+        [Tooltip("Длительность окна отслеживания резкого расхода энергии (сек)")]
+        [SerializeField] private float overchargeTimeWindow = 3f;
+
+        [Header("Debug")]
+        [SerializeField] private bool showDebugLogs = false;
+
+        #endregion
+
+        #region Runtime State
+
+        private StateTransition _transition;
+        private StateMachineContext _cachedContext;
+        private ActionResult[] _onSpendEffects;
+
+        // Pending actions
         private bool _pendingShortBuff;
         private bool _pendingOverchargeTrigger;
 
-        // отслеживание "резкого расхода" энергии выше границы перегрузки
+        // Energy tracking window
         private bool _windowActive;
         private float _windowStartTime;
         private float _windowSpentAccumulator;
-        private Coroutine _overchargeDurationRoutine;
-        
-        [SerializeField] private bool ShowingDebugs = false;
 
-        
-        
+        // Activation state
+        private bool _isInActivationPhase;
+        private bool _isOverchargeActive;
+        private Coroutine _overchargeDurationRoutine;
+
+        #endregion
+
+        #region UI State
+
+        private float _lastEnergyCurrent;
+        private float _lastEnergyMax;
+        private bool _isReadyForOvercharge;
+        private OverchargeModuleState _currentState;
+
+        public event UnityAction<OverchargeUISnapshot> OnUIUpdate = delegate { };
+
+        #endregion
+
+        #region Lifecycle
+
         private void Start()
         {
-            _onSpend = new ActionResult[energySpendEffects.Length];
-            for (int i = 0; i < energySpendEffects.Length; i++)
-            {
-                _onSpend[i] = energySpendEffects[i].Deserialize();
-            }
-            statsComponent.RegisterStatsViewer((this));
-            
-            UpdateUIAndState();
+            InitializeEffects();
+            statsComponent.RegisterStatsViewer(this);
+            UpdateState();
         }
-        
+
         private void Update()
         {
-            bool windowExpired = false;
+            if (!enabled) return;
 
-            // 1. Проверяем истечение окна траты энергии в реальном времени
-            if (_windowActive && Time.time - _windowStartTime > overchargeTimeWindow)
+            // Проверяем истечение окна траты в реальном времени
+            if (_windowActive && IsWindowExpired())
             {
-                if (ShowingDebugs) 
-                    Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge window expired by timeout (Update loop)");
-                
+                LogDebug("Window expired by timeout");
                 _windowActive = false;
-                windowExpired = true;
+                UpdateState();
             }
-
-            // 2. Если окно истекло (чтобы сбросить статус) или оно активно 
-            // (для плавного обновления timeRemaining в снапшоте), вызываем апдейт состояния и UI.
-            if (windowExpired || _windowActive)
+            else if (_windowActive)
             {
-                UpdateUIAndState();
+                // Обновляем UI для плавного изменения timeRemaining
+                UpdateState();
             }
         }
+
+        private void OnDisable()
+        {
+            ResetAllState();
+        }
+
+        #endregion
+
+        #region Initialization
+
+        private void InitializeEffects()
+        {
+            _onSpendEffects = new ActionResult[energySpendEffects.Length];
+            for (int i = 0; i < energySpendEffects.Length; i++)
+            {
+                _onSpendEffects[i] = energySpendEffects[i].Deserialize();
+            }
+        }
+
+        #endregion
+
+        #region Energy Tracking
 
         public void PrepareCommand(UnitActionType type)
         {
@@ -98,145 +129,214 @@ namespace Arcatech.Stats
             _pendingShortBuff = false;
             _pendingOverchargeTrigger = false;
 
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] PrepareCommand: type={type}");
+            LogDebug($"PrepareCommand: type={type}");
         }
 
-        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta,
+        public void HandleStatsUpdate(ResourceStatType stat, float current, float max, float delta,
             EntityStatsComponent.ExpendType changeType, BaseGameEntityComponent source)
         {
             if (!enabled) return;
 
-            // Кэшируем текущее/максимальное значение энергии для UI независимо от того,
-            // чья это трата (в отличие от логики перегрузки, тут важен любой Energy-апдейт,
-            // включая пассивный реген).
+            // Обновляем кэш энергии для UI (любой апдейт Energy важен)
             if (stat == ResourceStatType.Energy)
             {
-                _lastEnergyCurrent = statCurrent;
-                _lastEnergyMax = statMax;
-                _isReadyForOvercharge = statCurrent >= overchargeLevelThreshold;
-                UpdateUIAndState();
+                CacheEnergyValues(current, max);
+                _isReadyForOvercharge = current >= overchargeLevelThreshold;
+                UpdateState();
             }
 
-            if (source != entity || stat != ResourceStatType.Energy || changeType != EntityStatsComponent.ExpendType.UsableCost)
-            {
-               // if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Stats update ignored: stat={stat}, changeType={changeType}, source={source}");
+            // Обрабатываем только трату энергии на способности от нашего entity
+            if (!IsRelevantEnergySpend(source, stat, changeType))
                 return;
-            }
 
-            HandleAbilityEnergySpent(statCurrent, statMax, statDelta);
+            HandleAbilityEnergySpent(current, max, delta);
         }
 
-        private void HandleAbilityEnergySpent(float statCurrent, float statMax, float statDelta)
+        private bool IsRelevantEnergySpend(BaseGameEntityComponent source, ResourceStatType stat,
+            EntityStatsComponent.ExpendType changeType)
         {
-            float energyBeforeSpend = statCurrent - statDelta;
-            float spentThisTick = -statDelta; // statDelta отрицательный
+            return source == entity &&
+                   stat == ResourceStatType.Energy &&
+                   changeType == EntityStatsComponent.ExpendType.UsableCost;
+        }
 
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Ability energy spend: before={energyBeforeSpend}, after={statCurrent}, max={statMax}");
+        private void HandleAbilityEnergySpent(float current, float max, float delta)
+        {
+            float energyBeforeSpend = current - delta;
+            float spentThisTick = -delta;
 
-            // если окно было активно, но истекло по времени - гасим его перед новой проверкой
-            if (_windowActive && Time.time - _windowStartTime > overchargeTimeWindow)
+            LogDebug($"Energy spend: before={energyBeforeSpend}, after={current}, max={max}");
+
+            // Проверяем и сбрасываем истекшее окно
+            if (_windowActive && IsWindowExpired())
             {
-                if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge window expired by timeout");
+                LogDebug("Window expired before new spend");
                 _windowActive = false;
-                UpdateUIAndState();
             }
 
+            // Если окно не активно - решаем, начинать его или выдать короткий бафф
             if (!_windowActive)
             {
-                // Окно не активно - решаем, начинать копить перегрузку или выдать короткий бафф.
                 if (energyBeforeSpend < overchargeLevelThreshold)
                 {
-                    if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Below overcharge threshold ({overchargeLevelThreshold}) -> short buff pending");
+                    LogDebug($"Below threshold ({overchargeLevelThreshold}) -> short buff pending");
                     _pendingShortBuff = true;
-                    UpdateUIAndState();
+                    UpdateState();
                     return;
                 }
 
-                _windowActive = true;
-                _windowStartTime = Time.time;
-                _windowSpentAccumulator = 0f;
-                if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge tracking window started");
-                UpdateUIAndState();
-                
+                StartTrackingWindow();
             }
 
-            // Окно активно (только что начато или продолжается) - копим трату,
-            // даже если текущий каст стартовал уже ниже порога (это ожидаемо для "рывка").
+            // Копим трату в активном окне
             _windowSpentAccumulator += spentThisTick;
+            LogDebug($"Spent in window: {_windowSpentAccumulator} / needed {max * overchargeSpendFraction}");
 
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Spent in window: {_windowSpentAccumulator} / needed {statMax * overchargeSpendFraction}");
-
-            if (_windowSpentAccumulator >= statMax * overchargeSpendFraction)
+            // Проверяем достижение порога перегрузки
+            if (_windowSpentAccumulator >= max * overchargeSpendFraction)
             {
-                if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge threshold reached -> overcharge pending");
+                LogDebug("Overcharge threshold reached");
                 _pendingOverchargeTrigger = true;
                 _windowActive = false;
-                UpdateUIAndState();
             }
-            else
-            {
-                UpdateUIAndState();
-            }
+
+            UpdateState();
         }
+
+        private bool IsWindowExpired()
+        {
+            return Time.time - _windowStartTime > overchargeTimeWindow;
+        }
+
+        private void StartTrackingWindow()
+        {
+            _windowActive = true;
+            _windowStartTime = Time.time;
+            _windowSpentAccumulator = 0f;
+            LogDebug("Tracking window started");
+            UpdateState();
+        }
+
+        private void CacheEnergyValues(float current, float max)
+        {
+            _lastEnergyCurrent = current;
+            _lastEnergyMax = max;
+        }
+
+        #endregion
+
+        #region Command Execution
 
         public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {
             if (!enabled) return;
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] DoUnitCommand: type={type}, success={wasSuccessful}, pendingBuff={_pendingShortBuff}, pendingOvercharge={_pendingOverchargeTrigger}");
 
-            // wasSuccessful == true означает только "действие успешно запущено".
-            // Короткий бафф мгновенный - применяем сразу.
-            // Перегрузку применять здесь нельзя - она ждёт StateMachineNotification/EndUse.
+            LogDebug($"DoUnitCommand: type={type}, success={wasSuccessful}, pendingBuff={_pendingShortBuff}, pendingOvercharge={_pendingOverchargeTrigger}");
+
+            // Короткий бафф применяется сразу при успешном запуске
             if (wasSuccessful && _pendingShortBuff)
             {
                 ApplyShortBuff();
             }
 
             _pendingShortBuff = false;
-            UpdateUIAndState();
-            // _pendingOverchargeTrigger НЕ трогаем - его обрабатывает StateMachineNotification
+            UpdateState();
         }
 
         [ProButton]
         public void ApplyShortBuff()
         {
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Applying short buff, effects count={_onSpend.Length}");
-            for (int i = 0; i < _onSpend.Length; i++)
+            LogDebug($"Applying short buff, effects count={_onSpendEffects.Length}");
+
+            foreach (var effect in _onSpendEffects)
             {
-                _onSpend[i].ProduceResult(entity, entity, entity.EffectSpawn.position, entity.EffectSpawn.rotation);
+                effect.ProduceResult(entity, entity, entity.EffectSpawn.position, entity.EffectSpawn.rotation);
             }
-            OnUIUpdate?.Invoke(GetUISnapshot());
+
+            NotifyUI();
         }
+
+        #endregion
+
+        #region Overcharge Management
 
         [ProButton]
         private void TriggerOvercharge()
         {
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge triggered!");
+            LogDebug("Overcharge triggered!");
 
-            OverchargeEngaged = true;
+            // Фаза Activation: продлится до выхода из стейта Overcharge (конец анимации).
+            // Корутину баффа здесь НЕ запускаем.
+            _isInActivationPhase = true;
             SetOverchargeTriggerPending(true);
-
-            if (_overchargeDurationRoutine != null)
-            {
-                StopCoroutine(_overchargeDurationRoutine);
-            }
-            _overchargeDurationRoutine = StartCoroutine(EndOverchargeAfterDuration());
-            UpdateUIAndState();
+            UpdateState();
         }
         private IEnumerator EndOverchargeAfterDuration()
         {
             yield return new WaitForSeconds(overchargeBuffDuration);
 
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge buff duration ended -> OverChargeReady = false");
+            LogDebug("Overcharge duration ended");
 
-            OverchargeEngaged = false;
+            _isOverchargeActive = false;
             _overchargeDurationRoutine = null;
-            UpdateUIAndState();
+            UpdateState();
         }
+        private void StartOverchargeBuff()
+        {
+            LogDebug("Activation finished -> buff started");
+
+            _isInActivationPhase = false;
+            _isOverchargeActive = true;
+
+            StopExistingDurationRoutine();
+            _overchargeDurationRoutine = StartCoroutine(EndOverchargeAfterDuration());
+            UpdateState();
+        }
+        
+        private void StopExistingDurationRoutine()
+        {
+            if (_overchargeDurationRoutine != null)
+            {
+                StopCoroutine(_overchargeDurationRoutine);
+                _overchargeDurationRoutine = null;
+            }
+        }
+
+        private void SetOverchargeTriggerPending(bool value)
+        {
+            if (_cachedContext != null)
+            {
+                _cachedContext.OverchargeTriggerPending = value;
+                LogDebug($"OverchargeTriggerPending -> {value}");
+            }
+        }
+
+        private void ResetAllState()
+        {
+            StopExistingDurationRoutine();
+
+            _pendingShortBuff = false;
+            _pendingOverchargeTrigger = false;
+            _windowActive = false;
+            _isReadyForOvercharge = false;
+            _isInActivationPhase = false;
+            _isOverchargeActive = false;
+
+            if (_cachedContext != null)
+            {
+                _cachedContext.OverchargeTriggerPending = false;
+            }
+
+            UpdateState();
+        }
+
+        #endregion
+
+        #region State Machine Integration
 
         public void SetShieldValue(ResourceStatType stat, float currentValue)
         {
-            // NOOP
+            // No operation
         }
 
         public void Attach(IStateAugmentorReceiver machine)
@@ -254,42 +354,32 @@ namespace Arcatech.Stats
         {
             _cachedContext ??= context;
 
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] OnStateEntered: state={state}");
-
-            // Проверяем имя входящего состояния напрямую по аргументу, а не по контексту
-            if (state.StateName == overChargeEnter.nextState.stateDisplayName)
+            if (IsOverchargeState(state))
             {
-                _isActivationAnimating = true;
-        
-                // Потребляем триггер, если он был выставлен
+                _isInActivationPhase = true; // страховка, если EndUse пришёл раньше входа
+
                 if (context.OverchargeTriggerPending)
-                {
                     SetOverchargeTriggerPending(false);
-                    if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Overcharge trigger consumed on enter");
-                }
             }
 
-            UpdateUIAndState();
+            UpdateState();
         }
 
         public void OnStateExited(UnitState state, StateMachineContext context)
         {
-            // Сбрасываем флаг только при выходе из конкретного состояния активации
-            if (state.StateName == overChargeEnter.nextState.stateDisplayName)
+            if (IsOverchargeState(state) && _isInActivationPhase)
             {
-                _isActivationAnimating = false;
-                if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] Activation animation state exited");
+                // Выход из стейта активации = конец анимации = начало баффа
+                StartOverchargeBuff();
             }
-    
-            UpdateUIAndState();
-        }
-        
-        private void SetOverchargeTriggerPending(bool value)
-        {
-            _cachedContext.OverchargeTriggerPending = value;
-            if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] OverchargeTriggerPending -> {value}");
+
+            UpdateState();
         }
 
+        private bool IsOverchargeState(UnitState state)
+        {
+            return state.StateName == overChargeEnter.nextState.stateDisplayName;
+        }
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)
         {
@@ -297,106 +387,87 @@ namespace Arcatech.Stats
 
             switch (notifyType)
             {
-                case StateMachineNotifyType.NoNotify:
-                    break;
-                case StateMachineNotifyType.Starting:
-                    break;
-                case StateMachineNotifyType.Use:
-                    break;
                 case StateMachineNotifyType.EndUse:
-                    if (_pendingOverchargeTrigger)
-                    {
-                        if (ShowingDebugs) Debug.Log($"[{nameof(TailsOverchargeModule)}] EndUse -> applying overcharge");
-                        TriggerOvercharge();
-                    }
-                    _pendingOverchargeTrigger = false;
-                    UpdateUIAndState();
+                    HandleEndUse();
                     break;
+
                 case StateMachineNotifyType.Cancel:
-                    if (_pendingOverchargeTrigger && ShowingDebugs)
-                        Debug.Log($"[{nameof(TailsOverchargeModule)}] Action cancelled - discarding pending overcharge");
-                    _pendingOverchargeTrigger = false;
-                    UpdateUIAndState();
+                    HandleCancel();
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(notifyType), notifyType, null);
             }
         }
-        private void OnDisable()
+
+        private void HandleEndUse()
         {
-            // На случай отключения компонента посреди активного баффа/окна - убираем "зависший" таймер
-            // и не оставляем персонажа навечно в состоянии перегрузки.
-            if (_overchargeDurationRoutine != null)
+            if (_pendingOverchargeTrigger)
             {
-                StopCoroutine(_overchargeDurationRoutine);
-                _overchargeDurationRoutine = null;
+                LogDebug("EndUse -> applying overcharge");
+                TriggerOvercharge();
             }
 
-            _pendingShortBuff = false;
             _pendingOverchargeTrigger = false;
-            _windowActive = false;
-            _isReadyForOvercharge = false;
-            if (OverchargeEngaged)
-            {
-                _cachedContext.OverchargeTriggerPending = false;
-                OverchargeEngaged = false;
-            }
-            UpdateUIAndState();
+            UpdateState();
         }
-        
-        
-        #region UI
-        private float _lastEnergyCurrent;
-        private float _lastEnergyMax;
-        private OverchargeModuleState _state;
-        private bool _isReadyForOvercharge = false;
-        private void UpdateUIAndState()
-        {
-            // Приоритет состояний (от высшего к низшему):
-            // 1. Active - перегрузка активна
-            // 2. Activation - анимация перегрузки
-            // 3. Ready - готов к перегрузке
-            // 4. InSpendWindow - идет накопление
-            // 5. Idle - все остальное
 
-            if (OverchargeEngaged)
+        private void HandleCancel()
+        {
+            if (_pendingOverchargeTrigger)
             {
-                _state = OverchargeModuleState.Active;
+                LogDebug("Action cancelled - discarding pending overcharge");
             }
-            // ИСПРАВЛЕНИЕ: Используем надежный флаг вместо проверки контекста
-            else if (_isActivationAnimating)
+
+            _pendingOverchargeTrigger = false;
+            UpdateState();
+        }
+
+        #endregion
+
+        #region State Management
+
+        private void UpdateState()
+        {
+            DetermineCurrentState();
+            NotifyUI();
+        }
+
+        private void DetermineCurrentState()
+        {
+            if (_isOverchargeActive)
             {
-                _state = OverchargeModuleState.Activation;
+                _currentState = OverchargeModuleState.Active;
             }
-            else if (_pendingOverchargeTrigger)
+            else if (_isInActivationPhase)
             {
-                // Если триггер висит, но мы еще не вошли в стейт активации
-                _state = OverchargeModuleState.Ready; 
+                _currentState = OverchargeModuleState.Activation;
             }
-            else if (_isReadyForOvercharge && !_windowActive)
+            else if (_pendingOverchargeTrigger || (_isReadyForOvercharge && !_windowActive))
             {
-                _state = OverchargeModuleState.Ready;
+                _currentState = OverchargeModuleState.Ready;
             }
             else if (_windowActive)
             {
-                _state = OverchargeModuleState.InSpendWindow;
+                _currentState = OverchargeModuleState.InSpendWindow;
             }
             else
             {
-                _state = OverchargeModuleState.Idle;
+                _currentState = OverchargeModuleState.Idle;
             }
-
-            OnUIUpdate?.Invoke(GetUISnapshot());
         }
-        public event UnityAction<OverchargeUISnapshot> OnUIUpdate = delegate { };
 
-        OverchargeUISnapshot GetUISnapshot()
+        #endregion
+
+        #region UI Management
+
+        private void NotifyUI()
         {
-            float timeRemaining = 0f;
-            if (_windowActive)
-            {
-                timeRemaining = Mathf.Max(0f, overchargeTimeWindow - (Time.time - _windowStartTime));
-            }
+            OnUIUpdate?.Invoke(CreateUISnapshot());
+        }
+
+        private OverchargeUISnapshot CreateUISnapshot()
+        {
+            float timeRemaining = _windowActive
+                ? Mathf.Max(0f, overchargeTimeWindow - (Time.time - _windowStartTime))
+                : 0f;
 
             return new OverchargeUISnapshot(
                 currentEnergy: _lastEnergyCurrent,
@@ -406,8 +477,23 @@ namespace Arcatech.Stats
                 requiredSpentEnergy: _lastEnergyMax * overchargeSpendFraction,
                 windowTimeRemaining: timeRemaining,
                 windowDuration: overchargeTimeWindow,
-                currentState: _state);
+                currentState: _currentState,
+                totalDuration:overchargeBuffDuration
+            );
         }
+
+        #endregion
+
+        #region Debug Logging
+
+        private void LogDebug(string message)
+        {
+            if (showDebugLogs)
+            {
+                Debug.Log($"[{nameof(TailsOverchargeModule)}] {message}");
+            }
+        }
+
         #endregion
     }
 }

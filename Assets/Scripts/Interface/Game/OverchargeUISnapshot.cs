@@ -15,6 +15,7 @@
         public readonly float MaxEnergy;
 
         public readonly float Threshold;
+        public readonly float OverchargeDuration;
     
         public readonly float WindowSpentEnergy;
         public readonly float RequiredSpentEnergy;
@@ -32,7 +33,8 @@
             float requiredSpentEnergy,
             float windowTimeRemaining,
             float windowDuration,
-            OverchargeModuleState currentState)
+            OverchargeModuleState currentState,
+            float totalDuration)
         {
             CurrentEnergy = currentEnergy;
             MaxEnergy = maxEnergy;
@@ -42,6 +44,7 @@
             WindowTimeRemaining = windowTimeRemaining;
             WindowDuration = windowDuration;
             CurrentState = currentState;
+            OverchargeDuration = totalDuration;
         }
     }
 }
