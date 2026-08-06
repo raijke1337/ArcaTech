@@ -52,10 +52,9 @@ namespace Arcatech.Managers
 
         private void Start()
         {
-            {
-                playerPanel.Show();
-                koWindow.Hide();
-            }
+            playerPanel.gameObject.SetActive(true);
+            playerPanel.Show();
+            koWindow.Hide();
         }
         
         #region game dialogues and texts
@@ -132,7 +131,19 @@ namespace Arcatech.Managers
         }
 
         #endregion
+        
+        #region glitch effect
+
+        public void ShowGlitchEffect()
+        {
+            
+        }
+        #endregion
+        
 #region draw damage
+
+
+
         // ---------------------------
         // Floating Texts (Damage/Heal)
         // ---------------------------
@@ -251,8 +262,6 @@ namespace Arcatech.Managers
         // ---------------------------
 
 #endregion
-        
+
     }
-
-
 }

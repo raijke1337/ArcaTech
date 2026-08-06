@@ -1,5 +1,7 @@
 using Arcatech.Items;
+using Arcatech.Managers;
 using Arcatech.Stats;
+using ArcaTech.UI;
 using Arcatech.Units;
 using DG.Tweening;
 using KBCore.Refs;
@@ -7,6 +9,7 @@ using SpankyBoy.JuiceUI.Free;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace Arcatech.UI
@@ -17,6 +20,7 @@ namespace Arcatech.UI
         [SerializeField, Child] protected BarsContainersManager barsManager;
         [SerializeField, Child] protected OverchargeUIMain overcharge;
         [SerializeField,Self] PanelAnimator_Free panelAnimator;
+        [Space, SerializeField, Range(0,int.MaxValue)] private int bigDamageThreshold = 25;
         /// <summary>
         /// not called in this component
         /// </summary>
@@ -98,7 +102,14 @@ namespace Arcatech.UI
         public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
             BaseGameEntityComponent source)
         {
-            //Debug.Log("HandleStatsUpdate player panel");
+            if (stat == ResourceStatType.Health && statDelta < 0)
+            {
+                GameInterfaceManager.Instance.ShowGlitchEffect();
+                if (Mathf.Abs(statDelta) > bigDamageThreshold)
+                {
+                    GlitchController.Instance.TriggerGlitch();
+                }
+            }
         }
 
         public void SetShieldValue(ResourceStatType stat, float currentValue)

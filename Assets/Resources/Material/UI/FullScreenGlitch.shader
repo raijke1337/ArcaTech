@@ -1,4 +1,4 @@
-Shader "PostProcess/FullScreenGlitch"
+Shader "Arcatech/FullScreenGlitch"
 {
     Properties
     {
