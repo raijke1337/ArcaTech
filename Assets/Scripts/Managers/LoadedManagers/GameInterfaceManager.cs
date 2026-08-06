@@ -8,6 +8,7 @@ using Arcatech.UI;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
 using KBCore.Refs;
+using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,7 +17,7 @@ namespace Arcatech.Managers
     public class GameInterfaceManager : ValidatedMonoBehaviour
     {
 
-        public static SerializedDictionary<ResourceStatType, Sprite> icons;
+        public static SerializedDictionary<ResourceStatType, Sprite> Icons;
 
         public static GameInterfaceManager Instance;
         private void Awake()
@@ -25,10 +26,13 @@ namespace Arcatech.Managers
             else Destroy(this.gameObject);
         }
 
-        [SerializeField,Child] private PlayerUnitPanel _playerPan;
+        [SerializeField] private PanelAnimator_Free koWindow;
+        [SerializeField] private PanelAnimator_Free fade;
+        [SerializeField] private PanelAnimator_Free pauseWindow;
+        
+        [SerializeField,Child] private PlayerUnitPanel playerPanel;
         [SerializeField,Child] private GameTextWindowComponent _text;
-        [SerializeField] private GameObject _ded;
-        [SerializeField] private GameObject _pause;
+
         [SerializeField,Child] private ItemCardComponent inspectItemCard;
         [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
         [SerializeField] public Transform miniGame;
@@ -39,8 +43,6 @@ namespace Arcatech.Managers
         /// called by inputs
         /// </summary>
         EventBinding<PauseToggleEvent> _pauseToggleBind;
-        
-
 
         private void OnEnable()
         {
@@ -50,15 +52,9 @@ namespace Arcatech.Managers
 
         private void Start()
         {
-            // if (GameManager.Instance.GetCurrentLevelData.LevelType != LevelType.Game)
-            // {
-            //     _playerPan.gameObject.SetActive(false);
-            //     _ded.SetActive(false);
-            // }
-           // else
             {
-                _playerPan.gameObject.SetActive(true);
-                _ded.SetActive(false);
+                playerPanel.Show();
+                koWindow.Hide();
             }
         }
         
@@ -67,6 +63,7 @@ namespace Arcatech.Managers
         {
             if (!dialogue) return;
             _text.gameObject.SetActive(true);
+            
             _text.ShowDialogue(dialogue);
         }
 
@@ -79,66 +76,31 @@ namespace Arcatech.Managers
             if (!floatingTooltip) return;
             if (!show)
             {
-               FadeOut(floatingTooltip.transform);
+                floatingTooltip.PanelAnimator.Hide();
                 return;
             }
             floatingTooltip.Set(targetable);
-            FadeIn(floatingTooltip.transform);
-        }
-
-        private Sequence tooltipSeq;
-        private void FadeIn(Transform window)
-        {
-            var cg = window.GetComponent<CanvasGroup>();
-
-            // Cancel any in-flight tweens (prevents stale OnComplete from hiding it)
-            tooltipSeq?.Kill(false);
-            cg.DOKill(false);
-            window.DOKill(false);
-
-            // Make sure it's active and start from hidden values if necessary
-            window.gameObject.SetActive(true);
-            if (cg.alpha < 1f) cg.alpha = 0f;
-            if (window.localScale.x < 1f || window.localScale.y < 1f) window.localScale = Vector3.zero;
-
-            tooltipSeq = DOTween.Sequence()
-                .Join(cg.DOFade(1f, 0.25f).SetEase(Ease.OutQuad))
-                .Join(window.DOScale(1f, 0.25f).SetEase(Ease.OutBack));
-        }
-
-        private void FadeOut(Transform window)
-        {
-            var cg = window.GetComponent<CanvasGroup>();
-
-            // Cancel any in-flight tweens
-            tooltipSeq?.Kill(false);
-            cg.DOKill(false);
-            window.DOKill(false);
-
-            tooltipSeq = DOTween.Sequence()
-                .Join(cg.DOFade(0f, 0.2f).SetEase(Ease.InQuad))
-                .Join(window.DOScale(0f, 0.2f).SetEase(Ease.InBack))
-                .OnComplete(() => window.gameObject.SetActive(false));
-
-        }
-        private void OnDisable()
-        {
-            tooltipSeq?.Kill(false);
-            if (floatingTooltip != null)
-            {
-                var t = floatingTooltip.transform;
-                t.DOKill(false);
-                t.GetComponent<CanvasGroup>()?.DOKill(false);
-            }
+            floatingTooltip.PanelAnimator.Show();
         }
 
 
         #region menus
-        
-        public void ShowPauseMenu(PauseToggleEvent isPause)
+
+        void ShowPauseMenu(PauseToggleEvent isPause)
         {
             // dont pause the game here
-            _pause.SetActive(isPause.Value);
+            if (isPause.Value)
+            {
+                pauseWindow.gameObject.SetActive(true);
+                pauseWindow.Show();
+                fade.gameObject.SetActive(true);
+                fade.Show();
+            }
+            else
+            {
+                pauseWindow.Hide();
+                fade.Hide();
+            }
         }
 
         public void ClickResume()
@@ -149,13 +111,21 @@ namespace Arcatech.Managers
         
         public void ShowPlayerDeadMenu()
         {
-            _ded.SetActive(true);
+            koWindow.gameObject.SetActive(true);
+            fade.gameObject.SetActive(true);
+            koWindow.Show();
+            fade.Show();
         }
         public void ToMain()
         {
             GameManager.Instance.OnReturnToMain();
         }
         public void OnRestart()
+        {
+            var currentLevelID = SceneManager.GetActiveScene().name;
+            SceneManager.LoadScene(currentLevelID);
+        }
+        public void OnRestartAtCheckpoint()
         {
             var currentLevelID = SceneManager.GetActiveScene().name;
             SceneManager.LoadScene(currentLevelID);

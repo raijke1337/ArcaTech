@@ -3,6 +3,7 @@ using Arcatech.Stats;
 using Arcatech.Units;
 using DG.Tweening;
 using KBCore.Refs;
+using SpankyBoy.JuiceUI.Free;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -15,11 +16,7 @@ namespace Arcatech.UI
         [SerializeField, Child] protected PlayerBarUsablesIconsContainerManager usablesIcons;
         [SerializeField, Child] protected BarsContainersManager barsManager;
         [SerializeField, Child] protected OverchargeUIMain overcharge;
-        [SerializeField, Self] protected RectTransform _rect;
-        [SerializeField] protected float _shakeAtHealthDelta = 0.1f;
-        [SerializeField] protected Image _dmgGlow;
-        [SerializeField] Color glowColor = Color.red;
-        
+        [SerializeField,Self] PanelAnimator_Free panelAnimator;
         /// <summary>
         /// not called in this component
         /// </summary>
@@ -28,7 +25,8 @@ namespace Arcatech.UI
         BaseGameEntityComponent _player;
         UsablesCasterComponent _usablesCasterComponent;
         TailsOverchargeModule _tailsOverchargeModule;
-
+        public void Show() => panelAnimator.Show();
+        public void Hide() => panelAnimator.Hide();
         
         private void Start()
         {
@@ -100,15 +98,7 @@ namespace Arcatech.UI
         public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
             BaseGameEntityComponent source)
         {
-            if (stat != ResourceStatType.Health) return;
-
-            if (statDelta >= 0 || Mathf.Abs(statDelta / statMax) < _shakeAtHealthDelta) return;
-
-            _rect.DOShakePosition(0.2f, 5);
-            if (_dmgGlow != null)
-            {
-                _dmgGlow.DOFade(1, 0.3f).OnComplete(() => _dmgGlow.DOFade(0, 0.3f));
-            }
+            //Debug.Log("HandleStatsUpdate player panel");
         }
 
         public void SetShieldValue(ResourceStatType stat, float currentValue)

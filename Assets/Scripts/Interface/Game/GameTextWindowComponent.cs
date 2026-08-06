@@ -1,14 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Arcatech.Texts;
 using KBCore.Refs;
+using SpankyBoy.JuiceUI.Free;
 using TMPro;
 using UnityEngine;
 
 public class GameTextWindowComponent : ValidatedMonoBehaviour
 {
     [Space, Header("Text settings")]
-    [SerializeField] private TextMeshProUGUI _mainText;
+    [SerializeField] private TextMeshProUGUI speechText;
+    [SerializeField] private TextMeshProUGUI speakerText;
     [SerializeField] private float letterDelay = 0.1f;
     [SerializeField] private float fullTextDuration = 1.276f;
     [SerializeField, Self] private RectTransform rect;
@@ -31,9 +34,15 @@ public class GameTextWindowComponent : ValidatedMonoBehaviour
     private bool _skipRequested = false;
     private Queue<DialoguePart> _dialogueQueue = new Queue<DialoguePart>();
 
+    [SerializeField,Self] PanelAnimator_Free animator;
     private void Start()
     {
         windowSize.x = rect.sizeDelta.x;
+    }
+
+    private void OnEnable()
+    {
+        animator.Show();
     }
 
     public void ShowDialogue(DialoguePart dialoguePart)
@@ -121,7 +130,7 @@ public class GameTextWindowComponent : ValidatedMonoBehaviour
         string formattedName = FormatSpeakerName(speakerName);
 
         // Show speaker name immediately
-        _mainText.text = formattedName;
+        speakerText.text = formattedName;
 
         // Small pause after showing name
         yield return new WaitForSeconds(0.1f);
@@ -135,10 +144,10 @@ public class GameTextWindowComponent : ValidatedMonoBehaviour
                 i = text.Length;
             }
 
-            _mainText.text = formattedName + text.Substring(0, i);
+            speechText.text = text.Substring(0, i);
             
             // Update window size
-            windowSize.y = _mainText.preferredHeight + textPadding;
+            windowSize.y = speechText.preferredHeight + textPadding;
             rect.sizeDelta = windowSize;
 
             if (i < text.Length)
@@ -196,7 +205,8 @@ public class GameTextWindowComponent : ValidatedMonoBehaviour
         {
            // Debug.Log("[Dialogue] No more dialogues, hiding window");
             // Только здесь отключаем окно
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
+            animator.Hide();
         }
     }
 

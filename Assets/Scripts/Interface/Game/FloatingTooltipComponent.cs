@@ -1,20 +1,21 @@
 ﻿using Arcatech.Interactions;
+using KBCore.Refs;
+using SpankyBoy.JuiceUI.Free;
 using TMPro;
 using UnityEngine;
 
 namespace Arcatech.UI
 {
-    public class FloatingTooltipComponent : MonoBehaviour
+    [RequireComponent(typeof(PanelAnimator_Free))]
+    public class FloatingTooltipComponent : ValidatedMonoBehaviour
     {
 
+        [SerializeField, Self] private PanelAnimator_Free animator;
         [SerializeField] private TextMeshProUGUI TitleLabel;
         [SerializeField] private TextMeshProUGUI InteractiveLabel;
-        private RectTransform _rectTransform;
-        private void Start()
-        {
-            _rectTransform = GetComponent<RectTransform>();
-        }
+        [SerializeField, Self] RectTransform rectT;
 
+        public PanelAnimator_Free PanelAnimator => animator;
         private void Update()
         {
             UpdatePosition();
@@ -26,7 +27,7 @@ namespace Arcatech.UI
         
             // Add offset so tooltip doesn't overlap cursor
             Vector2 offset = new Vector2(30f, -30f);
-            _rectTransform.position = mousePosition + offset;
+            rectT.position = mousePosition + offset;
 
            ClampToScreen();
         }
@@ -34,9 +35,9 @@ namespace Arcatech.UI
         void ClampToScreen()
         {
             Vector3[] corners = new Vector3[4];
-            _rectTransform.GetWorldCorners(corners);
+            rectT.GetWorldCorners(corners);
         
-            Vector3 position = _rectTransform.position;
+            Vector3 position = rectT.position;
         
             // Check right edge
             if (corners[2].x > Screen.width)
@@ -54,7 +55,7 @@ namespace Arcatech.UI
             if (corners[0].y < 0)
                 position.y -= corners[0].y;
             
-            _rectTransform.position = position;
+            rectT.position = position;
         }
 
         public void Set(ITargetable tgt)

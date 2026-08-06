@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using KBCore.Refs;
 
 namespace SpankyBoy.JuiceUI.Free
 {
-    [RequireComponent(typeof(RectTransform))]
-    public class PanelAnimator_Free : MonoBehaviour
+    [RequireComponent(typeof(RectTransform),typeof(CanvasGroup))]
+    public class PanelAnimator_Free : ValidatedMonoBehaviour
     {
         // --- FREE VERSION: Limited to 4 animation types ---
         public enum AnimationType
@@ -51,7 +52,7 @@ namespace SpankyBoy.JuiceUI.Free
         public float volume = 1.0f;
 
         private RectTransform rectTransform;
-        private CanvasGroup canvasGroup;
+        [SerializeField,Self]private CanvasGroup canvasGroup;
         private Vector2 originalPosition;
         private Vector3 originalScale;
         private AudioSource audioSource;

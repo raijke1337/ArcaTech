@@ -43,10 +43,7 @@ namespace Arcatech.UI
                 HideAllIcons();
                 return;
             }
-            Debug.Log(
-                $"[Usables UI] Actions received: {string.Join(", ", usables.Keys)}",
-                this
-            );
+
                 
             /*
              * Скрываем иконки, для которых больше нет действия
@@ -72,13 +69,6 @@ namespace Arcatech.UI
                 UnitActionType actionType = usablePair.Key;
                 IUsable usable = usablePair.Value;
 
-                Debug.Log(
-                    $"[Usables UI] Processing: {actionType}; " +
-                    $"usable null: {usable == null}; " +
-                    $"runtime type: {(usable == null ? "null" : usable.GetType().Name)}",
-                    this
-                );
-
                 if (actionType == UnitActionType.None)
                 {
                     continue;
@@ -102,12 +92,6 @@ namespace Arcatech.UI
                 icon.AssignIcon(usable)
                     .WithHotkey(GetHotkey(actionType));
 
-                Debug.Log(
-                    $"[Usables UI] Icon ready: {actionType}; " +
-                    $"GameObject: {icon.gameObject.name}; " +
-                    $"Active: {icon.gameObject.activeSelf}",
-                    this
-                );
 
                 icon.transform.SetSiblingIndex(iconIndex);
                 iconIndex++;
