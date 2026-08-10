@@ -11,15 +11,20 @@ public partial class ResetNavigationAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
 
+    private NavMeshAgent _agent;
+
+
     protected override Status OnStart()
     {
-        var nav = Agent.Value.GetComponent<NavMeshAgent>();
-        nav.ResetPath();
-        return Status.Success;
+        _agent??= Agent.Value.GetComponent<NavMeshAgent>();
+
+        return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
+        if (!_agent.isOnNavMesh) return Status.Running;
+         _agent.ResetPath();
         return Status.Success;
     }
 

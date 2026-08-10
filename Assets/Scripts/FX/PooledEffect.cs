@@ -1,124 +1,69 @@
-﻿using System.Collections;
-using Arcatech.Managers;
-using CartoonFX;
+﻿using CartoonFX;
 using UnityEngine;
 
-namespace Arcatech.Effects
+namespace Arcatech.Managers
 {
     [DisallowMultipleComponent]
-    public class PooledEffect : MonoBehaviour
+    [RequireComponent(typeof(ParticleSystem))]
+    public sealed class PooledEffect : MonoBehaviour
     {
-        internal EffectsManager owner;
-        internal CFXR_Effect prefabKey;
+        public int PrefabInstanceId { get; private set; }
 
-        ParticleSystem[] systems;
-        bool anyLooping;
+        private EffectsManager _manager;
+        private CFXR_Effect _effect;
+        private ParticleSystem _rootParticleSystem;
 
-        void Awake()
+        private bool _isArmed;
+        private bool _rootSystemStopped;
+
+        public void Initialize(
+            EffectsManager manager,
+            int prefabInstanceId,
+            ParticleSystem rootParticleSystem)
         {
-            // Cache once
-            systems = GetComponentsInChildren<ParticleSystem>(true);
-            anyLooping = false;
-            for (int i = 0; i < systems.Length; i++)
+            _manager = manager;
+            PrefabInstanceId = prefabInstanceId;
+            _rootParticleSystem = rootParticleSystem;
+            _effect = GetComponent<CFXR_Effect>();
+        }
+
+        public void Arm()
+        {
+            _rootSystemStopped = false;
+            _isArmed = true;
+        }
+
+        public void Disarm()
+        {
+            _isArmed = false;
+            _rootSystemStopped = false;
+        }
+
+        private void OnParticleSystemStopped()
+        {
+            if (!_isArmed)
             {
-                var main = systems[i].main;
-                if (main.loop) anyLooping = true;
-
-                // Ensure we get callbacks when systems stop
-                var m = systems[i].main;
-                m.stopAction = ParticleSystemStopAction.Callback;
-            }
-        }
-
-        // Called by manager before playing
-        internal void PrepareForPlay()
-        {
-            // Reset all particle systems cleanly
-            for (int i = 0; i < systems.Length; i++)
-            {
-                systems[i].Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                systems[i].Clear(true);
-                // Optional (slightly more expensive): systems[i].Simulate(0f, true, true, true);
-            }
-        }
-
-        internal void PlayNow()
-        {
-            for (int i = 0; i < systems.Length; i++)
-                systems[i].Play(true);
-
-            // If the effect is non-looping, we can auto-return when done
-            StopAllCoroutines();
-            StartCoroutine(ReturnWhenComplete());
-        }
-
-        IEnumerator ReturnWhenComplete()
-        {
-            // For looping effects, you’ll need to Stop() manually via handle, but we still
-            // return when explicitly stopped or parent disabled.
-            if (anyLooping)
-                yield break;
-
-            // Wait until all systems are dead
-            bool alive;
-            do
-            {
-                alive = false;
-                for (int i = 0; i < systems.Length; i++)
-                {
-                    if (systems[i] != null && systems[i].IsAlive(true))
-                    {
-                        alive = true;
-                        break;
-                    }
-                }
-                if (alive) yield return null;
-            } while (alive);
-
-            ReturnToPool();
-        }
-
-        public void StopAndReturn()
-        {
-            for (int i = 0; i < systems.Length; i++)
-                systems[i].Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            ReturnToPool();
-        }
-
-        void OnDisable()
-        {
-            // If something disables the object (scene unload, parent disabled), return it.
-            if (owner != null && gameObject.activeInHierarchy == false)
-            {
-                ReturnToPool();
-            }
-        }
-
-        void OnParticleSystemStopped()
-        {
-            // For non-looping effects, the coroutine handles return.
-            // For looping, if all are stopped, we can return immediately.
-            if (!anyLooping)
                 return;
-
-            bool anyAlive = false;
-            for (int i = 0; i < systems.Length; i++)
-            {
-                if (systems[i] != null && systems[i].IsAlive(true))
-                {
-                    anyAlive = true;
-                    break;
-                }
             }
-            if (!anyAlive)
-                ReturnToPool();
+
+            _rootSystemStopped = true;
         }
 
-        void ReturnToPool()
+        private void Update()
         {
-            if (owner != null)
-                owner.Return(this);
+            if (!_isArmed || !_rootSystemStopped)
+            {
+                return;
+            }
+
+            // Включая дочерние particle systems и sub-emitter'ы.
+            if (_rootParticleSystem.IsAlive(withChildren: true))
+            {
+                return;
+            }
+
+            _isArmed = false;
+            _manager.Release(_effect);
         }
     }
-    
 }

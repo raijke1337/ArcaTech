@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
+using Arcatech.SaveSystem;
 using Arcatech.Units;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
@@ -23,12 +24,14 @@ namespace Arcatech.Stats
         [SerializeField] private bool preserveCurrentRatioOnMaxChange = true;
         [SerializeField, Self] BaseGameEntityComponent entity;
 
+        [SerializeField] private bool killAt0Hp = false;
         private readonly Dictionary<ResourceStatType, StatRuntime> stats = new();
         private readonly Dictionary<SourceKey, List<StatModifier>> liveEquipMaxModifiers = new();
 
         private bool init = false;
         private IDamageDrawer _damageDrawer;
 
+        
         private void Awake()
         {
             if (init) return;
@@ -571,6 +574,13 @@ namespace Arcatech.Stats
         {
             value = 0f;
             if (HasStat(stat)) value = stats[stat].current;
+            return HasStat(stat);
+        }
+
+        public bool TryGetMax(ResourceStatType stat, out float value)
+        {
+            value = 0f;
+            if (HasStat(stat)) value = stats[stat].max;
             return HasStat(stat);
         }
 

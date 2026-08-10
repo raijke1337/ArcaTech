@@ -58,19 +58,40 @@ namespace Arcatech.Triggers
 
         public void AreaCast(ITriggerNotificationReceiver receiver)
         {
-            var found = Physics.OverlapBox(triggerCollider.bounds.center,
-                triggerCollider.bounds.extents / 2,
-                transform.rotation,
-                _valid);
-            foreach (var box in found)
+            if (triggerCollider is not BoxCollider boxCollider)
             {
-                OnTriggerEnter(box);
+                Debug.LogError($"{nameof(AreaCast)} requires a {nameof(BoxCollider)}.", this);
+                return;
+            }
+
+            Transform boxTransform = boxCollider.transform;
+
+            Vector3 worldCenter = boxTransform.TransformPoint(boxCollider.center);
+
+            Vector3 halfExtents = Vector3.Scale(
+                boxCollider.size * 0.5f,
+                boxTransform.lossyScale);
+
+            Collider[] found = Physics.OverlapBox(
+                worldCenter,
+                halfExtents,
+                boxTransform.rotation,
+                Physics.AllLayers,
+                QueryTriggerInteraction.Collide);
+
+            foreach (Collider foundCollider in found)
+            {
+                if (foundCollider == triggerCollider)
+                {
+                    continue;
+                }
+
+                OnTriggerEnter(foundCollider);
             }
         }
 
         protected void OnTriggerEnter(Collider other)
         {
-           // Debug.Log($"TriggerTracker collision with {other.gameObject.name}");
             if (!CanNotify() || other.isTrigger) return;
 
             var hitGeometry = CalculateHitGeometry(other);
@@ -88,7 +109,6 @@ namespace Arcatech.Triggers
                     hitGeometry.normal,
                     Time.time));
             }
-
             AddHitForVisualization(hitGeometry.position, hitGeometry.direction, hitGeometry.normal);
         }
 

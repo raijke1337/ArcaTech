@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody), typeof(NPCBehaviorWrapper))]
+[DisallowMultipleComponent]
 public sealed class ImpulseApplier : MonoBehaviour, IPausableComponent
 {
     private Rigidbody _rigidbody;
@@ -17,6 +18,7 @@ public sealed class ImpulseApplier : MonoBehaviour, IPausableComponent
         behavior = GetComponent<BehaviorGraphAgent>();
     }
 
+    public bool IsActive => _impulseActive;
     public bool Paused { get; set; }
 
     [Space, Header("Impulse Settings")]

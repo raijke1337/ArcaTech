@@ -28,15 +28,20 @@ namespace Arcatech.Actions
              direction = d;
              mult = m;
         }
-        public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place, Quaternion placeRot)
+        public override bool ProduceResult(
+            BaseGameEntityComponent user, BaseGameEntityComponent target,
+            Vector3 place, Quaternion placeRot)
         {
-            if (!init)
+            if (mover == null)
+                target.TryGetComponent(out mover);   
+
+            if (mover == null)
             {
-                if (target.TryGetComponent(out mover));
+                Debug.LogWarning($"[Impulse] IMove not found on {target?.name}");
+                return false;
             }
 
-            if (mover == null) return false;
-            mover.ApplyImpulse(direction*mult);
+            mover.ApplyImpulse(direction * mult);
             return true;
         }
     }

@@ -187,7 +187,7 @@ namespace Arcatech.Interactions
 
         private void ApplyPostEffects(InteractionState state)
         {
-            var list = state switch
+             var list = state switch
             {
                 InteractionState.Success => successEffects,
                 InteractionState.Failure => failureEffects,

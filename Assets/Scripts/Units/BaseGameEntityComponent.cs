@@ -43,7 +43,7 @@ namespace Arcatech
         public LittlePauseHelperComponent Pauser => _pauser;
 
         public string GetID => id.UniqueId;
-        public string GetName =>  _name;
+        public string GetName =>  string.IsNullOrEmpty(_name) ? gameObject.name : _name;
         public Side GetEntitySide => entitySide;
         public bool ShowingDebugs => _showDebugs;
         public void AssignName(string n) => _name = n;

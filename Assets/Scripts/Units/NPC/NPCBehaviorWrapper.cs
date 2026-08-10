@@ -1,9 +1,10 @@
+
+using System;
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
-using NUnit.Framework;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -13,7 +14,8 @@ namespace Arcatech.Units
     [RequireComponent(typeof(BehaviorGraphAgent), typeof(NavMeshAgent), typeof(UnitInputsComponent))]
     [RequireComponent(typeof(BaseGameEntityComponent), typeof(EntityStatsComponent))]
     [RequireComponent(typeof(EffectsReceiverComponent))]
-    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IMove,
+    public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IKillableComponent, 
+        IPausableComponent, IMove,
         ISavedProgressItem, ITierProvider
     {
         [SerializeField, Self] protected NavMeshAgent agent;
@@ -21,13 +23,52 @@ namespace Arcatech.Units
         [SerializeField, Self] protected BaseGameEntityComponent entity;
         [SerializeField, Self] protected UnitInputsComponent unitInputs;
         [SerializeField, Self] protected EntityStatsComponent stats;
-        [SerializeField] protected Animator animator;
         [SerializeField, Child] protected EffectsReceiverComponent effectsReceiver;
+        [SerializeField] protected Animator animator;
 
+        [SerializeField] private EnemyData_SO data;
+        [SerializeField] string CombatGroup;
+
+        public EnemyData_SO Config => data;
+        
+        private IModifierAggregator _mods;
         private ImpulseApplier _impulse;
+        
+        private bool _paused;
+        private float _speedMultiplier = 1f;
+        private bool _canMove;
 
         #region BLACKBOARD actions
 
+        private bool _inCombat = false;
+        private EnterCombatEventChannel _combateventChannel;
+        private BlackboardVariable<Vector3> _start;
+        private void OnEnable()
+        {
+            behavior.GetVariable("CombatState", out var combatState);
+            _combateventChannel = combatState.ObjectValue as EnterCombatEventChannel;
+            if (_combateventChannel == null)
+            {
+                Debug.Log($"Cast failed! {Entity.GetName}");
+                return;
+            }
+            _combateventChannel.Event += OnCombatStateChanged;
+            behavior.GetVariable("StartingPosition", out _start);
+            if (!TryGetComponent(out _impulse)) _impulse = gameObject.AddComponent<ImpulseApplier>();
+        }
+
+        private void OnDisable()
+        {
+            if (_combateventChannel != null)
+            _combateventChannel.Event -= OnCombatStateChanged;
+        }
+        private void OnCombatStateChanged(bool state) => _inCombat =  state;
+        public NavMeshAgent Nav => agent;
+        public float CurrentMoveSpeed  => _inCombat? 
+            Config.CombatMoveSpeed * _speedMultiplier :
+                    Config.NonCombatMoveSpeed *  _speedMultiplier;
+            
+        public Vector3 StartPoint => _start.Value;
         public float GetStatPercent(ResourceStatType statType)
         {
             if (stats.TryGetCurrent(statType, out var value))
@@ -53,27 +94,20 @@ namespace Arcatech.Units
 
         #endregion
 
-        private void Start()
-        {
-            Initialize();
-        }
         public bool HasEffect(string ID)
         {
             return effectsReceiver.Controller.HasEffect(ID, out _);
         }
-
-        public void SetKilled(IKillerComponent component, bool value)
+        
+        private void LateUpdate()
         {
-            agent.isStopped = value;
-            ReadItemState = value ? ProgressItemState.Completed : ProgressItemState.Default;
-
-            if (!behavior) return;
-            if (value) behavior.End();
-            else behavior.Restart();
+            if (_mods != null)
+            {
+                SpeedMultiplier = _mods.GetMultiplier(ModifierParam.MoveSpeed);
+            }
         }
 
-        private bool _paused;
-
+        #region ipausable
         public bool Paused
         {
             get => _paused;
@@ -86,17 +120,32 @@ namespace Arcatech.Units
                 behavior.enabled = !_paused;
             }
         }
+        #endregion
+        #region ikillable
+        
+        public void SetKilled(IKillerComponent component, bool value)
+        {
+            agent.isStopped = value;
+            ReadItemState = value ? ProgressItemState.Completed : ProgressItemState.Default;
 
-        private bool _canMove;
+            if (!behavior) return;
+            if (value) behavior.End();
+            else behavior.Restart();
+        }
+        #endregion
+
+        #region imover
+
+        public bool ImpulseActive => _impulse != null && _impulse.IsActive;
 
         public bool CanMove
         {
             get => _canMove;
             set
             {
-                if (!agent.isOnNavMesh) return;
-                // to prevent errors caused by state switches during knockback
-                _canMove = value;
+                _canMove = value;                 // намерение запоминаем ВСЕГДА
+                if (ImpulseActive) return;        // во время импульса агентом рулит физика
+                if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
                 agent.isStopped = !value;
             }
         }
@@ -109,7 +158,18 @@ namespace Arcatech.Units
 
         public float ActualMovementVelocity => agent.velocity.magnitude;
         public bool IsGrounded => agent.isOnNavMesh;
+        public void ApplyImpulse(Vector3 impulse) => _impulse.ApplyImpulse(impulse);
+        public void ApplyImpulse(float impulseRelative)=>  _impulse.ApplyImpulse(impulseRelative);
 
+        public float SpeedMultiplier
+        {
+            get => _speedMultiplier;
+            set
+            {
+                if (Mathf.Approximately(_speedMultiplier, value)) return;
+                _speedMultiplier = value;
+            }
+        }
         public bool UseRootMotion
         {
             get => animator !=null && animator.applyRootMotion;
@@ -122,17 +182,19 @@ namespace Arcatech.Units
                 animator.applyRootMotion = value;
             }
         }
-
-        private IModifierAggregator _mods;
-
-        private void LateUpdate()
+        #endregion
+        
+        #region itier
+        public UnitTier GetTierInfo
         {
-            if (_mods != null)
+            get
             {
-                SpeedMultiplier = _mods.GetMultiplier(ModifierParam.MoveSpeed);
+                bool hasTier = behavior.GetVariable<UnitTier>("Tier", out var tierVar);
+                return hasTier ? tierVar.Value : UnitTier.Unassigned;
             }
         }
-
+        #endregion
+        
         #region save
 
         public string SavedItemID => entity.GetID;
@@ -145,6 +207,7 @@ namespace Arcatech.Units
             }
         }
 
+        
         public string Name => entity.GetName;
         public BaseGameEntityComponent  Entity => entity;
 
@@ -161,89 +224,6 @@ namespace Arcatech.Units
         }
 
         #endregion
-
-        private BlackboardVariable<float> m_NonCombatMSVar;
-        private BlackboardVariable<float> m_CombatMSVar;
-        
-        private float m_OriginalNonCombatMS;
-        private float m_OriginalCombatMS;
-        private bool m_IsInitialized = false;
-        
-        private float _speedMultiplier = 1f;
-        public float SpeedMultiplier
-        {
-            get => _speedMultiplier;
-            set
-            {
-                if (Mathf.Approximately(_speedMultiplier, value)) return;
-                _speedMultiplier = value;
-
-                // Если кто-то пытается применить дебафф раньше, чем отработал Start()
-                if (!m_IsInitialized)
-                {
-                    Initialize(); 
-                }
-                else
-                {
-                    ApplySpeedMultiplier();
-                }
-            }
-        }
-
-        public void ApplyImpulse(Vector3 impulse) => _impulse.ApplyImpulse(impulse);
-        public void ApplyImpulse(float impulseRelative)=>  _impulse.ApplyImpulse(impulseRelative);
-
-        private void Initialize()
-        {
-            if (m_IsInitialized) return;
-            animator = GetComponent<Animator>();
-            effectsReceiver.TryGetModifierAggregator(out _mods);
-            // BehaviorGraphAgent.GetVariable автоматически ищет во всей иерархии черных досок, 
-            // включая доп. ассеты (такие как EnemyData), подключенные к графу.
-            bool hasNonCombat = behavior.GetVariable<float>("NonCombatMS", out m_NonCombatMSVar);
-            bool hasCombat = behavior.GetVariable<float>("CombatMS", out m_CombatMSVar);
-
-            if (hasNonCombat && hasCombat)
-            {
-                // Кешируем стартовые значения из Blackboard на момент старта игры
-                m_OriginalNonCombatMS = m_NonCombatMSVar.Value;
-                m_OriginalCombatMS = m_CombatMSVar.Value;
-                m_IsInitialized = true;
-
-                // Сразу применяем множитель (на случай, если его изменили до вызова Start)
-                ApplySpeedMultiplier();
-            }
-            else
-            {
-                Debug.LogWarning($"[SpeedController] Переменные 'NonCombatMS' и 'CombatMS' не найдены в доске на {gameObject.name}. " +
-                                 $"Убедитесь, что граф инициализирован и доска подключена.");
-            }
-
-            _impulse = gameObject.GetOrAddComponent<ImpulseApplier>();
-        }
-        private void ApplySpeedMultiplier()
-        {
-            if (!m_IsInitialized) return;
-
-            // Расчет итоговой рабочей скорости по формуле: 
-            // $V_{current} = V_{original} \times SpeedMultiplier$
-            m_NonCombatMSVar.Value = m_OriginalNonCombatMS * _speedMultiplier;
-            m_CombatMSVar.Value = m_OriginalCombatMS * _speedMultiplier;
-        }
-
-        public UnitTier GetTierInfo
-        {
-            get
-            {
-                bool hasTier = behavior.GetVariable<UnitTier>("Tier", out var tierVar);
-                return hasTier ? tierVar.Value : UnitTier.Unassigned;
-            }
-        }
-    }
-
-    public interface ITierProvider
-    {
-        public UnitTier GetTierInfo { get; }
     }
 }
 

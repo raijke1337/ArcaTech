@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using Arcatech.Stats;
 using DG.Tweening;
+using KBCore.Refs;
+using SpankyBoy.JuiceUI.Free;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Arcatech.UI
 {
-    public class OverchargeUIMain : MonoBehaviour
+    [RequireComponent(typeof(PanelAnimator_Free))]
+    public class OverchargeUIMain : ValidatedMonoBehaviour
     {
+        [SerializeField,Self] private PanelAnimator_Free panelAnimator;
         [SerializeField] private Image fill;
         [SerializeField] private Image activatingFrame;
         [SerializeField] private TextMeshProUGUI text;
@@ -26,6 +30,7 @@ namespace Arcatech.UI
 
         private const int Segments = 12;
 
+        public PanelAnimator_Free Animator => panelAnimator;
         private TailsOverchargeModule overchargeModule;
 
         private OverchargeModuleState _previousState = OverchargeModuleState.Idle;

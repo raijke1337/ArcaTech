@@ -36,7 +36,8 @@ namespace Arcatech.Managers
         [SerializeField,Child] private ItemCardComponent inspectItemCard;
         [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
         [SerializeField] public Transform miniGame;
-        
+        [SerializeField] private bool showTooltip = true;
+        [SerializeField] private bool showDialogues = true;
 
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace Arcatech.Managers
         #region game dialogues and texts
         public void ShowDialoguePart(DialoguePart dialogue)
         {
-            if (!dialogue) return;
+            if (!dialogue || !showDialogues) return;
             _text.gameObject.SetActive(true);
             
             _text.ShowDialogue(dialogue);
@@ -72,12 +73,14 @@ namespace Arcatech.Managers
         
         public void NotifyTargetable(ITargetable targetable, bool show)
         {
+            if (!showTooltip) return;
             if (!floatingTooltip) return;
             if (!show)
             {
                 floatingTooltip.PanelAnimator.Hide();
                 return;
             }
+            floatingTooltip.gameObject.SetActive(true);
             floatingTooltip.Set(targetable);
             floatingTooltip.PanelAnimator.Show();
         }
@@ -136,7 +139,7 @@ namespace Arcatech.Managers
 
         public void ShowGlitchEffect()
         {
-            
+            // TODO!
         }
         #endregion
         

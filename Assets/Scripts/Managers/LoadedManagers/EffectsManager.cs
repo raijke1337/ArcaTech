@@ -9,140 +9,277 @@ namespace Arcatech.Managers
 {
     public class EffectsManager : GenericLazySingleton<EffectsManager>
     {
+        [Header("Pool")]
+        [SerializeField, Min(0)]
+        private int _defaultCapacity = 8;
+
+        [SerializeField, Min(1)]
+        private int _maxPoolSizePerEffect = 64;
+
+        [SerializeField]
+        private Transform _poolRoot;
+
+        private readonly Dictionary<int, EffectPool> _pools = new();
+
+        private EventBinding<ParticlesEvent> _particlesEventBinding;
+        private bool _isRegistered;
+
         protected void Awake()
         {
-            // Prewarm configured prefabs
-            for (int i = 0; i < prewarm.Count; i++)
+
+            if (_poolRoot == null)
             {
-                var entry = prewarm[i];
-                if (entry.prefab == null || entry.initial <= 0) continue;
-
-                if (!_particlesPools.ContainsKey(entry.prefab))
-                    _particlesPools[entry.prefab] = new Queue<PooledEffect>();
-
-                maxPerPrefab[entry.prefab] = entry.max > 0 ? entry.max : int.MaxValue;
-
-                for (int j = 0; j < entry.initial; j++)
-                {
-                    var ins = CreateInstance(entry.prefab);
-                }
+                var rootObject = new GameObject("[Pooled Effects]");
+                rootObject.transform.SetParent(transform);
+                _poolRoot = rootObject.transform;
             }
         }
 
-        #region particles
-
-        private EventBinding<ParticlesEvent> _placeParticleEventBind;
-
-        [Header("Optional prewarm")] public List<PrewarmEntry> prewarm = new List<PrewarmEntry>();
-
-        // Pools keyed by prefab asset
-        readonly Dictionary<CFXR_Effect, Queue<PooledEffect>>
-            _particlesPools = new();
-
-        // Optional caps
-        readonly Dictionary<CFXR_Effect, int> maxPerPrefab = new();
-
-
-        private void HandleEvent(ParticlesEvent request)
+        private void OnEnable()
         {
-            if (request.Effect == null) return; // lazy ass guard
-            Spawn(request.Effect, request.Place, Quaternion.identity, request.Parent);
-        }
-
-        private void Spawn(CFXR_Effect prefab, Vector3 position, Quaternion rotation, Transform parent = null)
-        {
-            if (prefab == null)
+            if (_isRegistered)
             {
-                Debug.LogWarning("[EffectsManager] Spawn called with null prefab.");
                 return;
             }
 
-            if (!_particlesPools.TryGetValue(prefab, out var pool))
+            _particlesEventBinding = new EventBinding<ParticlesEvent>(HandleEvent);
+            EventBus<ParticlesEvent>.Register(_particlesEventBinding);
+
+            _isRegistered = true;
+        }
+
+        private void OnDisable()
+        {
+            if (!_isRegistered)
             {
-                pool = new Queue<PooledEffect>();
-                _particlesPools[prefab] = pool;
+                return;
             }
 
-            PooledEffect inst = pool.Count > 0 ? pool.Dequeue() : CreateInstance(prefab);
-            // Parent and position
-            if (!inst) return;
-            // sometimes null - FIX
-            
-            var t = inst.transform;
-            if (parent != null && t.gameObject.activeInHierarchy)
+            EventBus<ParticlesEvent>.Deregister(_particlesEventBinding);
+
+            _isRegistered = false;
+        }
+
+        private void OnDestroy()
+        {
+            foreach (var pool in _pools.Values)
             {
-                t.SetParent(parent, false);
-                t.localPosition = Vector3.zero;
-                t.localRotation = Quaternion.identity;
+                pool.Dispose();
+            }
+
+            _pools.Clear();
+        }
+
+        private void HandleEvent(ParticlesEvent particlesEvent)
+        {
+            if (particlesEvent.Prefab == null)
+            {
+                Debug.LogWarning(
+                    $"{nameof(EffectsManager)} received {nameof(ParticlesEvent)} without a prefab.",
+                    this);
+
+                return;
+            }
+
+            var pool = GetOrCreatePool(particlesEvent.Prefab);
+            var effect = pool.Get();
+
+            PrepareEffect(effect, particlesEvent);
+        }
+
+        private EffectPool GetOrCreatePool(CFXR_Effect prefab)
+        {
+            int prefabId = prefab.GetInstanceID();
+
+            if (_pools.TryGetValue(prefabId, out var pool))
+            {
+                return pool;
+            }
+
+            pool = new EffectPool(
+                prefab,
+                _poolRoot,
+                _defaultCapacity,
+                _maxPoolSizePerEffect);
+
+            _pools.Add(prefabId, pool);
+
+            return pool;
+        }
+
+        private static void PrepareEffect(
+            CFXR_Effect effect,
+            in ParticlesEvent particlesEvent)
+        {
+            var effectTransform = effect.transform;
+            var particleSystem = effect.GetComponent<ParticleSystem>();
+            var lifetime = effect.GetComponent<PooledEffect>();
+
+            // На случай, если предыдущая жизнь эффекта завершалась вручную.
+            lifetime.Disarm();
+
+            particleSystem.Stop(
+                withChildren: true,
+                stopBehavior: ParticleSystemStopBehavior.StopEmittingAndClear);
+
+            particleSystem.Clear(withChildren: true);
+
+            effect.ResetState();
+
+            if (particlesEvent.IsLocalSpace)
+            {
+                effectTransform.SetParent(particlesEvent.Parent, worldPositionStays: false);
+                effectTransform.SetLocalPositionAndRotation(
+                    particlesEvent.Position,
+                    particlesEvent.Rotation);
             }
             else
             {
-                t.SetParent(transform, false);
+                // До активации эффект остаётся дочерним объектом пула,
+                // но его координаты задаются в мировом пространстве.
+                effectTransform.SetParent(null, worldPositionStays: false);
+                effectTransform.SetPositionAndRotation(
+                    particlesEvent.Position,
+                    particlesEvent.Rotation);
             }
 
-            t.SetPositionAndRotation(position, rotation); // if position is world-space
+            effect.gameObject.SetActive(true);
 
-            // Ensure clean state and play
-            inst.gameObject.SetActive(true);
-            inst.PrepareForPlay();
-            inst.PlayNow();
-
+            particleSystem.Play(withChildren: true);
+            lifetime.Arm();
         }
 
-    public void Return(PooledEffect inst)
+        internal void Release(CFXR_Effect effect)
         {
-            if (inst == null) return;
-
-           // inst.transform.SetParent(transform, false);
-            
-            // Clean up
-            inst.gameObject.SetActive(false);
-            var prefab = inst.prefabKey;
-            if (!_particlesPools.TryGetValue(prefab, out var pool))
+            if (effect == null)
             {
-                pool = new Queue<PooledEffect>();
-                _particlesPools[prefab] = pool;
-            }
-
-            // Optional: enforce max pool size per prefab
-            if (maxPerPrefab.TryGetValue(prefab, out int max) && pool.Count >= max)
-            {
-                Destroy(inst.gameObject);
                 return;
             }
 
-            pool.Enqueue(inst);
-        }
-        
-        
-        PooledEffect CreateInstance(CFXR_Effect prefab)
-        {
-            var go = Instantiate(prefab, transform);
-            go.name = $"{prefab.name} (Pooled)";
-            go.clearBehavior = CFXR_Effect.ClearBehavior.None;
-            var pooled = go.GetComponent<PooledEffect>();
-            if (pooled == null) pooled = go.gameObject.AddComponent<PooledEffect>();
+            var lifetime = effect.GetComponent<PooledEffect>();
+            lifetime.Disarm();
 
-            pooled.owner = this;
-            pooled.prefabKey = prefab;
-            go.gameObject.SetActive(false);
-            return pooled;
+            int prefabId = lifetime.PrefabInstanceId;
+
+            if (_pools.TryGetValue(prefabId, out var pool))
+            {
+                pool.Release(effect);
+            }
+            else
+            {
+                Destroy(effect.gameObject);
+            }
         }
 
-        #endregion
-        
-     
-        private void Start()
+        private sealed class EffectPool
         {
-            _placeParticleEventBind = new EventBinding<ParticlesEvent>(HandleEvent);
-            EventBus<ParticlesEvent>.Register(_placeParticleEventBind);
-        }
-        
-        private void OnDisable()
-        {
-            StopAllCoroutines();
-            EventBus<ParticlesEvent>.Deregister(_placeParticleEventBind);
-        }
+            private readonly CFXR_Effect _prefab;
+            private readonly Transform _poolRoot;
+            private readonly int _prefabInstanceId;
 
+            private readonly ObjectPool<CFXR_Effect> _pool;
+
+            public EffectPool(
+                CFXR_Effect prefab,
+                Transform poolRoot,
+                int defaultCapacity,
+                int maxPoolSize)
+            {
+                _prefab = prefab;
+                _poolRoot = poolRoot;
+                _prefabInstanceId = prefab.GetInstanceID();
+
+                _pool = new ObjectPool<CFXR_Effect>(
+                    createFunc: Create,
+                    actionOnGet: OnGet,
+                    actionOnRelease: OnRelease,
+                    actionOnDestroy: OnDestroy,
+                    collectionCheck: Application.isEditor,
+                    defaultCapacity: defaultCapacity,
+                    maxSize: maxPoolSize);
+            }
+
+            public CFXR_Effect Get()
+            {
+                return _pool.Get();
+            }
+
+            public void Release(CFXR_Effect effect)
+            {
+                _pool.Release(effect);
+            }
+
+            public void Dispose()
+            {
+                _pool.Dispose();
+            }
+
+            private CFXR_Effect Create()
+            {
+                var effect = Instantiate(_prefab, _poolRoot);
+                effect.gameObject.SetActive(false);
+
+                // Cartoon FX не должен самостоятельно выключать или уничтожать объект.
+                // Возвратом в пул управляет PooledCfxEffectLifetime.
+                effect.clearBehavior = CFXR_Effect.ClearBehavior.None;
+
+                var particleSystem = effect.GetComponent<ParticleSystem>();
+
+                // Unity вызовет OnParticleSystemStopped, когда root ParticleSystem завершится.
+                var main = particleSystem.main;
+                main.stopAction = ParticleSystemStopAction.Callback;
+
+                var lifetime = effect.GetComponent<PooledEffect>();
+
+                if (lifetime == null)
+                {
+                    lifetime = effect.gameObject.AddComponent<PooledEffect>();
+                }
+
+                lifetime.Initialize(
+                    EffectsManager.Instance,
+                    _prefabInstanceId,
+                    particleSystem);
+
+                return effect;
+            }
+
+            private static void OnGet(CFXR_Effect effect)
+            {
+                // Подготовка выполняется в EffectsManager.PrepareEffect.
+            }
+
+            private void OnRelease(CFXR_Effect effect)
+            {
+                if (effect == null)
+                {
+                    return;
+                }
+
+                var lifetime = effect.GetComponent<PooledEffect>();
+                lifetime.Disarm();
+
+                var particleSystem = effect.GetComponent<ParticleSystem>();
+
+                particleSystem.Stop(
+                    withChildren: true,
+                    stopBehavior: ParticleSystemStopBehavior.StopEmittingAndClear);
+
+                particleSystem.Clear(withChildren: true);
+
+                effect.ResetState();
+
+                effect.transform.SetParent(_poolRoot, worldPositionStays: false);
+                effect.gameObject.SetActive(false);
+            }
+
+            private static void OnDestroy(CFXR_Effect effect)
+            {
+                if (effect != null)
+                {
+                    Destroy(effect.gameObject);
+                }
+            }
+        }
     }
 }

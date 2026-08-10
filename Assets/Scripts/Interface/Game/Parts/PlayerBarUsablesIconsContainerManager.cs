@@ -1,29 +1,13 @@
 using System.Collections.Generic;
+using System.Linq;
+using KBCore.Refs;
+using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
 
 namespace Arcatech.UI
 {
-    public static class UIReferences
-    {
-        public static readonly IReadOnlyDictionary<UnitActionType, string> Hotkeys =
-            new Dictionary<UnitActionType, string>
-            {
-                { UnitActionType.None, string.Empty },
-
-                { UnitActionType.Melee, "LMB" },
-                { UnitActionType.MeleeSkill, "Q" },
-
-                { UnitActionType.Ranged, "RMB" },
-                { UnitActionType.RangedSkill, "E" },
-
-                { UnitActionType.ShieldSkill, "R" },
-                { UnitActionType.DodgeSkill, "SHIFT" },
-                { UnitActionType.Jump, "SPACE" },
-                { UnitActionType.Use, "H" }
-            };
-    }
-
-    public class PlayerBarUsablesIconsContainerManager : MonoBehaviour
+    [RequireComponent(typeof(PanelAnimator_Free))]
+    public class PlayerBarUsablesIconsContainerManager : ValidatedMonoBehaviour
     {
         [Header("References")]
         [SerializeField]
@@ -31,20 +15,20 @@ namespace Arcatech.UI
 
         [SerializeField]
         private Transform usablesParent;
+        
+        [SerializeField,Child] private PanelAnimator_Free panelAnimator;
+        public PanelAnimator_Free Animator => panelAnimator;
 
         private readonly Dictionary<UnitActionType, IconContainerUIScript> usablesIcons =
             new Dictionary<UnitActionType, IconContainerUIScript>();
 
         public void LoadIcons(Dictionary<UnitActionType, IUsable> usables)
         {
-            
             if (usables == null)
             {
                 HideAllIcons();
                 return;
             }
-
-                
             /*
              * Скрываем иконки, для которых больше нет действия
              * в текущем наборе экипировки / инвентаря.
@@ -66,6 +50,8 @@ namespace Arcatech.UI
 
             foreach (var usablePair in usables)
             {
+                if (!UIReferences.ShownUsableTypes.Contains(usablePair.Key)) continue;
+                
                 UnitActionType actionType = usablePair.Key;
                 IUsable usable = usablePair.Value;
 
@@ -93,7 +79,8 @@ namespace Arcatech.UI
                     .WithHotkey(GetHotkey(actionType));
 
 
-                icon.transform.SetSiblingIndex(iconIndex);
+                //icon.transform.SetSiblingIndex(iconIndex);
+                icon.transform.SetAsLastSibling();
                 iconIndex++;
             }
         }
@@ -117,6 +104,7 @@ namespace Arcatech.UI
             }
 
             IconContainerUIScript newIcon = Instantiate(iconPrefab, usablesParent);
+
 
             newIcon.name = $"Usable Icon [{actionType}]";
 

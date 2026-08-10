@@ -1,50 +1,83 @@
 using Arcatech.EventBus;
+using Arcatech.SaveSystem;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Cinemachine;
 
 namespace Arcatech.Units.Control
 {
-
     [RequireComponent(typeof(PlayerAimingComponent))]
     public class PlayerUnitInputsComponent : UnitInputsComponent
     {
-        [Space, Header("Required components")] [SerializeField, Anywhere]
-        PlayerInputReaderObject _playerInputReader;
+        [Space, Header("Required components")] 
+        [SerializeField, Anywhere]
+        private PlayerInputReaderObject playerInputReader;
 
-        private IMove mover;
+        private IMove _mover;
+        private readonly IsoCamAdjust _adj = new IsoCamAdjust();
+
+        private bool _inCameraBlend = false;
         
         protected override void ControllerStartBindings(bool enabling)
         {
-            _adj ??= new IsoCamAdjust();
-
             if (enabling)
             {
-                mover = GetComponent<IMove>();
-                _playerInputReader.PausePressed += OnPause;
-                _playerInputReader.CombatAction += OnValidatedStateMachineAction;
+                _mover = GetComponent<IMove>();
+                playerInputReader.PausePressed += OnPause;
+                playerInputReader.CombatAction += OnValidatedStateMachineAction;
+                
+                // Подписываемся на событие обновления активной камеры Cinemachine
+                // CameraActivatedEvent вызывается ТОЛЬКО когда Brain переключает виртуальную камеру
+               
+                CinemachineCore.BlendCreatedEvent.AddListener(OnCameraBlendStarted);
+                CinemachineCore.BlendFinishedEvent.AddListener(OnCameraBlendCompleted);
+                
+                // Форсируем первичный расчет, чтобы не ждать первого переключения
+                _adj.UpdateBasis();
+                
             }
             else
             {
-                _playerInputReader.PausePressed -= OnPause;
-                _playerInputReader.CombatAction -= OnValidatedStateMachineAction;
+                playerInputReader.PausePressed -= OnPause;
+                playerInputReader.CombatAction -= OnValidatedStateMachineAction;
+                
+                // ОБЯЗАТЕЛЬНО отписываемся от статического события!
+                CinemachineCore.BlendCreatedEvent.RemoveListener(OnCameraBlendStarted);
+                CinemachineCore.BlendFinishedEvent.RemoveListener(OnCameraBlendCompleted);
             }
 
             base.ControllerStartBindings(enabling);
         }
 
+        private void OnCameraBlendStarted(CinemachineCore.BlendEventParams arg0)
+        {
+            _inCameraBlend = true;
+            InputMovement = Vector3.zero;
+            if (_mover != null)
+                _mover.MovementVector = InputMovement;
+        }
+
+        private void OnCameraBlendCompleted(ICinemachineMixer m, ICinemachineCamera c)
+        {
+            _inCameraBlend = false;
+            _adj.UpdateBasis();
+        }
+
         private void OnValidatedStateMachineAction(InputAction.CallbackContext ctx, UnitActionType type)
         {
+            if (_inCameraBlend) return;
             if (type == UnitActionType.Movement)
             {
                 UpdateCachedInputVector(ctx);
-                if (mover.ActualMovementVelocity<= 0.1f) // some magic number. create a new movement input command
-                                                         // only if the player is not actually moving already
-                RequestCombatAction(type);
+                
+                if (_mover != null && _mover.ActualMovementVelocity <= 0.1f) 
+                    RequestCombatAction(type);
             }
             else 
             {
-                if (ctx.performed) RequestCombatAction(type);
+                if (ctx.performed) 
+                    RequestCombatAction(type);
             }
         }
 
@@ -56,58 +89,57 @@ namespace Arcatech.Units.Control
 
         private void Update()
         {
-            if (mover != null) 
-                mover.MovementVector = InputMovement;
-            // to fix the issue with movement not continuing after using attacks or jump
+            if (_inCameraBlend) return;
+            if (_mover != null) 
+                _mover.MovementVector = InputMovement;
         }
 
         private void UpdateCachedInputVector(InputAction.CallbackContext arg0)
         {
-            Vector3 direction = Vector3.forward;
             switch (arg0.phase)
             {
                 case InputActionPhase.Performed:
-                    var x =arg0.ReadValue<Vector2>().x;
-                    var z =arg0.ReadValue<Vector2>().y;
-                    direction.x = x;
-                    direction.z = z;
-                    InputMovement = RotateInput(direction);
-
+                    Vector2 rawInput = arg0.ReadValue<Vector2>();
+                    Vector3 localDirection = new Vector3(rawInput.x, 0f, rawInput.y);
+                    
+                    // RotateInput теперь просто использует закэшированные значения — без пересчетов!
+                    InputMovement = RotateInput(localDirection);
                     break;
+                    
                 default:
                     InputMovement = Vector3.zero;
                     break;
             }
-            mover.MovementVector = InputMovement;
+
+            if (_mover != null)
+                _mover.MovementVector = InputMovement;
         }
         
-        private IsoCamAdjust _adj;
         private Vector3 RotateInput(Vector3 input)
         {
-            var AD = _adj.Isoright * input.x;
-            var WS = _adj.Isoforward * input.z;
-            
-            return AD + WS;
+            // Больше никаких вызовов UpdateBasis() здесь — используем закэшированный базис
+            var move = (_adj.Isoright * input.x) + (_adj.Isoforward * input.z);
+            return move.sqrMagnitude > 0.0001f ? Vector3.Normalize(move) : Vector3.zero;
         }
 
         internal class IsoCamAdjust
         {
+            public Vector3 Isoforward { get; private set; } = Vector3.forward;
+            public Vector3 Isoright { get; private set; } = Vector3.right;
 
-            public Vector3 Isoforward;
-            public Vector3 Isoright;
-
-            private void AdjustDirections()
+            public void UpdateBasis()
             {
-                if (Camera.main == null) return; // main menu
-                Isoforward = Camera.main.transform.forward;
-                Isoforward.y = 0;
-                Isoforward = Vector3.Normalize(Isoforward);
-                Isoright = Quaternion.Euler(new Vector3(0, 90, 0)) * Isoforward;
-            }
+                if (Camera.main == null) 
+                    return; 
 
-            public IsoCamAdjust()
-            {
-                AdjustDirections();
+                Vector3 camForward = Camera.main.transform.forward;
+                Vector3 flatForward = new Vector3(camForward.x, 0f, camForward.z);
+                
+                if (flatForward.sqrMagnitude < 0.0001f)
+                    return;
+
+                Isoforward = flatForward.normalized;
+                Isoright = Vector3.Cross(Vector3.up, Isoforward).normalized;
             }
         }
     }

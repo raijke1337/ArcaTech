@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: TAILS
+  uniqueId: Tails
 --- !u!114 &3413998453285093005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,7 +374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.PlayerUnitInputsComponent
   stateMachine: {fileID: 5228831593658462585}
-  _playerInputReader: {fileID: 11400000, guid: c5f0d6e24b96f5143956c9299b3ee2b4, type: 2}
+  playerInputReader: {fileID: 11400000, guid: c5f0d6e24b96f5143956c9299b3ee2b4, type: 2}
 --- !u!114 &8074146902712792649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,6 +409,7 @@ MonoBehaviour:
   startingConfig: {fileID: 11400000, guid: e2b47cfeff3595443b82c62e8e54f55e, type: 2}
   preserveCurrentRatioOnMaxChange: 1
   entity: {fileID: 3413998453285093005}
+  killAt0Hp: 0
 --- !u!114 &2594953831469317237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -450,7 +451,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.EntityInventoryComponent
   baseGameEntity: {fileID: 3413998453285093005}
-  defaultEquips: {fileID: 11400000, guid: bad0242a05b2c7341ac8632ca43b47da, type: 2}
+  defaultEquips: {fileID: 11400000, guid: fb4ced8f96949854faf12cb4afa34649, type: 2}
   useSaveSystem: 0
 --- !u!114 &4056496551489463538
 MonoBehaviour:
@@ -637,14 +638,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.TailsOverchargeModule
   statsComponent: {fileID: 8341150968193856820}
+  entity: {fileID: 3413998453285093005}
+  overchargeBuffDuration: 5
   overChargeEnter: {fileID: 11400000, guid: 38b329a79d7265f46885a664eb31e2f8, type: 2}
   energySpendEffects:
   - {fileID: 11400000, guid: bdf1f81820d2274488cdf006e91024bf, type: 2}
   overchargeLevelThreshold: 45
   overchargeSpendFraction: 0.583
   overchargeTimeWindow: 10
-  entity: {fileID: 3413998453285093005}
-  ShowingDebugs: 0
+  showDebugLogs: 0
 --- !u!114 &1788432916849468796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -672,7 +674,7 @@ GameObject:
   - component: {fileID: 6944565704269025568}
   - component: {fileID: 7971591224842378761}
   - component: {fileID: 3835125167219550012}
-  m_Layer: 6
+  m_Layer: 2
   m_Name: FixedHitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -999,12 +1001,12 @@ PrefabInstance:
     - target: {fileID: 8939147010546790495, guid: 27fa6cfd459e24c46b902cad5ccb92db,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].normalizedDistanceFromRoot
-      value: 0.34420052
+      value: 0.34420013
       objectReference: {fileID: 0}
     - target: {fileID: 8939147010546790495, guid: 27fa6cfd459e24c46b902cad5ccb92db,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[3].normalizedDistanceFromRoot
-      value: 0.7499043
+      value: 0.7499039
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1213,7 +1215,7 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].normalizedDistanceFromRoot
-      value: 0.12616481
+      value: 0.12616459
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1422,7 +1424,7 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].normalizedDistanceFromRoot
-      value: 0.10351244
+      value: 0.1035126
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3659,7 +3661,7 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].normalizedDistanceFromRoot
-      value: 0.1250952
+      value: 0.12509541
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

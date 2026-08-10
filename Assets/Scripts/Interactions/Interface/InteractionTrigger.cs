@@ -33,19 +33,19 @@ namespace Arcatech.Interactions
         {
             _startTime = Time.time;
             if (expirationTime > 0) _expireAt =  _startTime + expirationTime;
-            triggerTrackerComponent.RegisterReceiver(this);
+            triggerTrackerComponent?.RegisterReceiver(this);
         }
 
         protected virtual void OnDisable()
         {
-            triggerTrackerComponent.UnregisterReceiver(this);
+            triggerTrackerComponent?.UnregisterReceiver(this);
         }
 
         private void Update()
         {
             if (expirationTime > 0 && Time.time > _expireAt)
             {
-                triggerTrackerComponent.Active = false;
+                if (triggerTrackerComponent) triggerTrackerComponent.Active = false;
                 if (destroyAfterExpiry)
                     gameObject.SetActive(false);
             }

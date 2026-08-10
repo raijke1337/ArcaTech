@@ -12,6 +12,7 @@ namespace Arcatech.SaveSystem
     {
 
         [SerializeField] private bool showDebugs = false;
+        [SerializeField] private bool useSaveSystem = false;
         private string _currentLevelID;
         
         [SerializeField] private LevelProgressData _currentProgress;
@@ -27,6 +28,7 @@ namespace Arcatech.SaveSystem
             _currentLevelID = SceneManager.GetActiveScene().name;
             ReadLevel();
             
+            if (!useSaveSystem) return;
             var save = SaveManager.Instance.GetGameData;
             var record = save.levelRecords.FirstOrDefault(t => t.levelID == _currentLevelID);
             if (record!= null)
@@ -58,12 +60,15 @@ namespace Arcatech.SaveSystem
 
         private void OnDisable()
         {
-            _trackedItems.Clear();
+ 
             _player.AnnounceDead.RemoveListener(OnPlayerAnnounceDead);
+            if (!useSaveSystem) return;
+            _trackedItems.Clear();
         }
 
         private void ReadLevel()
         {
+            
             _player =  FindObjectsByType<BaseGameEntityComponent>(FindObjectsSortMode.None).First(t=>t.CompareTag("Player"));
             if (_player != null)
             {
@@ -73,6 +78,7 @@ namespace Arcatech.SaveSystem
             {
                 if (showDebugs) Debug.Log("No player found");
             }
+            if (!useSaveSystem) return;
             _trackedItems = new List<ISavedProgressItem>(FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ISavedProgressItem>().ToArray());
             foreach (var item in _trackedItems)
             {
@@ -83,6 +89,8 @@ namespace Arcatech.SaveSystem
 
         private void WriteLevel()
         {
+            
+            if (!useSaveSystem) return;
             foreach (var item in _trackedItems)
             {
                 if (_checkpointProgress.ProgressItemStates.TryGetValue(item.SavedItemID, out var completed))
@@ -100,6 +108,8 @@ namespace Arcatech.SaveSystem
 
         public void OnCheckPointReached(CheckpointTrigger trigger)
         {
+            
+            if (!useSaveSystem) return;
             if (showDebugs) Debug.Log($"Checkpoint found! {trigger.name}");
             _checkpointProgress = new LevelProgressData(_currentProgress)
             {
@@ -113,6 +123,7 @@ namespace Arcatech.SaveSystem
         public void SavedItemAnnounce(ISavedProgressItem item) => RecordItem(item);
         private void RecordItem(ISavedProgressItem item)
         {
+            if (!useSaveSystem) return;
             if (showDebugs)  Debug.Log($"Recording item state {item.ReadItemState} for {item.SavedItemID}");
             _currentProgress.ProgressItemStates[item.SavedItemID] = item.ReadItemState;
         }
@@ -120,13 +131,16 @@ namespace Arcatech.SaveSystem
         private void OnPlayerAnnounceDead(BaseGameEntityComponent arg0)
         {
             if (arg0.EntityAlive) return;
-            _currentProgress = new LevelProgressData(_checkpointProgress);
-            SaveManager.Instance.UpdateData(_checkpointProgress);
             GameInterfaceManager.Instance.ShowPlayerDeadMenu();
+            if (!useSaveSystem) return;
+            _currentProgress = new LevelProgressData(_checkpointProgress);
+
+            SaveManager.Instance.UpdateData(_checkpointProgress);
         }
         
         public void OnSaveData()
         {
+            if (!useSaveSystem) return;
             SaveManager.Instance.UpdateData(_checkpointProgress);
             EditorApplication.ExitPlaymode();
         }

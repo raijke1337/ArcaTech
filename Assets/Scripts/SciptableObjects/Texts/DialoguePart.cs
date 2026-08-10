@@ -4,7 +4,7 @@ using Random = UnityEngine.Random;
 
 namespace Arcatech.Texts
 {
-    [CreateAssetMenu(fileName = "New Dialogue part part", menuName = "Game/Dialogues/Dialogue")]
+    [CreateAssetMenu(fileName = "dialoguePart_", menuName = "Game/Dialogues/Dialogue part")]
     public class DialoguePart : ScriptableObject
     {
         public bool IsForcedDialogue = false;

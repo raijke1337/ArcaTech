@@ -117,10 +117,11 @@ namespace Arcatech.Units
                 if (un != null)
                 {
                     // something was dropped
-                    var box = un.PackItem;
-                    box.transform.position = transform.position + transform.forward;
-                    box.gameObject.SetActive(true);
-                    Destroy(un.DisplayItem.gameObject);
+                    
+                    // var box = un.PackItem;
+                    // box.transform.position = transform.position + transform.forward;
+                    // box.gameObject.SetActive(true);
+                    // Destroy(un.DisplayItem.gameObject);
                 }
             }
             else

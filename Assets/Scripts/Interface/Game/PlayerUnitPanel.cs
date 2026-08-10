@@ -1,16 +1,13 @@
+using System.Linq;
 using Arcatech.Items;
 using Arcatech.Managers;
 using Arcatech.Stats;
 using ArcaTech.UI;
 using Arcatech.Units;
-using DG.Tweening;
 using KBCore.Refs;
 using SpankyBoy.JuiceUI.Free;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering;
-using UnityEngine.UI;
 
 namespace Arcatech.UI
 {
@@ -20,13 +17,13 @@ namespace Arcatech.UI
         [SerializeField, Child] protected BarsContainersManager barsManager;
         [SerializeField, Child] protected OverchargeUIMain overcharge;
         [SerializeField,Self] PanelAnimator_Free panelAnimator;
-        [Space, SerializeField, Range(0,int.MaxValue)] private int bigDamageThreshold = 25;
+        [Space, SerializeField, Range(0,200)] private int bigDamageThreshold = 25;
         /// <summary>
         /// not called in this component
         /// </summary>
         public event UnityAction ViewChangedInventory;
-
         BaseGameEntityComponent _player;
+        private EntityStatsComponent st;
         UsablesCasterComponent _usablesCasterComponent;
         TailsOverchargeModule _tailsOverchargeModule;
         public void Show() => panelAnimator.Show();
@@ -37,7 +34,7 @@ namespace Arcatech.UI
             _player = GameObject.FindWithTag("Player").GetComponent<BaseGameEntityComponent>();
             if (_player != null)
             {
-                var st = _player.GetComponent<EntityStatsComponent>();
+                st = _player.GetComponent<EntityStatsComponent>();
                 if (st != null)
                 {
                     st.RegisterStatsViewer(barsManager);
@@ -46,58 +43,83 @@ namespace Arcatech.UI
                 else
                 {
                     Debug.LogWarning("Player has no stats component, disabling");
-                    gameObject.SetActive(false);
+                    panelAnimator.Hide();
                 }
 
                 var inv = _player.GetComponent<EntityInventoryComponent>();
                 if (inv != null)
                 {
                     inv.SetModelView(this);
-
                 }
                 else
                 {
                     Debug.LogWarning("Player has no inventory component");
                 }
-                _usablesCasterComponent = _player.GetComponent<UsablesCasterComponent>();
-                if (_usablesCasterComponent != null)
-                {
-                    usablesIcons.LoadIcons(_usablesCasterComponent.GetUsables);
-                }
-                else
-                {
-                    Debug.LogWarning("Player has no usablesCaster component");
-                }
-                _tailsOverchargeModule = _player.GetComponent<TailsOverchargeModule>();
-                if (_tailsOverchargeModule != null && barsManager.TryGetResourceBar(ResourceStatType.Energy, out var b))
-                {
-                    overcharge.SetDataSource(_tailsOverchargeModule);
-                }
-                else
-                {
-                    Debug.LogWarning("Failed to setup overcharge plugin");
-                }
-                
+                SetupUsables();
+                SetupOvercharge();
                 
                 var inputs = _player.GetComponent<UnitInputsComponent>();
-                inputs.RegisterCommandHandler(this);
+                inputs?.RegisterCommandHandler(this);
             }
             else
             {
                 Debug.LogWarning("No player in scene but player info panel is active, disabling");
-                gameObject.SetActive(false);
+                panelAnimator.Hide();
             }
         }
 
 
+        void SetupUsables()
+        {
+            _usablesCasterComponent ??= _player.GetComponent<UsablesCasterComponent>();
+    
+            if (_usablesCasterComponent != null)
+            {
+                if (_usablesCasterComponent.GetUsables.Keys.
+                    Intersect(UIReferences.ShownUsableTypes).
+                    Any())
+                {
+                    usablesIcons.gameObject.SetActive(true);
+                    usablesIcons.LoadIcons(_usablesCasterComponent.GetUsables);
+                    usablesIcons.Animator.Show();
+                    return;
+                }
+            }
+    
+            // Используем условие для предотвращения повторного вызова Hide
+            if (usablesIcons.gameObject.activeSelf)
+            {
+                usablesIcons.Animator.Hide();
+            }
+        }
 
+        void SetupOvercharge()
+        {
+            _tailsOverchargeModule ??= _player.GetComponent<TailsOverchargeModule>();
+    
+            if (_tailsOverchargeModule != null && 
+                barsManager.TryGetResourceBar(ResourceStatType.Energy, out var b) &&
+                st.TryGetMax(ResourceStatType.Energy, out var v) &&
+                v > 0)
+            {
+                overcharge.gameObject.SetActive(true);
+                overcharge.SetDataSource(_tailsOverchargeModule);
+                overcharge.Animator.Show();
+            }
+            else
+            {
+                if (overcharge.gameObject.activeSelf)
+                {
+                    overcharge.Animator.Hide();
+                }
+            }
+        }
         #region interface
 
         public void RefreshView(UnitInventoryModel model)
         {
-            // reload icons in case items have changed
-            if (!_usablesCasterComponent) return;
-            usablesIcons.LoadIcons(_usablesCasterComponent.GetUsables);
+            SetupUsables();
+            SetupOvercharge();
         }
         public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
             BaseGameEntityComponent source)
@@ -109,6 +131,10 @@ namespace Arcatech.UI
                 {
                     GlitchController.Instance.TriggerGlitch();
                 }
+                else
+                {
+                    GlitchController.Instance.TriggerGlitch(0.2f,0.3f);
+                }
             }
         }
 
@@ -119,7 +145,9 @@ namespace Arcatech.UI
         #endregion
 
         public void PrepareCommand(UnitActionType type)
-        { }
+        {// noop
+            
+        }
 
         public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
         {

@@ -24,14 +24,14 @@ namespace Arcatech.Items
         public virtual float FillValue => 0;
         public virtual string StringInfo => string.Empty;
 
-        public ItemPickUpEffect PackItem
-        {
-            get
-            {
-                var box = GameObject.Instantiate(Config.worldItemContainerPrefab);
-                box.PutItem(Config);
-                return box;
-            }
-        }
+        // public ItemPickUpEffect PackItem
+        // {
+        //     get
+        //     {
+        //         var box = GameObject.Instantiate(Config.worldItemContainerPrefab);
+        //         box.PutItem(Config);
+        //         return box;
+        //     }
+        // }
     }
 }

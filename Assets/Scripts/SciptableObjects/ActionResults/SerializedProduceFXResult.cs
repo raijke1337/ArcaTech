@@ -10,11 +10,11 @@ namespace Arcatech.Actions
     [CreateAssetMenu(fileName = "New instantiate particles result ", menuName = "Actions/Action Result/Produce particle effects")]
     public class SerializedProduceFXResult : SerializedActionResult
     {
-        [SerializeField] CFXR_Effect Effects;
-        [SerializeField] bool ParentParticles;
+        [SerializeField] CFXR_Effect effects;
+        [SerializeField] bool parentParticles;
         public override ActionResult Deserialize()
         {
-            return new ProduceFXResult(Effects, ParentParticles);
+            return new ProduceFXResult(effects, parentParticles);
         }
         
         public override string ToString()
@@ -25,20 +25,21 @@ namespace Arcatech.Actions
 
     public class ProduceFXResult : ActionResult
     {
-        ParticlesEvent _event;
-        private bool _p;
-        public ProduceFXResult(CFXR_Effect effs, bool p)
+        private CFXR_Effect effect;
+        private bool isParented;
+        public ProduceFXResult(CFXR_Effect effs, bool isParented)
         {
-            _event = new ParticlesEvent(effs);
-            _p = p;
+            this.isParented = isParented;
+            effect = effs;
         }
 
         public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
             Quaternion placeRot)
         {
-            if (_p && !_event.Parent) _event.Parent = user.EffectSpawn.transform;
-            _event.Place = place;
-            EventBus<ParticlesEvent>.Raise(_event);
+            ParticlesEvent e;
+            if (isParented) e = new ParticlesEvent(effect, user.EffectSpawn);
+            else e = new ParticlesEvent(effect,place,placeRot);
+            EventBus<ParticlesEvent>.Raise(e);
             return true;
         }
     }
