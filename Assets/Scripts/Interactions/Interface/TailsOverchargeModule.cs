@@ -3,6 +3,7 @@ using Arcatech.Actions;
 using Arcatech.Items;
 using Arcatech.UI;
 using Arcatech.Units;
+using Arcatech.Units.Control;
 using com.cyborgAssets.inspectorButtonPro;
 using KBCore.Refs;
 using UnityEngine;
@@ -122,14 +123,14 @@ namespace Arcatech.Stats
 
         #region Energy Tracking
 
-        public void PrepareCommand(UnitActionType type)
+        public void PrepareCommand(UnitCommand command)
         {
             if (!enabled) return;
 
             _pendingShortBuff = false;
             _pendingOverchargeTrigger = false;
 
-            LogDebug($"PrepareCommand: type={type}");
+            LogDebug($"PrepareCommand: type={command}");
         }
 
         public void HandleStatsUpdate(ResourceStatType stat, float current, float max, float delta,
@@ -227,11 +228,11 @@ namespace Arcatech.Stats
 
         #region Command Execution
 
-        public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
+        public void DoUnitCommand(UnitCommand command, bool wasSuccessful)
         {
             if (!enabled) return;
 
-            LogDebug($"DoUnitCommand: type={type}, success={wasSuccessful}, pendingBuff={_pendingShortBuff}, pendingOvercharge={_pendingOverchargeTrigger}");
+            LogDebug($"DoUnitCommand: type={command}, success={wasSuccessful}, pendingBuff={_pendingShortBuff}, pendingOvercharge={_pendingOverchargeTrigger}");
 
             // Короткий бафф применяется сразу при успешном запуске
             if (wasSuccessful && _pendingShortBuff)

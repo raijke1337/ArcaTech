@@ -5,116 +5,118 @@ using Arcatech.Units;
 using Arcatech.Units.Control;
 using KBCore.Refs;
 using UnityEngine;
+
 namespace Arcatech
 {
-    
-    /// <summary>
-    /// class that handles inputs from Behavior tree or player commands
-    /// </summary>
-    [RequireComponent (typeof(EntityStateMachineComponent),typeof(InteractionComponent),typeof(LocomotionStateInjector))]
-    public class UnitInputsComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent
+    [RequireComponent(
+        typeof(EntityStateMachineComponent),
+        typeof(InteractionComponent),
+        typeof(LocomotionStateInjector))]
+    public class UnitInputsComponent :
+        ValidatedMonoBehaviour,
+        IPausableComponent,
+        IKillableComponent
     {
-        private List <IUnitCommandValidator> _commandValidators;
-        [SerializeField,Self] EntityStateMachineComponent stateMachine;
-        private List<IUnitCommandPerformer> _commandPerformers;
-        private bool _killed = false;
+        [SerializeField, Self]
+        private EntityStateMachineComponent stateMachine;
+
+        private readonly List<IUnitCommandValidator> _commandValidators = new();
+        private readonly List<IUnitCommandPerformer> _commandPerformers = new();
+
+        private bool _killed;
+
+        public Vector3 InputMovement { get; protected set; }
+
+        public bool Paused { get; set; }
 
         public bool RequestCombatAction(UnitActionType type)
         {
-            if (Paused) return false;
-            if (_killed) return false;
-            
-            if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] At {Time.time} Request {type} (validators: {_commandValidators.Count})");
-            foreach (var v in _commandValidators)
+            return RequestCombatAction(new UnitCommand(type));
+        }
+
+        public bool RequestCombatAction(UnitCommand command)
+        {
+            if (Paused)
+                return false;
+
+            if (_killed)
+                return false;
+
+            foreach (IUnitCommandValidator validator in _commandValidators)
             {
-                if (!v.CanDoUnitCommand(type, out string info))
+                if (!validator.CanDoUnitCommand(
+                        command,
+                        out string info))
                 {
-                    if (stateMachine.verboseDebugs && stateMachine.GetMainEntity.ShowingDebugs) Debug.Log($"[Input] Command fail {type} in {v}.{info} at {Time.time}.");
-                    foreach (var p in _commandPerformers)
+                    foreach (IUnitCommandPerformer performer in _commandPerformers)
                     {
-                        p.DoUnitCommand(type, false);
+                        performer.DoUnitCommand(command, false);
                     }
-                    // this should be in state machine but I think this bandaid is fine enough for now
+
                     return false;
                 }
             }
-            var ok = stateMachine.TryCommandTransition(type,_commandPerformers);
-            if (stateMachine.GetMainEntity.ShowingDebugs)
-            {
-                Debug.Log($"[Inputs] Command: {type}, state machine response: {(ok? "OK" : stateMachine.LastCommandRejectReason)}");
-            }
-            return ok;
+
+            bool accepted = stateMachine.TryCommandTransition(
+                command,
+                _commandPerformers);
+
+            return accepted;
         }
 
-        public bool CanPerformCombatAction(UnitActionType type, out string info)
+        public bool CanPerformCombatAction(
+            UnitCommand type,
+            out string info)
         {
             info = "OK";
-            foreach (var v in _commandValidators)
+
+            foreach (IUnitCommandValidator validator in _commandValidators)
             {
-                if (!v.CanDoUnitCommand(type, out info)) return false; 
-                info = "OK";
+                if (!validator.CanDoUnitCommand(type, out info))
+                    return false;
             }
-            
+
             return true;
         }
-        
-        public Vector3 InputMovement { get; protected set; }
-        private void OnEnable() => ControllerStartBindings(true);  
-        private void OnDisable() => ControllerStartBindings(false);
 
-        protected virtual void ControllerStartBindings(bool enabling)
-        {
-            if (enabling)
-            {
-                _commandPerformers ??= new();
-                _commandPerformers.AddRange(GetComponents<IUnitCommandPerformer>());
-                if (_commandPerformers.Count == 0)
-                {
-                    Debug.Log($"No unit command handlers found");
-                }
-                _commandValidators ??= new();
-                _commandValidators.AddRange(GetComponents<IUnitCommandValidator>());
-                if (_commandValidators.Count == 0)
-                {
-                    Debug.Log("No unit command validators found");
-                }
-            }
-            else
-            {
-                _commandPerformers.Clear();
-                _commandValidators.Clear();
-            }
-        }
-
-        public void RegisterCommandValidator(IUnitCommandValidator validator)
-        {
-            _commandValidators ??= new();
-            if (!_commandValidators.Contains(validator)) _commandValidators.Add(validator);
-        }
-
-        public void UnregisterCommandValidator(IUnitCommandValidator validator)
-        {
-            if (_commandValidators.Contains(validator)) _commandValidators.Remove(validator);
-        }
-
-        public void RegisterCommandHandler(IUnitCommandPerformer performer)
-        {
-            _commandPerformers ??= new();
-            if (!_commandPerformers.Contains(performer)) _commandPerformers.Add(performer);
-        }
-
-        public void UnregisterCommandHandler(IUnitCommandPerformer performer)
-        {
-            if (_commandPerformers.Contains(performer)) _commandPerformers.Remove(performer);
-        }
-
-
-        public void SetKilled(IKillerComponent comp, bool value)
+        public void SetKilled(IKillerComponent component, bool value)
         {
             _killed = value;
         }
 
-        public bool Paused { get; set; } = false;
+        protected virtual void Awake()
+        {
+            _commandPerformers.AddRange(
+                GetComponents<IUnitCommandPerformer>());
 
+            _commandValidators.AddRange(
+                GetComponents<IUnitCommandValidator>());
+        }
+
+        public void RegisterCommandValidator(
+            IUnitCommandValidator validator)
+        {
+            if (!_commandValidators.Contains(validator))
+                _commandValidators.Add(validator);
+        }
+
+        public void UnregisterCommandValidator(
+            IUnitCommandValidator validator)
+        {
+            _commandValidators.Remove(validator);
+        }
+
+        public void RegisterCommandHandler(
+            IUnitCommandPerformer performer)
+        {
+            if (!_commandPerformers.Contains(performer))
+                _commandPerformers.Add(performer);
+        }
+
+        public void UnregisterCommandHandler(
+            IUnitCommandPerformer performer)
+        {
+            _commandPerformers.Remove(performer);
+        }
     }
 }

@@ -31,9 +31,17 @@ namespace Arcatech.Units
 
         // --- command context -------------------------------------------------
         readonly List<IUnitCommandPerformer> _pendingPerformers = new();
-        UnitActionType _pendingAction = UnitActionType.None;
 
-        bool HasPendingCommand => _pendingAction != UnitActionType.None;
+        UnitCommand _pendingCommand = UnitCommand.None;
+
+        bool HasPendingCommand =>
+            _pendingCommand.Type != UnitActionType.None;
+        public UnitCommand PendingCommand =>
+            _pendingCommand;
+
+        public UnitActionType PendingActionType =>
+            _pendingCommand.Type;
+        
         [Space, Header("Command buffering")]
         [SerializeField, Tooltip("Max seconds a command may stay buffered before it is auto-cancelled. <= 0 disables the timeout.")]
         float _commandBufferTimeout = 0.5f;
@@ -77,7 +85,7 @@ namespace Arcatech.Units
                 Owner = gameEntity,
                 CurrentState = null,
                 Animator = animator,
-                PendingCommand = UnitActionType.None
+                PendingCommand = UnitCommand.None
             };
 
             _defaultState = defaultState.Build();
@@ -159,17 +167,32 @@ namespace Arcatech.Units
         }
         void TickCommandTimeout()
         {
-            if (!HasPendingCommand) return;
-            if (_commandBufferTimeout <= 0f) return;          // timeout disabled
-            if (_pendingCommandStamp < 0f) return;            // no valid stamp
+            if (!HasPendingCommand)
+                return;
 
-            if (Time.time - _pendingCommandStamp >= _commandBufferTimeout)
+            if (_commandBufferTimeout <= 0f)
+                return;
+
+            if (_pendingCommandStamp < 0f)
+                return;
+
+            if (Time.time - _pendingCommandStamp <
+                _commandBufferTimeout)
             {
-                if (verboseDebugs && GetMainEntity != null && GetMainEntity.ShowingDebugs)
-                    Debug.Log($"[{name}] Command '{_pendingAction}' timed out after {_commandBufferTimeout:0.##}s -> cancelled.");
-
-                CompletePendingCommand(false);   // legitimate rejection: command never became valid
+                return;
             }
+
+            if (verboseDebugs &&
+                GetMainEntity != null &&
+                GetMainEntity.ShowingDebugs)
+            {
+                Debug.Log(
+                    $"[{name}] Command '{_pendingCommand.Type}' " +
+                    $"timed out after {_commandBufferTimeout:0.##}s " +
+                    "-> cancelled.");
+            }
+
+            CompletePendingCommand(false);
         }
 
         bool TransitionsInUpdate()
@@ -186,64 +209,92 @@ namespace Arcatech.Units
         // ---------------------------------------------------------------------
         // command entry point
         // ---------------------------------------------------------------------
-        public bool TryCommandTransition(UnitActionType actionType,
+        public bool TryCommandTransition(
+            UnitCommand command,
             IEnumerable<IUnitCommandPerformer> commandPerformers)
         {
-            LastCommandRejectReason = CommandRejectReason.None;
+            LastCommandRejectReason =
+                CommandRejectReason.None;
 
-            if (Paused || _killed || _context.KnockDownState)
+            if (Paused ||
+                _killed ||
+                _context.KnockDownState)
             {
-                LastCommandRejectReason = CommandRejectReason.IncapacitatedState;
+                LastCommandRejectReason =
+                    CommandRejectReason.IncapacitatedState;
+
                 return false;
             }
-            
 
-            CacheCommandContext(actionType, commandPerformers);
-            _context.PendingCommand = actionType;
+            CacheCommandContext(
+                command,
+                commandPerformers);
 
-            bool committed = ValidateCommandTransition();
+            _context.SetCommand(command);
 
-            if (!committed && LastCommandRejectReason == CommandRejectReason.None)
-                LastCommandRejectReason = CommandRejectReason.NoValidTransitionYet;
+            bool committed =
+                ValidateCommandTransition();
+
+            if (!committed &&
+                LastCommandRejectReason ==
+                CommandRejectReason.None)
+            {
+                LastCommandRejectReason =
+                    CommandRejectReason.NoValidTransitionYet;
+            }
 
             return committed;
         }
-        
-        void CacheCommandContext(UnitActionType actionType,
+
+        void CacheCommandContext(
+            UnitCommand command,
             IEnumerable<IUnitCommandPerformer> performers)
         {
-            // Cancel any previous buffered command before storing a new one.
+            // Если уже была другая забуференная команда,
+            // она считается отклоненной.
             if (HasPendingCommand)
                 CompletePendingCommand(false);
 
-            _pendingAction = actionType;
+            _pendingCommand = command;
+
             _pendingPerformers.Clear();
 
             if (performers != null)
             {
-                foreach (var p in performers)
+                foreach (IUnitCommandPerformer performer in performers)
                 {
-                    if (p == null) continue;
-                    if (!_pendingPerformers.Contains(p))
-                        _pendingPerformers.Add(p);
+                    if (performer == null)
+                        continue;
+
+                    if (!_pendingPerformers.Contains(performer))
+                        _pendingPerformers.Add(performer);
                 }
             }
 
-            // Stamp the moment this command entered the buffer (for timeout).
             _pendingCommandStamp = Time.time;
         }
 
-        
         void CompletePendingCommand(bool success)
         {
-            if (!HasPendingCommand) return;
+            if (!HasPendingCommand)
+                return;
 
-            foreach (var performer in _pendingPerformers)
-                performer?.DoUnitCommand(_pendingAction, success);
+            UnitCommand completedCommand =
+                _pendingCommand;
+
+            foreach (IUnitCommandPerformer performer
+                     in _pendingPerformers)
+            {
+                performer?.DoUnitCommand(
+                    completedCommand,
+                    success);
+            }
 
             _pendingPerformers.Clear();
-            _pendingAction = UnitActionType.None;
-            _pendingCommandStamp = -1f;          // <-- reset stamp
+
+            _pendingCommand = UnitCommand.None;
+            _pendingCommandStamp = -1f;
+
             _context.ClearCommand();
         }
 
@@ -251,16 +302,21 @@ namespace Arcatech.Units
         {
             if (_currentState == null)
             {
-                LastCommandRejectReason = CommandRejectReason.NoCurrentState;
+                LastCommandRejectReason =
+                    CommandRejectReason.NoCurrentState;
+
                 CompletePendingCommand(false);
                 return false;
             }
 
-            var chosen = PickBestTransition(out _);
+            StateTransition chosen =
+                PickBestTransition(out _);
+
             if (chosen == null)
             {
-                // keep command buffered, but make it clear why
-                LastCommandRejectReason = CommandRejectReason.NoValidTransitionYet;
+                LastCommandRejectReason =
+                    CommandRejectReason.NoValidTransitionYet;
+
                 return false;
             }
 
@@ -268,44 +324,71 @@ namespace Arcatech.Units
             return true;
         }
 
-        void CommitTransition(StateTransition tr)
+        void CommitTransition(StateTransition transition)
         {
-            if (tr == null || tr.NextState == null) return;
-
-            bool consumesPending = HasPendingCommand && _context.PendingCommand != UnitActionType.None;
-
-            // 1) Exit current state first. Any EndUse notifications emitted here
-            //    should belong to the *previous* usable.
-            _currentState?.ExitState(_context, animator);
-            
-            foreach (var aug in _activeAugmentors.ToArray())
-                aug.OnStateExited(_currentState, _context);
-
-            // 2) Now we can safely prepare the new usable without it getting cleared.
-            if (consumesPending)
+            if (transition == null ||
+                transition.NextState == null)
             {
-                foreach (var performer in _pendingPerformers)
-                    performer?.PrepareCommand(_pendingAction);
+                return;
             }
 
-            // 3) Run transition actions (if any).
-            ProduceTransitionResults(tr);
+            bool consumesPending =
+                HasPendingCommand &&
+                _context.HasPendingCommand;
 
-            // 4) Enter the new state.
-            _currentState = tr.NextState;
-            _context.CurrentState = _currentState;
-            _currentState.EnterState(_context, animator);
-            
-            foreach (var aug in _activeAugmentors.ToArray())
-                aug.OnStateEntered(_currentState, _context);
+            UnitCommand command =
+                _pendingCommand;
 
-            // 5) Notify performers about success or clear command.
+            _currentState?.ExitState(
+                _context,
+                animator);
+
+            foreach (IStateAugmentor augmentor
+                     in _activeAugmentors.ToArray())
+            {
+                augmentor.OnStateExited(
+                    _currentState,
+                    _context);
+            }
+
             if (consumesPending)
-                CompletePendingCommand(true);
-            else
-                _context.ClearCommand();
-        }
+            {
+                foreach (IUnitCommandPerformer performer
+                         in _pendingPerformers)
+                {
+                    performer?.PrepareCommand(command);
+                }
+            }
 
+            ProduceTransitionResults(transition);
+
+            _currentState =
+                transition.NextState;
+
+            _context.CurrentState =
+                _currentState;
+
+            _currentState.EnterState(
+                _context,
+                animator);
+
+            foreach (IStateAugmentor augmentor
+                     in _activeAugmentors.ToArray())
+            {
+                augmentor.OnStateEntered(
+                    _currentState,
+                    _context);
+            }
+
+            if (consumesPending)
+            {
+                CompletePendingCommand(true);
+            }
+            else
+            {
+                _context.ClearCommand();
+            }
+        }
         void ProduceTransitionResults(StateTransition tr)
         {
             if (tr?.OnTransition == null) return;
@@ -410,12 +493,17 @@ namespace Arcatech.Units
         }
         bool _paused;
 
-        public void SetKilled(IKillerComponent comp, bool value)
+        public void SetKilled(
+            IKillerComponent component,
+            bool value)
         {
             _killed = value;
+
             if (value && HasPendingCommand)
-                CompletePendingCommand(false);   // resets stamp internally
-            _context.PendingCommand = UnitActionType.None;
+                CompletePendingCommand(false);
+
+            _pendingCommand = UnitCommand.None;
+            _context.ClearCommand();
         }
     }
 }

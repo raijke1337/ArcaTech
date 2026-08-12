@@ -9,7 +9,7 @@ namespace Arcatech.Units
 
         public override bool CanTransition(StateMachineContext ctx)
         {
-            return ctx.PendingCommand == requiredCommand;
+            return ctx.PendingCommand.Type == requiredCommand;
         }
     }
 }

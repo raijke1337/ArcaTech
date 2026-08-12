@@ -118,51 +118,6 @@ namespace Arcatech.Units.Control
             _startSpeed = maxWalkSpeed;
         }
 
-        // private void Animate()
-        // {
-        //     // LinearVelocity — модуль скорости (м/с), нужен для бленд-деревьев
-        //     animator.SetFloat(vI, characterMovement.speed);
-        //
-        //     if (MovementVector != Vector3.zero)
-        //     {
-        //         // forwardSpeed/sidewaysSpeed — это «проекция velocity на оси» в м/с.
-        //         // Делим на speed, чтобы получить нормализованный -1..1, как и было.
-        //         float speed = characterMovement.speed;
-        //         if (speed > 0.0001f)
-        //         {
-        //             float fwd = characterMovement.forwardSpeed  / speed;
-        //             float side = characterMovement.sidewaysSpeed / speed;
-        //             animator.SetFloat(fmI, fwd);
-        //             animator.SetFloat(smI, side);
-        //         }
-        //         else
-        //         {
-        //             animator.SetFloat(fmI, 0f);
-        //             animator.SetFloat(smI, 0f);
-        //         }
-        //
-        //         isStandingRotating = false;
-        //         animator.ResetTrigger(drI);
-        //     }
-        //     else
-        //     {
-        //         animator.SetFloat(fmI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
-        //         animator.SetFloat(smI, 0f, dampTime: 0.25f, deltaTime: Time.deltaTime);
-        //
-        //         Vector3 fwd = GetForwardVector();
-        //         var crossY = Mathf.Abs(Vector3.Cross(fwd, AimDirection).y);
-        //
-        //         if (ShouldRotateWhileStanding())
-        //         {
-        //             animator.SetTrigger(drI);
-        //             isStandingRotating = true;
-        //         }
-        //         if (crossY <= 0.01f)
-        //             isStandingRotating = false;
-        //     }
-        //
-        //     animator.SetFloat(vmI, characterMovement.velocity.y);
-        // }
         private void Animate()
         {
             UpdateMovementBlend();   // ForwardMove / SideMove
@@ -254,10 +209,10 @@ namespace Arcatech.Units.Control
         
         #endregion
 
-        public bool CanDoUnitCommand(UnitActionType type, out string info)
+        public bool CanDoUnitCommand(UnitCommand type, out string info)
         {
             info = "Movement ctrl jump:";
-            switch (type)
+            switch (type.Type)
             {
                 case UnitActionType.Jump:
                     bool canJump = CanJump();

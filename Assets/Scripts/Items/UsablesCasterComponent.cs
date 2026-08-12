@@ -2,6 +2,7 @@
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units;
+using Arcatech.Units.Control;
 using Arcatech.Usables;
 using KBCore.Refs;
 using UnityEngine;
@@ -98,12 +99,12 @@ namespace Arcatech.Items
 
         #endregion
 
-        public bool CanDoUnitCommand(UnitActionType type, out string info)
+        public bool CanDoUnitCommand(UnitCommand command, out string info)
         {
-            info = $"No usable for action type {type}";
-            if (type == UnitActionType.Movement || type == UnitActionType.Jump || type == UnitActionType.Use)
+            info = $"No usable for action type {command}";
+            if (command.Type == UnitActionType.Movement || command.Type == UnitActionType.Jump || command.Type == UnitActionType.Use)
                 return true;
-            if (!_usables.TryGetValue(type, out var usable)) return false;
+            if (!_usables.TryGetValue(command.Type, out var usable)) return false;
             info = "";
 
             bool ok = false;
@@ -123,33 +124,33 @@ namespace Arcatech.Items
             return ok;
         }
 
-        public void PrepareCommand(UnitActionType type)
+        public void PrepareCommand(UnitCommand command)
         {
-            if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs)  Debug.Log($"[Usables] {Time.time} Prepare {type}");
-            if (!_usables.TryGetValue(type, out var usable)) return;
+            if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs)  Debug.Log($"[Usables] {Time.time} Prepare {command}");
+            if (!_usables.TryGetValue(command.Type, out var usable)) return;
             _currentUsable = usable;
         }
 
-        public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
+        public void DoUnitCommand(UnitCommand command, bool wasSuccessful)
         {
-            if (type is UnitActionType.Movement or UnitActionType.Jump or UnitActionType.Use) return;
+            if (command.Type is UnitActionType.Movement or UnitActionType.Jump or UnitActionType.Use) return;
 
 
             if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs)
             {
-                Debug.Log($"[Usables] {Time.time} Do {type} success={wasSuccessful}, usable={_currentUsable?.Description.Title ?? "null"}");
+                Debug.Log($"[Usables] {Time.time} Do {command} success={wasSuccessful}, usable={_currentUsable?.Description.Title ?? "null"}");
             }
             
             if (!wasSuccessful)
             {
                 return;
             }
-            if (_usables[type].DrawStrategy != null && _usables[type].DrawStrategy != _currentDrawItemStrategy)
+            if (_usables[command.Type].DrawStrategy != null && _usables[command.Type].DrawStrategy != _currentDrawItemStrategy)
             {
-                _currentDrawItemStrategy = _usables[type].DrawStrategy;
+                _currentDrawItemStrategy = _usables[command.Type].DrawStrategy;
                 _redraw = true;
             }
-            _stats.ApplyUsableCost(_usables[type].GetCost,stateUnit.GetMainEntity);
+            _stats.ApplyUsableCost(_usables[command.Type].GetCost,stateUnit.GetMainEntity);
       }
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)

@@ -1,5 +1,6 @@
 using Arcatech.Audio;
 using Arcatech.Items;
+using Arcatech.Units.Control;
 using AYellowpaper.SerializedCollections;
 using KBCore.Refs;
 using UnityEngine;
@@ -11,14 +12,16 @@ namespace Arcatech.Units
     {
         [SerializeField, Self] private BaseGameEntityComponent entity;
         [SerializeField] private SerializedDictionary<UnitActionType, SoundDefinition> soundDefinitions;
+        
 
-        public void PrepareCommand(UnitActionType type)
+
+        public void PrepareCommand(UnitCommand command)
         {
         }
 
-        public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
+        public void DoUnitCommand(UnitCommand command, bool wasSuccessful)
         {
-            if (!wasSuccessful || !soundDefinitions.TryGetValue(type,out var d)) return;
+            if (!wasSuccessful || !soundDefinitions.TryGetValue(command.Type,out var d)) return;
             AudioEvents.Play(d,entity.EffectSpawn.position);
         }
     }

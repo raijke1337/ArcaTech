@@ -93,7 +93,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             ""id"": ""a2175133-0639-46e1-85f6-af389ba464f6"",
             ""actions"": [
                 {
-                    ""name"": ""WASD"",
+                    ""name"": ""MoveDirection"",
                     ""type"": ""Value"",
                     ""id"": ""e1dc2b4b-9f42-4aef-8911-12736512847b"",
                     ""expectedControlType"": ""Vector2"",
@@ -102,63 +102,18 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""UseMeleeSkill"",
-                    ""type"": ""Button"",
-                    ""id"": ""bfd0dbeb-7ca0-4e47-bd96-58cb6786a09d"",
-                    ""expectedControlType"": """",
+                    ""name"": ""AimDirection"",
+                    ""type"": ""Value"",
+                    ""id"": ""5b7a8052-1242-4751-886d-813dd17bf1c5"",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""UseRangedSkill"",
+                    ""name"": ""Interact"",
                     ""type"": ""Button"",
-                    ""id"": ""e2917fca-79e3-4182-bf7b-96c2ec7e5061"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""UseShieldSkill"",
-                    ""type"": ""Button"",
-                    ""id"": ""f0f3862b-e0cd-4e33-967e-fe7cc6fe6044"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Pause"",
-                    ""type"": ""Button"",
-                    ""id"": ""fe54560b-7bd0-45b7-bf9c-f5d72f3ea0eb"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""UseDodgeSkill"",
-                    ""type"": ""Button"",
-                    ""id"": ""dc59ae78-b565-45db-9c63-afd7d5a4a4a6"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""MainAttack"",
-                    ""type"": ""Button"",
-                    ""id"": ""d45a1719-ff0a-4fa6-8db8-b280e4a19447"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RangedAttack"",
-                    ""type"": ""Button"",
-                    ""id"": ""e9c23c4d-a739-4ae0-8b74-c3ffdef73b6d"",
+                    ""id"": ""a7177a66-95f8-446f-b694-725d25bda369"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -167,25 +122,88 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
-                    ""id"": ""b5fc2ab7-72da-4da8-b113-26745a684b5a"",
+                    ""id"": ""ea66a6e1-bdd5-496f-8043-3d255fec3bfe"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Use"",
+                    ""name"": ""MeleeWeaponAtk"",
                     ""type"": ""Button"",
-                    ""id"": ""15eca33c-4683-4ad2-a4d6-18b36102cf02"",
+                    ""id"": ""536bc3f5-2c41-4bdf-8a46-e9bc8b56f1bf"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Inspect"",
+                    ""name"": ""RangedWeaponAtk"",
                     ""type"": ""Button"",
-                    ""id"": ""ef689397-bbb1-4f32-aa00-4b38c0f90826"",
+                    ""id"": ""4bc00468-72d3-407c-b47d-aa61828a1542"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Evasion"",
+                    ""type"": ""Button"",
+                    ""id"": ""c1e174e3-e52d-483b-b0e5-21944f244b14"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""ba1278c3-4a54-4c5c-9318-d1554b06f2de"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraRotateCW"",
+                    ""type"": ""Button"",
+                    ""id"": ""a493ce25-4e52-41c3-bcda-c439b93a365a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraRotateCCW"",
+                    ""type"": ""Button"",
+                    ""id"": ""2dbff4d4-d94f-4ab7-b813-3140c051c677"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpecialMelee"",
+                    ""type"": ""Button"",
+                    ""id"": ""81df04ea-6d94-426d-b631-884c63bc7655"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpecialRanged"",
+                    ""type"": ""Button"",
+                    ""id"": ""96ccbc7c-66e0-4db3-a3d8-0ce23a0ad1a3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpecialBattery"",
+                    ""type"": ""Button"",
+                    ""id"": ""18667568-6515-4419-9b9e-cec317e2549d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -194,188 +212,449 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             ],
             ""bindings"": [
                 {
+                    ""name"": """",
+                    ""id"": ""eeccbd51-e912-4ff7-b4cc-fbdeb7a60a10"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""MoveDirection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
                     ""name"": ""2D Vector"",
-                    ""id"": ""f1adefd3-de1e-472c-91ef-fa679fc13d88"",
+                    ""id"": ""7d40134f-9770-41fd-a48a-5589d4fafa67"",
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""WASD"",
+                    ""action"": ""MoveDirection"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": ""up"",
-                    ""id"": ""480496d9-20ed-4a3b-aa66-3a330dd86c75"",
+                    ""id"": ""1ab6396f-a362-4990-8472-d0ea9bcb6ac5"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""WASD"",
+                    ""groups"": "";KBM"",
+                    ""action"": ""MoveDirection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
                     ""name"": ""down"",
-                    ""id"": ""4f81c151-9c8e-401c-af6d-9ef0e6de87d4"",
+                    ""id"": ""20ac9559-f844-420e-8f3e-2ffd838dc013"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""WASD"",
+                    ""groups"": "";KBM"",
+                    ""action"": ""MoveDirection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""b4e89c35-f8dd-4f44-a58b-39945439141b"",
+                    ""id"": ""f0fdde6a-b1d8-4435-aebe-626b735bf97c"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""WASD"",
+                    ""groups"": "";KBM"",
+                    ""action"": ""MoveDirection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
                     ""name"": ""right"",
-                    ""id"": ""5191f12a-c6e1-4b4a-bed5-c256f95ec034"",
+                    ""id"": ""33a9920e-f210-4c1a-922c-4a159b7d3fb6"",
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""WASD"",
+                    ""groups"": "";KBM"",
+                    ""action"": ""MoveDirection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
-                    ""id"": ""3997acb2-927d-40e6-9910-02eb38948d6b"",
-                    ""path"": ""<Keyboard>/q"",
+                    ""id"": ""3277f2cf-12bc-45a2-9842-69a5f4f2566e"",
+                    ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""UseMeleeSkill"",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""AimDirection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b3fe82c4-6cfe-4cff-b764-8c513fbe9173"",
-                    ""path"": ""<Keyboard>/escape"",
+                    ""id"": ""62a55329-6c3b-4d8c-a8c5-e250b6edc611"",
+                    ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Pause"",
+                    ""groups"": "";KBM"",
+                    ""action"": ""AimDirection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ea33ecec-6802-494f-9532-7a0b46e38fce"",
-                    ""path"": ""<Keyboard>/leftShift"",
+                    ""id"": ""93ac6550-64f6-4821-8d2f-de5be66655c6"",
+                    ""path"": ""<Gamepad>/buttonWest"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""UseDodgeSkill"",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ec6c3874-581d-41f5-b5a9-07b89654ac68"",
-                    ""path"": ""<Keyboard>/e"",
+                    ""id"": ""7b7bd75b-a961-4e56-b80c-3a1ce373bf60"",
+                    ""path"": ""<Keyboard>/f"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""UseRangedSkill"",
+                    ""groups"": "";KBM"",
+                    ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""3f9336bd-7f91-4611-a546-95a6244ef73c"",
-                    ""path"": ""<Keyboard>/r"",
+                    ""id"": ""6ad6563f-446c-476b-9686-c732a53559b4"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""UseShieldSkill"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""aa95f088-fd79-42f1-a62f-715621b94816"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": ""Press,Hold"",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""MainAttack"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""6d9e2a57-7241-4427-8dc7-f980ecca1ac2"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": ""Hold,Press"",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RangedAttack"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""e8622000-275c-4d53-b0fa-8e356b727018"",
-                    ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";GamePad"",
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""aa17cbf8-f841-48ac-b8a5-2acc3159fa41"",
-                    ""path"": ""<Keyboard>/h"",
+                    ""id"": ""b125c64c-89bf-4927-bc04-4aa86d21f5a9"",
+                    ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Use"",
+                    ""groups"": "";KBM"",
+                    ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""977806a5-3c3a-47a2-b55d-aaafa8ebf8a4"",
-                    ""path"": ""<Keyboard>/g"",
+                    ""id"": ""91befa70-c002-436c-9e95-e33bdedba1d1"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""MeleeWeaponAtk"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ac5921ae-2e8f-407e-baff-7e29a2ca127f"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""MeleeWeaponAtk"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cff0fbec-e8b6-433d-9c9d-32d3514ee81d"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""RangedWeaponAtk"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""83be9875-f30a-4e12-a247-18a86e2903f9"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""RangedWeaponAtk"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e82c77cc-0b03-4a5b-a044-d7d150cd53fe"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""Evasion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""35e82373-0729-4b9e-bbb5-2c9796735982"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""Evasion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d81838cb-659d-4ae0-93ce-5696d55b0f63"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""936a9151-5148-4894-9967-0f34c75a22e8"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7ba4565a-2fc6-4e43-aa03-b63570fd55fb"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""CameraRotateCW"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c94deb40-29ea-4d8c-ad33-76ce230a0a30"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""CameraRotateCW"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""266954b9-3bb1-4dbd-83f7-7ec529b5d59c"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""CameraRotateCCW"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c8bfced7-cd3e-46df-b06a-794832c94339"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""CameraRotateCCW"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""be238ed9-6b98-4dfb-a880-0273d091091c"",
+                    ""path"": ""OneModifier"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Inspect"",
+                    ""action"": ""SpecialMelee"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""094d98eb-c3c5-4ba3-a68a-f08970b7ff41"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""SpecialMelee"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""3356344e-b227-4116-8826-7937f1745ae1"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""SpecialMelee"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""54afd0d2-3b10-49c1-b049-48e618a9d6c2"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""SpecialMelee"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""70a19e79-6bec-42bc-a4bf-ba795d7aa508"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpecialRanged"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""c171e846-a564-4b5d-b6a6-d02298e3d94b"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""SpecialRanged"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""70e67f4e-7a72-4f85-8a47-598b2d92c8da"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""SpecialRanged"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fc042368-d415-41ba-bbba-94ef43425958"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""SpecialRanged"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""36286898-2d6f-4ee1-a287-0868baec2218"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpecialBattery"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""1cc89387-8eb3-4017-8b90-22e70b89fb35"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""SpecialBattery"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""3d1ea281-6ec6-4caf-88a4-bf9998d6a5ad"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""SpecialBattery"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2caa1bdd-16cb-4134-9471-3fe13a61baf9"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""SpecialBattery"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
             ]
         }
     ],
-    ""controlSchemes"": []
+    ""controlSchemes"": [
+        {
+            ""name"": ""KBM"",
+            ""bindingGroup"": ""KBM"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Keyboard>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                },
+                {
+                    ""devicePath"": ""<Mouse>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""GamePad"",
+            ""bindingGroup"": ""GamePad"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Gamepad>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
+        }
+    ]
 }");
         // Game
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
-        m_Game_WASD = m_Game.FindAction("WASD", throwIfNotFound: true);
-        m_Game_UseMeleeSkill = m_Game.FindAction("UseMeleeSkill", throwIfNotFound: true);
-        m_Game_UseRangedSkill = m_Game.FindAction("UseRangedSkill", throwIfNotFound: true);
-        m_Game_UseShieldSkill = m_Game.FindAction("UseShieldSkill", throwIfNotFound: true);
-        m_Game_Pause = m_Game.FindAction("Pause", throwIfNotFound: true);
-        m_Game_UseDodgeSkill = m_Game.FindAction("UseDodgeSkill", throwIfNotFound: true);
-        m_Game_MainAttack = m_Game.FindAction("MainAttack", throwIfNotFound: true);
-        m_Game_RangedAttack = m_Game.FindAction("RangedAttack", throwIfNotFound: true);
+        m_Game_MoveDirection = m_Game.FindAction("MoveDirection", throwIfNotFound: true);
+        m_Game_AimDirection = m_Game.FindAction("AimDirection", throwIfNotFound: true);
+        m_Game_Interact = m_Game.FindAction("Interact", throwIfNotFound: true);
         m_Game_Jump = m_Game.FindAction("Jump", throwIfNotFound: true);
-        m_Game_Use = m_Game.FindAction("Use", throwIfNotFound: true);
-        m_Game_Inspect = m_Game.FindAction("Inspect", throwIfNotFound: true);
+        m_Game_MeleeWeaponAtk = m_Game.FindAction("MeleeWeaponAtk", throwIfNotFound: true);
+        m_Game_RangedWeaponAtk = m_Game.FindAction("RangedWeaponAtk", throwIfNotFound: true);
+        m_Game_Evasion = m_Game.FindAction("Evasion", throwIfNotFound: true);
+        m_Game_Pause = m_Game.FindAction("Pause", throwIfNotFound: true);
+        m_Game_CameraRotateCW = m_Game.FindAction("CameraRotateCW", throwIfNotFound: true);
+        m_Game_CameraRotateCCW = m_Game.FindAction("CameraRotateCCW", throwIfNotFound: true);
+        m_Game_SpecialMelee = m_Game.FindAction("SpecialMelee", throwIfNotFound: true);
+        m_Game_SpecialRanged = m_Game.FindAction("SpecialRanged", throwIfNotFound: true);
+        m_Game_SpecialBattery = m_Game.FindAction("SpecialBattery", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -456,17 +735,19 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     // Game
     private readonly InputActionMap m_Game;
     private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
-    private readonly InputAction m_Game_WASD;
-    private readonly InputAction m_Game_UseMeleeSkill;
-    private readonly InputAction m_Game_UseRangedSkill;
-    private readonly InputAction m_Game_UseShieldSkill;
-    private readonly InputAction m_Game_Pause;
-    private readonly InputAction m_Game_UseDodgeSkill;
-    private readonly InputAction m_Game_MainAttack;
-    private readonly InputAction m_Game_RangedAttack;
+    private readonly InputAction m_Game_MoveDirection;
+    private readonly InputAction m_Game_AimDirection;
+    private readonly InputAction m_Game_Interact;
     private readonly InputAction m_Game_Jump;
-    private readonly InputAction m_Game_Use;
-    private readonly InputAction m_Game_Inspect;
+    private readonly InputAction m_Game_MeleeWeaponAtk;
+    private readonly InputAction m_Game_RangedWeaponAtk;
+    private readonly InputAction m_Game_Evasion;
+    private readonly InputAction m_Game_Pause;
+    private readonly InputAction m_Game_CameraRotateCW;
+    private readonly InputAction m_Game_CameraRotateCCW;
+    private readonly InputAction m_Game_SpecialMelee;
+    private readonly InputAction m_Game_SpecialRanged;
+    private readonly InputAction m_Game_SpecialBattery;
     /// <summary>
     /// Provides access to input actions defined in input action map "Game".
     /// </summary>
@@ -479,49 +760,57 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// </summary>
         public GameActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "Game/WASD".
+        /// Provides access to the underlying input action "Game/MoveDirection".
         /// </summary>
-        public InputAction @WASD => m_Wrapper.m_Game_WASD;
+        public InputAction @MoveDirection => m_Wrapper.m_Game_MoveDirection;
         /// <summary>
-        /// Provides access to the underlying input action "Game/UseMeleeSkill".
+        /// Provides access to the underlying input action "Game/AimDirection".
         /// </summary>
-        public InputAction @UseMeleeSkill => m_Wrapper.m_Game_UseMeleeSkill;
+        public InputAction @AimDirection => m_Wrapper.m_Game_AimDirection;
         /// <summary>
-        /// Provides access to the underlying input action "Game/UseRangedSkill".
+        /// Provides access to the underlying input action "Game/Interact".
         /// </summary>
-        public InputAction @UseRangedSkill => m_Wrapper.m_Game_UseRangedSkill;
-        /// <summary>
-        /// Provides access to the underlying input action "Game/UseShieldSkill".
-        /// </summary>
-        public InputAction @UseShieldSkill => m_Wrapper.m_Game_UseShieldSkill;
-        /// <summary>
-        /// Provides access to the underlying input action "Game/Pause".
-        /// </summary>
-        public InputAction @Pause => m_Wrapper.m_Game_Pause;
-        /// <summary>
-        /// Provides access to the underlying input action "Game/UseDodgeSkill".
-        /// </summary>
-        public InputAction @UseDodgeSkill => m_Wrapper.m_Game_UseDodgeSkill;
-        /// <summary>
-        /// Provides access to the underlying input action "Game/MainAttack".
-        /// </summary>
-        public InputAction @MainAttack => m_Wrapper.m_Game_MainAttack;
-        /// <summary>
-        /// Provides access to the underlying input action "Game/RangedAttack".
-        /// </summary>
-        public InputAction @RangedAttack => m_Wrapper.m_Game_RangedAttack;
+        public InputAction @Interact => m_Wrapper.m_Game_Interact;
         /// <summary>
         /// Provides access to the underlying input action "Game/Jump".
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_Game_Jump;
         /// <summary>
-        /// Provides access to the underlying input action "Game/Use".
+        /// Provides access to the underlying input action "Game/MeleeWeaponAtk".
         /// </summary>
-        public InputAction @Use => m_Wrapper.m_Game_Use;
+        public InputAction @MeleeWeaponAtk => m_Wrapper.m_Game_MeleeWeaponAtk;
         /// <summary>
-        /// Provides access to the underlying input action "Game/Inspect".
+        /// Provides access to the underlying input action "Game/RangedWeaponAtk".
         /// </summary>
-        public InputAction @Inspect => m_Wrapper.m_Game_Inspect;
+        public InputAction @RangedWeaponAtk => m_Wrapper.m_Game_RangedWeaponAtk;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/Evasion".
+        /// </summary>
+        public InputAction @Evasion => m_Wrapper.m_Game_Evasion;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/Pause".
+        /// </summary>
+        public InputAction @Pause => m_Wrapper.m_Game_Pause;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/CameraRotateCW".
+        /// </summary>
+        public InputAction @CameraRotateCW => m_Wrapper.m_Game_CameraRotateCW;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/CameraRotateCCW".
+        /// </summary>
+        public InputAction @CameraRotateCCW => m_Wrapper.m_Game_CameraRotateCCW;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/SpecialMelee".
+        /// </summary>
+        public InputAction @SpecialMelee => m_Wrapper.m_Game_SpecialMelee;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/SpecialRanged".
+        /// </summary>
+        public InputAction @SpecialRanged => m_Wrapper.m_Game_SpecialRanged;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/SpecialBattery".
+        /// </summary>
+        public InputAction @SpecialBattery => m_Wrapper.m_Game_SpecialBattery;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -548,39 +837,45 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_GameActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_GameActionsCallbackInterfaces.Add(instance);
-            @WASD.started += instance.OnWASD;
-            @WASD.performed += instance.OnWASD;
-            @WASD.canceled += instance.OnWASD;
-            @UseMeleeSkill.started += instance.OnUseMeleeSkill;
-            @UseMeleeSkill.performed += instance.OnUseMeleeSkill;
-            @UseMeleeSkill.canceled += instance.OnUseMeleeSkill;
-            @UseRangedSkill.started += instance.OnUseRangedSkill;
-            @UseRangedSkill.performed += instance.OnUseRangedSkill;
-            @UseRangedSkill.canceled += instance.OnUseRangedSkill;
-            @UseShieldSkill.started += instance.OnUseShieldSkill;
-            @UseShieldSkill.performed += instance.OnUseShieldSkill;
-            @UseShieldSkill.canceled += instance.OnUseShieldSkill;
-            @Pause.started += instance.OnPause;
-            @Pause.performed += instance.OnPause;
-            @Pause.canceled += instance.OnPause;
-            @UseDodgeSkill.started += instance.OnUseDodgeSkill;
-            @UseDodgeSkill.performed += instance.OnUseDodgeSkill;
-            @UseDodgeSkill.canceled += instance.OnUseDodgeSkill;
-            @MainAttack.started += instance.OnMainAttack;
-            @MainAttack.performed += instance.OnMainAttack;
-            @MainAttack.canceled += instance.OnMainAttack;
-            @RangedAttack.started += instance.OnRangedAttack;
-            @RangedAttack.performed += instance.OnRangedAttack;
-            @RangedAttack.canceled += instance.OnRangedAttack;
+            @MoveDirection.started += instance.OnMoveDirection;
+            @MoveDirection.performed += instance.OnMoveDirection;
+            @MoveDirection.canceled += instance.OnMoveDirection;
+            @AimDirection.started += instance.OnAimDirection;
+            @AimDirection.performed += instance.OnAimDirection;
+            @AimDirection.canceled += instance.OnAimDirection;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @Use.started += instance.OnUse;
-            @Use.performed += instance.OnUse;
-            @Use.canceled += instance.OnUse;
-            @Inspect.started += instance.OnInspect;
-            @Inspect.performed += instance.OnInspect;
-            @Inspect.canceled += instance.OnInspect;
+            @MeleeWeaponAtk.started += instance.OnMeleeWeaponAtk;
+            @MeleeWeaponAtk.performed += instance.OnMeleeWeaponAtk;
+            @MeleeWeaponAtk.canceled += instance.OnMeleeWeaponAtk;
+            @RangedWeaponAtk.started += instance.OnRangedWeaponAtk;
+            @RangedWeaponAtk.performed += instance.OnRangedWeaponAtk;
+            @RangedWeaponAtk.canceled += instance.OnRangedWeaponAtk;
+            @Evasion.started += instance.OnEvasion;
+            @Evasion.performed += instance.OnEvasion;
+            @Evasion.canceled += instance.OnEvasion;
+            @Pause.started += instance.OnPause;
+            @Pause.performed += instance.OnPause;
+            @Pause.canceled += instance.OnPause;
+            @CameraRotateCW.started += instance.OnCameraRotateCW;
+            @CameraRotateCW.performed += instance.OnCameraRotateCW;
+            @CameraRotateCW.canceled += instance.OnCameraRotateCW;
+            @CameraRotateCCW.started += instance.OnCameraRotateCCW;
+            @CameraRotateCCW.performed += instance.OnCameraRotateCCW;
+            @CameraRotateCCW.canceled += instance.OnCameraRotateCCW;
+            @SpecialMelee.started += instance.OnSpecialMelee;
+            @SpecialMelee.performed += instance.OnSpecialMelee;
+            @SpecialMelee.canceled += instance.OnSpecialMelee;
+            @SpecialRanged.started += instance.OnSpecialRanged;
+            @SpecialRanged.performed += instance.OnSpecialRanged;
+            @SpecialRanged.canceled += instance.OnSpecialRanged;
+            @SpecialBattery.started += instance.OnSpecialBattery;
+            @SpecialBattery.performed += instance.OnSpecialBattery;
+            @SpecialBattery.canceled += instance.OnSpecialBattery;
         }
 
         /// <summary>
@@ -592,39 +887,45 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="GameActions" />
         private void UnregisterCallbacks(IGameActions instance)
         {
-            @WASD.started -= instance.OnWASD;
-            @WASD.performed -= instance.OnWASD;
-            @WASD.canceled -= instance.OnWASD;
-            @UseMeleeSkill.started -= instance.OnUseMeleeSkill;
-            @UseMeleeSkill.performed -= instance.OnUseMeleeSkill;
-            @UseMeleeSkill.canceled -= instance.OnUseMeleeSkill;
-            @UseRangedSkill.started -= instance.OnUseRangedSkill;
-            @UseRangedSkill.performed -= instance.OnUseRangedSkill;
-            @UseRangedSkill.canceled -= instance.OnUseRangedSkill;
-            @UseShieldSkill.started -= instance.OnUseShieldSkill;
-            @UseShieldSkill.performed -= instance.OnUseShieldSkill;
-            @UseShieldSkill.canceled -= instance.OnUseShieldSkill;
-            @Pause.started -= instance.OnPause;
-            @Pause.performed -= instance.OnPause;
-            @Pause.canceled -= instance.OnPause;
-            @UseDodgeSkill.started -= instance.OnUseDodgeSkill;
-            @UseDodgeSkill.performed -= instance.OnUseDodgeSkill;
-            @UseDodgeSkill.canceled -= instance.OnUseDodgeSkill;
-            @MainAttack.started -= instance.OnMainAttack;
-            @MainAttack.performed -= instance.OnMainAttack;
-            @MainAttack.canceled -= instance.OnMainAttack;
-            @RangedAttack.started -= instance.OnRangedAttack;
-            @RangedAttack.performed -= instance.OnRangedAttack;
-            @RangedAttack.canceled -= instance.OnRangedAttack;
+            @MoveDirection.started -= instance.OnMoveDirection;
+            @MoveDirection.performed -= instance.OnMoveDirection;
+            @MoveDirection.canceled -= instance.OnMoveDirection;
+            @AimDirection.started -= instance.OnAimDirection;
+            @AimDirection.performed -= instance.OnAimDirection;
+            @AimDirection.canceled -= instance.OnAimDirection;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @Use.started -= instance.OnUse;
-            @Use.performed -= instance.OnUse;
-            @Use.canceled -= instance.OnUse;
-            @Inspect.started -= instance.OnInspect;
-            @Inspect.performed -= instance.OnInspect;
-            @Inspect.canceled -= instance.OnInspect;
+            @MeleeWeaponAtk.started -= instance.OnMeleeWeaponAtk;
+            @MeleeWeaponAtk.performed -= instance.OnMeleeWeaponAtk;
+            @MeleeWeaponAtk.canceled -= instance.OnMeleeWeaponAtk;
+            @RangedWeaponAtk.started -= instance.OnRangedWeaponAtk;
+            @RangedWeaponAtk.performed -= instance.OnRangedWeaponAtk;
+            @RangedWeaponAtk.canceled -= instance.OnRangedWeaponAtk;
+            @Evasion.started -= instance.OnEvasion;
+            @Evasion.performed -= instance.OnEvasion;
+            @Evasion.canceled -= instance.OnEvasion;
+            @Pause.started -= instance.OnPause;
+            @Pause.performed -= instance.OnPause;
+            @Pause.canceled -= instance.OnPause;
+            @CameraRotateCW.started -= instance.OnCameraRotateCW;
+            @CameraRotateCW.performed -= instance.OnCameraRotateCW;
+            @CameraRotateCW.canceled -= instance.OnCameraRotateCW;
+            @CameraRotateCCW.started -= instance.OnCameraRotateCCW;
+            @CameraRotateCCW.performed -= instance.OnCameraRotateCCW;
+            @CameraRotateCCW.canceled -= instance.OnCameraRotateCCW;
+            @SpecialMelee.started -= instance.OnSpecialMelee;
+            @SpecialMelee.performed -= instance.OnSpecialMelee;
+            @SpecialMelee.canceled -= instance.OnSpecialMelee;
+            @SpecialRanged.started -= instance.OnSpecialRanged;
+            @SpecialRanged.performed -= instance.OnSpecialRanged;
+            @SpecialRanged.canceled -= instance.OnSpecialRanged;
+            @SpecialBattery.started -= instance.OnSpecialBattery;
+            @SpecialBattery.performed -= instance.OnSpecialBattery;
+            @SpecialBattery.canceled -= instance.OnSpecialBattery;
         }
 
         /// <summary>
@@ -658,6 +959,32 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="GameActions" /> instance referencing this action map.
     /// </summary>
     public GameActions @Game => new GameActions(this);
+    private int m_KBMSchemeIndex = -1;
+    /// <summary>
+    /// Provides access to the input control scheme.
+    /// </summary>
+    /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
+    public InputControlScheme KBMScheme
+    {
+        get
+        {
+            if (m_KBMSchemeIndex == -1) m_KBMSchemeIndex = asset.FindControlSchemeIndex("KBM");
+            return asset.controlSchemes[m_KBMSchemeIndex];
+        }
+    }
+    private int m_GamePadSchemeIndex = -1;
+    /// <summary>
+    /// Provides access to the input control scheme.
+    /// </summary>
+    /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
+    public InputControlScheme GamePadScheme
+    {
+        get
+        {
+            if (m_GamePadSchemeIndex == -1) m_GamePadSchemeIndex = asset.FindControlSchemeIndex("GamePad");
+            return asset.controlSchemes[m_GamePadSchemeIndex];
+        }
+    }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Game" which allows adding and removing callbacks.
     /// </summary>
@@ -666,61 +993,26 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     public interface IGameActions
     {
         /// <summary>
-        /// Method invoked when associated input action "WASD" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "MoveDirection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnWASD(InputAction.CallbackContext context);
+        void OnMoveDirection(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "UseMeleeSkill" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "AimDirection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUseMeleeSkill(InputAction.CallbackContext context);
+        void OnAimDirection(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "UseRangedSkill" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Interact" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUseRangedSkill(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "UseShieldSkill" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUseShieldSkill(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Pause" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPause(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "UseDodgeSkill" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUseDodgeSkill(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "MainAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnMainAttack(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RangedAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRangedAttack(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -729,18 +1021,67 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnJump(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Use" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "MeleeWeaponAtk" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUse(InputAction.CallbackContext context);
+        void OnMeleeWeaponAtk(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Inspect" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "RangedWeaponAtk" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnInspect(InputAction.CallbackContext context);
+        void OnRangedWeaponAtk(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Evasion" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEvasion(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Pause" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPause(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CameraRotateCW" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCameraRotateCW(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CameraRotateCCW" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCameraRotateCCW(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SpecialMelee" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSpecialMelee(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SpecialRanged" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSpecialRanged(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SpecialBattery" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSpecialBattery(InputAction.CallbackContext context);
     }
 }

@@ -1,5 +1,4 @@
 using Arcatech.EventBus;
-using Arcatech.SaveSystem;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,138 +7,211 @@ using Unity.Cinemachine;
 namespace Arcatech.Units.Control
 {
     [RequireComponent(typeof(PlayerAimingComponent))]
-    public class PlayerUnitInputsComponent : UnitInputsComponent
+    [RequireComponent(typeof(PlayerInputGateway))]
+    public sealed class PlayerUnitInputsComponent :
+        UnitInputsComponent
     {
-        [Space, Header("Required components")] 
-        [SerializeField, Anywhere]
-        private PlayerInputReaderObject playerInputReader;
+        [Header("Required components")]
+        [SerializeField, Self]
+        private PlayerInputGateway inputGateway;
+
+        [SerializeField, Self]
+        private PlayerAimingComponent aiming;
 
         private IMove _mover;
-        private readonly IsoCamAdjust _adj = new IsoCamAdjust();
+        private readonly IsoCamAdjust _cameraAdjust = new();
 
-        private bool _inCameraBlend = false;
-        
-        protected override void ControllerStartBindings(bool enabling)
+        private bool _inCameraBlend;
+
+        protected override void Awake()
         {
-            if (enabling)
-            {
-                _mover = GetComponent<IMove>();
-                playerInputReader.PausePressed += OnPause;
-                playerInputReader.CombatAction += OnValidatedStateMachineAction;
-                
-                // Подписываемся на событие обновления активной камеры Cinemachine
-                // CameraActivatedEvent вызывается ТОЛЬКО когда Brain переключает виртуальную камеру
-               
-                CinemachineCore.BlendCreatedEvent.AddListener(OnCameraBlendStarted);
-                CinemachineCore.BlendFinishedEvent.AddListener(OnCameraBlendCompleted);
-                
-                // Форсируем первичный расчет, чтобы не ждать первого переключения
-                _adj.UpdateBasis();
-                
-            }
-            else
-            {
-                playerInputReader.PausePressed -= OnPause;
-                playerInputReader.CombatAction -= OnValidatedStateMachineAction;
-                
-                // ОБЯЗАТЕЛЬНО отписываемся от статического события!
-                CinemachineCore.BlendCreatedEvent.RemoveListener(OnCameraBlendStarted);
-                CinemachineCore.BlendFinishedEvent.RemoveListener(OnCameraBlendCompleted);
-            }
-
-            base.ControllerStartBindings(enabling);
+            base.Awake();
+            _mover = GetComponent<IMove>();
+            aiming.Initialize(inputGateway);
         }
 
-        private void OnCameraBlendStarted(CinemachineCore.BlendEventParams arg0)
+        private void OnEnable()
         {
-            _inCameraBlend = true;
-            InputMovement = Vector3.zero;
-            if (_mover != null)
-                _mover.MovementVector = InputMovement;
+            inputGateway.MoveChanged += OnMoveChanged;
+
+            inputGateway.MeleeAttackPressed += OnMeleeAttack;
+            inputGateway.RangedAttackPressed += OnRangedAttack;
+            inputGateway.MeleeSkillPressed += OnMeleeSkill;
+            inputGateway.RangedSkillPressed += OnRangedSkill;
+            inputGateway.ShieldSkillPressed += OnShieldSkill;
+            inputGateway.DodgePressed += OnDodge;
+            inputGateway.JumpPressed += OnJump;
+            inputGateway.InteractPressed += OnInteract;
+            inputGateway.PausePressed += OnPause;
+
+            CinemachineCore.BlendCreatedEvent
+                .AddListener(OnCameraBlendStarted);
+
+            CinemachineCore.BlendFinishedEvent
+                .AddListener(OnCameraBlendFinished);
+
+            _cameraAdjust.UpdateBasis();
         }
 
-        private void OnCameraBlendCompleted(ICinemachineMixer m, ICinemachineCamera c)
+        private void OnDisable()
         {
-            _inCameraBlend = false;
-            _adj.UpdateBasis();
-        }
-
-        private void OnValidatedStateMachineAction(InputAction.CallbackContext ctx, UnitActionType type)
-        {
-            if (_inCameraBlend) return;
-            if (type == UnitActionType.Movement)
+            if (inputGateway != null)
             {
-                UpdateCachedInputVector(ctx);
-                
-                if (_mover != null && _mover.ActualMovementVelocity <= 0.1f) 
-                    RequestCombatAction(type);
-            }
-            else 
-            {
-                if (ctx.performed) 
-                    RequestCombatAction(type);
-            }
-        }
+                inputGateway.MoveChanged -= OnMoveChanged;
 
-        private void OnPause(InputAction.CallbackContext arg0)
-        {
-            if (arg0.phase == InputActionPhase.Performed)
-                EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(!Paused));
+                inputGateway.MeleeAttackPressed -= OnMeleeAttack;
+                inputGateway.RangedAttackPressed -= OnRangedAttack;
+                inputGateway.MeleeSkillPressed -= OnMeleeSkill;
+                inputGateway.RangedSkillPressed -= OnRangedSkill;
+                inputGateway.ShieldSkillPressed -= OnShieldSkill;
+                inputGateway.DodgePressed -= OnDodge;
+                inputGateway.JumpPressed -= OnJump;
+                inputGateway.InteractPressed -= OnInteract;
+                inputGateway.PausePressed -= OnPause;
+            }
+
+            CinemachineCore.BlendCreatedEvent
+                .RemoveListener(OnCameraBlendStarted);
+
+            CinemachineCore.BlendFinishedEvent
+                .RemoveListener(OnCameraBlendFinished);
         }
 
         private void Update()
         {
-            if (_inCameraBlend) return;
-            if (_mover != null) 
-                _mover.MovementVector = InputMovement;
-        }
-
-        private void UpdateCachedInputVector(InputAction.CallbackContext arg0)
-        {
-            switch (arg0.phase)
-            {
-                case InputActionPhase.Performed:
-                    Vector2 rawInput = arg0.ReadValue<Vector2>();
-                    Vector3 localDirection = new Vector3(rawInput.x, 0f, rawInput.y);
-                    
-                    // RotateInput теперь просто использует закэшированные значения — без пересчетов!
-                    InputMovement = RotateInput(localDirection);
-                    break;
-                    
-                default:
-                    InputMovement = Vector3.zero;
-                    break;
-            }
+            if (_inCameraBlend)
+                return;
 
             if (_mover != null)
                 _mover.MovementVector = InputMovement;
         }
-        
-        private Vector3 RotateInput(Vector3 input)
+
+        private void OnMoveChanged(Vector2 input)
         {
-            // Больше никаких вызовов UpdateBasis() здесь — используем закэшированный базис
-            var move = (_adj.Isoright * input.x) + (_adj.Isoforward * input.z);
-            return move.sqrMagnitude > 0.0001f ? Vector3.Normalize(move) : Vector3.zero;
+            if (_inCameraBlend)
+            {
+                SetMovement(Vector3.zero);
+                return;
+            }
+
+            Vector3 localDirection = new Vector3(
+                input.x,
+                0f,
+                input.y);
+
+            SetMovement(RotateInput(localDirection));
         }
 
-        internal class IsoCamAdjust
+        private void OnMeleeAttack()
         {
-            public Vector3 Isoforward { get; private set; } = Vector3.forward;
-            public Vector3 Isoright { get; private set; } = Vector3.right;
+            RequestCombatAction(UnitActionType.Melee);
+        }
+
+        private void OnRangedAttack()
+        {
+            RequestCombatAction(UnitActionType.Ranged);
+        }
+
+        private void OnMeleeSkill()
+        {
+            RequestCombatAction(UnitActionType.MeleeSkill);
+        }
+
+        private void OnRangedSkill()
+        {
+            RequestCombatAction(UnitActionType.RangedSkill);
+        }
+
+        private void OnShieldSkill()
+        {
+            RequestCombatAction(UnitActionType.ShieldSkill);
+        }
+
+        private void OnJump()
+        {
+            RequestCombatAction(UnitActionType.Jump);
+        }
+
+        private void OnInteract()
+        {
+            RequestCombatAction(UnitActionType.Use);
+        }
+
+        private void OnDodge()
+        {
+            if (InputMovement.sqrMagnitude < 0.01f)
+                return;
+
+            UnitCommand command = new UnitCommand(
+                UnitActionType.DodgeSkill,
+                InputMovement);
+
+            RequestCombatAction(command);
+        }
+
+        private void OnPause()
+        {
+            EventBus<PauseToggleEvent>.Raise(
+                new PauseToggleEvent(!Paused));
+        }
+
+        private void SetMovement(Vector3 movement)
+        {
+            InputMovement = movement;
+
+            if (_mover != null)
+                _mover.MovementVector = InputMovement;
+        }
+
+        private Vector3 RotateInput(Vector3 input)
+        {
+            Vector3 move =
+                _cameraAdjust.Isoright * input.x +
+                _cameraAdjust.Isoforward * input.z;
+
+            return Vector3.ClampMagnitude(move, 1f);
+        }
+
+        private void OnCameraBlendStarted(
+            CinemachineCore.BlendEventParams parameters)
+        {
+            _inCameraBlend = true;
+            SetMovement(Vector3.zero);
+        }
+
+        private void OnCameraBlendFinished(
+            ICinemachineMixer mixer,
+            ICinemachineCamera camera)
+        {
+            _inCameraBlend = false;
+            _cameraAdjust.UpdateBasis();
+        }
+
+        private sealed class IsoCamAdjust
+        {
+            public Vector3 Isoforward { get; private set; } =
+                Vector3.forward;
+
+            public Vector3 Isoright { get; private set; } =
+                Vector3.right;
 
             public void UpdateBasis()
             {
-                if (Camera.main == null) 
-                    return; 
+                Camera camera = Camera.main;
 
-                Vector3 camForward = Camera.main.transform.forward;
-                Vector3 flatForward = new Vector3(camForward.x, 0f, camForward.z);
-                
-                if (flatForward.sqrMagnitude < 0.0001f)
+                if (camera == null)
                     return;
 
-                Isoforward = flatForward.normalized;
-                Isoright = Vector3.Cross(Vector3.up, Isoforward).normalized;
+                Vector3 forward = camera.transform.forward;
+                forward.y = 0f;
+
+                if (forward.sqrMagnitude < 0.0001f)
+                    return;
+
+                Isoforward = forward.normalized;
+                Isoright = Vector3.Cross(
+                    Vector3.up,
+                    Isoforward).normalized;
             }
         }
     }
