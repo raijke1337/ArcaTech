@@ -125,7 +125,7 @@ namespace Arcatech.Units
         
         public void SetKilled(IKillerComponent component, bool value)
         {
-            agent.isStopped = value;
+            if (agent.isOnNavMesh) agent.isStopped = value;
             ReadItemState = value ? ProgressItemState.Completed : ProgressItemState.Default;
 
             if (!behavior) return;

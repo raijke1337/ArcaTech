@@ -78,14 +78,17 @@ namespace Arcatech.Units.Control
         {
             IsGamepad = context.control.device is Gamepad;
 
-            // Для мыши action Aim должен быть Vector2 и читать Mouse Position.
             Vector2 value = context.ReadValue<Vector2>();
 
             if (IsGamepad)
+            {
                 AimInput = ApplyDeadZone(value, aimDeadZone);
+            }
             else
+            {
                 AimInput = value;
-
+            }
+    
             AimChanged.Invoke(AimInput);
         }
 

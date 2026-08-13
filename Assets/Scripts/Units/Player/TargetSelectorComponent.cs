@@ -1,75 +1,113 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Arcatech.Units.Control
 {
     /// <summary>
-    /// the component used to assess targets when using gamepad auto-aim
+    /// Finds the closest valid target inside an aiming cone.
     /// </summary>
     public sealed class TargetSelector : MonoBehaviour
     {
-        [SerializeField] private LayerMask targetMask;
-        [SerializeField] private float searchRadius = 15f;
-        [SerializeField] private float searchAngle = 45f;
-
-        public BaseGameEntityComponent FindTarget(
+        public BaseGameEntityComponent FindClosestTarget(
             Vector3 origin,
-            Vector3 direction)
+            Vector3 direction,
+            Transform ignoredRoot,
+            LayerMask targetMask,
+            float searchRadius,
+            float searchAngle)
         {
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude < 0.0001f)
+                return null;
+
+            direction.Normalize();
+
             Collider[] colliders = Physics.OverlapSphere(
                 origin,
                 searchRadius,
-                targetMask);
+                targetMask,
+                QueryTriggerInteraction.Ignore);
 
-            BaseGameEntityComponent best = null;
-            float bestScore = float.MinValue;
+            BaseGameEntityComponent closestTarget = null;
+            float closestDistanceSqr = float.MaxValue;
+
+            var checkedEntities = new HashSet<BaseGameEntityComponent>();
 
             foreach (Collider collider in colliders)
             {
-                if (!collider.TryGetComponent(
-                        out BaseGameEntityComponent entity))
-                {
-                    continue;
-                }
-
-                if (!entity.Targetable)
+                if (collider == null)
                     continue;
 
-                Vector3 toTarget =
-                    entity.EffectSpawn.position - origin;
+                BaseGameEntityComponent entity =
+                    collider.GetComponentInParent<BaseGameEntityComponent>();
 
+                if (entity == null)
+                    continue;
+
+                if (!checkedEntities.Add(entity))
+                    continue;
+
+                if (!IsValidCandidate(entity, ignoredRoot))
+                    continue;
+
+                Vector3 toTarget = entity.EffectSpawn.position - origin;
                 toTarget.y = 0f;
 
-                float distance = toTarget.magnitude;
+                float distanceSqr = toTarget.sqrMagnitude;
 
-                if (distance < 0.001f)
+                if (distanceSqr < 0.0001f)
                     continue;
 
-                Vector3 targetDirection =
-                    toTarget / distance;
+                Vector3 targetDirection = toTarget.normalized;
 
-                float angle = Vector3.Angle(
-                    direction,
-                    targetDirection);
+                float angle = Vector3.Angle(direction, targetDirection);
 
                 if (angle > searchAngle)
                     continue;
 
-                float alignment = Vector3.Dot(
-                    direction,
-                    targetDirection);
+                if (distanceSqr >= closestDistanceSqr)
+                    continue;
 
-                float score =
-                    alignment * 10f -
-                    distance;
-
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    best = entity;
-                }
+                closestDistanceSqr = distanceSqr;
+                closestTarget = entity;
             }
 
-            return best;
+            return closestTarget;
         }
+
+        private static bool IsValidCandidate(
+            BaseGameEntityComponent entity,
+            Transform ignoredRoot)
+        {
+            if (entity == null ||
+                entity.EffectSpawn == null ||
+                !entity.gameObject.activeInHierarchy ||
+                !entity.Targetable)
+            {
+                return false;
+            }
+
+            // Не выбираем самого игрока и его дочерние объекты.
+            if (ignoredRoot != null &&
+                entity.transform.IsChildOf(ignoredRoot))
+            {
+                return false;
+            }
+
+            // Дополнительная защита: Player никогда не является целью.
+            if (entity.CompareTag("Player"))
+                return false;
+
+            return true;
+        }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, 15f);
+        }
+#endif
     }
 }
