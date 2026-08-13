@@ -4,6 +4,7 @@ using Arcatech.Managers;
 using Arcatech.Stats;
 using ArcaTech.UI;
 using Arcatech.Units;
+using Arcatech.Units.Control;
 using KBCore.Refs;
 using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
@@ -144,14 +145,14 @@ namespace Arcatech.UI
 
         #endregion
 
-        public void PrepareCommand(UnitActionType type)
+        public void PrepareCommand(UnitCommand command)
         {// noop
             
         }
 
-        public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
+        public void DoUnitCommand(UnitCommand command, bool wasSuccessful)
         {
-            usablesIcons.HandlePlayerAction(type, wasSuccessful);
+            usablesIcons.HandlePlayerAction(command.Type, wasSuccessful);
         }
     }
 }

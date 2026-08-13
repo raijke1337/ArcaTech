@@ -82,7 +82,7 @@ namespace Arcatech.Units
         public bool ActionAvailable(UnitActionType actionType)
         {
 
-            var ok = unitInputs.CanPerformCombatAction(actionType, out var info);
+            var ok = unitInputs.CanPerformCombatAction(new UnitCommand(actionType), out var info);
             if (!ok && entity.ShowingDebugs) Debug.Log(info);
             return ok;
         }
@@ -125,7 +125,7 @@ namespace Arcatech.Units
         
         public void SetKilled(IKillerComponent component, bool value)
         {
-            agent.isStopped = value;
+            if (agent.isOnNavMesh) agent.isStopped = value;
             ReadItemState = value ? ProgressItemState.Completed : ProgressItemState.Default;
 
             if (!behavior) return;

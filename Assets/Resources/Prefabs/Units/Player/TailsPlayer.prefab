@@ -98,6 +98,8 @@ GameObject:
   - component: {fileID: -367359324892275855}
   - component: {fileID: 1962562224133234995}
   - component: {fileID: 1788432916849468796}
+  - component: {fileID: 9103845225237627509}
+  - component: {fileID: 1836545175343542454}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -218,7 +220,11 @@ MonoBehaviour:
   defaultState: {fileID: 11400000, guid: 0feb9fd035117c14bbe6bb4a0cedc03f, type: 2}
   verboseDebugs: 0
   _context:
-    PendingCommand: 0
+    PendingCommand:
+      Type: 0
+      Direction: {x: 0, y: 0, z: 0}
+      Target: {fileID: 0}
+      TargetPoint: {x: 0, y: 0, z: 0}
     Spawn: {fileID: 0}
     Owner: {fileID: 0}
     Stats: {fileID: 0}
@@ -360,7 +366,13 @@ MonoBehaviour:
   entitiesLayerMask:
     serializedVersion: 2
     m_Bits: 64
-  debugMode: 0
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  targetSearchRadius: 15
+  targetSearchAngle: 45
+  gamepadAimDeadZone: 0.2
+  targetSwitchCooldown: 0.25
 --- !u!114 &2141420009144466885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,7 +386,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.PlayerUnitInputsComponent
   stateMachine: {fileID: 5228831593658462585}
-  playerInputReader: {fileID: 11400000, guid: c5f0d6e24b96f5143956c9299b3ee2b4, type: 2}
+  inputGateway: {fileID: 1836545175343542454}
+  aiming: {fileID: 8462650149815504940}
 --- !u!114 &8074146902712792649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -662,6 +675,37 @@ MonoBehaviour:
   entity: {fileID: 3413998453285093005}
   soundDefinitions:
     _serializedList: []
+--- !u!114 &9103845225237627509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4988392682974cbcb73c2f047714e261, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.TargetSelector
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 64
+  searchRadius: 15
+  searchAngle: 45
+--- !u!114 &1836545175343542454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11435cb0356a22340bf03154a15fd473, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.PlayerInputGateway
+  moveDeadZone: 0.15
+  aimDeadZone: 0.2
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0

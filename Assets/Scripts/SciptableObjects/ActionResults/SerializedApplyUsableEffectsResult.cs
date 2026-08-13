@@ -45,7 +45,7 @@ namespace Arcatech.Actions
             EffectFactory factory = null)
         {
             _effs = cfg;
-            _selector = selector ?? new TargetSelector();
+            _selector = selector ?? new EffectTargetSelector();
             _factory = factory ?? new EffectFactory();
         }
 

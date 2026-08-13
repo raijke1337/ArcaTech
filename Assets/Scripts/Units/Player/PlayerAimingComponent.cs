@@ -1,159 +1,393 @@
 using System.Collections.Generic;
+using Arcatech.Managers;
 using UnityEngine;
 
 namespace Arcatech.Units.Control
 {
-    public interface IAim
+    public enum AimMode
     {
-        bool CanAim { get; set; }
-        Vector3 AimDirection { get; set; }
+        Free,
+        TargetLocked
     }
 
-    public interface IAimTarget
+    [RequireComponent(typeof(TargetSelector))]
+    public sealed class PlayerAimingComponent :
+        MonoBehaviour,
+        IPausableComponent,
+        IKillableComponent
     {
-        Vector3 GetAimPoint();
-    }
+        [Header("Aim")]
+        [SerializeField] private float aimOffset;
+        [SerializeField] private LayerMask targetMask;
+        [SerializeField, Min(0f)] private float searchRadius = 15f;
+        [SerializeField, Range(0f, 180f)] private float searchAngle = 45f;
 
-    public class PlayerAimingComponent : MonoBehaviour, IPausableComponent, IKillableComponent
-    {
-        public void SetKilled(IKillerComponent comp, bool value) => _killed = value;
-        public bool Paused { get; set; } = false;
-
-        [SerializeField] private float aimOffset = 0f;
-        [SerializeField] private LayerMask entitiesLayerMask;
+        [Header("Gamepad")]
+        [SerializeField, Range(0f, 1f)] private float gamepadAimDeadZone = 0.2f;
+        [SerializeField, Min(0f)] private float targetSwitchCooldown = 0.25f;
 
         [Header("Debug")]
-        [SerializeField] private bool debugMode = false;   // включить в инспекторе для отладки
+        [SerializeField] private bool logTargetChanges = true;
+        [SerializeField] private bool logAimWarnings = true;
+
+        private readonly List<IAim> _aimInterfaces = new();
+
+        private TargetSelector _targetSelector;
+        private PlayerInputGateway _inputGateway;
+        private Camera _camera;
+        private Plane _groundPlane;
 
         private Vector3 _desiredLookDirection;
-        private List<IAim> _aimInterfaces = new List<IAim>();
-        private Plane _groundPlane;
-        private bool _killed = false;
+        private float _nextTargetSwitchTime;
+        private bool _killed;
 
-        private CamerasController _cameraProvider;
-        private Camera _camera;
+        public bool Paused { get; set; }
+
+        public AimMode Mode { get; private set; } = AimMode.Free;
 
         public BaseGameEntityComponent CurrentTarget { get; private set; }
 
         private void Awake()
         {
-            _cameraProvider = CamerasController.Instance;
-            if (_cameraProvider != null)
-                _cameraProvider.OnActiveCameraChanged += HandleCameraChanged;
 
+            targetMask = LayerMask.GetMask(DataManager.GameRules.ValidHitsLayer);
+            _targetSelector = GetComponent<TargetSelector>();
+            _groundPlane = new Plane(Vector3.up, 0f);
             _camera = Camera.main;
 
-            if (_camera == null && debugMode)
-                Debug.LogWarning("PlayerAimingComponent: Camera.main is null on Awake!");
+            // Важно: компонент, реализующий IAim, может быть на дочернем объекте.
+            _aimInterfaces.AddRange(GetComponentsInChildren<IAim>(true));
+
+            if (_aimInterfaces.Count == 0 && logAimWarnings)
+            {
+                Debug.LogWarning(
+                    $"[{nameof(PlayerAimingComponent)}] " +
+                    $"На '{name}' не найден ни один компонент, " +
+                    $"реализующий {nameof(IAim)}. " +
+                    $"Персонаж не сможет поворачиваться.",
+                    this);
+            }
         }
 
-        private void Start()
+        public void Initialize(PlayerInputGateway inputGateway)
         {
-            _groundPlane = new Plane(Vector3.up, 0f);
-            _aimInterfaces.AddRange(GetComponents<IAim>());
+            if (_inputGateway != null)
+                _inputGateway.AimChanged -= OnAimChanged;
+
+            _inputGateway = inputGateway;
+
+            if (_inputGateway != null)
+                _inputGateway.AimChanged += OnAimChanged;
         }
 
         private void OnDestroy()
         {
-            if (_cameraProvider != null)
-                _cameraProvider.OnActiveCameraChanged -= HandleCameraChanged;
-        }
-
-        private void HandleCameraChanged(Camera newCamera)
-        {
-            _camera = newCamera;
-            if (debugMode)
-                Debug.Log($"PlayerAimingComponent: Camera changed to {(newCamera != null ? newCamera.name : "null")}");
+            if (_inputGateway != null)
+                _inputGateway.AimChanged -= OnAimChanged;
         }
 
         private void Update()
         {
-            if (Paused || _killed) return;
+            if (Paused || _killed)
+                return;
 
-            if (_camera == null)
+            // Зафиксированная цель имеет абсолютный приоритет.
+            // Поэтому персонаж продолжает смотреть на неё и во время бега.
+            if (CurrentTarget != null)
             {
-                if (debugMode)
-                    Debug.LogWarning("PlayerAimingComponent: No active camera!");
+                if (!IsValidTarget(CurrentTarget))
+                {
+                    ClearTarget("Цель стала невалидной");
+                    return;
+                }
+
+                _desiredLookDirection = GetPlanarDirection(
+                    CurrentTarget.EffectSpawn.position - transform.position);
+
+                ApplyAimDirection();
+            }
+        }
+
+        private void OnAimChanged(Vector2 input)
+        {
+            if (Paused || _killed)
+                return;
+
+            if (_inputGateway != null && _inputGateway.IsGamepad)
+                HandleGamepadAim(input);
+            else
+                HandleMouseAim(input);
+
+            ApplyAimDirection();
+        }
+
+        private void HandleMouseAim(Vector2 mousePosition)
+        {
+            Camera camera = GetCamera();
+
+            if (camera == null)
+            {
+                Debug.LogWarning(
+                    $"[{nameof(PlayerAimingComponent)}] Камера не найдена.",
+                    this);
+
                 return;
             }
 
-            DoAiming();
+            _groundPlane.distance = -(transform.position.y + aimOffset);
+
+            Ray ray = camera.ScreenPointToRay(mousePosition);
+
+
+            if (Physics.Raycast(
+                    ray,
+                    out RaycastHit hit,
+                    Mathf.Infinity,
+                    targetMask,
+                    QueryTriggerInteraction.Ignore))
+            {
+                var entity = hit.collider.GetComponentInParent<BaseGameEntityComponent>();
+
+                if (IsValidTarget(entity))
+                {
+                    SetTarget(entity, "Выбрана мышью");
+
+                    _desiredLookDirection = GetPlanarDirection(
+                        entity.EffectSpawn.position - transform.position);
+
+                    return;
+                }
+            }
+
+            // Нет валидной цели под курсором:
+            // свободно смотрим в точку, на которую указывает курсор.
+            ClearTarget("Под курсором нет валидной цели");
+
+            if (!_groundPlane.Raycast(ray, out float distance))
+                return;
+
+            Vector3 aimPoint = ray.GetPoint(distance);
+
+            _desiredLookDirection = GetPlanarDirection(
+                aimPoint - transform.position);
         }
 
-        private void DoAiming()
+        private void HandleGamepadAim(Vector2 stick)
         {
-            _groundPlane.distance = -(transform.position.y + aimOffset);
-            Vector3 mousePosition = Input.mousePosition;
-            Ray ray = _camera.ScreenPointToRay(mousePosition);
+            float deadZoneSqr = gamepadAimDeadZone * gamepadAimDeadZone;
 
-            // --- НАЧАЛО ОТЛАДКИ ---
-            if (debugMode)
+            if (stick.sqrMagnitude < deadZoneSqr)
+                return;
+
+            Vector3 stickWorldDirection = ConvertStickToWorldDirection(stick);
+
+            BaseGameEntityComponent targetInStickDirection =
+                _targetSelector.FindClosestTarget(
+                    transform.position,
+                    stickWorldDirection,
+                    transform,
+                    targetMask,
+                    searchRadius,
+                    searchAngle);
+
+            // Если нет зафиксированной цели:
+            // персонаж смотрит по направлению стика.
+            if (CurrentTarget == null)
             {
-                // Жёлтый луч от камеры
-                Debug.DrawRay(ray.origin, ray.direction * 100f, Color.yellow);
-            }
-
-            RaycastHit hit;
-            bool hitEntity = Physics.Raycast(ray, out hit, Mathf.Infinity, entitiesLayerMask);
-
-            if (hitEntity && hit.collider.TryGetComponent<BaseGameEntityComponent>(out var entity) && entity.Targetable)
-            {
-                Vector3 aimTarget = GetEntityAimPoint(entity);
-                _desiredLookDirection = (aimTarget - transform.position).normalized;
-                CurrentTarget = entity;
-
-                if (debugMode)
+                if (targetInStickDirection != null)
                 {
-                    // Красный луч от персонажа к точке прицеливания на сущности
-                    Debug.DrawLine(transform.position, aimTarget, Color.red, Time.deltaTime);
-                    Debug.Log($"[AIM] Entity: {entity.name}, aimTarget: {aimTarget}, direction: {_desiredLookDirection}");
-                }
-            }
-            else
-            {
-                CurrentTarget = null;
-
-                if (debugMode && hitEntity)
-                {
-                    // Луч попал в коллайдер, но компонент не найден
-                    Debug.LogWarning($"[AIM] Hit {hit.collider.name} but no BaseGameEntityComponent found!");
-                }
-
-                if (_groundPlane.Raycast(ray, out float distance))
-                {
-                    Vector3 hitPoint = ray.GetPoint(distance);
-                    _desiredLookDirection = (hitPoint - transform.position).normalized;
-
-                    if (debugMode)
-                    {
-                        // Зелёный луч от персонажа к точке на земле
-                        Debug.DrawLine(transform.position, hitPoint, Color.green, Time.deltaTime);
-                    }
+                    SetTarget(
+                        targetInStickDirection,
+                        "Выбрана геймпадом");
                 }
                 else
                 {
-                    if (debugMode)
-                        Debug.LogWarning("[AIM] Ray missed both entities and ground!");
-
-                    _desiredLookDirection = transform.forward;
+                    Mode = AimMode.Free;
+                    _desiredLookDirection = stickWorldDirection;
                 }
+
+                return;
             }
 
-            // Применяем направление ко всем IAim
-            if (_aimInterfaces.Count > 0)
+            // Если цель уже зафиксирована, а в направлении стика нет другой:
+            // сохраняем lock-on и продолжаем смотреть на текущую цель.
+            if (targetInStickDirection == null ||
+                targetInStickDirection == CurrentTarget)
             {
-                foreach (var aim in _aimInterfaces)
-                {
-                    aim.AimDirection = _desiredLookDirection;
-                }
+                return;
+            }
+
+            // Переключаем цель только после cooldown.
+            if (Time.time < _nextTargetSwitchTime)
+                return;
+
+            SetTarget(
+                targetInStickDirection,
+                "Переключена геймпадом");
+
+            _nextTargetSwitchTime = Time.time + targetSwitchCooldown;
+        }
+
+        private Vector3 ConvertStickToWorldDirection(Vector2 stick)
+        {
+            Camera camera = GetCamera();
+
+            if (camera == null)
+                return GetPlanarDirection(transform.forward);
+
+            Vector3 cameraForward = camera.transform.forward;
+            cameraForward.y = 0f;
+            cameraForward.Normalize();
+
+            Vector3 cameraRight = camera.transform.right;
+            cameraRight.y = 0f;
+            cameraRight.Normalize();
+
+            Vector3 worldDirection =
+                cameraRight * stick.x +
+                cameraForward * stick.y;
+
+            return GetPlanarDirection(worldDirection);
+        }
+
+        private Camera GetCamera()
+        {
+            if (_camera == null)
+                _camera = Camera.main;
+
+            return _camera;
+        }
+
+        private void SetTarget(
+            BaseGameEntityComponent target,
+            string reason)
+        {
+            if (!IsValidTarget(target))
+            {
+                ClearTarget("Попытка выбрать невалидную цель");
+                return;
+            }
+
+            if (CurrentTarget == target)
+                return;
+
+            CurrentTarget = target;
+            Mode = AimMode.TargetLocked;
+
+            _desiredLookDirection = GetPlanarDirection(
+                target.EffectSpawn.position - transform.position);
+
+            NotifyGameInterface(target);
+            LogTarget(reason);
+        }
+
+        private void ClearTarget(string reason)
+        {
+            if (CurrentTarget == null && Mode == AimMode.Free)
+                return;
+
+            string previousTargetName = CurrentTarget != null
+                ? CurrentTarget.name
+                : "null";
+
+            CurrentTarget = null;
+            Mode = AimMode.Free;
+
+            NotifyGameInterface(null);
+
+            if (logTargetChanges)
+            {
+                // Debug.Log(
+                //     $"[{nameof(PlayerAimingComponent)}] " +
+                //     $"Цель снята. Предыдущая цель: '{previousTargetName}'. " +
+                //     $"Причина: {reason}.",
+                //     this);
             }
         }
 
-        private Vector3 GetEntityAimPoint(BaseGameEntityComponent entity)
+        private void ApplyAimDirection()
         {
-            if (entity is IAimTarget aimTarget)
-                return aimTarget.GetAimPoint();
-            return entity.transform.position;
+            if (_desiredLookDirection.sqrMagnitude < 0.0001f)
+                return;
+
+            foreach (IAim aim in _aimInterfaces)
+            {
+                if (aim == null)
+                    continue;
+
+                if (!aim.CanAim)
+                    continue;
+
+                aim.AimDirection = _desiredLookDirection;
+            }
+        }
+
+        private void NotifyGameInterface(BaseGameEntityComponent target)
+        {
+            if (GameInterfaceManager.Instance != null)
+                GameInterfaceManager.Instance.LockOnTarget(target);
+        }
+
+        private static Vector3 GetPlanarDirection(Vector3 direction)
+        {
+            direction.y = 0f;
+
+            return direction.sqrMagnitude > 0.0001f
+                ? direction.normalized
+                : Vector3.zero;
+        }
+
+        private bool IsValidTarget(BaseGameEntityComponent target)
+        {
+            if (target == null ||
+                target.EffectSpawn == null ||
+                !target.gameObject.activeInHierarchy ||
+                !target.Targetable)
+            {
+                return false;
+            }
+
+            // Сам игрок и его дочерние объекты никогда не могут быть целью.
+            if (target.transform.IsChildOf(transform))
+                return false;
+
+            // Дополнительное исключение объектов с Player tag.
+            if (target.CompareTag("Player"))
+                return false;
+
+            Vector3 offset =
+                target.EffectSpawn.position - transform.position;
+
+            offset.y = 0f;
+
+            return offset.sqrMagnitude <= searchRadius * searchRadius;
+        }
+
+        private void LogTarget(string reason)
+        {
+            if (!logTargetChanges)
+                return;
+
+            string targetName = CurrentTarget != null
+                ? CurrentTarget.name
+                : "null";
+
+            // Debug.Log(
+            //     $"[{nameof(PlayerAimingComponent)}] " +
+            //     $"Текущая цель: '{targetName}'. " +
+            //     $"Режим: {Mode}. " +
+            //     $"Причина: {reason}.",
+            //     this);
+        }
+
+        public void SetKilled(
+            IKillerComponent component,
+            bool value)
+        {
+            _killed = value;
+
+            if (_killed)
+                ClearTarget("Персонаж погиб");
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Arcatech.Items;
 using Arcatech.Units;
+using Arcatech.Units.Control;
 using KBCore.Refs;
 using UnityEngine;
 
@@ -103,23 +104,23 @@ namespace Arcatech.Interactions
         }
 
         // --- Commands ---
-        public bool CanDoUnitCommand(UnitActionType type, out string info)
+        public bool CanDoUnitCommand(UnitCommand command, out string info)
         {
             info = "Interaction";
-            if (type == UnitActionType.Use)
+            if (command.Type == UnitActionType.Use)
                 return State == InteractionState.Idle;
             return true;
         }
 
-        public void PrepareCommand(UnitActionType type)
+        public void PrepareCommand(UnitCommand command)
         {
-            if (type == UnitActionType.Use && State == InteractionState.Idle)
+            if (command.Type == UnitActionType.Use && State == InteractionState.Idle)
                 State = InteractionState.Starting;
         }
 
-        public void DoUnitCommand(UnitActionType type, bool wasSuccessful)
+        public void DoUnitCommand(UnitCommand command, bool wasSuccessful)
         {
-            if (type != UnitActionType.Use || !wasSuccessful) return;
+            if (command.Type != UnitActionType.Use || !wasSuccessful) return;
 
             // Ветка 1: отмена текущего активного взаимодействия
             if (_active != null && _active == _target)

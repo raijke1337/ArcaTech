@@ -9,7 +9,7 @@ namespace ArcaTech.Usables.Effects
             BaseGameEntityComponent hit,
             out BaseGameEntityComponent finalTarget);
     }
-    public sealed class TargetSelector : ITargetSelector
+    public sealed class EffectTargetSelector : ITargetSelector
     {
         public bool TryPickTarget(TargetingType targeting,
             BaseGameEntityComponent source,

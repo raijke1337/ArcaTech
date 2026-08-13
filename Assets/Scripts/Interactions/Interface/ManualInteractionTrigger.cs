@@ -28,12 +28,12 @@ namespace Arcatech.Interactions
         
         public void OnPointerEnter(PointerEventData eventData)
         {
-            GameInterfaceManager.Instance?.NotifyTargetable(this,true);
+          //  GameInterfaceManager.Instance?.NotifyTargetable(this,true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            GameInterfaceManager.Instance?.NotifyTargetable(this,false);
+           // GameInterfaceManager.Instance?.NotifyTargetable(this,false);
         }
 
         private void OnEnable()
@@ -41,11 +41,11 @@ namespace Arcatech.Interactions
             interactableComponent.Entity.AssignName(GetInfo.Title);
         }
 
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            GameInterfaceManager.Instance?.NotifyTargetable(this,false);
-        }
+        // protected override void OnDisable()
+        // {
+        //     base.OnDisable();
+        //     GameInterfaceManager.Instance?.NotifyTargetable(this,false);
+        // }
 
         [Space,SerializeField] Description description;
         public Description GetInfo => description;

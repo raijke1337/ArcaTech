@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using Arcatech.EventBus;
 using Arcatech.Interactions;
@@ -11,6 +12,7 @@ using KBCore.Refs;
 using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 namespace Arcatech.Managers
 {
@@ -31,14 +33,15 @@ namespace Arcatech.Managers
         [SerializeField] private PanelAnimator_Free pauseWindow;
         
         [SerializeField,Child] private PlayerUnitPanel playerPanel;
-        [SerializeField,Child] private GameTextWindowComponent _text;
 
         [SerializeField,Child] private ItemCardComponent inspectItemCard;
-        [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
         [SerializeField] public Transform miniGame;
+        [Space]
         [SerializeField] private bool showTooltip = true;
+        [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
+        [Space]
+        [SerializeField,Child] private GameTextWindowComponent _text;
         [SerializeField] private bool showDialogues = true;
-
 
         /// <summary>
         /// called by inputs
@@ -56,8 +59,25 @@ namespace Arcatech.Managers
             playerPanel.gameObject.SetActive(true);
             playerPanel.Show();
             koWindow.Hide();
+
+            if (gameplayCamera == null)
+                gameplayCamera = Camera.main;
+
+            if (crosshair != null)
+            {
+                _crosshairRect = crosshair.GetComponent<RectTransform>();
+                _crosshairCanvas = crosshair.GetComponentInParent<Canvas>();
+
+                crosshair.CurrentTarget = null;
+                crosshair.gameObject.SetActive(false);
+            }
         }
-        
+        private void LateUpdate()
+        {
+            UpdateCrosshairPosition();
+        }
+
+
         #region game dialogues and texts
         public void ShowDialoguePart(DialoguePart dialogue)
         {
@@ -71,6 +91,13 @@ namespace Arcatech.Managers
         
         #endregion
         
+        #region targeting
+        [SerializeField] private bool showCrosshair = true;
+        [SerializeField] private CrosshairComponent crosshair;
+        [SerializeField] private Camera gameplayCamera;
+
+        private RectTransform _crosshairRect;
+        private Canvas _crosshairCanvas;
         public void NotifyTargetable(ITargetable targetable, bool show)
         {
             if (!showTooltip) return;
@@ -84,7 +111,97 @@ namespace Arcatech.Managers
             floatingTooltip.Set(targetable);
             floatingTooltip.PanelAnimator.Show();
         }
+        public void LockOnTarget(BaseGameEntityComponent target)
+        {
+            if (crosshair == null)
+                return;
 
+            crosshair.CurrentTarget = target;
+
+            bool shouldShow = showCrosshair && target != null;
+
+            crosshair.gameObject.SetActive(shouldShow);
+
+            Debug.Log(
+                target != null
+                    ? $"[GameInterfaceManager] Crosshair enabled: {target.name}"
+                    : "[GameInterfaceManager] Crosshair disabled");
+        }
+        
+        private void UpdateCrosshairPosition()
+        {
+            if (!showCrosshair ||
+                crosshair == null ||
+                !crosshair.gameObject.activeSelf)
+            {
+                return;
+            }
+
+            BaseGameEntityComponent target = crosshair.CurrentTarget;
+
+            if (target == null ||
+                !target.gameObject.activeInHierarchy ||
+                target.EffectSpawn == null)
+            {
+                LockOnTarget(null);
+                return;
+            }
+
+            if (gameplayCamera == null)
+                gameplayCamera = Camera.main;
+
+            if (gameplayCamera == null)
+                return;
+
+            if (_crosshairRect == null)
+                _crosshairRect = crosshair.GetComponent<RectTransform>();
+
+            if (_crosshairCanvas == null)
+                _crosshairCanvas = crosshair.GetComponentInParent<Canvas>();
+
+            if (_crosshairRect == null || _crosshairCanvas == null)
+                return;
+
+            Vector3 screenPosition = gameplayCamera.WorldToScreenPoint(
+                target.EffectSpawn.position);
+
+            // Цель за камерой — прицел не показываем.
+            if (screenPosition.z <= 0f)
+            {
+                crosshair.gameObject.SetActive(false);
+                return;
+            }
+
+            RectTransform parentRect = _crosshairRect.parent as RectTransform;
+
+            if (parentRect == null)
+                return;
+
+            Camera canvasCamera = null;
+
+            if (_crosshairCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            {
+                canvasCamera = _crosshairCanvas.worldCamera != null
+                    ? _crosshairCanvas.worldCamera
+                    : gameplayCamera;
+            }
+
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    parentRect,
+                    screenPosition,
+                    canvasCamera,
+                    out Vector2 localPosition))
+            {
+                return;
+            }
+
+            _crosshairRect.anchoredPosition = localPosition;
+
+            // Если цель снова оказалась перед камерой — показываем прицел.
+            if (!crosshair.gameObject.activeSelf)
+                crosshair.gameObject.SetActive(true);
+        }
+        #endregion
 
         #region menus
 
@@ -140,8 +257,12 @@ namespace Arcatech.Managers
         public void ShowGlitchEffect()
         {
             // TODO!
+            // interface shake effect
         }
         #endregion
+        
+        
+        
         
 #region draw damage
 
