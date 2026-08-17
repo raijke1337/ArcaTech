@@ -50,7 +50,7 @@ namespace Arcatech.Usables
                         break;
                     case StateMachineNotifyType.Use:
                         provider.Active = true;
-                        provider.AreaCast(this);
+                       // provider.AreaCast(this);
                         break;
                     case StateMachineNotifyType.EndUse:
                         provider.Active = false;

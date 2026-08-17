@@ -363,16 +363,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.PlayerAimingComponent
   aimOffset: 0
-  entitiesLayerMask:
+  targetMask:
     serializedVersion: 2
     m_Bits: 64
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  targetSearchRadius: 15
-  targetSearchAngle: 45
+  searchRadius: 15
+  searchAngle: 45
   gamepadAimDeadZone: 0.2
   targetSwitchCooldown: 0.25
+  logTargetChanges: 1
+  logAimWarnings: 1
 --- !u!114 &2141420009144466885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -618,12 +617,7 @@ MonoBehaviour:
   stats: {fileID: 8341150968193856820}
   stateMachine: {fileID: 5228831593658462585}
   toKilledState: {fileID: 11400000, guid: aa806e69f163ab043a5541d5106fee78, type: 2}
-  canBeInterrupted: 0
-  interruptCondition:
-    requireAll: 0
-    invert: 0
-    statConditions: []
-  toDamageInterrupt: {fileID: 0}
+  toKnockDown: {fileID: 11400000, guid: aa2c57c1ff12e6d47b27770c3affa4b8, type: 2}
   dmgFrontAnimatorParameter: DamageFront
   dmgRightAnimatorParameter: DamageRight
 --- !u!114 &-367359324892275855
@@ -687,11 +681,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4988392682974cbcb73c2f047714e261, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.TargetSelector
-  targetMask:
-    serializedVersion: 2
-    m_Bits: 64
-  searchRadius: 15
-  searchAngle: 45
 --- !u!114 &1836545175343542454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1159,17 +1148,17 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[0].lossyScale
-      value: 1.0000001
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[1].lossyScale
-      value: 1.0000001
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].lossyScale
-      value: 1.0000001
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
@@ -3605,17 +3594,17 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[0].lossyScale
-      value: 1
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[1].lossyScale
-      value: 1
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].lossyScale
-      value: 1
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: cdfa246038fd8494aa1d928b1a24eec8,
         type: 3}

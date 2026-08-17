@@ -1,3 +1,4 @@
+using Arcatech.Cameras;
 using Arcatech.EventBus;
 using KBCore.Refs;
 using UnityEngine;
@@ -43,15 +44,37 @@ namespace Arcatech.Units.Control
             inputGateway.JumpPressed += OnJump;
             inputGateway.InteractPressed += OnInteract;
             inputGateway.PausePressed += OnPause;
-
-            CinemachineCore.BlendCreatedEvent
-                .AddListener(OnCameraBlendStarted);
-
-            CinemachineCore.BlendFinishedEvent
-                .AddListener(OnCameraBlendFinished);
+            inputGateway.CameraRotateLeftPressed += () => RotateCamera(true);
+            inputGateway.CameraRotateRightPressed += () => RotateCamera(false);
+            
+            
+            // CinemachineCore.BlendCreatedEvent
+            //     .AddListener(OnCameraBlendStarted);
+            //
+            // CinemachineCore.BlendFinishedEvent
+            //     .AddListener(OnCameraBlendFinished);
 
             _cameraAdjust.UpdateBasis();
+            
+            
         }
+
+        private void RotateCamera(bool clockwise)
+        {
+            Debug.Log($"RotateCamera called. Clockwise: {clockwise}");
+
+            CamerasController.Instance.SwitchCamera(
+                clockwise,
+                () =>
+                {
+                    Debug.Log("Camera callback received: UpdateBasis will be called.");
+
+                    _cameraAdjust.UpdateBasis();
+
+                    Debug.Log("UpdateBasis completed.");
+                });
+        }
+
 
         private void OnDisable()
         {
@@ -68,13 +91,16 @@ namespace Arcatech.Units.Control
                 inputGateway.JumpPressed -= OnJump;
                 inputGateway.InteractPressed -= OnInteract;
                 inputGateway.PausePressed -= OnPause;
+                
+                inputGateway.CameraRotateLeftPressed -= () => RotateCamera(true);
+                inputGateway.CameraRotateRightPressed -= () => RotateCamera(false);
             }
 
-            CinemachineCore.BlendCreatedEvent
-                .RemoveListener(OnCameraBlendStarted);
-
-            CinemachineCore.BlendFinishedEvent
-                .RemoveListener(OnCameraBlendFinished);
+            // CinemachineCore.BlendCreatedEvent
+            //     .RemoveListener(OnCameraBlendStarted);
+            //
+            // CinemachineCore.BlendFinishedEvent
+            //     .RemoveListener(OnCameraBlendFinished);
         }
 
         private void Update()
@@ -172,20 +198,20 @@ namespace Arcatech.Units.Control
             return Vector3.ClampMagnitude(move, 1f);
         }
 
-        private void OnCameraBlendStarted(
-            CinemachineCore.BlendEventParams parameters)
-        {
-            _inCameraBlend = true;
-            SetMovement(Vector3.zero);
-        }
-
-        private void OnCameraBlendFinished(
-            ICinemachineMixer mixer,
-            ICinemachineCamera camera)
-        {
-            _inCameraBlend = false;
-            _cameraAdjust.UpdateBasis();
-        }
+        // private void OnCameraBlendStarted(
+        //     CinemachineCore.BlendEventParams parameters)
+        // {
+        //     _inCameraBlend = true;
+        //     SetMovement(Vector3.zero);
+        // }
+        //
+        // private void OnCameraBlendFinished(
+        //     ICinemachineMixer mixer,
+        //     ICinemachineCamera camera)
+        // {
+        //     _inCameraBlend = false;
+        //     _cameraAdjust.UpdateBasis();
+        // }
 
         private sealed class IsoCamAdjust
         {
@@ -197,6 +223,7 @@ namespace Arcatech.Units.Control
 
             public void UpdateBasis()
             {
+                Debug.Log("UpdateBasis");
                 Camera camera = Camera.main;
 
                 if (camera == null)
@@ -214,5 +241,7 @@ namespace Arcatech.Units.Control
                     Isoforward).normalized;
             }
         }
+        
+        
     }
 }

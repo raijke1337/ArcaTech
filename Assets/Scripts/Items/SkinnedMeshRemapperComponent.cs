@@ -19,7 +19,7 @@ namespace Arcatech.Items
 
         [SerializeField] private bool destroyTemplateAfterBind = true;
 
-        private static readonly Dictionary<int, Dictionary<string, Transform>> SkeletonCache = new();
+        private static readonly Dictionary<EntityId, Dictionary<string, Transform>> SkeletonCache = new();
         private bool isBound;
 
         private void Reset()
@@ -145,7 +145,7 @@ namespace Arcatech.Items
 
         private static Dictionary<string, Transform> GetOrBuildSkeletonMap(Transform skeletonRoot)
         {
-            int id = skeletonRoot.GetInstanceID();
+            var id = skeletonRoot.GetEntityId();
             if (SkeletonCache.TryGetValue(id, out var cached))
                 return cached;
 

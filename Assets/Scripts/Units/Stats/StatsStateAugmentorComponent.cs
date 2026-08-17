@@ -19,11 +19,11 @@ namespace Arcatech.Stats
         private EntityStatsComponent stats;
         [SerializeField,Self] EntityStateMachineComponent stateMachine;
         [SerializeField] private SerializedStateTransition toKilledState;
-       // [SerializeField] private SerializedStateTransition toKnockDown;
+        [SerializeField] private SerializedStateTransition toKnockDown;
         private StateTransition _toKilled;
-    //   private StateTransition _toKnockDown;
+        private StateTransition _toKnockDown;
         private UnitState _killState;
-      //  private UnitState _knockDownStart;
+        private UnitState _knockDownStart;
         
         private StateMachineContext _stateMachineCtx;
         private List <IKillableComponent> _components;
@@ -41,13 +41,13 @@ namespace Arcatech.Stats
                 _killState = _toKilled.NextState;
             }
 
-            // if (toKnockDown != null)
-            // {
-            //     _toKnockDown = toKnockDown.Build();
-            //     machine.AddTransition(_toKnockDown);
-            //     _knockDownStart = _toKnockDown.NextState;
-            // }
-            //
+            if (toKnockDown != null)
+            {
+                _toKnockDown = toKnockDown.Build();
+                machine.AddTransition(_toKnockDown);
+                _knockDownStart = _toKnockDown.NextState;
+            }
+            
             // if (_damageInterrupt != null)
             // {
             //     _damageInterrupt ??= toDamageInterrupt.Build();
@@ -61,16 +61,16 @@ namespace Arcatech.Stats
         public void Detach(IStateAugmentorReceiver machine)
         {
             if (_toKilled != null) machine.RemoveTransition(_toKilled);
-          //  if (_toKnockDown != null) machine.RemoveTransition(_toKnockDown);
+            if (_toKnockDown != null) machine.RemoveTransition(_toKnockDown);
        //     if (_damageInterrupt!=null) machine.RemoveTransition(_damageInterrupt);
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)
         {
-            // if (state == _knockDownStart)
-            // {
-            //     context.KnockDownState = true;
-            // }
+             if (state == _knockDownStart)
+             {
+                 context.KnockDownState = true;
+             }
 
             if (state == _killState)
             {
@@ -109,9 +109,9 @@ namespace Arcatech.Stats
 
 
 
-        [SerializeField] private bool canBeInterrupted = true;
-        [SerializeField] private ConditionGroup interruptCondition;
-        [SerializeField] private SerializedStateTransition toDamageInterrupt;
+      //  [SerializeField] private bool canBeInterrupted = true;
+       // [SerializeField] private ConditionGroup interruptCondition;
+      //  [SerializeField] private SerializedStateTransition toDamageInterrupt;
         [SerializeField] private string dmgFrontAnimatorParameter = "DamageFront";
         [SerializeField] private string dmgRightAnimatorParameter = "DamageRight";
 

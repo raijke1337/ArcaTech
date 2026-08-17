@@ -122,10 +122,6 @@ namespace Arcatech.Managers
 
             crosshair.gameObject.SetActive(shouldShow);
 
-            Debug.Log(
-                target != null
-                    ? $"[GameInterfaceManager] Crosshair enabled: {target.name}"
-                    : "[GameInterfaceManager] Crosshair disabled");
         }
         
         private void UpdateCrosshairPosition()

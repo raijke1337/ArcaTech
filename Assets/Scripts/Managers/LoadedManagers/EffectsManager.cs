@@ -19,7 +19,7 @@ namespace Arcatech.Managers
         [SerializeField]
         private Transform _poolRoot;
 
-        private readonly Dictionary<int, EffectPool> _pools = new();
+        private readonly Dictionary<EntityId, EffectPool> _pools = new();
 
         private EventBinding<ParticlesEvent> _particlesEventBinding;
         private bool _isRegistered;
@@ -89,7 +89,7 @@ namespace Arcatech.Managers
 
         private EffectPool GetOrCreatePool(CFXR_Effect prefab)
         {
-            int prefabId = prefab.GetInstanceID();
+            var prefabId = prefab.GetEntityId();
 
             if (_pools.TryGetValue(prefabId, out var pool))
             {
@@ -159,7 +159,7 @@ namespace Arcatech.Managers
             var lifetime = effect.GetComponent<PooledEffect>();
             lifetime.Disarm();
 
-            int prefabId = lifetime.PrefabInstanceId;
+            var prefabId = lifetime.PrefabInstanceId;
 
             if (_pools.TryGetValue(prefabId, out var pool))
             {
@@ -175,7 +175,7 @@ namespace Arcatech.Managers
         {
             private readonly CFXR_Effect _prefab;
             private readonly Transform _poolRoot;
-            private readonly int _prefabInstanceId;
+            private readonly EntityId _prefabInstanceId;
 
             private readonly ObjectPool<CFXR_Effect> _pool;
 
@@ -187,7 +187,7 @@ namespace Arcatech.Managers
             {
                 _prefab = prefab;
                 _poolRoot = poolRoot;
-                _prefabInstanceId = prefab.GetInstanceID();
+                _prefabInstanceId = prefab.GetEntityId();
 
                 _pool = new ObjectPool<CFXR_Effect>(
                     createFunc: Create,

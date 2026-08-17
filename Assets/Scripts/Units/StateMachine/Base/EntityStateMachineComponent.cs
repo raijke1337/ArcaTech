@@ -111,10 +111,12 @@ namespace Arcatech.Units
         const int kMaxChain = 8;
         void Update()
         {
-            if (Paused || _killed) return;
+            if (Paused) return;
 
             _currentState?.UpdateState(_context, animator, Time.deltaTime);
 
+            if (_killed) return;
+            
             int safety = 0;
             while (safety++ < kMaxChain)
             {

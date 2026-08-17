@@ -7,7 +7,7 @@ namespace Arcatech.Managers
     [RequireComponent(typeof(ParticleSystem))]
     public sealed class PooledEffect : MonoBehaviour
     {
-        public int PrefabInstanceId { get; private set; }
+        public EntityId PrefabInstanceId { get; private set; }
 
         private EffectsManager _manager;
         private CFXR_Effect _effect;
@@ -18,7 +18,7 @@ namespace Arcatech.Managers
 
         public void Initialize(
             EffectsManager manager,
-            int prefabInstanceId,
+            EntityId prefabInstanceId,
             ParticleSystem rootParticleSystem)
         {
             _manager = manager;

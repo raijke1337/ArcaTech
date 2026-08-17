@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Arcatech.Audio;
 using Arcatech.Texts;
 using KBCore.Refs;
 using SpankyBoy.JuiceUI.Free;
@@ -115,8 +116,11 @@ public class GameTextWindowComponent : ValidatedMonoBehaviour
         {
             StopCoroutine(_coroutine);
         }
+
+        var line = _currentDialogue.Dialogue;
         
-        _coroutine = StartCoroutine(RevealText(dialoguePart.Dialogue));
+        _coroutine = StartCoroutine(RevealText(line.Text));
+        if (line.TryGetVoiceLine(out var v)) AudioEvents.Play(v);
     }
 
     private IEnumerator RevealText(string text, float delay = -1f)

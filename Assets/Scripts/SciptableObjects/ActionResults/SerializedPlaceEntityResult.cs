@@ -17,16 +17,17 @@ namespace Arcatech.Actions
 
     public class PlaceEntityResult : ActionResult
     {
-        BaseGameEntityComponent EntityToPlace;
-        public PlaceEntityResult(BaseGameEntityComponent entityToPlace)
+        BaseGameEntityComponent _prefab;
+        public PlaceEntityResult(BaseGameEntityComponent prefab)
         {
-            EntityToPlace = entityToPlace;
+            _prefab = prefab;
         }
         public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place,
             Quaternion placeRot)
         {
-            GameObject.Instantiate(EntityToPlace, place, placeRot);
-            return EntityToPlace;
+            
+            Object.Instantiate(_prefab, place, placeRot);
+            return _prefab;
         }
     }
 }

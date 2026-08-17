@@ -23,8 +23,8 @@ namespace com.cyborgAssets.internalIBPEditor
             }
         }
 
-        private static Dictionary<int, Dictionary<MethodInfo, ParameterValue[]>> cache =
-            new Dictionary<int, Dictionary<MethodInfo, ParameterValue[]>>();
+        private static Dictionary<EntityId, Dictionary<MethodInfo, ParameterValue[]>> cache =
+            new Dictionary<EntityId, Dictionary<MethodInfo, ParameterValue[]>>();
 
         protected abstract bool AllowSceneObjects { get; }
 
@@ -62,7 +62,7 @@ namespace com.cyborgAssets.internalIBPEditor
             if (serializedObject.targetObject == null)
                 return;
             var type = GetTargetType();
-            var objectID = serializedObject.targetObject.GetInstanceID();
+            var objectID = serializedObject.targetObject.GetEntityId();
 
             if (cache.ContainsKey(objectID))
             {
@@ -103,7 +103,7 @@ namespace com.cyborgAssets.internalIBPEditor
         private void TryAddObjectToCacheMine(UnityEngine.Object targetObjectMine)
         {
             var type = GetTargetType(targetObjectMine);
-            var objectID = targetObjectMine.GetInstanceID();
+            var objectID = targetObjectMine.GetEntityId();
 
 
 
@@ -432,7 +432,7 @@ namespace com.cyborgAssets.internalIBPEditor
                         {
                             TryAddObjectToCacheMine(targetObject); // this fixes a bug where duplicating objects then selecting them then clicking a button threw an error since the new objects where not in the cache until you selected them
 
-                            var targetParameters = cache[targetObject.GetInstanceID()][methodParams.Key];
+                            var targetParameters = cache[targetObject.GetEntityId()][methodParams.Key];
 
 
 
