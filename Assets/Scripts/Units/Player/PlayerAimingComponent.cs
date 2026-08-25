@@ -372,12 +372,12 @@ namespace Arcatech.Units.Control
                 ? CurrentTarget.name
                 : "null";
 
-            // Debug.Log(
-            //     $"[{nameof(PlayerAimingComponent)}] " +
-            //     $"Текущая цель: '{targetName}'. " +
-            //     $"Режим: {Mode}. " +
-            //     $"Причина: {reason}.",
-            //     this);
+            Debug.Log(
+                $"[{nameof(PlayerAimingComponent)}] " +
+                $"Текущая цель: '{targetName}'. " +
+                $"Режим: {Mode}. " +
+                $"Причина: {reason}.",
+                this);
         }
 
         public void SetKilled(

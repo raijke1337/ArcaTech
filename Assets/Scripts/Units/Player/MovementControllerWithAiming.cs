@@ -12,13 +12,15 @@ namespace Arcatech.Units.Control
         private IModifierAggregator _agg;
         private float _startSpeed;
         private float _mult = 1f;
-
+        
+        public bool IsGamepadInput { get; set; } = false;
 
         #region aim
         
         public bool CanAim { get; set; } = true;
 
         public Vector3 AimDirection { get; set; }
+        public bool HasLockedTarget { get; set; } = false;
         
         #endregion
 
@@ -57,9 +59,26 @@ namespace Arcatech.Units.Control
         }
 
 
+        // protected override void CustomRotationMode(float deltaTime)
+        // {
+        //     if (CanAim) RotateTowards(AimDirection, deltaTime);
+        //     base.CustomRotationMode(deltaTime);
+        // }
+        
+        
         protected override void CustomRotationMode(float deltaTime)
         {
-            if (CanAim) RotateTowards(AimDirection, deltaTime);
+            if (!CanAim)
+                return;
+
+            bool isMoving = MovementVector.sqrMagnitude > 0.0001f;
+
+            bool rotateToMovement = !HasLockedTarget && IsGamepadInput && isMoving;
+
+            Vector3 targetDirection = rotateToMovement ? MovementVector : AimDirection;
+
+            RotateTowards(targetDirection, deltaTime);
+
             base.CustomRotationMode(deltaTime);
         }
 

@@ -5,6 +5,7 @@ using Arcatech.Stats;
 using Arcatech.Units.Control;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
+using NUnit.Framework.Constraints;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -160,6 +161,7 @@ namespace Arcatech.Units
         public bool IsGrounded => agent.isOnNavMesh;
         public void ApplyImpulse(Vector3 impulse) => _impulse.ApplyImpulse(impulse);
         public void ApplyImpulse(float impulseRelative)=>  _impulse.ApplyImpulse(impulseRelative);
+        public bool IsGamepadInput { get; set; } = false;
 
         public float SpeedMultiplier
         {

@@ -34,7 +34,7 @@ namespace Arcatech
         
         [Space, SerializeField] protected bool _showDebugs = false;
         public Transform EffectSpawn => effectSpawn;
-        [SerializeField] private bool targetable = true;
+        [SerializeField] private bool targetable = false;
         public bool Targetable => targetable;
         
         /// <summary>

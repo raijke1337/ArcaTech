@@ -6,5 +6,6 @@ namespace Arcatech.Units.Control
     {
         bool CanAim { get; set; }
         Vector3 AimDirection { get; set; }
+        public bool HasLockedTarget { get; set; }
     }
 }

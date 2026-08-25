@@ -20,6 +20,7 @@ namespace Arcatech.Units.Control
         private PlayerAimingComponent aiming;
 
         private IMove _mover;
+        private IAim _aim;
         private readonly IsoCamAdjust _cameraAdjust = new();
 
         private bool _inCameraBlend;
@@ -28,6 +29,7 @@ namespace Arcatech.Units.Control
         {
             base.Awake();
             _mover = GetComponent<IMove>();
+            _aim  = GetComponent<IAim>();
             aiming.Initialize(inputGateway);
         }
 
@@ -61,17 +63,11 @@ namespace Arcatech.Units.Control
 
         private void RotateCamera(bool clockwise)
         {
-            Debug.Log($"RotateCamera called. Clockwise: {clockwise}");
-
             CamerasController.Instance.SwitchCamera(
                 clockwise,
                 () =>
-                {
-                    Debug.Log("Camera callback received: UpdateBasis will be called.");
-
+                { 
                     _cameraAdjust.UpdateBasis();
-
-                    Debug.Log("UpdateBasis completed.");
                 });
         }
 
@@ -109,7 +105,15 @@ namespace Arcatech.Units.Control
                 return;
 
             if (_mover != null)
+            {
                 _mover.MovementVector = InputMovement;
+                _mover.IsGamepadInput = inputGateway.IsGamepad;
+            }
+
+            if (_aim != null)
+            {
+                _aim.HasLockedTarget = aiming.CurrentTarget;
+            }
         }
 
         private void OnMoveChanged(Vector2 input)

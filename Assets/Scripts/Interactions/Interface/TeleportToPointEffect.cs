@@ -1,4 +1,5 @@
-﻿using Arcatech.SaveSystem;
+﻿using System;
+using Arcatech.SaveSystem;
 using UnityEngine;
 
 namespace Arcatech.Interactions
@@ -14,6 +15,15 @@ namespace Arcatech.Interactions
         public override void OnLoadLevelState(ProgressItemState stateToLoad)
         {
             
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (point != null)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawSphere(point.position, 1f);
+            }
         }
     }
 }

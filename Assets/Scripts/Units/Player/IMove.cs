@@ -12,5 +12,6 @@ namespace Arcatech.Units.Control
         public float SpeedMultiplier { get; set; }
         public void ApplyImpulse(Vector3 impulse);
         public void ApplyImpulse(float impulseRelative);
+        public bool IsGamepadInput { get; set; }
     }
 }

@@ -5,6 +5,11 @@ Shader "Stylized/Toon Wall"
         [MainColor] _Color ("Color", Color) = (0.7, 0.7, 0.7, 1)
         [MainTexture] _MainTex ("Albedo", 2D) = "white" {}
 
+        [Header(World Space Mapping)]
+        // Размер тайла в мировых единицах: чем больше Tiling, тем мельче квадраты.
+        // Scale объекта на это больше не влияет.
+        _TriplanarSharpness ("Triplanar Sharpness", Range(1, 16)) = 4
+
         [Header(Step Shading)]
         _ShadowColor ("Shadow Color", Color) = (0.2, 0.2, 0.25, 1)
         _StepOffset ("Step Offset", Range(-0.5, 0.5)) = 0
@@ -20,12 +25,11 @@ Shader "Stylized/Toon Wall"
         _OutlineTextureStrength ("Outline Texture Strength", Range(0, 1)) = 0
 
         [Header(Transparency)]
-        // 0 = Opaque, 1 = Transparent (для fade стен)
         [Enum(Opaque,0,Transparent,1)] _Surface ("Surface Type", Float) = 1
-        [HideInInspector] _SrcBlend ("Src Blend", Float) = 5 // SrcAlpha
-        [HideInInspector] _DstBlend ("Dst Blend", Float) = 10 // OneMinusSrcAlpha
+        [HideInInspector] _SrcBlend ("Src Blend", Float) = 5
+        [HideInInspector] _DstBlend ("Dst Blend", Float) = 10
         [HideInInspector] _ZWrite ("ZWrite", Float) = 0
-        [HideInInspector] _Cull ("Cull", Float) = 2 // Back
+        [HideInInspector] _Cull ("Cull", Float) = 2
 
         [HideInInspector] _QueueOffset ("Queue Offset", Float) = 0
     }
@@ -77,23 +81,41 @@ Shader "Stylized/Toon Wall"
                 float _Thickness;
                 float _AdaptiveThickness;
                 float _OutlineTextureStrength;
+                float _TriplanarSharpness;
             CBUFFER_END
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
-                float2 uv         : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
-                float2 uv         : TEXCOORD0;
+                float3 positionWS : TEXCOORD0;
+                float3 normalWS   : TEXCOORD1;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
+
+            // World-space triplanar sample — размер текстуры в мировых единицах
+            half4 SampleMainTexTriplanar(float3 positionWS, float3 normalWS)
+            {
+                float3 blend = pow(abs(normalWS), _TriplanarSharpness);
+                blend /= max(blend.x + blend.y + blend.z, 1e-5);
+
+                float2 uvX = positionWS.zy * _MainTex_ST.xy + _MainTex_ST.zw;
+                float2 uvY = positionWS.xz * _MainTex_ST.xy + _MainTex_ST.zw;
+                float2 uvZ = positionWS.xy * _MainTex_ST.xy + _MainTex_ST.zw;
+
+                half4 cx = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uvX);
+                half4 cy = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uvY);
+                half4 cz = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uvZ);
+
+                return cx * blend.x + cy * blend.y + cz * blend.z;
+            }
 
             Varyings vert(Attributes input)
             {
@@ -102,20 +124,25 @@ Shader "Stylized/Toon Wall"
                 UNITY_TRANSFER_INSTANCE_ID(input, o);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+                float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                float3 normalWS   = TransformObjectToWorldNormal(input.normalOS);
+
                 #ifdef _USEOUTLINE_ON
-                    float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
                     float dist = distance(_WorldSpaceCameraPos, positionWS);
                     float thickness = _Thickness * lerp(1.0, dist, _AdaptiveThickness);
 
+                    // offset в object space, как раньше
                     float3 normalOS = normalize(input.normalOS);
                     float3 posOS = input.positionOS.xyz + normalOS * thickness;
                     o.positionCS = TransformObjectToHClip(posOS);
+                    // для текстуры берём мировую позицию уже «выдавленного» контура
+                    o.positionWS = TransformObjectToWorld(posOS);
                 #else
-                    // вырожденный треугольник — outline выключен
                     o.positionCS = float4(0, 0, 0, 0);
+                    o.positionWS = positionWS;
                 #endif
 
-                o.uv = TRANSFORM_TEX(input.uv, _MainTex);
+                o.normalWS = normalWS;
                 return o;
             }
 
@@ -127,10 +154,8 @@ Shader "Stylized/Toon Wall"
                     discard;
                 #endif
 
-                half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+                half4 tex = SampleMainTexTriplanar(i.positionWS, normalize(i.normalWS));
                 half3 col = lerp(_OutlineColor.rgb, tex.rgb * _OutlineColor.rgb, _OutlineTextureStrength);
-
-                // alpha берём из _Color — fade через MaterialPropertyBlock
                 half alpha = _Color.a * tex.a * _OutlineColor.a;
                 return half4(col, alpha);
             }
@@ -179,28 +204,44 @@ Shader "Stylized/Toon Wall"
                 float _Thickness;
                 float _AdaptiveThickness;
                 float _OutlineTextureStrength;
+                float _TriplanarSharpness;
             CBUFFER_END
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
-                float2 uv         : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
-                float2 uv         : TEXCOORD0;
-                float3 positionWS : TEXCOORD1;
-                float3 normalWS   : TEXCOORD2;
+                float3 positionWS : TEXCOORD0;
+                float3 normalWS   : TEXCOORD1;
                 #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
-                    float4 shadowCoord : TEXCOORD3;
+                    float4 shadowCoord : TEXCOORD2;
                 #endif
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
+
+            half4 SampleMainTexTriplanar(float3 positionWS, float3 normalWS)
+            {
+                float3 blend = pow(abs(normalWS), _TriplanarSharpness);
+                blend /= max(blend.x + blend.y + blend.z, 1e-5);
+
+                // UV из мировой позиции → scale объекта не растягивает текстуру
+                float2 uvX = positionWS.zy * _MainTex_ST.xy + _MainTex_ST.zw;
+                float2 uvY = positionWS.xz * _MainTex_ST.xy + _MainTex_ST.zw;
+                float2 uvZ = positionWS.xy * _MainTex_ST.xy + _MainTex_ST.zw;
+
+                half4 cx = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uvX);
+                half4 cy = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uvY);
+                half4 cz = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uvZ);
+
+                return cx * blend.x + cy * blend.y + cz * blend.z;
+            }
 
             Varyings vert(Attributes input)
             {
@@ -215,7 +256,6 @@ Shader "Stylized/Toon Wall"
                 o.positionCS = posInputs.positionCS;
                 o.positionWS = posInputs.positionWS;
                 o.normalWS   = nrmInputs.normalWS;
-                o.uv         = TRANSFORM_TEX(input.uv, _MainTex);
 
                 #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
                     o.shadowCoord = GetShadowCoord(posInputs);
@@ -228,10 +268,9 @@ Shader "Stylized/Toon Wall"
             {
                 UNITY_SETUP_INSTANCE_ID(i);
 
-                half4 albedo = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv) * _Color;
                 half3 normalWS = normalize(i.normalWS);
+                half4 albedo = SampleMainTexTriplanar(i.positionWS, normalWS) * _Color;
 
-                // Shadow coord
                 float4 shadowCoord = float4(0, 0, 0, 0);
                 #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
                     shadowCoord = i.shadowCoord;
@@ -241,29 +280,22 @@ Shader "Stylized/Toon Wall"
 
                 Light mainLight = GetMainLight(shadowCoord);
 
-                // N·L
                 half NdotL = saturate(dot(normalWS, mainLight.direction));
 
-                // Step shading
                 half threshold = 0.5 + _StepOffset;
                 half stepShade = smoothstep(threshold - _StepSoftness, threshold + _StepSoftness, NdotL);
 
-                // Shadows
                 half shadow = (_UseShadows > 0.5) ? mainLight.shadowAttenuation * mainLight.distanceAttenuation : 1.0;
                 stepShade *= shadow;
 
-                // Light color
                 half3 lightCol = mainLight.color * _MainLightIntensity;
 
-                // Final diffuse: lerp shadow color → lit color
                 half3 lit = albedo.rgb * lightCol;
                 half3 col = lerp(_ShadowColor.rgb * albedo.rgb, lit, stepShade);
 
-                // Ambient (лёгкий, чтобы стены в тени не были чёрными)
                 half3 ambient = SampleSH(normalWS) * albedo.rgb * 0.35;
                 col += ambient;
 
-                // Additional lights (простой add, без step — можно убрать если не нужны)
                 #ifdef _ADDITIONAL_LIGHTS
                 uint count = GetAdditionalLightsCount();
                 for (uint li = 0; li < count; li++)
@@ -318,6 +350,7 @@ Shader "Stylized/Toon Wall"
                 float _Thickness;
                 float _AdaptiveThickness;
                 float _OutlineTextureStrength;
+                float _TriplanarSharpness;
             CBUFFER_END
 
             struct Attributes
@@ -363,8 +396,6 @@ Shader "Stylized/Toon Wall"
 
             half4 frag(Varyings i) : SV_Target
             {
-                // При полной прозрачности можно не отбрасывать тень — опционально:
-                // if (_Color.a < 0.01) discard;
                 return 0;
             }
             ENDHLSL
@@ -402,6 +433,7 @@ Shader "Stylized/Toon Wall"
                 float _Thickness;
                 float _AdaptiveThickness;
                 float _OutlineTextureStrength;
+                float _TriplanarSharpness;
             CBUFFER_END
 
             struct Attributes
