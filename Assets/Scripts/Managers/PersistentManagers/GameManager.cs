@@ -26,7 +26,7 @@ namespace Arcatech.Managers
         #endregion
        
       //  [SerializeField] private MenuPrefabControllerComp _mainMenuPrefab;
-        [SerializeField] private GameInterfaceManager gameInterfaceManagerPrefab;
+      //  [SerializeField] private GameInterfaceManager gameInterfaceManagerPrefab;
 
         private void OnEnable()
         {
