@@ -32,14 +32,6 @@ namespace Arcatech.Managers
         {
             DOTween.Init();
             _dataManager = DataManager.Instance;
-
-            // for quicker load into debug level 
-            int sceneIndex = SceneManager.GetActiveScene().buildIndex;
-            _currentLevel = _dataManager.GetSceneContainer(sceneIndex);
-            if (_currentLevel == _mainScene)
-            {
-              //  Instantiate(_mainMenuPrefab);
-            }
         }
 
         #endregion
@@ -60,43 +52,43 @@ namespace Arcatech.Managers
 
         private bool _equipsDone = false;
         private SceneContainer _cachedGameLevel;
-        public void RequestLoadSceneFromContainer(SceneContainer sc)
-        {
-            DOTween.KillAll();
-           // Debug.Log($"Placeholder - starting level as GAME level");
-
-            if (sc == _mainScene)
-            {
-                //Instantiate(_mainMenuPrefab);
-            }
-
-            switch (sc.LevelType)
-            {
-                default:
-                    DoLoadScene(sc.SceneLoaderIndex);
-                    break;
-                case LevelType.Game:
-                    if (sc == _noEquipsLevel)
-                    {
-                        _cachedGameLevel = sc;
-                        DoLoadScene(_noEquipsLevel.SceneLoaderIndex);
-                        break;
-                    }// override default equips menu
-
-                    if (_equipsDone)
-                    {
-                        _equipsDone = false;
-                        DoLoadScene(_cachedGameLevel.SceneLoaderIndex);
-                    }
-                    else
-                    {
-                        _cachedGameLevel = sc;
-                        DoLoadScene(_equipsScene.SceneLoaderIndex);
-                    }
-
-                    break;
-            }
-        }
+        // public void RequestLoadSceneFromContainer(SceneContainer sc)
+        // {
+        //     DOTween.KillAll();
+        //    // Debug.Log($"Placeholder - starting level as GAME level");
+        //
+        //     if (sc == _mainScene)
+        //     {
+        //         //Instantiate(_mainMenuPrefab);
+        //     }
+        //
+        //     switch (sc.LevelType)
+        //     {
+        //         default:
+        //             DoLoadScene(sc.SceneLoaderIndex);
+        //             break;
+        //         case LevelType.Game:
+        //             if (sc == _noEquipsLevel)
+        //             {
+        //                 _cachedGameLevel = sc;
+        //                 DoLoadScene(_noEquipsLevel.SceneLoaderIndex);
+        //                 break;
+        //             }// override default equips menu
+        //
+        //             if (_equipsDone)
+        //             {
+        //                 _equipsDone = false;
+        //                 DoLoadScene(_cachedGameLevel.SceneLoaderIndex);
+        //             }
+        //             else
+        //             {
+        //                 _cachedGameLevel = sc;
+        //                 DoLoadScene(_equipsScene.SceneLoaderIndex);
+        //             }
+        //
+        //             break;
+        //     }
+        // }
 
         void DoLoadScene(int index)
         {            
@@ -109,11 +101,13 @@ namespace Arcatech.Managers
         #region UNITY UI
         public void OnStartNewGameButton()
         {
-            RequestLoadSceneFromContainer(_newgameScene);
+            DoLoadScene(_newgameScene.SceneLoaderIndex);
+           // RequestLoadSceneFromContainer(_newgameScene);
         }
         public void OnGalleryButton()
         {
-            RequestLoadSceneFromContainer(_galleryScene);
+            DoLoadScene(_galleryScene.SceneLoaderIndex);
+           // RequestLoadSceneFromContainer(_galleryScene);
         }
         public void OnExitButton()
         {
@@ -122,33 +116,19 @@ namespace Arcatech.Managers
 #endif
             Application.Quit();
         }
-
-        public void OnFinishedEquips()
-        {
-            _equipsDone = true;
-            RequestLoadSceneFromContainer(_cachedGameLevel);
-        }
-
-        
-        #endregion
-
-
-
         public void OnReturnToMain()
         {
             DoLoadScene(_mainScene.SceneLoaderIndex);
         }
 
-        public void QuitGame()
-        {
-            Application.Quit();
-#if UNITY_EDITOR
-            EditorApplication.ExitPlaymode();
-#endif
-        }
+        // public void OnFinishedEquips()
+        // {
+        //     _equipsDone = true;
+        //     RequestLoadSceneFromContainer(_cachedGameLevel);
+        // }
 
-
-
+        
+        #endregion
     }
 
 

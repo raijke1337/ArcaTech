@@ -7,20 +7,6 @@ namespace Arcatech.UI
 {
     public class MenuPrefabControllerComp : MonoBehaviour
     {
-        [SerializeField] private Button _lv;
-        [SerializeField] private Button _gallery;
-
-        private void Start()
-        {
-#if UNITY_EDITOR
-            Assert.IsNotNull(_lv);
-            Assert.IsNotNull(_gallery);
-#endif
-           // _lv.gameObject.SetActive(!DataManager.Instance.IsNewGame);
-          //  _gallery.gameObject.SetActive(!DataManager.Instance.IsNewGame);
-        }
-
-        #region unity UI
 
         public void OnNew()
         {
@@ -34,7 +20,6 @@ namespace Arcatech.UI
         {
             GameManager.Instance.OnExitButton();
         }
-        #endregion
 
     }
 }

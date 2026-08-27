@@ -41,7 +41,7 @@ namespace Arcatech.UI
         }
         public void ClickedEventCall()
         {
-            GameManager.Instance.RequestLoadSceneFromContainer(_data);
+           // GameManager.Instance.RequestLoadSceneFromContainer(_data);
         }
 
     }
