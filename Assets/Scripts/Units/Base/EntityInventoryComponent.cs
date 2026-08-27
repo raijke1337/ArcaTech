@@ -15,7 +15,7 @@ namespace Arcatech.Units
     /// model is deserialized from saves or loaded from a preset SO.
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class EntityInventoryComponent : ValidatedMonoBehaviour, ISaveable
+    public class EntityInventoryComponent : ValidatedMonoBehaviour
     {
         [ProButton]
         public void DEBUG_WriteItems()
@@ -41,11 +41,11 @@ namespace Arcatech.Units
         {
             _views = new();
             IEntityItemsList itemsData = defaultEquips;
-            if (useSaveSystem)
-            {
-                var data = SaveManager.Instance.GetGameData;
-                data.TryGetInventoryForEntity(baseGameEntity.GetID, out itemsData);
-            }
+            // if (useSaveSystem)
+            // {
+            //     var data = SaveManager.Instance.GetGameData;
+            //     data.TryGetInventoryForEntity(baseGameEntity.GetID, out itemsData);
+            // }
             _model = new UnitInventoryModel(itemsData, baseGameEntity);
             
             var views = gameObject.GetComponentsInChildren<IUnitInventoryView>();
@@ -145,14 +145,7 @@ namespace Arcatech.Units
 
         #endregion
 
-        /// <summary>
-        /// called by levelprogress mgr on checkpoint reached
-        /// </summary>
-        public void NotifyForUpdate()
-        {
-            SaveManager.Instance.UpdateData(this);
-        }
-
+    
         public void PopulateSaveData(GameData data)
         {
             if (!useSaveSystem) return;
@@ -178,7 +171,6 @@ namespace Arcatech.Units
             save.EntityItemIDs = savedInventory.Keys.ToArray();
             save.EntityItemsCount = savedInventory.Values.ToArray();
             
-            data.AddOrUpdateInventory(save);
         }
     }
 

@@ -12,10 +12,11 @@ namespace Arcatech.Interactions
     /// item to be interacted with
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class InteractableComponent : ValidatedMonoBehaviour, ISavedProgressItem
+    public class InteractableComponent : ValidatedMonoBehaviour
     {
         [SerializeField, Self] private BaseGameEntityComponent entity;
         public BaseGameEntityComponent Entity => entity;
+
         [Header("Pipeline")] [SerializeField, Self]
         protected InteractionTrigger trigger;
 
@@ -37,8 +38,8 @@ namespace Arcatech.Interactions
         private int _executionId; // защита от stale callbacks
 
         private bool _listening = false; // activated after load level condition
-        public bool IsAvailable => !_isExecuting && _listening && executor  != null;
-        
+        public bool IsAvailable => !_isExecuting && _listening && executor != null;
+
         private void OnDisable()
         {
             if (_isExecuting)
@@ -55,7 +56,7 @@ namespace Arcatech.Interactions
             if (!IsAvailable) return;
 
             if (!ctx.Target && !ctx.Interactor.Entity) return;
-            
+
             // Инвалидируем старый execution и блокируем новый
             _executionId++;
             StopAllCoroutines();
@@ -66,7 +67,7 @@ namespace Arcatech.Interactions
 
         private IEnumerator RunPipeline(InteractionContext ctx)
         {
-            
+
             _currentCtx = ctx;
             ctx.Target = entity;
 
@@ -187,26 +188,13 @@ namespace Arcatech.Interactions
 
         private void ApplyPostEffects(InteractionState state)
         {
-             var list = state switch
+            var list = state switch
             {
                 InteractionState.Success => successEffects,
                 InteractionState.Failure => failureEffects,
                 InteractionState.Cancelled => cancelEffects,
                 _ => null
             };
-            switch (state)
-            {
-
-                case InteractionState.Success:
-                    ReadItemState = ProgressItemState.Completed;
-                    break;
-                case InteractionState.Failure:
-                    ReadItemState = ProgressItemState.Failed;
-                    break;
-                default:
-                    ReadItemState = default;
-                    break;
-            }
 
             if (_currentCtx != null)
             {
@@ -237,36 +225,5 @@ namespace Arcatech.Interactions
         {
             _currentCtx?.Interactor?.SetInteractionState(state);
         }
-
-        public string SavedItemID => entity.GetID;
-        public string Name => entity.GetName;
-
-        private ProgressItemState _currentState = ProgressItemState.Default;
-
-        public ProgressItemState ReadItemState
-        {
-            get =>  _currentState;
-            set
-            {
-                _currentState = value;
-                LevelProgressManager.Instance.SavedItemAnnounce(this);
-            }
-        }
-        public void ApplySaveState(ProgressItemState state, LevelProgressManager ctx)
-        {
-            switch (state)
-            {
-                case ProgressItemState.Completed:
-                    foreach (var effect in successEffects.ToList())
-                    {
-                        effect.OnLoadLevelState(state);
-                    }
-                    break;
-                default:
-                    _listening = true;
-                    break;
-            }
-        }
-
     }
 }

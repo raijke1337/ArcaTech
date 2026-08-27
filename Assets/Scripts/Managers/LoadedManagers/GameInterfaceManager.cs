@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using Arcatech.EventBus;
 using Arcatech.Interactions;
+using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Texts;
 using Arcatech.UI;
+using ArcaTech.UI;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
 using KBCore.Refs;
@@ -222,8 +224,6 @@ namespace Arcatech.Managers
         {
             EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(false));
         }
-
-        
         public void ShowPlayerDeadMenu()
         {
             koWindow.gameObject.SetActive(true);
@@ -233,29 +233,22 @@ namespace Arcatech.Managers
         }
         public void ToMain()
         {
+            LevelProgressController.Instance.ExitAfterDeath();
             GameManager.Instance.OnReturnToMain();
         }
         public void OnRestart()
         {
-            var currentLevelID = SceneManager.GetActiveScene().name;
-            SceneManager.LoadScene(currentLevelID);
+            GlitchController.Instance.TriggerGlitch(1,2);
+            LevelProgressController.Instance.RestartLevelFromScratch();
         }
         public void OnRestartAtCheckpoint()
         {
-            var currentLevelID = SceneManager.GetActiveScene().name;
-            SceneManager.LoadScene(currentLevelID);
+            GlitchController.Instance.TriggerGlitch(1,2);
+            LevelProgressController.Instance.ReturnToCheckpoint();
         }
 
         #endregion
-        
-        #region glitch effect
 
-        public void ShowGlitchEffect()
-        {
-            // TODO!
-            // interface shake effect
-        }
-        #endregion
         
         
         

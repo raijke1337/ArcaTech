@@ -501,11 +501,17 @@ namespace Arcatech.Units
         {
             _killed = value;
 
-            if (value && HasPendingCommand)
-                CompletePendingCommand(false);
+            if (value)
+            {
+                if (HasPendingCommand) CompletePendingCommand(false);
+                _pendingCommand = UnitCommand.None;
+                _context.ClearCommand();
+            }
+            else
+            {
+                Start();
+            }
 
-            _pendingCommand = UnitCommand.None;
-            _context.ClearCommand();
         }
     }
 }

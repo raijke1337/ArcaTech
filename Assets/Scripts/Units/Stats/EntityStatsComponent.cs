@@ -756,7 +756,7 @@ namespace Arcatech.Stats
         public void SetKilled(IKillerComponent c, bool value)
         {
             _killed = value;
-            if (value)
+            if (!value)
             {
                 InitializeFromConfig(); // reset unit stats, called on reload checkpoint
             }

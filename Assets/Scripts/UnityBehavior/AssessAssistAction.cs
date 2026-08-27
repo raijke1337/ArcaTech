@@ -32,7 +32,7 @@ public partial class AssessAssistAction : Action
             {
                 if (scanResults[i] != null 
                     && scanResults[i].TryGetComponent(out BaseGameEntityComponent comp) 
-                    && comp.GetEntitySide == Drone.Value.Entity.GetEntitySide)
+                    && comp.GetEntitySide == Drone.Value.EntitySide)
                 {
                     if (comp.TryGetComponent(out ITierProvider tierProvider))
                     {

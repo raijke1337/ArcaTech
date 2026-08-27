@@ -127,7 +127,7 @@ namespace Arcatech.UI
         {
             if (stat == ResourceStatType.Health && statDelta < 0)
             {
-                GameInterfaceManager.Instance.ShowGlitchEffect();
+               // GameInterfaceManager.Instance.GlitchInterface();
                 if (Mathf.Abs(statDelta) > bigDamageThreshold)
                 {
                     GlitchController.Instance.TriggerGlitch();

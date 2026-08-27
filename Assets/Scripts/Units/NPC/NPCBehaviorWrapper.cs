@@ -17,7 +17,7 @@ namespace Arcatech.Units
     [RequireComponent(typeof(EffectsReceiverComponent))]
     public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IKillableComponent, 
         IPausableComponent, IMove,
-        ISavedProgressItem, ITierProvider
+        ITierProvider
     {
         [SerializeField, Self] protected NavMeshAgent agent;
         [SerializeField, Self] protected BehaviorGraphAgent behavior;
@@ -29,7 +29,7 @@ namespace Arcatech.Units
 
         [SerializeField] private EnemyData_SO data;
         [SerializeField] string CombatGroup;
-
+        public Side EntitySide => entity.GetEntitySide;
         public EnemyData_SO Config => data;
         
         private IModifierAggregator _mods;
@@ -50,7 +50,7 @@ namespace Arcatech.Units
             _combateventChannel = combatState.ObjectValue as EnterCombatEventChannel;
             if (_combateventChannel == null)
             {
-                Debug.Log($"Cast failed! {Entity.GetName}");
+                Debug.Log($"Cast failed! {entity.GetName}");
                 return;
             }
             _combateventChannel.Event += OnCombatStateChanged;
@@ -127,8 +127,6 @@ namespace Arcatech.Units
         public void SetKilled(IKillerComponent component, bool value)
         {
             if (agent.isOnNavMesh) agent.isStopped = value;
-            ReadItemState = value ? ProgressItemState.Completed : ProgressItemState.Default;
-
             if (!behavior) return;
             if (value) behavior.End();
             else behavior.Restart();
@@ -197,35 +195,6 @@ namespace Arcatech.Units
         }
         #endregion
         
-        #region save
-
-        public string SavedItemID => entity.GetID;
-
-        public void ApplySaveState(ProgressItemState state, LevelProgressManager ctx)
-        {
-            if (state == ProgressItemState.Completed)
-            {
-                gameObject.SetActive(false);
-            }
-        }
-
-        
-        public string Name => entity.GetName;
-        public BaseGameEntityComponent  Entity => entity;
-
-        private ProgressItemState _currentState = ProgressItemState.Default;
-
-        public ProgressItemState ReadItemState
-        {
-            get => _currentState;
-            set
-            {
-                _currentState = value;
-                LevelProgressManager.Instance.SavedItemAnnounce(this);
-            }
-        }
-
-        #endregion
     }
 }
 

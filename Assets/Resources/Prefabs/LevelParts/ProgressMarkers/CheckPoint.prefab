@@ -68,8 +68,8 @@ GameObject:
   - component: {fileID: 6386900530009433559}
   - component: {fileID: 2675361078386437783}
   - component: {fileID: 6667891894578995311}
-  - component: {fileID: 4858178902369088579}
   - component: {fileID: 9192498073503499865}
+  - component: {fileID: 2648941249996009508}
   m_Layer: 6
   m_Name: CheckPoint
   m_TagString: Untagged
@@ -216,6 +216,10 @@ MonoBehaviour:
   _hitVisualizationDuration: 2
   _hitSphereRadius: 0.1
   _lineLength: 0.5
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!114 &8738833819163380097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -241,14 +245,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
   _pauser: {fileID: 8738833819163380097}
+  _name: 
+  id: {fileID: 9192498073503499865}
   _rb: {fileID: 2567633310065105756}
   setKinematic: 1
-  _name: 
   entitySide: 0
   effectSpawn: {fileID: 9056334934206970525}
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
+  targetable: 0
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -271,7 +277,7 @@ MonoBehaviour:
   executor: {fileID: 6667891894578995311}
   duringExecuteEffects: []
   successEffects:
-  - {fileID: 4858178902369088579}
+  - {fileID: 0}
   - {fileID: 456769838707845330}
   failureEffects: []
   cancelEffects: []
@@ -290,10 +296,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.AutoInteractionTrigger
   triggerTrackerComponent: {fileID: 6867913903839420304}
   interactableComponent: {fileID: 6386900530009433559}
-  id: {fileID: 9192498073503499865}
+  expirationTime: 0
+  destroyAfterExpiry: 0
   triggerOnce: 1
   cooldown: 0
-  useInitiatorAsInteractor: 1
+  affectedSide: 0
 --- !u!114 &6667891894578995311
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,18 +314,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
   willComplete: 1
---- !u!114 &4858178902369088579
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6699262900707491017}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5033c1d5173c415daef0176de03e6620, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.CheckpointTrigger
 --- !u!114 &9192498073503499865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,6 +327,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.SaveObjectID
   uniqueId: 
+--- !u!114 &2648941249996009508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6699262900707491017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 562b9a215b224cc5b0b176c598502236, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.CheckpointTrigger
+  entity: {fileID: 4922447346516799693}
+  trigger: {fileID: 6867913903839420304}
 --- !u!1001 &8902491395032539278
 PrefabInstance:
   m_ObjectHideFlags: 0
