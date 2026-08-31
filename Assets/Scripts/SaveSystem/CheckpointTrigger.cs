@@ -9,7 +9,6 @@ namespace Arcatech.SaveSystem
     public class CheckpointTrigger: SavedProgressItemBase, ITriggerNotificationReceiver
     {
         [SerializeField, Self] private TriggerTrackerComponent trigger; 
-        public override ProgressItemState ReadItemState { get; }
 
         protected override void OnEnable()
         {
@@ -46,7 +45,7 @@ namespace Arcatech.SaveSystem
             if (triggerHitInfo.TryGetEntityTarget(out var tgt) 
                 && tgt.CompareTag("Player"))
             {
-                Announce();
+                Announce(ProgressItemState.Completed);
                 LevelProgressController.Instance.OnCheckPointReached(this);
             }
         }

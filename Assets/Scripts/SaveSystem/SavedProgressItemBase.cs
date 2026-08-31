@@ -16,7 +16,8 @@ namespace Arcatech.SaveSystem
         public string SavedItemID => entity.GetID;
         public string Name => entity.GetName;
 
-        public abstract ProgressItemState ReadItemState { get; }
+        private ProgressItemState _state;
+        public ProgressItemState ReadItemState => _state;
         public abstract void ApplySaveState(ProgressItemState state, ILevelProgressContext ctx);
 
         protected virtual void OnEnable()
@@ -31,8 +32,9 @@ namespace Arcatech.SaveSystem
 
         /// <summary>Вызывать из наследника при каждом изменении состояния
         /// (подобрали предмет, убили врага и т.п.).</summary>
-        protected void Announce()
+        protected void Announce(ProgressItemState state)
         {
+            _state = state;
             LevelProgressController.Instance.SavedItemAnnounce(this);
         }
     }

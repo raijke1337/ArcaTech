@@ -174,6 +174,10 @@ namespace Arcatech.SaveSystem
                 {
                     kvp.Value.ApplySaveState(state, this);
                 }
+                else
+                {
+                    kvp.Value.ApplySaveState(ProgressItemState.Default, this);
+                }
             }
 
             if (_player != null)

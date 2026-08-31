@@ -37,9 +37,12 @@ namespace Arcatech.Units
         private List<IUnitInventoryView> _views;
         [SerializeField] private UnitInventoryModel _model;
 
+        private bool init = false;
+        
         private void OnEnable()
         {
-            _views = new();
+           // Debug.Log("Inventory enable");
+            _views??= new();
             IEntityItemsList itemsData = defaultEquips;
             // if (useSaveSystem)
             // {
@@ -59,6 +62,7 @@ namespace Arcatech.Units
 
         private void OnDisable()
         {
+           // Debug.Log("Inventory disable");
             _model.ModelUpdatedEvent -= RefreshViews;
             foreach (var view in _views)
             {
@@ -86,6 +90,7 @@ namespace Arcatech.Units
         {
             if (view != null)
             {
+                _views??= new();
                 if (!_views.Contains(view))
                 {
                     _views.Add(view);

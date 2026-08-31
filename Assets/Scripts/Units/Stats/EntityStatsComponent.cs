@@ -634,8 +634,7 @@ namespace Arcatech.Stats
 
         public void RegisterStatsViewer(IStatUpdatesViewer viewer)
         {
-            if (statUpdatesViewers.Contains(viewer)) return;
-            statUpdatesViewers.Add(viewer);
+            if (!statUpdatesViewers.Contains(viewer)) statUpdatesViewers.Add(viewer);
             StartViewer(viewer);
         }
 

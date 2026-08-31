@@ -8,6 +8,7 @@ using Arcatech.Stats;
 using Arcatech.Texts;
 using Arcatech.UI;
 using ArcaTech.UI;
+using Arcatech.Units;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
 using KBCore.Refs;
@@ -58,6 +59,8 @@ namespace Arcatech.Managers
 
         private void Start()
         {
+            if (!FindAnyObjectByType<PlayerComponent>()) return;
+            
             playerPanel.gameObject.SetActive(true);
             playerPanel.Show();
             koWindow.Hide();
@@ -74,6 +77,12 @@ namespace Arcatech.Managers
                 crosshair.gameObject.SetActive(false);
             }
         }
+
+        private void OnDisable()
+        {
+            EventBus<PauseToggleEvent>.Deregister(_pauseToggleBind);
+        }
+
         private void LateUpdate()
         {
             UpdateCrosshairPosition();
@@ -212,9 +221,12 @@ namespace Arcatech.Managers
                 pauseWindow.Show();
                 fade.gameObject.SetActive(true);
                 fade.Show();
+                playerPanel.Hide();
             }
             else
             {
+                playerPanel.gameObject.SetActive(true);
+                playerPanel.Show();
                 pauseWindow.Hide();
                 fade.Hide();
             }
@@ -228,6 +240,7 @@ namespace Arcatech.Managers
         {
             koWindow.gameObject.SetActive(true);
             fade.gameObject.SetActive(true);
+            playerPanel.Hide();
             koWindow.Show();
             fade.Show();
         }
@@ -238,13 +251,17 @@ namespace Arcatech.Managers
         }
         public void OnRestart()
         {
-            GlitchController.Instance.TriggerGlitch(1,2);
+            GlitchController.Instance.TriggerGlitch(1,0.5f);
             LevelProgressController.Instance.RestartLevelFromScratch();
+            
         }
         public void OnRestartAtCheckpoint()
         {
-            GlitchController.Instance.TriggerGlitch(1,2);
+            
+            GlitchController.Instance.TriggerGlitch(1,0.5f);
             LevelProgressController.Instance.ReturnToCheckpoint();
+            playerPanel.gameObject.SetActive(true);
+            playerPanel.Show();
         }
 
         #endregion

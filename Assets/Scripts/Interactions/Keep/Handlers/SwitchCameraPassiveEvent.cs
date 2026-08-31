@@ -23,9 +23,5 @@ namespace Arcatech.Interactions
             StartCoroutine(CameraRoutine());
         }
 
-        public override void OnLoadLevelState(ProgressItemState stateToLoad)
-        {
-            //noop
-        }
     }
 }

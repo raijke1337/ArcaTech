@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Arcatech.SaveSystem;
 using KBCore.Refs;
+using Unity.U2D.Physics;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcatech.Interactions
 {
@@ -224,6 +226,79 @@ namespace Arcatech.Interactions
         private void UpdateStateInInteractor(InteractionState state)
         {
             _currentCtx?.Interactor?.SetInteractionState(state);
+            StateChangedEvent?.Invoke(state);
+        }
+
+        public Action<InteractionState> StateChangedEvent;
+
+        public void ForceState(ProgressItemState state)
+        {
+            // Если состояние уже завершено или отменено, ничего делать не нужно
+            if (state != ProgressItemState.Completed) return;
+
+            // Создаем фиктивный контекст для проигрывания эффектов.
+            // Важно: Interactor может быть null при загрузке, если игрок далеко, 
+            // но эффекты должны уметь это обрабатывать или мы передаем заглушку.
+            var ctx = new InteractionContext
+            {
+                Target = entity,
+                State = InteractionState.Starting
+            };
+
+            // 1. Pre-Execute Effects
+            // Выполняем только те, что помечены для воспроизведения при загрузке
+            if (preExecuteEffects != null)
+            {
+                foreach (var effect in preExecuteEffects)
+                {
+                    if (effect != null && effect.ReplayOnLoad)
+                    {
+                        effect.Play(ctx);
+                    }
+                }
+            }
+
+            // 2. Executor пропускаем полностью (избегаем мини-игр и логики выполнения)
+
+            // 3. During Execute Effects
+            if (duringExecuteEffects != null)
+            {
+                foreach (var effect in duringExecuteEffects)
+                {
+                    if (effect != null && effect.ReplayOnLoad)
+                    {
+                        effect.Play(ctx);
+                    }
+                }
+            }
+
+            // 4. Success Effects (так как ForceState обычно вызывается для Completed состояния в прогрессе)
+            // Если логика игры подразумевает, что ForceState(Completed) означает успешное завершение в прошлом
+            if (state == ProgressItemState.Completed) 
+            {
+                ctx.State = InteractionState.Success;
+                
+                if (successEffects != null)
+                {
+                    foreach (var effect in successEffects)
+                    {
+                        if (effect != null && effect.ReplayOnLoad)
+                        {
+                            effect.Play(ctx);
+                        }
+                    }
+                }
+                
+                // Если объект должен был уничтожиться после успеха, делаем это сейчас
+                if (destroyAfterSuccess)
+                {
+                    gameObject.SetActive(false);
+                }
+            }
+            
+            // Сбрасываем флаг исполнения, чтобы объект снова стал интерактивным (если это задумано дизайном)
+            // Или оставляем _isExecuting = false, так как мы не запускали корутину
+            _isExecuting = false;
         }
     }
 }

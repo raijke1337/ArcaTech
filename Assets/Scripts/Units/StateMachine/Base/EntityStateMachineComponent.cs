@@ -55,7 +55,7 @@ namespace Arcatech.Units
         {
             if (augmentor == null || _activeAugmentors.Contains(augmentor))
             {
-                Debug.Log($"tried to register {augmentor} and failed");
+              //  Debug.Log($"tried to register {augmentor} and failed");
                 return;
             }
             

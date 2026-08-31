@@ -15,12 +15,14 @@ namespace Arcatech.Interactions
         /// </summary>
         public virtual bool IsBlocking => false;
         public virtual bool IsBlockingComplete => true;
+        public virtual bool ReplayOnLoad => false;
 
+        
         /// <summary>
         /// Вызывается при принудительной отмене взаимодействия.
         /// </summary>
         public virtual void OnCancelled() { }
 
-        public abstract void OnLoadLevelState(ProgressItemState stateToLoad);
+       // public abstract void OnLoadLevelState(ProgressItemState stateToLoad);
     }
 }

@@ -12,10 +12,7 @@ namespace Arcatech.Interactions
             ctx.Interactor.Entity.transform.position = point.position;
         }
 
-        public override void OnLoadLevelState(ProgressItemState stateToLoad)
-        {
-            
-        }
+
 
         private void OnDrawGizmos()
         {

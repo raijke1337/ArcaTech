@@ -23,9 +23,6 @@ namespace Arcatech.Interactions
         }
 
         public override bool IsBlockingComplete => !GameInterfaceManager.Instance.IsDialogueShowing;
-        public override void OnLoadLevelState(ProgressItemState stateToLoad)
-        {
-            // noop 
-        }
+
     }
 }

@@ -5,7 +5,7 @@ namespace Arcatech.Interactions
     public class AutoInteractionTrigger : InteractionTrigger
     {
         
-        [SerializeField,Header("Unassigned = apply to all")] Side affectedSide = Side.Unassigned;
+        [SerializeField,Header("Unassigned = apply to all")] Side affectedSide = Side.PlayerSide;
         public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             if (interactableComponent == null) return;

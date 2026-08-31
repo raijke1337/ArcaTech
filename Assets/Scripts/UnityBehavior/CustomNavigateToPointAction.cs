@@ -16,7 +16,7 @@ public partial class CustomNavigateToPointAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
     [SerializeReference] public BlackboardVariable<Vector3>    Destination;
-    [SerializeReference] public BlackboardVariable<float>      StoppingDistance = new(0.2f);
+    [SerializeReference] public BlackboardVariable<float>      StoppingDistance = new(1f);
 
     private NPCBehaviorWrapper _wrapper;
     private NavMeshAgent       _nav;

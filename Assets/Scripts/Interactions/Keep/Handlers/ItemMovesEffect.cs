@@ -12,11 +12,13 @@ namespace Arcatech.Interactions
         // TODO: this whole part is now in "Item moves with Tween".
         // remove duplication
         
-        [SerializeField] bool runFromEnable = true;
+        [SerializeField] bool runFromEnable = false;
         [SerializeField] SerializedDOTweener tween;
         Tween cached;
         bool _pause = false;
         bool toggled = false;
+
+        public override bool ReplayOnLoad => true;
 
         public bool Paused
         {
@@ -56,13 +58,13 @@ namespace Arcatech.Interactions
             toggled = true;
         }
 
-        public override void OnLoadLevelState(ProgressItemState stateToLoad)
-        {
-            if (stateToLoad != ProgressItemState.Completed) return;
-            toggled = true;
-            cached ??= tween.GetTween(transform).Pause();
-            cached.Play();
-        }
+        // public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        // {
+        //     if (stateToLoad != ProgressItemState.Completed) return;
+        //     toggled = true;
+        //     cached ??= tween.GetTween(transform).Pause();
+        //     cached.Play();
+        // }
     }
 
 }
