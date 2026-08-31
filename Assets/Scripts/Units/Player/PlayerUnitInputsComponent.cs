@@ -53,12 +53,10 @@ namespace Arcatech.Units.Control
             // CinemachineCore.BlendCreatedEvent
             //     .AddListener(OnCameraBlendStarted);
             //
-            // CinemachineCore.BlendFinishedEvent
-            //     .AddListener(OnCameraBlendFinished);
+            CinemachineCore.BlendFinishedEvent
+                .AddListener(OnCameraBlendFinished);
 
             _cameraAdjust.UpdateBasis();
-            
-            
         }
 
         private void RotateCamera(bool clockwise)
@@ -94,9 +92,9 @@ namespace Arcatech.Units.Control
 
             // CinemachineCore.BlendCreatedEvent
             //     .RemoveListener(OnCameraBlendStarted);
-            //
-            // CinemachineCore.BlendFinishedEvent
-            //     .RemoveListener(OnCameraBlendFinished);
+            
+            CinemachineCore.BlendFinishedEvent
+                .RemoveListener(OnCameraBlendFinished);
         }
 
         private void Update()
@@ -209,13 +207,12 @@ namespace Arcatech.Units.Control
         //     SetMovement(Vector3.zero);
         // }
         //
-        // private void OnCameraBlendFinished(
-        //     ICinemachineMixer mixer,
-        //     ICinemachineCamera camera)
-        // {
-        //     _inCameraBlend = false;
-        //     _cameraAdjust.UpdateBasis();
-        // }
+        private void OnCameraBlendFinished(
+            ICinemachineMixer mixer,
+            ICinemachineCamera camera)
+        {
+            _cameraAdjust.UpdateBasis();
+        }
 
         private sealed class IsoCamAdjust
         {
