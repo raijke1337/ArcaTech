@@ -1,9 +1,14 @@
-﻿using UnityEngine;
+﻿using KBCore.Refs;
+using UnityEngine;
 
 namespace Arcatech.Units
 {
-    public class PlayerComponent : MonoBehaviour, ITierProvider
+    [RequireComponent(typeof(BaseGameEntityComponent))]
+    public class PlayerComponent : ValidatedMonoBehaviour, ITierProvider
     {
+        
+        [SerializeField,Self]public BaseGameEntityComponent Entity;
+        
         public UnitTier GetTierInfo => UnitTier.Boss;
     }
 }

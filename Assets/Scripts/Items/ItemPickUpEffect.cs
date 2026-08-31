@@ -13,8 +13,9 @@ namespace Arcatech.Items
         [SerializeField] private ItemSO content;
         [SerializeField] private int count = 1;
         [SerializeField] private Transform billboard;
-        
-        
+
+        public override bool ReplayOnLoad => false;
+
         #region intraction
         
         public override void Play(InteractionContext ctx)
@@ -26,11 +27,11 @@ namespace Arcatech.Items
             }
         }
 
-        public override void OnLoadLevelState(ProgressItemState stateToLoad)
-        {
-            if (stateToLoad == ProgressItemState.Completed)
-                gameObject.SetActive(false);
-        }
+        // public override void OnLoadLevelState(ProgressItemState stateToLoad)
+        // {
+        //     if (stateToLoad == ProgressItemState.Completed)
+        //         gameObject.SetActive(false);
+        // }
 
         #endregion
         

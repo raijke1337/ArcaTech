@@ -11,7 +11,6 @@ namespace Arcatech.Interactions
         [SerializeField] SerializedDictionary<InteractionState,string> _states;
         [SerializeField] private Transform interactorPlace;
         private Animator _animator;
-
         
         private bool _blockingComplete;
         private string _lastPlayedState;
@@ -30,12 +29,7 @@ namespace Arcatech.Interactions
             StopWaiting();
             _blockingComplete = true;
         }
-
-        public override void OnLoadLevelState(ProgressItemState stateToLoad)
-        {
-            // noop
-        }
-
+        
         public override void Play(InteractionContext ctx)
         {
             _blockingComplete = false;

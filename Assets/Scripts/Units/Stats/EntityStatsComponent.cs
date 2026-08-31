@@ -634,8 +634,7 @@ namespace Arcatech.Stats
 
         public void RegisterStatsViewer(IStatUpdatesViewer viewer)
         {
-            if (statUpdatesViewers.Contains(viewer)) return;
-            statUpdatesViewers.Add(viewer);
+            if (!statUpdatesViewers.Contains(viewer)) statUpdatesViewers.Add(viewer);
             StartViewer(viewer);
         }
 
@@ -756,7 +755,7 @@ namespace Arcatech.Stats
         public void SetKilled(IKillerComponent c, bool value)
         {
             _killed = value;
-            if (value)
+            if (!value)
             {
                 InitializeFromConfig(); // reset unit stats, called on reload checkpoint
             }

@@ -1,7 +1,10 @@
-using System;
+
+using Arcatech.Effects;
 using Arcatech.Units;
+using CartoonFX;
 using KBCore.Refs;
 using UnityEngine;
+using Arcatech.EventBus;
 
 namespace Arcatech.Lewding
 {
@@ -20,6 +23,8 @@ namespace Arcatech.Lewding
 
         [Space]
         [SerializeField] private TouchZone[]  touchZones;
+
+        [SerializeField] private CFXR_Effect hearts;
         
         private StateTransition _toHeadPat;
         private StateTransition _toTouchChest;
@@ -44,9 +49,10 @@ namespace Arcatech.Lewding
             comp.Register(this);
         }
 
-        private void OnTouch(TouchZoneType place)
+        private void OnTouch(TouchZoneType place, Vector3 position)
         {
             if (_lctx!=null) _lctx.LastTouchCommand = place;
+            EventBus<ParticlesEvent>.Raise(new  ParticlesEvent(hearts,position));
         }
 
         public void Attach(IStateAugmentorReceiver machine)
@@ -64,9 +70,7 @@ namespace Arcatech.Lewding
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)
-        {
-
-        }
+        { }
 
         public void OnStateExited(UnitState state, StateMachineContext context)
         {
@@ -91,6 +95,7 @@ namespace Arcatech.Lewding
                 context.EcchiContext.ArousalPercent += lewdGainOnTouchBottom;
             }
             context.EcchiContext.LastTouchCommand = TouchZoneType.None;
+            Debug.Log($"Lewdness percent: {context.EcchiContext.ArousalPercent}");
         }
 
         public void Initialize(LewdnessContext context)

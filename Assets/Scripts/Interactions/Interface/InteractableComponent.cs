@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Arcatech.SaveSystem;
 using KBCore.Refs;
+using Unity.U2D.Physics;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcatech.Interactions
 {
@@ -12,10 +14,11 @@ namespace Arcatech.Interactions
     /// item to be interacted with
     /// </summary>
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public class InteractableComponent : ValidatedMonoBehaviour, ISavedProgressItem
+    public class InteractableComponent : ValidatedMonoBehaviour
     {
         [SerializeField, Self] private BaseGameEntityComponent entity;
         public BaseGameEntityComponent Entity => entity;
+
         [Header("Pipeline")] [SerializeField, Self]
         protected InteractionTrigger trigger;
 
@@ -37,8 +40,8 @@ namespace Arcatech.Interactions
         private int _executionId; // защита от stale callbacks
 
         private bool _listening = false; // activated after load level condition
-        public bool IsAvailable => !_isExecuting && _listening && executor  != null;
-        
+        public bool IsAvailable => !_isExecuting && _listening && executor != null;
+
         private void OnDisable()
         {
             if (_isExecuting)
@@ -55,7 +58,7 @@ namespace Arcatech.Interactions
             if (!IsAvailable) return;
 
             if (!ctx.Target && !ctx.Interactor.Entity) return;
-            
+
             // Инвалидируем старый execution и блокируем новый
             _executionId++;
             StopAllCoroutines();
@@ -66,7 +69,7 @@ namespace Arcatech.Interactions
 
         private IEnumerator RunPipeline(InteractionContext ctx)
         {
-            
+
             _currentCtx = ctx;
             ctx.Target = entity;
 
@@ -187,26 +190,13 @@ namespace Arcatech.Interactions
 
         private void ApplyPostEffects(InteractionState state)
         {
-             var list = state switch
+            var list = state switch
             {
                 InteractionState.Success => successEffects,
                 InteractionState.Failure => failureEffects,
                 InteractionState.Cancelled => cancelEffects,
                 _ => null
             };
-            switch (state)
-            {
-
-                case InteractionState.Success:
-                    ReadItemState = ProgressItemState.Completed;
-                    break;
-                case InteractionState.Failure:
-                    ReadItemState = ProgressItemState.Failed;
-                    break;
-                default:
-                    ReadItemState = default;
-                    break;
-            }
 
             if (_currentCtx != null)
             {
@@ -236,37 +226,79 @@ namespace Arcatech.Interactions
         private void UpdateStateInInteractor(InteractionState state)
         {
             _currentCtx?.Interactor?.SetInteractionState(state);
+            StateChangedEvent?.Invoke(state);
         }
 
-        public string SavedItemID => entity.GetID;
-        public string Name => entity.GetName;
+        public Action<InteractionState> StateChangedEvent;
 
-        private ProgressItemState _currentState = ProgressItemState.Default;
+        public void ForceState(ProgressItemState state)
+        {
+            // Если состояние уже завершено или отменено, ничего делать не нужно
+            if (state != ProgressItemState.Completed) return;
 
-        public ProgressItemState ReadItemState
-        {
-            get =>  _currentState;
-            set
+            // Создаем фиктивный контекст для проигрывания эффектов.
+            // Важно: Interactor может быть null при загрузке, если игрок далеко, 
+            // но эффекты должны уметь это обрабатывать или мы передаем заглушку.
+            var ctx = new InteractionContext
             {
-                _currentState = value;
-                LevelProgressManager.Instance.SavedItemAnnounce(this);
-            }
-        }
-        public void ApplySaveState(ProgressItemState state, LevelProgressManager ctx)
-        {
-            switch (state)
+                Target = entity,
+                State = InteractionState.Starting
+            };
+
+            // 1. Pre-Execute Effects
+            // Выполняем только те, что помечены для воспроизведения при загрузке
+            if (preExecuteEffects != null)
             {
-                case ProgressItemState.Completed:
-                    foreach (var effect in successEffects.ToList())
+                foreach (var effect in preExecuteEffects)
+                {
+                    if (effect != null && effect.ReplayOnLoad)
                     {
-                        effect.OnLoadLevelState(state);
+                        effect.Play(ctx);
                     }
-                    break;
-                default:
-                    _listening = true;
-                    break;
+                }
             }
-        }
 
+            // 2. Executor пропускаем полностью (избегаем мини-игр и логики выполнения)
+
+            // 3. During Execute Effects
+            if (duringExecuteEffects != null)
+            {
+                foreach (var effect in duringExecuteEffects)
+                {
+                    if (effect != null && effect.ReplayOnLoad)
+                    {
+                        effect.Play(ctx);
+                    }
+                }
+            }
+
+            // 4. Success Effects (так как ForceState обычно вызывается для Completed состояния в прогрессе)
+            // Если логика игры подразумевает, что ForceState(Completed) означает успешное завершение в прошлом
+            if (state == ProgressItemState.Completed) 
+            {
+                ctx.State = InteractionState.Success;
+                
+                if (successEffects != null)
+                {
+                    foreach (var effect in successEffects)
+                    {
+                        if (effect != null && effect.ReplayOnLoad)
+                        {
+                            effect.Play(ctx);
+                        }
+                    }
+                }
+                
+                // Если объект должен был уничтожиться после успеха, делаем это сейчас
+                if (destroyAfterSuccess)
+                {
+                    gameObject.SetActive(false);
+                }
+            }
+            
+            // Сбрасываем флаг исполнения, чтобы объект снова стал интерактивным (если это задумано дизайном)
+            // Или оставляем _isExecuting = false, так как мы не запускали корутину
+            _isExecuting = false;
+        }
     }
 }

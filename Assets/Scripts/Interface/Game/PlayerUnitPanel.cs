@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Arcatech.Items;
 using Arcatech.Managers;
 using Arcatech.Stats;
@@ -24,22 +26,28 @@ namespace Arcatech.UI
         /// </summary>
         public event UnityAction ViewChangedInventory;
         BaseGameEntityComponent _player;
-        private EntityStatsComponent st;
+        private EntityStatsComponent _st;
         UsablesCasterComponent _usablesCasterComponent;
         TailsOverchargeModule _tailsOverchargeModule;
         public void Show() => panelAnimator.Show();
         public void Hide() => panelAnimator.Hide();
-        
+        private bool needsReload = false;
+
+        private void OnEnable()
+        {
+            if (needsReload) Start();
+        }
+
         private void Start()
         {
             _player = GameObject.FindWithTag("Player").GetComponent<BaseGameEntityComponent>();
             if (_player != null)
             {
-                st = _player.GetComponent<EntityStatsComponent>();
-                if (st != null)
+                _st = _player.GetComponent<EntityStatsComponent>();
+                if (_st != null)
                 {
-                    st.RegisterStatsViewer(barsManager);
-                    st.RegisterStatsViewer(this);
+                    _st.RegisterStatsViewer(barsManager);
+                    _st.RegisterStatsViewer(this);
                 }
                 else
                 {
@@ -67,6 +75,20 @@ namespace Arcatech.UI
                 Debug.LogWarning("No player in scene but player info panel is active, disabling");
                 panelAnimator.Hide();
             }
+
+            needsReload = false;
+        }
+
+        private void OnDisable()
+        {
+            // if (!_player) return;
+            // if (_st != null)
+            // {
+            //     _st.UnregisterStatsViewer(barsManager);
+            //     _st.UnregisterStatsViewer(this);
+            // }
+            needsReload = true;
+            // init in start, not called on enable
         }
 
 
@@ -100,7 +122,7 @@ namespace Arcatech.UI
     
             if (_tailsOverchargeModule != null && 
                 barsManager.TryGetResourceBar(ResourceStatType.Energy, out var b) &&
-                st.TryGetMax(ResourceStatType.Energy, out var v) &&
+                _st.TryGetMax(ResourceStatType.Energy, out var v) &&
                 v > 0)
             {
                 overcharge.gameObject.SetActive(true);
@@ -115,6 +137,7 @@ namespace Arcatech.UI
                 }
             }
         }
+        
         #region interface
 
         public void RefreshView(UnitInventoryModel model)
@@ -127,7 +150,7 @@ namespace Arcatech.UI
         {
             if (stat == ResourceStatType.Health && statDelta < 0)
             {
-                GameInterfaceManager.Instance.ShowGlitchEffect();
+               // GameInterfaceManager.Instance.GlitchInterface();
                 if (Mathf.Abs(statDelta) > bigDamageThreshold)
                 {
                     GlitchController.Instance.TriggerGlitch();
@@ -147,8 +170,7 @@ namespace Arcatech.UI
 
         public void PrepareCommand(UnitCommand command)
         {// noop
-            
-        }
+            }
 
         public void DoUnitCommand(UnitCommand command, bool wasSuccessful)
         {

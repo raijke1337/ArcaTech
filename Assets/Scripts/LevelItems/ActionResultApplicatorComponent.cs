@@ -12,6 +12,7 @@ namespace Arcatech.Interactions
         [SerializeField] private SerializedDictionary<InteractionState, SerializedActionResult[]> actions;
         private Dictionary<InteractionState, ActionResult[]> _dict;
 
+
         private void Awake()
         {
             _dict = actions.ToDictionary(
@@ -30,7 +31,5 @@ namespace Arcatech.Interactions
             }
         }
 
-        public override void OnLoadLevelState(ProgressItemState stateToLoad)
-        { }
     }
 }

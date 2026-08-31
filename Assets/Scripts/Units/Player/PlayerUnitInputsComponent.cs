@@ -227,7 +227,7 @@ namespace Arcatech.Units.Control
 
             public void UpdateBasis()
             {
-                Debug.Log("UpdateBasis");
+              //  Debug.Log("UpdateBasis");
                 Camera camera = Camera.main;
 
                 if (camera == null)

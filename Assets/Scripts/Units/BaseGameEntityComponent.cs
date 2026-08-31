@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Units;
@@ -60,6 +61,8 @@ namespace Arcatech
 
         private void OnEnable()
         {
+            components = GetComponentsInChildren<IKillableComponent>().ToList();
+            components.Add(this);
             _rb.isKinematic = setKinematic;
         }
         
@@ -72,12 +75,21 @@ namespace Arcatech
         public bool Paused { get; set; }
         public void SetKilled(IKillerComponent comp, bool value)
         {
-            if (ShowingDebugs) Debug.Log($"{GetName} {(value ? "dead" : "resurrected")}, called by: {comp.KilledBy}");
+            //if (ShowingDebugs) Debug.Log($"{GetName} {(value ? "dead" : "resurrected")}, called by: {comp.KilledBy}");
             _killed = value;
             AnnounceDead?.Invoke(this);
             if (_killed && destroyOnDeath)
             {
                 Destroy(gameObject, timerToDestroy);
+            }
+        }
+
+        private List<IKillableComponent> components = new();
+        public void ReviveEntity()
+        {
+            foreach (var c in components)
+            {
+                c.SetKilled(null,false);
             }
         }
     }

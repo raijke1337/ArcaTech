@@ -55,7 +55,7 @@ namespace Arcatech.Units
         {
             if (augmentor == null || _activeAugmentors.Contains(augmentor))
             {
-                Debug.Log($"tried to register {augmentor} and failed");
+              //  Debug.Log($"tried to register {augmentor} and failed");
                 return;
             }
             
@@ -501,11 +501,17 @@ namespace Arcatech.Units
         {
             _killed = value;
 
-            if (value && HasPendingCommand)
-                CompletePendingCommand(false);
+            if (value)
+            {
+                if (HasPendingCommand) CompletePendingCommand(false);
+                _pendingCommand = UnitCommand.None;
+                _context.ClearCommand();
+            }
+            else
+            {
+                Start();
+            }
 
-            _pendingCommand = UnitCommand.None;
-            _context.ClearCommand();
         }
     }
 }
