@@ -1,37 +1,43 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+using Arcatech.Triggers;
 using com.cyborgAssets.inspectorButtonPro;
+using UnityEngine.Events;
 
 namespace Arcatech.Levels
 {
-    public enum RoomState
-    {
-        Hidden,
-        Inactive,
-        Active,
-        Explored
-    }
-
-    public class LevelBlockComponent : MonoBehaviour
+    public class LevelBlockComponent : MonoBehaviour, ITriggerNotificationReceiver
     {
         [Header("References")] [SerializeField]
         private List<Renderer> _renderers = new();
 
         [SerializeField] private List<Light> _lights = new();
-        [SerializeField] private Material _inactiveMaterial; // Назначить Arcatech/Room/InactiveScan
+        [SerializeField] private Material inactiveMaterial;
+        [SerializeField] private Material hiddenMaterial;
 
-        [Header("Settings")] [SerializeField] private bool _isSecret = false;
+        [Header("Settings")]
+        [SerializeField] private int _floor = 0; // 0 = базовый этаж, +1 выше, -1 ниже
+
+        public int Floor => _floor;
 
         private Material[] _originalMaterials;
         private RoomState _currentState = RoomState.Hidden;
-        private bool _initialized = false;
+        private bool _initialized = false; // теперь реально используется
+
+        [SerializeField] private List<LevelBlockComponent> neighbors = new();
+        public IReadOnlyList<LevelBlockComponent> Neighbors => neighbors;
 
         public RoomState CurrentState => _currentState;
-        public bool IsSecret => _isSecret;
 
-        private void Awake()
+        [SerializeField] private List<TriggerTrackerComponent> _roomTriggers = new(); // инициализировано!
+        private readonly HashSet<object> _entitiesInside = new();
+
+        public UnityAction<LevelBlockComponent, bool> RoomHasPlayerEvent = delegate { };
+
+        private void OnEnable()
         {
-            // Кэшируем оригинальные материалы при старте
             _originalMaterials = new Material[_renderers.Count];
             for (int i = 0; i < _renderers.Count; i++)
             {
@@ -39,18 +45,35 @@ namespace Arcatech.Levels
                     _originalMaterials[i] = _renderers[i].sharedMaterial;
             }
 
-            _initialized = true;
+            _roomTriggers = GetComponentsInChildren<TriggerTrackerComponent>().ToList();
+            foreach (var t in _roomTriggers)
+            {
+                t.RegisterReceiver(this);
+                t.Active = true;
+            }
+        }
 
-            // Начинаем в скрытом состоянии
-            SetState(RoomState.Hidden);
+        private void OnDisable()
+        {
+            if (_roomTriggers == null || _roomTriggers.Count == 0) return;
+            foreach (var t in _roomTriggers) t.UnregisterReceiver(this);
+        }
+
+        private void Start()
+        {
+            // to prevent race condition
+            if (_roomTriggers == null || _roomTriggers.Count == 0) return;
+            foreach (var t in _roomTriggers) t.AreaCast(this);
         }
 
         [ProButton]
         public void SetState(RoomState newState)
         {
-            if (!_initialized) return;
-            if (_currentState == newState) return;
+            // ключевой фикс: первый вызов всегда должен применяться,
+            // даже если newState совпадает с дефолтным _currentState
+            if (_initialized && _currentState == newState) return;
 
+            _initialized = true;
             _currentState = newState;
 
             switch (newState)
@@ -58,8 +81,13 @@ namespace Arcatech.Levels
                 case RoomState.Hidden:
                     // Полностью выключаем рендеринг и свет
                     foreach (var r in _renderers)
+                    {
                         if (r != null)
-                            r.enabled = false;
+                        {
+                            r.enabled = true;
+                            r.sharedMaterial = hiddenMaterial;
+                        }
+                    }
                     foreach (var l in _lights)
                         if (l != null)
                             l.enabled = false;
@@ -72,11 +100,10 @@ namespace Arcatech.Levels
                         if (r != null)
                         {
                             r.enabled = true;
-                            r.sharedMaterial = _inactiveMaterial;
+                            r.sharedMaterial = inactiveMaterial;
                         }
                     }
 
-                    // Свет выключен, но можно оставить слабый point light для атмосферы
                     foreach (var l in _lights)
                         if (l != null)
                             l.enabled = false;
@@ -101,13 +128,6 @@ namespace Arcatech.Levels
             }
         }
 
-        // Вызывается из RoomVisibilityManager при смене состояния
-        public void RevealSecret()
-        {
-            _isSecret = false;
-            // После раскрытия секрета комната ведет себя как обычная
-        }
-
 #if UNITY_EDITOR
         [ProButton]
         public void AutoCollect()
@@ -119,5 +139,31 @@ namespace Arcatech.Levels
             Debug.Log($"Collected {_renderers.Count} renderers and {_lights.Count} lights");
         }
 #endif
+        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
+        {
+            if (!triggerHitInfo.TryGetEntityTarget(out var e) || !e.CompareTag("Player")) return;
+
+            // Add() возвращает false, если сущность уже была в множестве —
+            // дублирующий Enter (например, от AreaCast + реальной физики
+            // на старте, или от нескольких триггеров одной комнаты) просто игнорируется.
+            if (_entitiesInside.Add(e) && _entitiesInside.Count == 1)
+            {
+                RoomHasPlayerEvent.Invoke(this, true);
+                Debug.Log($"Entered {name}");
+            }
+        }
+
+        public void TriggerExited(TriggerHitInfo triggerExitInfo)
+        {
+            if (!triggerExitInfo.TryGetEntityTarget(out var e) || !e.CompareTag("Player")) return;
+
+            // Remove() возвращает false, если сущности не было в множестве —
+            // лишний/повторный Exit тоже безопасно игнорируется.
+            if (_entitiesInside.Remove(e) && _entitiesInside.Count == 0)
+            {
+                RoomHasPlayerEvent.Invoke(this, false);
+                Debug.Log($"Exited {name}");
+            }
+        }
     }
 }

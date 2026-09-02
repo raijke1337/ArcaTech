@@ -16,7 +16,11 @@ namespace Arcatech.Triggers
 
         private readonly HashSet<ITriggerNotificationReceiver> _receivers = new();
         public bool Active { get; set; } = true;
-        public void RegisterReceiver(ITriggerNotificationReceiver r) => _receivers.Add(r);
+
+        public void RegisterReceiver(ITriggerNotificationReceiver r)
+        {
+            _receivers.Add(r);
+        }
 
         public void UnregisterReceiver(ITriggerNotificationReceiver r) => _receivers.Remove(r);
 

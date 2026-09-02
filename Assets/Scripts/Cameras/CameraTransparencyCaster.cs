@@ -6,112 +6,87 @@ namespace Arcatech.Cameras
 {
     public class CameraTransparencyCaster : MonoBehaviour
     {
-        Transform player;
+        [Header("Settings")]
         public LayerMask wallMask;
         public float sphereRadius = 0.45f;
         public float fadeSpeed = 8f;
-        [Range(0f, 1f)] public float targetAlpha = 0.25f;
+        [Range(0f, 1f)] public float targetFadeAmount = 0.85f; // 0.85 = сильное растворение с обводкой
 
-        Camera cam;
+        private Transform _player;
+        private Camera _cam;
 
-        readonly Dictionary<Renderer, float> currentAlpha = new();
-        readonly Dictionary<Renderer, Color> originalColor = new(); // RGB больше не трогаем
-        readonly Dictionary<Renderer, MaterialPropertyBlock> blocks = new();
-        readonly HashSet<Renderer> hitThisFrame = new();
-        readonly List<Renderer> keysCache = new();
+        // Используем MaterialPropertyBlock для сохранения SRP Batcher
+        private readonly Dictionary<Renderer, MaterialPropertyBlock> _blocks = new();
+        private readonly Dictionary<Renderer, float> _currentFade = new();
+        private readonly HashSet<Renderer> _hitThisFrame = new();
+        private readonly List<Renderer> _keysCache = new();
 
-        static readonly int ColorId = Shader.PropertyToID("_Color");
+        // ID свойств шейдера (кэшируем для производительности)
+        private static readonly int FadeAmountId = Shader.PropertyToID("_FadeAmount");
 
         void Awake()
         {
-            cam = Camera.main;
-            player = FindAnyObjectByType<PlayerComponent>().transform;
+            _cam = Camera.main;
+            _player = FindAnyObjectByType<PlayerComponent>()?.transform;
         }
 
         void LateUpdate()
         {
-            if (!player || !cam) return;
+            if (!_player || !_cam) return;
 
-            hitThisFrame.Clear();
+            _hitThisFrame.Clear();
 
-            Vector3 origin = cam.transform.position;
-            Vector3 toPlayer = player.position - origin;
+            Vector3 origin = _cam.transform.position;
+            Vector3 toPlayer = _player.position - origin;
             float dist = toPlayer.magnitude;
             if (dist < 0.001f) return;
 
-            var hits = Physics.SphereCastAll(
-                origin, sphereRadius, toPlayer.normalized, dist, wallMask,
-                QueryTriggerInteraction.Ignore);
+            var hits = Physics.SphereCastAll(origin, sphereRadius, toPlayer.normalized, dist, wallMask, QueryTriggerInteraction.Ignore);
 
             foreach (var hit in hits)
             {
                 var renderers = hit.collider.GetComponentsInChildren<Renderer>();
                 foreach (var r in renderers)
                 {
-                    if (!r) continue;
-                    hitThisFrame.Add(r);
-                    EnsureTracked(r);
+                    if (r != null) _hitThisFrame.Add(r);
                 }
             }
 
-            keysCache.Clear();
-            keysCache.AddRange(currentAlpha.Keys);
+            _keysCache.Clear();
+            _keysCache.AddRange(_currentFade.Keys);
 
-            foreach (var r in keysCache)
+            foreach (var r in _keysCache)
             {
-                if (!r)
+                if (r == null)
                 {
-                    currentAlpha.Remove(r);
-                    originalColor.Remove(r);
-                    blocks.Remove(r);
+                    _currentFade.Remove(r);
+                    _blocks.Remove(r);
                     continue;
                 }
 
-                float target = hitThisFrame.Contains(r) ? targetAlpha : 1f;
-                currentAlpha[r] = Mathf.MoveTowards(currentAlpha[r], target, fadeSpeed * Time.deltaTime);
-                ApplyAlpha(r, currentAlpha[r]);
+                float target = _hitThisFrame.Contains(r) ? targetFadeAmount : 0f;
+                _currentFade[r] = Mathf.MoveTowards(_currentFade[r], target, fadeSpeed * Time.deltaTime);
+                
+                ApplyFade(r, _currentFade[r]);
 
-                // Полностью восстановились — снимаем override
-                if (!hitThisFrame.Contains(r) && Mathf.Abs(currentAlpha[r] - 1f) < 0.001f)
+                // Оптимизация: снимаем MPB, если объект полностью видим, чтобы не нагружать рендер
+                if (!_hitThisFrame.Contains(r) && _currentFade[r] < 0.01f)
                 {
                     r.SetPropertyBlock(null);
-                    currentAlpha.Remove(r);
-                    originalColor.Remove(r);
-                    blocks.Remove(r);
+                    _currentFade.Remove(r);
+                    _blocks.Remove(r);
                 }
             }
         }
 
-        void EnsureTracked(Renderer r)
+        void ApplyFade(Renderer r, float fade)
         {
-            if (currentAlpha.ContainsKey(r)) return;
-
-            currentAlpha[r] = 1f;
-
-            // Один раз читаем исходный цвет с материала (не из MPB!)
-            Color baseColor = Color.white;
-            var mat = r.sharedMaterial;
-            if (mat != null && mat.HasProperty(ColorId))
-                baseColor = mat.GetColor(ColorId);
-
-            originalColor[r] = baseColor;
-        }
-
-        void ApplyAlpha(Renderer r, float a)
-        {
-            if (!originalColor.TryGetValue(r, out var baseColor))
-                return;
-
-            if (!blocks.TryGetValue(r, out var mpb))
+            if (!_blocks.TryGetValue(r, out var mpb))
             {
                 mpb = new MaterialPropertyBlock();
-                blocks[r] = mpb;
+                _blocks[r] = mpb;
             }
-
-            // Всегда берём закешированный RGB, меняем только A
-            Color c = baseColor;
-            c.a = baseColor.a * a; // учитываем alpha материала, если она не 1
-            mpb.SetColor(ColorId, c);
+            mpb.SetFloat(FadeAmountId, fade);
             r.SetPropertyBlock(mpb);
         }
     }
