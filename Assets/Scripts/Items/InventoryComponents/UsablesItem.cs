@@ -17,12 +17,5 @@ namespace Arcatech.Usables
             }
         }
 
-        public void OnUnequip()
-        {
-            foreach (var st in usables.Values)
-            {
-                st.CleanUp();
-            }
-        }
     }
 }

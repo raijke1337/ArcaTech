@@ -17,7 +17,7 @@ namespace Arcatech.Stats
     /// also uses stat change strategies to affect the rest of components
     /// </summary>
     public class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
-        IKillableComponent, IStatReceiver, IInvulnerability,IShieldReceiver
+        IKillableComponent, IStatReceiver, IShieldReceiver
     {
 
         [Header("Config")] [SerializeField] private BaseStatsConfig startingConfig;
@@ -150,13 +150,17 @@ namespace Arcatech.Stats
 
         public event UnityAction ViewChangedInventory;
 
-        public void RefreshView(UnitInventoryModel model)
+
+        public void RefreshView(InventoryChangeNotification notification)
         {
+            if (notification.ChangeType == InventoryChangeType.PickUp ||
+                notification.ChangeType == InventoryChangeType.Use) return;
+            
+            var model = notification.InventorySnapshot;
             if (!init) InitializeFromConfig();
 
             RemoveAllEquipmentContributions();
 
-//            Debug.Log("Refresh view");
             if (model != null)
             {
                 int itemIndex = 0;
@@ -507,46 +511,112 @@ namespace Arcatech.Stats
             }
         }
 
+        // private void ApplyDelta(StatDelta d, BaseGameEntityComponent source, SourceKey key)
+        // {
+        //     var sr = EnsureStat(d.stat);
+        //
+        //     if (d.target == StatTarget.Max)
+        //     {
+        //         // Treat as temporary additive effect to Max: add to effectAddMax and recompute.
+        //         float before = sr.max;
+        //         sr.effectAddMax += d.amount;
+        //         RecalculateAllMaxAndClampCurrent();
+        //     }
+        //     else
+        //     {
+        //         float clampMax = sr.maxClamp > 0f ? Mathf.Min(sr.maxClamp, sr.max) : sr.max;
+        //         float newCurrent = Mathf.Clamp(sr.current + d.amount, sr.minClamp, clampMax);
+        //         float delta = newCurrent - sr.current;
+        //         
+        //         // NEW
+        //         if (delta < 0f  && _damageDrawer != null)
+        //         {
+        //             float damageAmount = -delta;
+        //             _damageDrawer.DrawResourceChange(damageAmount, isDamage: true, 
+        //                 durationOverride: null, type: d.stat);
+        //         }
+        //         
+        //         //END
+        //         
+        //         if (Mathf.Abs(delta) > 0.0001f)
+        //             SetCurrentInternal(d.stat, newCurrent, key.expendType,key.source);
+        //     }
+        // }
         private void ApplyDelta(StatDelta d, BaseGameEntityComponent source, SourceKey key)
         {
             var sr = EnsureStat(d.stat);
 
             if (d.target == StatTarget.Max)
             {
-                // Treat as temporary additive effect to Max: add to effectAddMax and recompute.
-                float before = sr.max;
                 sr.effectAddMax += d.amount;
                 RecalculateAllMaxAndClampCurrent();
+                return;
             }
-            else
+
+            float clampMax = sr.maxClamp > 0f
+                ? Mathf.Min(sr.maxClamp, sr.max)
+                : sr.max;
+
+            float newCurrent = Mathf.Clamp(
+                sr.current + d.amount,
+                sr.minClamp,
+                clampMax);
+
+            float delta = newCurrent - sr.current;
+
+            if (delta < 0f && _damageDrawer != null)
             {
-                float clampMax = sr.maxClamp > 0f ? Mathf.Min(sr.maxClamp, sr.max) : sr.max;
-                float newCurrent = Mathf.Clamp(sr.current + d.amount, sr.minClamp, clampMax);
-                float delta = newCurrent - sr.current;
-                
-                // NEW
-                if (delta < 0f  && _damageDrawer != null)
-                {
-                    float damageAmount = -delta;
-                    _damageDrawer.DrawResourceChange(damageAmount, isDamage: true, 
-                        durationOverride: null, type: d.stat);
-                }
-                
-                //END
-                
-                if (Mathf.Abs(delta) > 0.0001f)
-                    SetCurrentInternal(d.stat, newCurrent, key.expendType,key.source);
+                _damageDrawer.DrawResourceChange(
+                    -delta,
+                    isDamage: true,
+                    durationOverride: null,
+                    type: d.stat);
             }
+
+            // Не использовать epsilon здесь:
+            // SetCurrentInternal самостоятельно проверит изменение.
+            SetCurrentInternal(
+                d.stat,
+                newCurrent,
+                key.expendType,
+                key.source);
         }
 
-        private void SetCurrentInternal(ResourceStatType stat, float newCurrent, ExpendType type,
+        // private void SetCurrentInternal(ResourceStatType stat, float newCurrent, ExpendType type,
+        //     BaseGameEntityComponent contributionSource)
+        // {
+        //     var sr = EnsureStat(stat);
+        //     float delta = newCurrent - sr.current;
+        //     if (Mathf.Abs(delta) <= 0.000001f) return;
+        //     sr.current = newCurrent;
+        //     UpdateViewers(stat, sr.current, sr.max, delta, type,contributionSource);
+        // }
+        private void SetCurrentInternal(
+            ResourceStatType stat,
+            float newCurrent,
+            ExpendType type,
             BaseGameEntityComponent contributionSource)
         {
             var sr = EnsureStat(stat);
-            float delta = newCurrent - sr.current;
-            if (Mathf.Abs(delta) <= 0.000001f) return;
+
+            float oldCurrent = sr.current;
+
+            // После Mathf.Clamp точное равенство здесь подходит:
+            // если значение отличается даже незначительно, его нужно сохранить.
+            if (newCurrent == oldCurrent)
+                return;
+
             sr.current = newCurrent;
-            UpdateViewers(stat, sr.current, sr.max, delta, type,contributionSource);
+
+            float delta = newCurrent - oldCurrent;
+
+            UpdateViewers(
+                stat,
+                sr.current,
+                sr.max,
+                delta,
+                type,
+                contributionSource);
         }
 
         private StatRuntime EnsureStat(ResourceStatType stat)

@@ -15,6 +15,7 @@ namespace Arcatech.Interactions
         [SerializeField] SerializedDictionary<InteractionState,SerializedStateTransition> stateTransitions;
         private Dictionary<InteractionState, StateTransition> _transitions;
 
+        private IStateAugmentorReceiver cached;
         private void Start()
         {
             _transitions = new Dictionary<InteractionState, StateTransition>();
@@ -28,6 +29,10 @@ namespace Arcatech.Interactions
         private void OnDisable()
         {
             activeArea?.UnregisterReceiver(this);
+            foreach (var pair in _transitions)
+            {
+                cached?.RemoveTransition(pair.Value);
+            }
         }
 
         #region State Augmentor
@@ -37,6 +42,7 @@ namespace Arcatech.Interactions
             {
                 machine.AddTransition(pair.Value);
             }
+            cached =  machine;
         }
 
         public void Detach(IStateAugmentorReceiver machine)

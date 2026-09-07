@@ -122,6 +122,7 @@ GameObject:
   - component: {fileID: 8156757486324064789}
   - component: {fileID: 2904987887053145934}
   - component: {fileID: 7152817584857583273}
+  - component: {fileID: 4258982380285892184}
   m_Layer: 6
   m_Name: Basic Box
   m_TagString: Untagged
@@ -307,7 +308,7 @@ MonoBehaviour:
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
-  targetable: 1
+  targetable: 0
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -455,7 +456,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: 4cc8c88d-f138-4f43-a22e-47523366d5a4
+--- !u!114 &4258982380285892184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7735594828011522598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 119ef3ebc21a48d29b7ae41857b4379c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractionStatesInjectorComponent
+  activeArea: {fileID: 7810916253604783490}
+  stateTransitions:
+    _serializedList:
+    - Key: 2
+      Value: {fileID: 11400000, guid: 60503119474df7745bee4765d060b2e2, type: 2}
+    - Key: 4
+      Value: {fileID: 11400000, guid: 7130243591e58444dbefd6992373d4ba, type: 2}
+    - Key: 3
+      Value: {fileID: 11400000, guid: d909ef16991e56548a9d7dda758d2638, type: 2}
 --- !u!1 &8238251637142270540
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,10 +10,10 @@ using UnityEngine.UI;
 
 namespace Arcatech.UI
 {
-    [RequireComponent(typeof(PanelAnimator_Free))]
+    [RequireComponent(typeof(PanelAnimator))]
     public class OverchargeUIMain : ValidatedMonoBehaviour
     {
-        [SerializeField,Self] private PanelAnimator_Free panelAnimator;
+        [SerializeField,Self] private PanelAnimator panelAnimator;
         [SerializeField] private Image fill;
         [SerializeField] private Image activatingFrame;
         [SerializeField] private TextMeshProUGUI text;
@@ -30,7 +30,7 @@ namespace Arcatech.UI
 
         private const int Segments = 12;
 
-        public PanelAnimator_Free Animator => panelAnimator;
+        public PanelAnimator Animator => panelAnimator;
         private TailsOverchargeModule overchargeModule;
 
         private OverchargeModuleState _previousState = OverchargeModuleState.Idle;

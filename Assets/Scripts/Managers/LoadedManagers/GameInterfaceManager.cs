@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Arcatech.EventBus;
 using Arcatech.Interactions;
@@ -14,6 +15,7 @@ using DG.Tweening;
 using KBCore.Refs;
 using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
@@ -31,13 +33,13 @@ namespace Arcatech.Managers
             else Destroy(this.gameObject);
         }
 
-        [SerializeField] private PanelAnimator_Free koWindow;
-        [SerializeField] private PanelAnimator_Free fade;
-        [SerializeField] private PanelAnimator_Free pauseWindow;
+        [SerializeField] private PanelAnimator koWindow;
+        [SerializeField] private PanelAnimator fade;
+        [SerializeField] private PanelAnimator pauseWindow;
         
         [SerializeField,Child] private PlayerUnitPanel playerPanel;
 
-        [SerializeField,Child] private ItemCardComponent inspectItemCard;
+        [SerializeField,Child] private EquipmentNotificationWindow inspectItemCard;
         [SerializeField] public Transform miniGame;
         [Space]
         [SerializeField] private bool showTooltip = true;
@@ -90,14 +92,22 @@ namespace Arcatech.Managers
 
 
         #region game dialogues and texts
-        public void ShowDialoguePart(DialoguePart dialogue)
+        public void ShowDialoguePart(DialoguePart dialogue, UnityAction onDialogueCompleted = null)
         {
             if (!dialogue || !showDialogues) return;
             _text.gameObject.SetActive(true);
-            
             _text.ShowDialogue(dialogue);
+            if (onDialogueCompleted != null) StartCoroutine(TextCheckingRoutine(onDialogueCompleted));
         }
 
+        private IEnumerator TextCheckingRoutine(UnityAction onDialogueCompleted)
+        {
+            while (IsDialogueShowing)
+            {
+                yield return null;
+            }
+            onDialogueCompleted.Invoke();
+        }
         public bool IsDialogueShowing => _text.gameObject.activeSelf;
         
         #endregion

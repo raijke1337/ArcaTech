@@ -48,7 +48,16 @@ namespace Arcatech.Cameras
                 var renderers = hit.collider.GetComponentsInChildren<Renderer>();
                 foreach (var r in renderers)
                 {
-                    if (r != null) _hitThisFrame.Add(r);
+                    if (r == null) continue;
+                    
+                    _hitThisFrame.Add(r);
+                    
+                    // ФИКС: Регистрируем новые объекты, которые впервые перекрыли обзор.
+                    // Если объекта нет в словаре, добавляем его с начальным значением 0 (полностью видим).
+                    if (!_currentFade.ContainsKey(r))
+                    {
+                        _currentFade[r] = 0f; 
+                    }
                 }
             }
 
@@ -57,6 +66,7 @@ namespace Arcatech.Cameras
 
             foreach (var r in _keysCache)
             {
+                // Защита от уничтоженных объектов
                 if (r == null)
                 {
                     _currentFade.Remove(r);
@@ -64,12 +74,13 @@ namespace Arcatech.Cameras
                     continue;
                 }
 
+                // Если объект в хитах - стремимся к targetFadeAmount, иначе - к 0 (полная видимость)
                 float target = _hitThisFrame.Contains(r) ? targetFadeAmount : 0f;
                 _currentFade[r] = Mathf.MoveTowards(_currentFade[r], target, fadeSpeed * Time.deltaTime);
                 
                 ApplyFade(r, _currentFade[r]);
 
-                // Оптимизация: снимаем MPB, если объект полностью видим, чтобы не нагружать рендер
+                // Оптимизация: снимаем MPB и удаляем из словарей, если объект полностью восстановился
                 if (!_hitThisFrame.Contains(r) && _currentFade[r] < 0.01f)
                 {
                     r.SetPropertyBlock(null);

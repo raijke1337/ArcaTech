@@ -73,11 +73,11 @@ namespace Arcatech.Units
 
 
 
-        private void RefreshViews()
+        private void RefreshViews(InventoryChangeNotification notification)
         {
             foreach (var view in _views)
             {
-                view.RefreshView(_model);
+                view.RefreshView(notification);
             }
 
         }
@@ -94,7 +94,13 @@ namespace Arcatech.Units
                 if (!_views.Contains(view))
                 {
                     _views.Add(view);
-                    view.RefreshView(_model);
+                    view.RefreshView(new InventoryChangeNotification()
+                    {
+                        ChangedItem = null,
+                        ChangedQuantity = 0,
+                        ChangeType = InventoryChangeType.Initialization,
+                        InventorySnapshot = _model
+                    });
                     view.ViewChangedInventory += HandleViewChange;
                 }
                 else
@@ -149,34 +155,7 @@ namespace Arcatech.Units
         }
 
         #endregion
-
-    
-        public void PopulateSaveData(GameData data)
-        {
-            if (!useSaveSystem) return;
-            string entityID = baseGameEntity.GetID;
-            IReadOnlyDictionary<Item, int> inv = _model.ListInventory;
-            IReadOnlyList<Equipment> equips = _model.ListEquipped;
-
-            Dictionary<string, int> savedInventory = new();
-            foreach (var pair in inv)
-            {
-                savedInventory[pair.Key.ID.ToString()] = pair.Value;
-            }
-            
-            List<string> equipsToSave = new();
-            foreach (var pair in equips)
-            {
-                equipsToSave.Add(pair.ID.ToString());
-            }
-            
-            SavedEntityInventory save = new();
-            save.EntityID = entityID;
-            save.EntityEquipmentIDs =  equipsToSave;
-            save.EntityItemIDs = savedInventory.Keys.ToArray();
-            save.EntityItemsCount = savedInventory.Values.ToArray();
-            
-        }
+        
     }
 
 }

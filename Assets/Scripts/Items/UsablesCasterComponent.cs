@@ -21,6 +21,7 @@ namespace Arcatech.Items
     {
 
         public event UnityAction ViewChangedInventory;
+
         [SerializeField,Self] EntityInventoryComponent entityInventory;
         [SerializeField, Self] private EntityStateMachineComponent stateUnit;
         [SerializeField] private TriggerTrackerComponent meleeHitbox;
@@ -37,16 +38,19 @@ namespace Arcatech.Items
             _usables = new();
             _stats = GetComponent<EntityStatsComponent>();
         }
-
-        public void RefreshView(UnitInventoryModel model)
+        public void RefreshView(InventoryChangeNotification notification)
         {
+            if (notification.ChangeType == InventoryChangeType.PickUp ||
+                notification.ChangeType == InventoryChangeType.Use) return;
+            
+            var model = notification.InventorySnapshot;
             _currentUsable = null;
             if (_usables != null)
             {
                 foreach (var usable in _usables.Values)
                 {
                     if (usable.GetStateTransition != null)
-                    stateUnit.RemoveTransition(usable.GetStateTransition);
+                        stateUnit.RemoveTransition(usable.GetStateTransition);
                 }
             }
 
@@ -67,11 +71,12 @@ namespace Arcatech.Items
             foreach (var usable in _usables.Values)
             {
                 if (usable.GetStateTransition != null)
-                stateUnit.AddTransition(usable.GetStateTransition);
+                    stateUnit.AddTransition(usable.GetStateTransition);
             }
 
             _redraw = true;
         }
+
 
         public void Update()
         {

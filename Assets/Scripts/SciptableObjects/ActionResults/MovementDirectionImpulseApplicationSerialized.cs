@@ -32,15 +32,8 @@ namespace Arcatech.Actions
             BaseGameEntityComponent user, BaseGameEntityComponent target,
             Vector3 place, Quaternion placeRot)
         {
-            if (mover == null)
-                target.TryGetComponent(out mover);   
 
-            if (mover == null)
-            {
-                Debug.LogWarning($"[Impulse] IMove not found on {target?.name}");
-                return false;
-            }
-
+            if (!target.TryGetComponent(out mover)) return false;
             mover.ApplyImpulse(direction * mult);
             return true;
         }

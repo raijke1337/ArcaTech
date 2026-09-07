@@ -106,50 +106,47 @@ namespace Arcatech.Units
 
         public void EnterState(StateMachineContext context, Animator animator)
         {
-            
             _stateTimer.Reset();
             _stateTimer.Start();
             _nextActionIndex = 0;
 
-            // Apply animator crossfade if an animation name/hash was provided
-            
+            foreach (var mover in context.Movers)
+            {
+                mover.CanMove = AllowsMovement;
+                mover.UseRootMotion = IsRootMotionState;
+            }
+
+            foreach (var aimer in context.Aimers)
+                aimer.CanAim = AllowsAiming;
+
+            foreach (var invulnerable in context.Invulnerables)
+                invulnerable.Invulnerable = Invulnerable;
+
             if (animator != null && _animatorHash != 0)
             {
                 if (!animator.HasState(_animatorLayer, _animatorHash))
                 {
                     Debug.LogWarning(
                         $"[{StateName}] Animator '{animator.runtimeAnimatorController.name}' " +
-                        $"has no state hash {_animatorHash} on layer {_animatorLayer}. " +
-                        $"Check the SerializedUnitState asset.");
+                        $"has no state hash {_animatorHash} on layer {_animatorLayer}.");
                 }
                 else
                 {
-                    animator.CrossFadeInFixedTime(_animatorHash, _crossfadeTime, _animatorLayer);
+                    animator.CrossFadeInFixedTime(
+                        _animatorHash,
+                        _crossfadeTime,
+                        _animatorLayer);
                 }
             }
 
-
-            foreach (var m in context.Movers)
+            foreach (var action in OnEnterState)
             {
-                m.CanMove = AllowsMovement;
-                m.UseRootMotion = IsRootMotionState;
+                action?.ProduceResult(
+                    context.Owner,
+                    null,
+                    context.Spawn.position,
+                    context.Spawn.rotation);
             }
-
-            foreach (var m in context.Aimers)
-            {
-                m.CanAim = AllowsAiming;
-            }
-
-            foreach (var i in context.Invulnerables)
-            {
-                i.Invulnerable = Invulnerable;
-            }
-
-            // Execute on-enter actions
-
-            if (OnEnterState == null || OnEnterState.Length <= 0) return;
-            foreach (var a in OnEnterState)
-                a?.ProduceResult(context.Owner, null, context.Spawn.position, context.Spawn.rotation);
         }
 
         public void UpdateState(StateMachineContext context, Animator animator,float delta)
@@ -179,11 +176,16 @@ namespace Arcatech.Units
 
         public void ExitState(StateMachineContext context, Animator animator)
         {
-            if (OnExitState == null || OnExitState.Length == 0) return;
-            foreach (var a in OnExitState)
-                a?.ProduceResult(context.Owner, null, context.Spawn.position, context.Spawn.rotation);
             _stateTimer.Stop();
 
+            foreach (var action in OnExitState)
+            {
+                action?.ProduceResult(
+                    context.Owner,
+                    null,
+                    context.Spawn.position,
+                    context.Spawn.rotation);
+            }
         }
         /// <summary>
         /// Returns true ONLY if this is a non-looping clip that has played to its end.

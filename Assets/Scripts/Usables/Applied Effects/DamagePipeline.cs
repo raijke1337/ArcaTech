@@ -12,6 +12,7 @@
     public static class DamagePipeline
     {
         public static IDifficultyDamageProvider Difficulty { get; set; } = new NullDifficultyProvider();
+        public static bool HitStopEnabled { get; } = true;
 
         /// <summary>
         /// Scales a combat amount. Only negative Current deltas (damage) are scaled;

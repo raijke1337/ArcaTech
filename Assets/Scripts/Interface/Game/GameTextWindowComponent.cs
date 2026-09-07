@@ -35,7 +35,7 @@ public class GameTextWindowComponent : ValidatedMonoBehaviour
     private bool _skipRequested = false;
     private Queue<DialoguePart> _dialogueQueue = new Queue<DialoguePart>();
 
-    [SerializeField,Self] PanelAnimator_Free animator;
+    [SerializeField,Self] PanelAnimator animator;
     private void Start()
     {
         windowSize.x = rect.sizeDelta.x;

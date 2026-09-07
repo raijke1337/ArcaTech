@@ -21,15 +21,17 @@ namespace Arcatech.Units
         
         private UnitInventoryModel inventoryModel;
         public event UnityAction ViewChangedInventory;
-        public void RefreshView(UnitInventoryModel model)
+        public void RefreshView(InventoryChangeNotification notification)
         {
-            if (inventoryModel != model)
+            if (notification.InventorySnapshot!= null && inventoryModel != notification.InventorySnapshot)
             {
                 // model is changed for some reason
-                inventoryModel = model;
+                inventoryModel = notification.InventorySnapshot;
             }
             DrawItems(defaultItemsDrawStrat);
         }
+        
+        
         
         #endregion
         

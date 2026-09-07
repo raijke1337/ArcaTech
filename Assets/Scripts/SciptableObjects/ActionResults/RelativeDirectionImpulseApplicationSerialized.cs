@@ -26,7 +26,6 @@ namespace Arcatech.Actions
         private readonly float _direction;
         private readonly float _mult;
         private IMove _mover;
-        private bool _initialized;
     
         public RelativeDirectionImpulseResult(float d, float m)
         {
@@ -36,16 +35,7 @@ namespace Arcatech.Actions
     
         public override bool ProduceResult(BaseGameEntityComponent user, BaseGameEntityComponent target, Vector3 place, Quaternion placeRot)
         {
-            // Инициализация
-            if (!_initialized)
-            {
-                _initialized = target.TryGetComponent(out _mover);
-            }
-        
-            if (_mover == null)
-            {
-                return false;
-            }
+            if (!target.TryGetComponent(out _mover)) return false;
 
             // Вычисляем направление от user к target
             Vector3 directionVector = (target.transform.position - user.transform.position).normalized;

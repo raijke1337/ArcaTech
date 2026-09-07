@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Arcatech.UI
 {
-    [RequireComponent(typeof(PanelAnimator_Free))]
+    [RequireComponent(typeof(PanelAnimator))]
     public class PlayerBarUsablesIconsContainerManager : ValidatedMonoBehaviour
     {
         [Header("References")]
@@ -16,8 +16,8 @@ namespace Arcatech.UI
         [SerializeField]
         private Transform usablesParent;
         
-        [SerializeField,Child] private PanelAnimator_Free panelAnimator;
-        public PanelAnimator_Free Animator => panelAnimator;
+        [SerializeField,Child] private PanelAnimator panelAnimator;
+        public PanelAnimator Animator => panelAnimator;
 
         private readonly Dictionary<UnitActionType, IconContainerUIScript> usablesIcons =
             new Dictionary<UnitActionType, IconContainerUIScript>();

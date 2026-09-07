@@ -25,7 +25,7 @@ namespace Arcatech.Usables.Effects
         private IStatusReceiver _status;
 
         // optional — present only if the entity also has stats
-        private IStatReceiver _stats;
+        private IStatReceiver[] _stats;
         private IShieldReceiver _shields;
 
         public BaseGameEntityComponent Owner => _owner;
@@ -40,13 +40,13 @@ namespace Arcatech.Usables.Effects
             _status = GetComponent<IStatusReceiver>();
 
             // optional stat-based receivers (same component implements both)
-            _stats = GetComponent<IStatReceiver>();
+            _stats = GetComponents<IStatReceiver>();
             _shields = GetComponent<IShieldReceiver>();
         }
 
         // --- receiver access (effects ask the receiver, not the entity) ---
 
-        public bool TryGetStatReceiver(out IStatReceiver r)
+        public bool TryGetStatReceiver(out IStatReceiver[] r)
         {
             r = _stats;
             return r != null;

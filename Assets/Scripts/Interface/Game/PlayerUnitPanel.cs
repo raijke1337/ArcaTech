@@ -19,7 +19,9 @@ namespace Arcatech.UI
         [SerializeField, Child] protected PlayerBarUsablesIconsContainerManager usablesIcons;
         [SerializeField, Child] protected BarsContainersManager barsManager;
         [SerializeField, Child] protected OverchargeUIMain overcharge;
-        [SerializeField,Self] PanelAnimator_Free panelAnimator;
+        [SerializeField] protected InventoryNotificationWindow inventoryNotification;
+        [SerializeField] protected EquipmentNotificationWindow equipsNotification;
+        [SerializeField,Self] PanelAnimator panelAnimator;
         [Space, SerializeField, Range(0,200)] private int bigDamageThreshold = 25;
         /// <summary>
         /// not called in this component
@@ -76,6 +78,7 @@ namespace Arcatech.UI
                 panelAnimator.Hide();
             }
 
+            inventoryNotification.Animator.Hide();
             needsReload = false;
         }
 
@@ -140,11 +143,28 @@ namespace Arcatech.UI
         
         #region interface
 
-        public void RefreshView(UnitInventoryModel model)
+        public void RefreshView(InventoryChangeNotification not)
         {
+            if (not.ChangeType == InventoryChangeType.PickUp ||
+                not.ChangeType == InventoryChangeType.Use)
+            {
+                inventoryNotification.gameObject.SetActive(true);
+                inventoryNotification.Animator.Show();
+                inventoryNotification.ShowText(not);
+                return;
+            }
+
+            if (not.ChangeType == InventoryChangeType.Equip)
+            {
+                equipsNotification.gameObject.SetActive(true);
+                equipsNotification.Animator.Show();
+                equipsNotification.LoadItem(not.ChangedItem);
+            }
+
             SetupUsables();
             SetupOvercharge();
         }
+
         public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
             BaseGameEntityComponent source)
         {

@@ -68,18 +68,23 @@ namespace Arcatech.Units.Control
         
         protected override void CustomRotationMode(float deltaTime)
         {
+            if (UseRootMotion)
+            {
+                RotateWithRootMotion();
+                return;
+            }
+
             if (!CanAim)
                 return;
 
             bool isMoving = MovementVector.sqrMagnitude > 0.0001f;
-
             bool rotateToMovement = !HasLockedTarget && IsGamepadInput && isMoving;
 
-            Vector3 targetDirection = rotateToMovement ? MovementVector : AimDirection;
+            Vector3 targetDirection = rotateToMovement
+                ? MovementVector
+                : AimDirection;
 
             RotateTowards(targetDirection, deltaTime);
-
-            base.CustomRotationMode(deltaTime);
         }
 
         protected override void OnValidate()

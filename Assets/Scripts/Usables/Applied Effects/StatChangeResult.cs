@@ -43,26 +43,29 @@ namespace Arcatech.Usables.Effects
         public override void Apply(EffectContext ctx)
         {
             if (ctx.TargetReceiver == null) return;
-            if (!ctx.TargetReceiver.TryGetStatReceiver(out var receiver)) return;
-            if (receiver.Invulnerable) return;
-
-            var attacker = ResolveAttackerReceiver(ctx.Source);
-            var defender = ctx.TargetReceiver;
-            var key = ctx.Instance != null ? ctx.Instance.Key : default;
-
-            for (int i = 0; i < _instantDeltas.Count; i++)
+            if (!ctx.TargetReceiver.TryGetStatReceiver(out var receivers)) return;
+            foreach (var receiver in receivers)
             {
-                var d = _instantDeltas[i];
+                if (receiver.Invulnerable) return;
 
-                // Scale combat damage (negative Current deltas) once, through the single
-                // pipeline. Healing / positive deltas pass through untouched (guarded inside).
-                d.amount = DamagePipeline.Resolve(d.amount, attacker, defender);
+                var attacker = ResolveAttackerReceiver(ctx.Source);
+                var defender = ctx.TargetReceiver;
+                var key = ctx.Instance != null ? ctx.Instance.Key : default;
 
-                // TODO (post-MVP): applied-effect conditions are not used per design doc.
-                // If ever needed: if (!d.condition.IsEmpty &&
-                //     !receiver.CheckStatsConditionGroup(d.condition)) continue;
+                for (int i = 0; i < _instantDeltas.Count; i++)
+                {
+                    var d = _instantDeltas[i];
 
-                receiver.ApplyInstantDelta(d, ctx.Source, key);
+                    // Scale combat damage (negative Current deltas) once, through the single
+                    // pipeline. Healing / positive deltas pass through untouched (guarded inside).
+                    d.amount = DamagePipeline.Resolve(d.amount, attacker, defender);
+
+                    // TODO (post-MVP): applied-effect conditions are not used per design doc.
+                    // If ever needed: if (!d.condition.IsEmpty &&
+                    //     !receiver.CheckStatsConditionGroup(d.condition)) continue;
+
+                    receiver.ApplyInstantDelta(d, ctx.Source, key);
+                }
             }
         }
 

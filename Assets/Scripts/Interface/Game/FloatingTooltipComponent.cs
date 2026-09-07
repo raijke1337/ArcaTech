@@ -6,16 +6,16 @@ using UnityEngine;
 
 namespace Arcatech.UI
 {
-    [RequireComponent(typeof(PanelAnimator_Free))]
+    [RequireComponent(typeof(PanelAnimator))]
     public class FloatingTooltipComponent : ValidatedMonoBehaviour
     {
 
-        [SerializeField, Self] private PanelAnimator_Free animator;
+        [SerializeField, Self] private PanelAnimator animator;
         [SerializeField] private TextMeshProUGUI TitleLabel;
         [SerializeField] private TextMeshProUGUI InteractiveLabel;
         [SerializeField, Self] RectTransform rectT;
 
-        public PanelAnimator_Free PanelAnimator => animator;
+        public PanelAnimator PanelAnimator => animator;
         private void Update()
         {
             UpdatePosition();

@@ -5,7 +5,7 @@ using Arcatech.Units;
 namespace Arcatech
 {
     public interface 
-        IUsable : ICosted, IActionIconContent,IAffectsItemDisplay,IHasDescription
+        IUsable : ICosted, IActionIconContent,IAffectsItemDisplay
     {
         public bool UsableIsReady();
         public StateTransition GetStateTransition { get; }

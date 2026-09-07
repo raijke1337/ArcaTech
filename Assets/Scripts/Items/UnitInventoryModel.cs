@@ -26,7 +26,7 @@ namespace Arcatech.Items
                  return readOnlyDictionary;
             }
         }
-        public event UnityAction ModelUpdatedEvent = delegate { };
+        public event UnityAction<InventoryChangeNotification> ModelUpdatedEvent = delegate { };
 
         public UnitInventoryModel(IEntityItemsList items, BaseGameEntityComponent o)
         {
@@ -74,7 +74,14 @@ namespace Arcatech.Items
             
             // for example small bots have different items that they equip but with the same stats
             _initialized = true;
-            ModelUpdatedEvent.Invoke();
+            
+            ModelUpdatedEvent.Invoke(new InventoryChangeNotification()
+            {
+                ChangedItem = null,
+                ChangedQuantity =  0,
+                InventorySnapshot = this,
+                ChangeType = InventoryChangeType.Initialization,
+            });
         }
         
         public void PickUpItem(Item item, int count)
@@ -82,7 +89,13 @@ namespace Arcatech.Items
             _inventory.Add(item,count);
             if (_initialized)
             {
-                ModelUpdatedEvent.Invoke();
+                ModelUpdatedEvent.Invoke(new  InventoryChangeNotification()
+                {
+                    ChangedItem = item,
+                    ChangedQuantity = count,
+                    InventorySnapshot = this,
+                    ChangeType = InventoryChangeType.PickUp,
+                });
             }
         }
         public void PickUpItems(IDictionary<Item,int> items)
@@ -118,6 +131,14 @@ namespace Arcatech.Items
             var neededID = item.ID; 
             var itemInQuestion = _inventory.Keys.First(x => x.ID == neededID);
             _inventory[itemInQuestion] -= amount;
+            
+            ModelUpdatedEvent.Invoke(new InventoryChangeNotification()
+            {
+                ChangedItem = itemInQuestion,
+                ChangedQuantity = -amount,
+                InventorySnapshot = this,
+                ChangeType = InventoryChangeType.Use
+            });
             if (_inventory[itemInQuestion] == 0) _inventory.Remove(itemInQuestion);
             return true;
         }
@@ -130,9 +151,23 @@ namespace Arcatech.Items
             {
                 drop.OnUnequip();
                 dropped = drop;
+                ModelUpdatedEvent.Invoke(new InventoryChangeNotification()
+                {
+                    ChangedItem = dropped,
+                    ChangedQuantity = -1,
+                    InventorySnapshot = this,
+                    ChangeType = InventoryChangeType.Unequip,
+                });
             }
             _equipments[toEquip.Slot] = toEquip;
-            if (_initialized) ModelUpdatedEvent.Invoke();
+            if (_initialized)
+                ModelUpdatedEvent.Invoke(new InventoryChangeNotification()
+                {
+                    ChangedItem = toEquip,
+                    ChangedQuantity = 1,
+                    InventorySnapshot = this,
+                    ChangeType = InventoryChangeType.Equip
+                });
         }
         
         /// <summary>
@@ -149,8 +184,6 @@ namespace Arcatech.Items
             }
             return list;
         }
-
-
     }
 
 
