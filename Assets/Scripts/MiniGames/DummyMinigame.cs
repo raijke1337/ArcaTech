@@ -24,5 +24,13 @@ namespace Arcatech.MiniGames
         {
             
         }
+
+        protected override void OnGameStarted()
+        {
+        }
+
+        protected override void OnGameEnded()
+        {
+        }
     }
 }

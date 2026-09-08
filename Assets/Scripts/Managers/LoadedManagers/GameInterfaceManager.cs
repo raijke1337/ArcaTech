@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Arcatech.EventBus;
 using Arcatech.Interactions;
+using Arcatech.MiniGames;
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Texts;
@@ -38,9 +39,11 @@ namespace Arcatech.Managers
         [SerializeField] private PanelAnimator pauseWindow;
         
         [SerializeField,Child] private PlayerUnitPanel playerPanel;
+        [SerializeField,Child] private MiniGameWindow miniGameWindow;
 
         [SerializeField,Child] private EquipmentNotificationWindow inspectItemCard;
-        [SerializeField] public Transform miniGame;
+       // [SerializeField] public Transform miniGame;
+        
         [Space]
         [SerializeField] private bool showTooltip = true;
         [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
@@ -276,11 +279,31 @@ namespace Arcatech.Managers
 
         #endregion
 
+        #region minigame
+
+        private UnityAction<InteractionState> _gameCallback;
+        public void StartMinigame(MiniGameBase game, UnityAction<InteractionState> callback)
+        {
+            miniGameWindow.gameObject.SetActive(true);
+            miniGameWindow.Animator.Show();
+            _gameCallback = callback;
+            miniGameWindow.LoadGame(game,OnGameCompleted);
+            fade.gameObject.SetActive(true);
+            fade.Show();
+        }
+
+        private void OnGameCompleted(InteractionState state)
+        {
+            fade.Hide();
+            _gameCallback?.Invoke(state);
+            _gameCallback = null;
+        }
+
+        #endregion
         
         
         
-        
-#region draw damage
+    #region draw damage
 
 
 
