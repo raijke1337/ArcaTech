@@ -33,6 +33,7 @@ namespace Arcatech.UI
         {
             cb.Invoke(state);
             cb = null;
+            Animator.Hide();
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Arcatech.MiniGames
         private Coroutine _transitionRoutine;
         private int _sessionId;
 
+        protected int SessionId => _sessionId;
         private bool _isRunning;
         private bool _isFinishing;
 
@@ -31,12 +32,7 @@ namespace Arcatech.MiniGames
 
             _isRunning = true;
             _isFinishing = false;
-
-            gameObject.SetActive(true);
-
-            // Важно: сбрасываем всё до fade-in.
             ResetGame();
-
             OnGameStarted();
         }
 

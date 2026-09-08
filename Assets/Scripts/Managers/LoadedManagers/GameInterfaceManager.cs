@@ -22,33 +22,24 @@ using Random = UnityEngine.Random;
 
 namespace Arcatech.Managers
 {
-    public class GameInterfaceManager : ValidatedMonoBehaviour
+    public class GameInterfaceManager : GenericLazySingleton<GameInterfaceManager>
     {
-
-        public static SerializedDictionary<ResourceStatType, Sprite> Icons;
-
-        public static GameInterfaceManager Instance;
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(this.gameObject);
-        }
 
         [SerializeField] private PanelAnimator koWindow;
         [SerializeField] private PanelAnimator fade;
         [SerializeField] private PanelAnimator pauseWindow;
         
-        [SerializeField,Child] private PlayerUnitPanel playerPanel;
-        [SerializeField,Child] private MiniGameWindow miniGameWindow;
+        [SerializeField] private PlayerUnitPanel playerPanel;
+        [SerializeField] private MiniGameWindow miniGameWindow;
 
-        [SerializeField,Child] private EquipmentNotificationWindow inspectItemCard;
+        [SerializeField] private EquipmentNotificationWindow inspectItemCard;
        // [SerializeField] public Transform miniGame;
         
         [Space]
         [SerializeField] private bool showTooltip = true;
-        [SerializeField,Child] private FloatingTooltipComponent floatingTooltip;
+        [SerializeField] private FloatingTooltipComponent floatingTooltip;
         [Space]
-        [SerializeField,Child] private GameTextWindowComponent _text;
+        [SerializeField] private GameTextWindowComponent _text;
         [SerializeField] private bool showDialogues = true;
 
         /// <summary>
