@@ -1,5 +1,4 @@
-﻿using System;
-using Arcatech.Managers;
+﻿using Arcatech.Managers;
 using Arcatech.SaveSystem;
 using Arcatech.Texts;
 using AYellowpaper.SerializedCollections;

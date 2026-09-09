@@ -34,7 +34,6 @@ namespace Arcatech.MiniGames
 
             [HideInInspector] public bool isStopped;
             [HideInInspector] public float currentAngle;
-            [HideInInspector] public Color originalColor;
         }
 
         [Header("Rings")]
@@ -93,12 +92,7 @@ namespace Arcatech.MiniGames
                 if (ring.transform != null)
                     ring.transform.localEulerAngles = new Vector3(0, 0, ring.currentAngle);
 
-                // Запоминаем исходный цвет для сброса
-                if (ring.ringImage != null)
-                {
-                    ring.originalColor = ring.ringImage.color;
-                    SetRingColor(ring, ring.originalColor, instant: true);
-                }
+                SetRingColor(ring, ColorCyan, instant: true);
             }
 
             // Показываем UI условий проигрыша
@@ -106,14 +100,12 @@ namespace Arcatech.MiniGames
             {
                 timerText.gameObject.SetActive(true);
                 timerText.text = timeLimit.ToString("F1");
-                timerText.color = Color.white;
             }
 
             if (limitedFailures && attemptsText != null)
             {
                 attemptsText.gameObject.SetActive(true);
                 attemptsText.text = allowedFailures.ToString();
-                attemptsText.color = Color.white;
             }
         }
 
@@ -127,7 +119,7 @@ namespace Arcatech.MiniGames
             foreach (var ring in rings)
             {
                 if (ring.ringImage != null)
-                    SetRingColor(ring, ring.originalColor, instant: true);
+                    SetRingColor(ring, ColorCyan, instant: true);
             }
 
             // Останавливаем все корутины, чтобы ResetFailedRings
@@ -150,7 +142,7 @@ namespace Arcatech.MiniGames
                     ring.transform.localEulerAngles = new Vector3(0, 0, ring.currentAngle);
 
                 if (ring.ringImage != null)
-                    SetRingColor(ring, ring.originalColor, instant: true);
+                    SetRingColor(ring, ColorCyan, instant: true);
             }
         }
 
@@ -304,7 +296,7 @@ namespace Arcatech.MiniGames
 
                 // Сбрасываем цвет к исходному
                 if (ring.ringImage != null)
-                    SetRingColor(ring, ring.originalColor, instant: reduceMotion);
+                    SetRingColor(ring, ColorCyan, instant: reduceMotion);
             }
         }
 
