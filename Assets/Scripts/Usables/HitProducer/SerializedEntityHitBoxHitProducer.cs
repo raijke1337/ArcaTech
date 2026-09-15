@@ -59,6 +59,7 @@ namespace Arcatech.Usables
         
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
+            if (!triggerHitInfo.TryGetEntityTarget(out _)) return;
             HitCallback(triggerHitInfo);
         }
 

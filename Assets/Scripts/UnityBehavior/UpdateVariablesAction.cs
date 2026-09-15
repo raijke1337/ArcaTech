@@ -29,7 +29,7 @@ public partial class UpdateVariablesAction : Action
     {
         if (_context == null) return Status.Failure;
 
-        Knockdown.Value = _context.KnockDownState;
+        Knockdown.Value = _context.StunnedState;
         if (!_stats.TryGetCurrent(ResourceStatType.Stamina, out var value)) return Status.Failure;
         Stamina.Value = value;
         return Status.Success;

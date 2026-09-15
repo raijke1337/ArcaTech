@@ -35,7 +35,7 @@ namespace Arcatech.Items
         
         private void Awake() 
         {
-            _usables = new();
+            _usables??= new();
             _stats = GetComponent<EntityStatsComponent>();
         }
         public void RefreshView(InventoryChangeNotification notification)
@@ -51,6 +51,7 @@ namespace Arcatech.Items
                 {
                     if (usable.GetStateTransition != null)
                         stateUnit.RemoveTransition(usable.GetStateTransition);
+                    usable.CleanUp();
                 }
             }
 

@@ -38,6 +38,6 @@ namespace Arcatech.Stats
         public ResourceStatType stat;
         public StatTarget target;
         public float amount; // Negative for damage, positive for healing/gain
-        public SerializedProduceFXResult onApply;
+      //  public SerializedProduceFXResult onApply;
     }
 }

@@ -13,7 +13,9 @@ namespace Arcatech.Units
             {
                 Debug.Log("Tried to validate stats without stats component"); return false;
             }
+            
             bool result = ctx.Stats.CheckStatsConditionGroup(conditionsToCheck);
+           // Debug.Log($"Check {conditionsToCheck} for {ctx.Interactor.Entity.GetName} to {result}");
             return result;
         }
     }

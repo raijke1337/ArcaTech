@@ -12,7 +12,7 @@ namespace Arcatech.Interactions
         [SerializeField] private SerializedDictionary<InteractionState, SerializedActionResult[]> actions;
         private Dictionary<InteractionState, ActionResult[]> _dict;
 
-
+        [SerializeField,Header("False will target the interaction target")] private bool targetUser = true;
         private void Awake()
         {
             _dict = actions.ToDictionary(
@@ -23,10 +23,12 @@ namespace Arcatech.Interactions
 
         public override void Play(InteractionContext ctx)
         {
+
+            var finalTarget = targetUser ? ctx.Interactor.Entity : ctx.Target;
             
             foreach (var result in _dict[ctx.State])
             {
-                result.ProduceResult(ctx.Target, ctx.Interactor.Entity,
+                result.ProduceResult(ctx.Target, finalTarget,
                     ctx.Interactor.Entity.EffectSpawn.position, ctx.Interactor.Entity.EffectSpawn.rotation);
             }
         }

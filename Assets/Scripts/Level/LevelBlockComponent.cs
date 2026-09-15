@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Cameras;
 using Arcatech.Triggers;
 using com.cyborgAssets.inspectorButtonPro;
 using UnityEngine.Events;
@@ -20,6 +21,7 @@ namespace Arcatech.Levels
         [Header("Settings")]
         [SerializeField] private int _floor = 0; // 0 = базовый этаж, +1 выше, -1 ниже
 
+        [SerializeField] private CamerasController.CameraViewType roomView;
         public int Floor => _floor;
 
         private Material[] _originalMaterials;
@@ -149,7 +151,7 @@ namespace Arcatech.Levels
             if (_entitiesInside.Add(e) && _entitiesInside.Count == 1)
             {
                 RoomHasPlayerEvent.Invoke(this, true);
-                Debug.Log($"Entered {name}");
+                CamerasController.Instance.SetView(roomView);
             }
         }
 
@@ -162,7 +164,6 @@ namespace Arcatech.Levels
             if (_entitiesInside.Remove(e) && _entitiesInside.Count == 0)
             {
                 RoomHasPlayerEvent.Invoke(this, false);
-                Debug.Log($"Exited {name}");
             }
         }
     }

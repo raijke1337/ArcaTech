@@ -34,6 +34,15 @@ namespace Arcatech.Interactions
         [SerializeField] private List<InteractionEffect> cancelEffects;
 
         [SerializeField] private bool destroyAfterSuccess;
+        
+        [Header("Alignment")]
+        [SerializeField] private Transform interactorAlignTransform;
+        [SerializeField] private bool alignInteractor = false;
+        [SerializeField] private bool disableInteractorCollisionDuringPlay = true;
+
+
+        private bool _colliderWasTrigger;
+        private Collider _alignedCollider;
 
         private bool _isExecuting;
         private InteractionContext _currentCtx;
@@ -42,10 +51,14 @@ namespace Arcatech.Interactions
         private bool _listening = false; // activated after load level condition
         public bool IsAvailable => !_isExecuting && _listening && executor != null;
 
+        [SerializeField] private bool affectsInteractorState = true;
+        
         private void OnDisable()
         {
             if (_isExecuting)
                 CancelInteraction();
+            else
+                RestoreInteractorCollision();
         }
 
         private void Start()
@@ -87,6 +100,9 @@ namespace Arcatech.Interactions
                     yield break;
                 }
             }
+            
+            // ─── 1.5. Alignment (один раз, ДО pre-effects, чтобы анимация стартовала в правильной позе) ───
+            AlignInteractor(ctx);
 
             // ─── 2. Pre-Execute ───
             // Теперь State = Starting гарантированно уйдёт в InteractionComponent
@@ -219,13 +235,15 @@ namespace Arcatech.Interactions
             // После терминального статуса явно сбрасываем интерактор в Idle (через задержку в InteractionComponent)
             if (state is InteractionState.Success or InteractionState.Failure or InteractionState.Cancelled)
             {
+                RestoreInteractorCollision();
                 _currentCtx?.Interactor?.ResetToIdle();
             }
         }
 
         private void UpdateStateInInteractor(InteractionState state)
         {
-            _currentCtx?.Interactor?.SetInteractionState(state);
+            if (affectsInteractorState)
+                _currentCtx?.Interactor?.SetInteractionState(state);
             StateChangedEvent?.Invoke(state);
         }
 
@@ -300,5 +318,37 @@ namespace Arcatech.Interactions
             // Или оставляем _isExecuting = false, так как мы не запускали корутину
             _isExecuting = false;
         }
+
+        #region Align
+
+        private void AlignInteractor(InteractionContext ctx)
+        {
+            if (!alignInteractor || interactorAlignTransform == null) return;
+            if (ctx?.Interactor?.Entity == null) return;
+
+            var entityTf = ctx.Interactor.Entity.transform;
+            entityTf.SetPositionAndRotation(
+                interactorAlignTransform.position,
+                interactorAlignTransform.rotation);
+
+            if (disableInteractorCollisionDuringPlay &&
+                ctx.Interactor.Entity.TryGetComponent(out Collider col))
+            {
+                _alignedCollider = col;
+                _colliderWasTrigger = col.isTrigger;
+                col.isTrigger = true;
+            }
+        }
+
+        private void RestoreInteractorCollision()
+        {
+            if (_alignedCollider != null)
+            {
+                _alignedCollider.isTrigger = _colliderWasTrigger;
+                _alignedCollider = null;
+            }
+        }
+
+        #endregion
     }
 }

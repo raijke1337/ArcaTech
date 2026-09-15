@@ -18,7 +18,7 @@ namespace Arcatech.Units
         
         
 #if UNITY_EDITOR
-        public StateMachineContext Context => _context;
+        public StateMachineContext Context => context;
         public UnitState CurrentUnitState => _currentState;
         public Animator Animator => animator;
         public int PendingPerformersCount => _pendingPerformers.Count;

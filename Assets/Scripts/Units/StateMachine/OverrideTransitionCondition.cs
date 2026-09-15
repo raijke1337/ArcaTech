@@ -6,13 +6,13 @@ namespace Arcatech.Units
     
     public class OverrideTransitionCondition : SerializedStateTransitionCondition
     {
-        [SerializeField] public bool KnockDownStateIs = false;
+        [SerializeField] public bool StunnedStateIs = false;
         [SerializeField] public bool DeadStateIs = false;
-        [SerializeField] public bool DamageStateIs = false;
+        [SerializeField] public bool InterruptPendingIs = false;
         [SerializeField] public bool OverChargeStateIs = false;
         public override bool CanTransition(StateMachineContext ctx)
         {
-            return (ctx.DeadState == DeadStateIs && ctx.KnockDownState == KnockDownStateIs && ctx.InterruptQueued == DamageStateIs
+            return (ctx.DeadState == DeadStateIs && ctx.StunnedState == StunnedStateIs && ctx.InterruptQueued == InterruptPendingIs
                 && ctx.OverchargeTriggerPending == OverChargeStateIs);
         }
     }

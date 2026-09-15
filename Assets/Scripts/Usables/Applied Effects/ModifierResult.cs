@@ -41,5 +41,7 @@
                 agg.RemoveStacks(ctx.Instance.Key);
             _applied = false;
         }
+
+        public override bool Validate(EffectContext ctx) => true;
     }
 }

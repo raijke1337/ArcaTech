@@ -12,7 +12,7 @@ namespace Arcatech.Items
        public void TriggerState(StateMachineNotifyType notification)
         {
             if (oldSound.IsValid) AudioEvents.Stop(oldSound);
-            if (sounds.TryGetValue(notification, out var sound)) AudioEvents.Play(sound,transform.position,transform,HandlePlayed);
+            if (sounds.TryGetValue(notification, out var sound)) AudioEvents.Play(sound,transform.position,null,HandlePlayed);
         }
 
         private void HandlePlayed(SoundHandle obj)

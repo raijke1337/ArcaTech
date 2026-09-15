@@ -86,7 +86,9 @@ namespace Arcatech.Items
         
         public void PickUpItem(Item item, int count)
         {
-            _inventory.Add(item,count);
+            if (!_inventory.TryAdd(item, count))
+                _inventory[item] += count;
+
             if (_initialized)
             {
                 ModelUpdatedEvent.Invoke(new  InventoryChangeNotification()
@@ -151,15 +153,14 @@ namespace Arcatech.Items
             {
                 drop.OnUnequip();
                 dropped = drop;
-                ModelUpdatedEvent.Invoke(new InventoryChangeNotification()
-                {
-                    ChangedItem = dropped,
-                    ChangedQuantity = -1,
-                    InventorySnapshot = this,
-                    ChangeType = InventoryChangeType.Unequip,
-                });
+        
+                // УДАЛИТЬ ОТ СЮДА:
+                // ModelUpdatedEvent.Invoke(new InventoryChangeNotification() { ... ChangeType = InventoryChangeType.Unequip });
+                // Это вызывало лишний Hide() в UI перед следующим Show()
             }
+    
             _equipments[toEquip.Slot] = toEquip;
+    
             if (_initialized)
                 ModelUpdatedEvent.Invoke(new InventoryChangeNotification()
                 {

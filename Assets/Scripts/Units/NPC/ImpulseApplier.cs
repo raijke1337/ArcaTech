@@ -60,6 +60,7 @@ public sealed class ImpulseApplier : MonoBehaviour, IPausableComponent
 
     private void BeginImpulse(Vector3 worldVelocity)
     {
+        _rigidbody.isKinematic = false;
         if (_impulseActive)
         {
             EndImpulse();
@@ -84,7 +85,7 @@ public sealed class ImpulseApplier : MonoBehaviour, IPausableComponent
             agent.enabled = false;
         }
 
-        _rigidbody.useGravity = true;
+        _rigidbody.useGravity = false;
         SetRigidbodyVelocity(worldVelocity);
 
         _impulseActive = true;
@@ -113,6 +114,8 @@ public sealed class ImpulseApplier : MonoBehaviour, IPausableComponent
             return;
         }
 
+        _rigidbody.isKinematic = true;
+        
         _impulseActive = false;
 
         SetRigidbodyVelocity(Vector3.zero);

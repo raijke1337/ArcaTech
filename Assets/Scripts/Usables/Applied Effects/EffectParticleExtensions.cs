@@ -7,33 +7,77 @@ public static class EffectParticleExtensions
     /// Плавно останавливает эмиссию, опционально фейдит альфу материала,
     /// затем уничтожает GameObject. Длительность подбирается по max lifetime.
     /// </summary>
+    // public static void FadeOutAndDestroy(this ParticleSystem ps, float maxWait = 2f)
+    // {
+    //     if (ps == null) return;
+    //
+    //     var go = ps.gameObject;
+    //
+    //     // 1) Прекратить рождение новых частиц, но НЕ убивать уже живущие
+    //     ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+    //
+    //     // 2) Сколько ждать — суммируем максимальный lifetime
+    //     //    корневого и всех дочерних ParticleSystem'ов
+    //     float maxLifetime = GetMaxLifetime(ps);
+    //     float wait = Mathf.Min(maxLifetime + 0.25f, maxWait);
+    //
+    //     // 3) (опционально) Фейдим альфу материала, чтобы фейд был заметным
+    //     //    даже если Color over Lifetime в ParticleSystem не настроен.
+    //     var rend = go.GetComponent<Renderer>();
+    //     if (rend != null)
+    //     {
+    //         // .material создаёт инстанс — оригинальный шейдер на префабе не трогается
+    //         var mat = rend.material;
+    //         mat.DOFade(0f, wait)
+    //            .SetEase(Ease.OutQuad);
+    //     }
+    //
+    //     // 4) Уничтожение через глобальный таймер DOTween —
+    //     //    НЕ привязан к GameObject, поэтому не «умирает» вместе с ним.
+    //     DOVirtual.DelayedCall(wait, () =>
+    //     {
+    //         if (go != null) Object.Destroy(go);
+    //     });
+    // }
     public static void FadeOutAndDestroy(this ParticleSystem ps, float maxWait = 2f)
     {
         if (ps == null) return;
-
         var go = ps.gameObject;
 
-        // 1) Прекратить рождение новых частиц, но НЕ убивать уже живущие
+        // 1. Останавливаем эмиссию, давая дожить текущим частицам
         ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
-        // 2) Сколько ждать — суммируем максимальный lifetime
-        //    корневого и всех дочерних ParticleSystem'ов
-        float maxLifetime = GetMaxLifetime(ps);
-        float wait = Mathf.Min(maxLifetime + 0.25f, maxWait);
+        float wait = Mathf.Min(GetMaxLifetime(ps) + 0.25f, maxWait);
 
-        // 3) (опционально) Фейдим альфу материала, чтобы фейд был заметным
-        //    даже если Color over Lifetime в ParticleSystem не настроен.
+        // 2. Безопасный фейд через MPB (не создает инстанс материала)
         var rend = go.GetComponent<Renderer>();
         if (rend != null)
         {
-            // .material создаёт инстанс — оригинальный шейдер на префабе не трогается
-            var mat = rend.material;
-            mat.DOFade(0f, wait)
-               .SetEase(Ease.OutQuad);
+            var mpb = new MaterialPropertyBlock();
+            rend.GetPropertyBlock(mpb);
+        
+            // Пытаемся найти свойство цвета. CFXR обычно использует _TintColor или _Color
+            // Если ни одного нет, фейд просто пропустится без ошибок
+            string colorProp = mpb.HasProperty("_TintColor") ? "_TintColor" 
+                : mpb.HasProperty("_Color") ? "_Color" 
+                : null;
+
+            if (colorProp != null)
+            {
+                Color c = mpb.GetColor(colorProp);
+                DOVirtual.Float(c.a, 0f, wait, alpha =>
+                {
+                    if (rend != null && go != null)
+                    {
+                        c.a = alpha;
+                        mpb.SetColor(colorProp, c);
+                        rend.SetPropertyBlock(mpb);
+                    }
+                }).SetEase(Ease.OutQuad);
+            }
         }
 
-        // 4) Уничтожение через глобальный таймер DOTween —
-        //    НЕ привязан к GameObject, поэтому не «умирает» вместе с ним.
+        // 3. Уничтожение
         DOVirtual.DelayedCall(wait, () =>
         {
             if (go != null) Object.Destroy(go);

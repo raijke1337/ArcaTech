@@ -68,6 +68,7 @@ namespace Arcatech.Usables.Effects
                 }
             }
         }
+        public override bool Validate(EffectContext ctx) => true;
 
         public override void OnExpire(EffectContext ctx)
         {

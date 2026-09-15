@@ -14,7 +14,7 @@ namespace Arcatech
     /// new component that defines any game entity
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(LittlePauseHelperComponent),typeof(EntityID))]
-    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IInvulnerability
+    public class BaseGameEntityComponent : ValidatedMonoBehaviour, IKillableComponent, IPausableComponent, IInvulnerability,IStunnable
     {
         
         [SerializeField, Self] LittlePauseHelperComponent _pauser;
@@ -92,5 +92,7 @@ namespace Arcatech
                 c.SetKilled(null,false);
             }
         }
+
+        public bool Stunned { get; set; }
     }
 }

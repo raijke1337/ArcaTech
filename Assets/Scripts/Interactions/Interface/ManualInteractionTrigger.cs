@@ -22,7 +22,7 @@ namespace Arcatech.Interactions
             if (triggerExitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
             {
                 interactor.UnregisterInteractive(interactableComponent);
-                if (interactor.Entity.ShowingDebugs) Debug.Log($"{interactor.Entity.GetName} has exited trigger are {name}");
+                if (interactor.Entity.ShowingDebugs) Debug.Log($"{interactor.Entity.GetName} has exited trigger area {name}");
             }
         }
         

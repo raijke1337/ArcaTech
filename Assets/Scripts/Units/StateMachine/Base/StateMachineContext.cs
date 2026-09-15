@@ -30,7 +30,7 @@ namespace Arcatech.Units
 
         public Animator Animator;
 
-        public bool KnockDownState { get; set; }
+        public bool StunnedState { get; set; }
         public bool DeadState { get; set; }
         public bool InterruptQueued { get; set; }
         public bool InInteraction { get; set; }

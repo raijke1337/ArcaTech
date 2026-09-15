@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Arcatech.Managers;
 using KBCore.Refs;
 using Unity.Cinemachine;
@@ -31,11 +32,26 @@ namespace Arcatech.Cameras
         [Header("Preset views")]
         [SerializeField] private CameraView[] views =
         {
-            new CameraView { horizontalAngle = 0f, verticalAxisValue = 10f },
-            new CameraView { horizontalAngle = 90f, verticalAxisValue = 10f },
-            new CameraView { horizontalAngle = 180f, verticalAxisValue = 10f },
-            new CameraView { horizontalAngle = 270f, verticalAxisValue = 10f }
+            new CameraView { horizontalAngle = 0f, verticalAxisValue = 45f },
+            new CameraView { horizontalAngle = 90f, verticalAxisValue = 45f },
+            new CameraView { horizontalAngle = 180f, verticalAxisValue = 45f },
+            new CameraView { horizontalAngle = 270f, verticalAxisValue = 45f }
         };
+        public enum CameraViewType
+        {
+            ForwardZ, // 0 / 45
+            ForwardX, // 90 / 45
+            BackwardZ, // 180 / 45
+            BackwardX // 270 /45
+        }
+        
+        public event UnityAction OnRotateStarted =  delegate { };
+        public event UnityAction OnRotateFinished =  delegate { };
+
+        public void SetView(CameraViewType type, UnityAction onComplete = null)
+        {
+            SetView((int)type, onComplete);
+        }
 
         [Header("Rotation")]
         [SerializeField, Min(0.01f)] private float rotationDuration = 0.35f;
@@ -173,6 +189,7 @@ namespace Arcatech.Cameras
             int expectedVersion,
             UnityAction onComplete)
         {
+            OnRotateStarted.Invoke();
             float startHorizontalAngle = orbitalFollow.HorizontalAxis.Value;
             float startVerticalValue = orbitalFollow.VerticalAxis.Value;
 
@@ -238,6 +255,8 @@ namespace Arcatech.Cameras
                 $"Vertical axis: {orbitalFollow.VerticalAxis.Value:F1}.");
 
             InvokeCallbackSafely(onComplete);
+            OnRotateFinished.Invoke();
+            
         }
 
         private void ApplyViewImmediately(int viewIndex)

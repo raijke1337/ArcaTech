@@ -29,13 +29,7 @@ namespace Arcatech.UI
                 HideAllIcons();
                 return;
             }
-            /*
-             * Скрываем иконки, для которых больше нет действия
-             * в текущем наборе экипировки / инвентаря.
-             *
-             * Layout Group не учитывает inactive-объекты,
-             * поэтому фон автоматически сузится.
-             */
+
             foreach (var loadedIcon in usablesIcons)
             {
                 bool actionStillExists = usables.ContainsKey(loadedIcon.Key);

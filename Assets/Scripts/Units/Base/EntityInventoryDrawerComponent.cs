@@ -1,37 +1,38 @@
 ﻿using Arcatech.Items;
 using KBCore.Refs;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Arcatech.Units
 {
-    /// <summary>
-    ///  new class to VIEW the data
-    /// also draws inventory items in game
-    /// </summary>
     [RequireComponent(typeof(EntityInventoryComponent))]
     public class EntityInventoryDrawerComponent : ValidatedMonoBehaviour, IUnitInventoryView
     {
-        [Self,SerializeField] EntityInventoryComponent inventoryComponent;
+        [Self, SerializeField] EntityInventoryComponent inventoryComponent;
         [SerializeField] protected ItemEmpties itemEmpties;
         [SerializeField] protected DrawItemsStrategy defaultItemsDrawStrat;
 
-        
+        // Храним список активных объектов, чтобы скрывать их при смене инвентаря
+        private HashSet<GameObject> _activeDisplayItems = new HashSet<GameObject>();
+
         #region model view
         
         private UnitInventoryModel inventoryModel;
         public event UnityAction ViewChangedInventory;
+
         public void RefreshView(InventoryChangeNotification notification)
         {
-            if (notification.InventorySnapshot!= null && inventoryModel != notification.InventorySnapshot)
+            if (notification.InventorySnapshot == null) return;
+
+            if (inventoryModel != notification.InventorySnapshot)
             {
-                // model is changed for some reason
                 inventoryModel = notification.InventorySnapshot;
             }
-            DrawItems(defaultItemsDrawStrat);
+            
+            // Всегда перерисовываем при изменении инвентаря, сохраняя текущую стратегию (например, если игрок целится)
+            DrawItems(currentDrawStrategy ?? defaultItemsDrawStrat);
         }
-        
-        
         
         #endregion
         
@@ -42,9 +43,20 @@ namespace Arcatech.Units
 
         private void DrawItems(IDrawItemStrategy strat)
         {
-            if (strat == currentDrawStrategy || strat == null) return; // this is probably  checked elsewhere but just in case
-//            Debug.Log("DrawItems: " + strat);
+            if (strat == null) return; 
+
+            // 1. Скрываем все ранее активные предметы (решает проблему "старое оружие остается видимым")
+            foreach (var go in _activeDisplayItems)
+            {
+                if (go != null) go.SetActive(false);
+            }
+            _activeDisplayItems.Clear();
+
             currentDrawStrategy = strat;
+            
+            if (inventoryModel == null) return;
+
+            // 2. Отрисовываем текущее экипированное оружие
             foreach (var e in inventoryModel.ListEquipped)
             {
                 ItemPlaceType placeType = strat.GetPlaces[e.Slot];
@@ -56,11 +68,13 @@ namespace Arcatech.Units
                 {
                     e.DisplayItem.gameObject.SetActive(true);
                     e.SetItemParent(itemEmpties.ItemPositions[strat.GetPlaces[e.Slot]]);
+                    _activeDisplayItems.Add(e.DisplayItem.gameObject);
                 }
             }
         }
         
         #endregion
+
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -69,6 +83,7 @@ namespace Arcatech.Units
                 Debug.LogWarning($"Multiple draw strategy providers on {this.name}");
             }
         }
+
         private void Start()
         {
             currentDrawStrategy = defaultItemsDrawStrat;
@@ -83,7 +98,6 @@ namespace Arcatech.Units
         {
             if (drawItemsStrategyProvider is { NeedsRedraw: true })
             {
-               
                 DrawItems(drawItemsStrategyProvider?.GetDrawStrategy);
             }
         }

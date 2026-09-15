@@ -9,7 +9,7 @@ namespace Arcatech.Usables.Effects
         private readonly float _coefficient;
         private readonly float _absorbLimit;
         private readonly float _bufferLifetime;
-
+        public override bool Validate(EffectContext ctx) => true;
         public AbsorbShieldResult(AppliedAbsorbShieldEffect cfg): base(cfg)
         {
             _stat = cfg.absorbedStat;

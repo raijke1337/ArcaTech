@@ -70,7 +70,7 @@ namespace Arcatech.Interactions
 
         void Trigger()
         {
-            Debug.Log("Triggered");
+//            Debug.Log("Triggered");
             HasTriggered = true;
             
             interactableComponent.StartInteraction(new InteractionContext()

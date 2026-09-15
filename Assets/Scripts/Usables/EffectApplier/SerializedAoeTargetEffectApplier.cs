@@ -51,7 +51,7 @@ namespace Arcatech.Usables
                 if (unit == user && !_affectUser) continue;
                 if (unit == initTarget && !_affectInitialTarget) continue;
                 
-                
+                Debug.Log($"Applying {effects.Count} effects to {unit.GetName}, triggered by hit on {hit.TargetCollider}");
                 foreach (var effect in effects)
                 {
                     effect.ProduceResult(user, unit, unit.transform.position, unit.transform.rotation);

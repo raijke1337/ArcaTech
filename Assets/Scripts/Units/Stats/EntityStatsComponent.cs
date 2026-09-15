@@ -2,36 +2,127 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
-using Arcatech.SaveSystem;
 using Arcatech.Units;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
-using Mono.Cecil;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Arcatech.Stats
 {
     /// <summary>
-    /// new component to handle the current stats and their changes on any game entity
-    /// also uses stat change strategies to affect the rest of components
+    /// Handles current stats and their changes on a game entity.
+    /// Aggregates Max from base + equipment + effects, ticks periodic deltas,
+    /// intercepts damage through shields and triggers the kill condition.
     /// </summary>
     public class EntityStatsComponent : ValidatedMonoBehaviour, IUnitInventoryView, IPausableComponent,
-        IKillableComponent, IStatReceiver, IShieldReceiver
+        IKillableComponent, IStatReceiver, IShieldReceiver, IKillerComponent
     {
+        #region Nested types
 
-        [Header("Config")] [SerializeField] private BaseStatsConfig startingConfig;
+        public enum ExpendType
+        {
+            None,
+            UsableCost,
+            ActionResult,
+            Equipment
+        }
+
+        private readonly struct SourceKey : IEquatable<SourceKey>
+        {
+            public readonly BaseGameEntityComponent source;
+            public readonly int id;
+            public readonly ExpendType expendType;
+
+            public SourceKey(BaseGameEntityComponent src, int id, ExpendType type)
+            {
+                source = src;
+                this.id = id;
+                expendType = type;
+            }
+
+            public bool Equals(SourceKey other) =>
+                ReferenceEquals(source, other.source) && id == other.id && expendType == other.expendType;
+
+            public override bool Equals(object obj) => obj is SourceKey other && Equals(other);
+
+            // FIX: expendType теперь участвует в хэше (согласовано с Equals)
+            public override int GetHashCode() =>
+                (((source?.GetHashCode() ?? 0) * 397) ^ id) * 31 + (int)expendType;
+
+            public override string ToString() => $"{source?.GetType().Name ?? "null"}#{id}:{expendType}";
+        }
+
+        private class PeriodicRuntime
+        {
+            public SourceKey key;
+            public PeriodicDelta spec;
+            public float accumulator;
+            public float? expireAt;            // null => бесконечно (экипировка / infinite effect)
+            public BaseGameEntityComponent sourceRef;
+            public int stacks = 1;
+        }
+
+        public class AppliedEffectInstance
+        {
+            public AppliedStatsDeltaEffect effect;
+            public float? expireAt;
+            public object sourceRef;
+            public int stacks = 1;
+            public List<StatModifier> persistentMaxMods = new();
+            // FIX: удалено дублирующее неиспользуемое поле BaseAppliedEffect Effect
+        }
+
+        #endregion
+
+        #region Inspector
+
+        [Header("Config")]
+        [SerializeField] private BaseStatsConfig startingConfig;
         [SerializeField] private bool preserveCurrentRatioOnMaxChange = true;
-        [SerializeField, Self] BaseGameEntityComponent entity;
+        [SerializeField, Self] private BaseGameEntityComponent entity;
 
-        [SerializeField] private bool killAt0Hp = false;
+        [Space, Header("Kill Condition")]
+        [SerializeField] private bool useKillCondition = false;
+        [Tooltip("Например: Health / Current / LessOrEqual / 0")]
+        [SerializeField] private StatCondition killCondition;
+
+        #endregion
+
+        #region Runtime state
+
         private readonly Dictionary<ResourceStatType, StatRuntime> stats = new();
         private readonly Dictionary<SourceKey, List<StatModifier>> liveEquipMaxModifiers = new();
+        private readonly List<PeriodicRuntime> periodic = new();
+        private readonly List<AppliedEffectInstance> activeEffects = new();
+        private readonly List<ShieldBuffer> _shields = new();
+        private readonly List<IStatUpdatesViewer> statUpdatesViewers = new();
+        private readonly Dictionary<ResourceStatType, float> _lastNotifiedShieldByStat = new();
 
-        private bool init = false;
+        private bool init;
+        private bool _killed;
+        private bool _hasConditionalMaxMods;   // true => переагрегировать Max каждый кадр
+        private int _nextId = 1;
         private IDamageDrawer _damageDrawer;
+        private BaseGameEntityComponent _lastHarmSource; // для KilledBy
 
-        
+        private const int MaxTicksPerFrame = 20;
+        private const float MinTickInterval = 0.0001f;
+
+        #endregion
+
+        #region Public properties
+
+        public bool Paused { get; set; }
+        public bool Invulnerable { get; set; }
+        public string KilledBy => $"Stats Kill Condition (source: {_lastHarmSource?.name ?? "unknown"})";
+
+        public event UnityAction ViewChangedInventory;
+
+        #endregion
+
+        #region Unity lifecycle
+
         private void Awake()
         {
             if (init) return;
@@ -43,72 +134,30 @@ namespace Arcatech.Stats
             TryGetComponent(out _damageDrawer);
         }
 
-        public enum ExpendType
+        private void Update()
         {
-            None,
-            UsableCost,
-            ActionResult,
-            Equipment
-        }
-        private struct SourceKey : IEquatable<SourceKey>
-        {
-            public readonly BaseGameEntityComponent source;
-            public readonly int id;
-            public readonly ExpendType expendType;
-            public SourceKey(BaseGameEntityComponent src, int id,ExpendType type)
-            {
-                source = src;
-                this.id = id;
-                expendType = type;
-            }
+            if (_killed || Paused) return;
 
-            public bool Equals(SourceKey other) => ReferenceEquals(source, other.source) && id == other.id && expendType == other.expendType;
-            public override bool Equals(object obj) => obj is SourceKey other && Equals(other);
-            public override int GetHashCode() => ((source?.GetHashCode() ?? 0) * 397) ^ id;
-            public override string ToString() => $"{source?.GetType().Name ?? "null"}#{id}";
+            float dt = Time.deltaTime;
+            float now = Time.time;
+
+            bool anyAppliedTicks = TickPeriodic(dt, now);
+            bool expiredAnyEffects = ExpireEffects(now);
+
+            if (_hasConditionalMaxMods || expiredAnyEffects || anyAppliedTicks)
+                RecalculateAllMaxAndClampCurrent();
+
+            TickShields(dt);
         }
 
-        private int _nextId = 1;
-        private int NextId() => _nextId++;
+        #endregion
 
-        // Store equipment-provided Max modifiers (we’ll aggregate each recalc)
-
-        private class PeriodicRuntime
-        {
-            public SourceKey key;
-            public PeriodicDelta spec;
-            public float accumulator;
-            public float? expireAt; // null => infinite (equipment) or infinite effect
-            public BaseGameEntityComponent sourceRef;
-            public int stacks = 1;
-        }
-
-        private readonly List<PeriodicRuntime> periodic = new();
-
-        public class AppliedEffectInstance
-        {
-            public AppliedStatsDeltaEffect effect;
-            public float? expireAt;
-            public object sourceRef;
-            public int stacks = 1;
-            public List<StatModifier> persistentMaxMods = new();
-
-
-            public BaseAppliedEffect Effect;
-        }
-
-        private readonly List<AppliedEffectInstance> activeEffects = new();
-
-        // If true, re-aggregate Max every frame to reflect conditional Max modifiers
-        private bool _hasConditionalMaxMods = false;
+        #region Initialization
 
         public void InitializeFromConfig()
         {
             stats.Clear();
 
-            // TODO: implement the standard values logic
-            // TODO: BaseStatsConfig is an IEquipmentStatsProvider now
-            
             if (startingConfig != null)
             {
                 foreach (var rs in startingConfig.resources)
@@ -135,119 +184,135 @@ namespace Arcatech.Stats
                     baseMax = 100,
                     minClamp = 0,
                     maxClamp = 100,
-                    max = 100
+                    max = 100,
+                    current = 100 // FIX: раньше current оставался 0 => мгновенная смерть с kill condition
                 };
             }
 
             liveEquipMaxModifiers.Clear();
             periodic.Clear();
             activeEffects.Clear();
+            _shields.Clear();                    // FIX: щиты переживали перезагрузку чекпоинта
+            _lastNotifiedShieldByStat.Clear();
             _hasConditionalMaxMods = false;
+            _lastHarmSource = null;
             init = true;
         }
 
-        #region inventory
+        #endregion
 
-        public event UnityAction ViewChangedInventory;
+        #region Kill condition
 
+        public void SetKilled(IKillerComponent c, bool value)
+        {
+            _killed = value;
+            if (!value)
+            {
+                InitializeFromConfig(); // reset unit stats, called on reload checkpoint
+            }
+        }
+
+        /// <summary>
+        /// Вызывается после каждого фактического изменения Current.
+        /// </summary>
+        private void CheckKillCondition(BaseGameEntityComponent lastSource)
+        {
+            if (_killed || !useKillCondition) return;
+            if (!EvaluateCondition(killCondition)) return;
+
+            _killed = true;
+            _lastHarmSource = lastSource != null ? lastSource : _lastHarmSource;
+            OnKillCondition();
+        }
+
+        private void OnKillCondition()
+        {
+            entity.SetKilled(this, true);
+        }
+
+        #endregion
+
+        #region Inventory (IUnitInventoryView)
 
         public void RefreshView(InventoryChangeNotification notification)
         {
             if (notification.ChangeType == InventoryChangeType.PickUp ||
                 notification.ChangeType == InventoryChangeType.Use) return;
-            
-            var model = notification.InventorySnapshot;
+
             if (!init) InitializeFromConfig();
 
             RemoveAllEquipmentContributions();
 
+            var model = notification.InventorySnapshot;
             if (model != null)
             {
                 int itemIndex = 0;
                 foreach (var provider in model.EnumerateProviders())
                 {
-                    var key = new SourceKey(entity, itemIndex++,ExpendType.Equipment);
+                    var key = new SourceKey(entity, itemIndex++, ExpendType.Equipment);
                     ApplyEquipmentProvider(provider, key);
                 }
             }
 
+            // Один пересчёт после всех провайдеров (раньше — на каждый предмет)
             RecomputeConditionalFlags();
             RecalculateAllMaxAndClampCurrent();
         }
 
-
         private void ApplyEquipmentProvider(IEquipmentStatsProvider provider, SourceKey key)
         {
             // 1) Persistent Max modifiers (null-safe)
-            var modsEnum = provider.GetPersistentModifiers();
-            List<StatModifier> mods = modsEnum != null ? modsEnum.ToList() : new List<StatModifier>();
-            List<StatModifier> maxMods = mods.Where(m => m.target == StatTarget.Max).ToList(); // never null
-
+            var mods = provider.GetPersistentModifiers()?.ToList() ?? new List<StatModifier>();
+            var maxMods = mods.Where(m => m.target == StatTarget.Max).ToList();
             if (maxMods.Count > 0)
-            {
                 liveEquipMaxModifiers[key] = maxMods;
-                if (!_hasConditionalMaxMods && maxMods.Any(m => !m.condition.IsEmpty))
-                    _hasConditionalMaxMods = true;
-            }
 
             // 2) Periodic deltas (null-safe)
-            var pdsEnum = provider.GetPeriodicDeltas();
-            if (pdsEnum != null)
-            {
-                foreach (var p in pdsEnum)
-                {
-                    periodic.Add(new PeriodicRuntime
-                    {
-                        key = key,
-                        spec = p,
-                        accumulator = 0f,
-                        expireAt = null,
-                        sourceRef = provider.Source
-                    });
-                }
-            }
+            var pds = provider.GetPeriodicDeltas();
+            if (pds == null) return;
 
-            // 3) Immediate recompute so changes show in the inspector right away
-            RecomputeConditionalFlags();
-            RecalculateAllMaxAndClampCurrent();
+            foreach (var p in pds)
+            {
+                periodic.Add(new PeriodicRuntime
+                {
+                    key = key,
+                    spec = p,
+                    accumulator = 0f,
+                    expireAt = null,
+                    sourceRef = provider.Source
+                });
+            }
+            // FIX: пересчёт убран отсюда — делается один раз в RefreshView
         }
 
         private void RemoveAllEquipmentContributions()
         {
             liveEquipMaxModifiers.Clear();
 
-            for (int i = periodic.Count - 1; i >= 0; --i)
-            {
-                if (!periodic[i].expireAt.HasValue && periodic[i].key.source is IEquipmentStatsProvider)
-                    periodic.RemoveAt(i);
-            }
+            // FIX: раньше проверялось "key.source is IEquipmentStatsProvider", что не срабатывало
+            // (в key.source лежит entity) и периодика экипировки дублировалась при каждом RefreshView.
+            periodic.RemoveAll(p => !p.expireAt.HasValue && p.key.expendType == ExpendType.Equipment);
         }
 
         #endregion
 
-        #region apply
+        #region Applying deltas & effects
 
         public bool ApplyUsableCost(AppliedStatsDeltaEffect eff, BaseGameEntityComponent s)
         {
             if (eff == null) return false;
 
-            var key = new SourceKey(s, NextId(),ExpendType.UsableCost);
+            var key = new SourceKey(s, NextId(), ExpendType.UsableCost);
             float now = Time.time;
             float? expire = eff.infiniteDuration ? (float?)null : now + Mathf.Max(0f, eff.durationSeconds);
 
             foreach (var d in eff.instantDeltas)
                 ApplyDelta(d, s, key);
 
-            // Store persistent Max modifiers (with potential conditions)
-            var effectMods = new List<StatModifier>();
-            foreach (var m in eff.persistentModifiers)
-            {
-                if (m.target == StatTarget.Max)
-                {
-                    effectMods.Add(m);
-                    if (!_hasConditionalMaxMods && !m.condition.IsEmpty) _hasConditionalMaxMods = true;
-                }
-            }
+            // Persistent Max modifiers (с возможными условиями)
+            var effectMods = eff.persistentModifiers
+                .Where(m => m.target == StatTarget.Max)
+                .ToList();
 
             foreach (var p in eff.periodicDeltas)
             {
@@ -276,36 +341,138 @@ namespace Arcatech.Stats
             return true;
         }
 
-        #region NEW
-
-        public bool Invulnerable { get; set; }
-
         public bool ApplyInstantDelta(StatDelta delta, BaseGameEntityComponent source, EffectKey key)
         {
-            if (Invulnerable) return false;
+            bool isHarm = delta.target == StatTarget.Current && delta.amount < 0f;
 
-            // Shield interception: only for incoming damage (negative Current delta).
-            if (delta.target == StatTarget.Current && delta.amount < 0f && _shields.Count > 0)
+            // FIX: неуязвимость блокирует только урон, а не лечение/оплату
+            if (Invulnerable && isHarm) return false;
+
+            // Shield interception: только входящий урон
+            if (isHarm && _shields.Count > 0)
             {
-                float damage = -delta.amount;             // positive magnitude
-                damage = AbsorbThroughShields(delta.stat, damage);
-                delta.amount = -damage;                   // remaining damage back to negative
+                float damage = AbsorbThroughShields(delta.stat, -delta.amount);
+                delta.amount = -damage;
             }
 
-            var localKey = new SourceKey(source, key.SourceId?.GetHashCode() ?? 0,ExpendType.ActionResult);
+            var localKey = new SourceKey(source, key.SourceId?.GetHashCode() ?? 0, ExpendType.ActionResult);
             ApplyDelta(delta, source, localKey);
             return true;
         }
 
-        #region shields
+        private void ApplyDelta(StatDelta d, BaseGameEntityComponent source, SourceKey key)
+        {
+            var sr = EnsureStat(d.stat);
 
-        private readonly List<ShieldBuffer> _shields = new();
+            if (d.target == StatTarget.Max)
+            {
+                sr.effectAddMax += d.amount;
+                RecalculateAllMaxAndClampCurrent();
+                return;
+            }
 
-// called by AbsorbShieldResult on each shield tick
+            float clampMax = sr.maxClamp > 0f ? Mathf.Min(sr.maxClamp, sr.max) : sr.max;
+            float newCurrent = Mathf.Clamp(sr.current + d.amount, sr.minClamp, clampMax);
+            float delta = newCurrent - sr.current;
+
+            if (delta < 0f)
+            {
+                _lastHarmSource = source; // запоминаем последний источник вреда для KilledBy
+
+                _damageDrawer?.DrawResourceChange(-delta, isDamage: true,
+                    durationOverride: null, type: d.stat);
+            }
+
+            SetCurrentInternal(d.stat, newCurrent, key.expendType, key.source);
+        }
+
+        private void SetCurrentInternal(ResourceStatType stat, float newCurrent,
+            ExpendType type, BaseGameEntityComponent contributionSource)
+        {
+            var sr = EnsureStat(stat);
+            float oldCurrent = sr.current;
+
+            // После Mathf.Clamp точное равенство здесь допустимо
+            if (newCurrent == oldCurrent) return;
+
+            sr.current = newCurrent;
+            UpdateViewers(stat, sr.current, sr.max, newCurrent - oldCurrent, type, contributionSource);
+
+            // NEW: единая точка проверки условия смерти —
+            // сюда стекаются все изменения Current (инстант, периодика, пересчёт Max)
+            CheckKillCondition(contributionSource);
+        }
+
+        private int NextId() => _nextId++;
+
+        private StatRuntime EnsureStat(ResourceStatType stat)
+        {
+            if (!stats.TryGetValue(stat, out var sr))
+            {
+                sr = new StatRuntime();
+                stats[stat] = sr;
+            }
+            return sr;
+        }
+
+        #endregion
+
+        #region Periodic & effect ticking
+
+        private bool TickPeriodic(float dt, float now)
+        {
+            bool anyAppliedTicks = false;
+
+            for (int i = periodic.Count - 1; i >= 0; --i)
+            {
+                var pr = periodic[i];
+
+                if (pr.expireAt.HasValue && now >= pr.expireAt.Value)
+                {
+                    periodic.RemoveAt(i);
+                    continue;
+                }
+
+                pr.accumulator += dt;
+                if (pr.spec.intervalSeconds <= 0f) pr.spec.intervalSeconds = MinTickInterval;
+
+                int ticks = 0;
+                while (pr.accumulator >= pr.spec.intervalSeconds && ticks < MaxTicksPerFrame)
+                {
+                    pr.accumulator -= pr.spec.intervalSeconds;
+                    ticks++;
+
+                    if (!EvaluateConditionGroup(pr.spec.condition)) continue;
+
+                    for (int s = 0; s < pr.stacks; s++)
+                    {
+                        ApplyDelta(pr.spec.delta, pr.sourceRef, pr.key);
+                        anyAppliedTicks = true;
+                    }
+                }
+
+                // FIX: не даём аккумулятору расти бесконечно при крошечном интервале
+                if (ticks >= MaxTicksPerFrame) pr.accumulator = 0f;
+
+                if (_killed) break; // юнит умер от тика — дальше не тикаем
+            }
+
+            return anyAppliedTicks;
+        }
+
+        private bool ExpireEffects(float now)
+        {
+            int removed = activeEffects.RemoveAll(ae => ae.expireAt.HasValue && now >= ae.expireAt.Value);
+            return removed > 0;
+        }
+
+        #endregion
+
+        #region Shields (IShieldReceiver)
+
         public void AddOrTopUpShield(EffectKey key, ResourceStatType stat, float topUp,
             float coefficient, float absorbLimit, float bufferLifetime)
         {
-            Debug.Log($"Shield apply {stat} {topUp}");
             var buf = _shields.Find(b => b.Key.Equals(key) && b.Stat == stat);
             if (buf == null)
             {
@@ -313,35 +480,24 @@ namespace Arcatech.Stats
                 _shields.Add(buf);
             }
             buf.TopUp(topUp, bufferLifetime);
-            NotifyShieldViewers(stat);   // <-- notify
+            NotifyShieldViewers(stat);
         }
 
-// снятие (RemoveShields):
         public void RemoveShields(EffectKey key)
         {
-            // До удаления фиксируем, какие ResourceStatType затрагивают щиты с этим ключом —
-            // после RemoveAll эту информацию восстановить будет уже нельзя.
             HashSet<ResourceStatType> affectedStats = null;
-            for (int i = 0; i < _shields.Count; i++)
+            foreach (var shield in _shields)
             {
-                if (_shields[i].Key.Equals(key))
-                {
-                    (affectedStats ??= new HashSet<ResourceStatType>()).Add(_shields[i].Stat);
-                }
+                if (shield.Key.Equals(key))
+                    (affectedStats ??= new HashSet<ResourceStatType>()).Add(shield.Stat);
             }
 
             int removed = _shields.RemoveAll(b => b.Key.Equals(key));
-
             if (removed > 0 && affectedStats != null)
-            {
-                foreach (ResourceStatType stat in affectedStats)
-                {
+                foreach (var stat in affectedStats)
                     NotifyShieldViewers(stat);
-                }
-            }
         }
 
-// in Update(): tick buffer lifetimes and sweep expired
         private void TickShields(float dt)
         {
             HashSet<ResourceStatType> affectedStats = null;
@@ -356,97 +512,29 @@ namespace Arcatech.Stats
                 }
             }
 
-            if (affectedStats != null)
-            {
-                foreach (ResourceStatType stat in affectedStats)
-                {
-                    NotifyShieldViewers(stat); // <-- buffer(s) expired
-                }
-            }
+            if (affectedStats == null) return;
+            foreach (var stat in affectedStats)
+                NotifyShieldViewers(stat);
         }
+
         private float AbsorbThroughShields(ResourceStatType stat, float damage)
         {
-            // FIFO: oldest buffer spent first.
+            // FIFO: старейший буфер тратится первым
             bool changed = false;
             for (int i = 0; i < _shields.Count && damage > 0f; i++)
             {
-                if (_shields[i].Stat == stat)
-                {
-                    float before = _shields[i].Current;
-                    damage = _shields[i].Absorb(damage);
-                    if (!Mathf.Approximately(before, _shields[i].Current)) changed = true;
-                }
+                if (_shields[i].Stat != stat) continue;
+                float before = _shields[i].Current;
+                damage = _shields[i].Absorb(damage);
+                if (!Mathf.Approximately(before, _shields[i].Current)) changed = true;
             }
-            if (changed) NotifyShieldViewers(stat);        // <-- shield absorbed damage
+            if (changed) NotifyShieldViewers(stat);
             return damage;
         }
-        #endregion
 
         #endregion
 
-        #endregion
-
-        private void Update()
-        {
-            if (_killed || Paused) return;
-
-            float dt = Time.deltaTime;
-            float now = Time.time;
-            bool anyAppliedTicks = false;
-
-            for (int i = periodic.Count - 1; i >= 0; --i)
-            {
-                var pr = periodic[i];
-
-                if (pr.expireAt.HasValue && now >= pr.expireAt.Value)
-                {
-                    periodic.RemoveAt(i);
-                    continue;
-                }
-
-                pr.accumulator += dt;
-                if (pr.spec.intervalSeconds <= 0f) pr.spec.intervalSeconds = 0.0001f;
-
-                int ticks = 0;
-                while (pr.accumulator >= pr.spec.intervalSeconds && ticks < 20)
-                {
-                    pr.accumulator -= pr.spec.intervalSeconds;
-                    ticks++;
-
-                    if (EvaluateConditionGroup(pr.spec.condition))
-                    {
-                        for (int s = 0; s < pr.stacks; s++)
-                        {
-                            ApplyDelta(pr.spec.delta, pr.sourceRef, pr.key);
-                            anyAppliedTicks = true;
-                        }
-                    }
-                }
-
-                periodic[i] = pr;
-            }
-
-            // Expire ended effects (remove their persistent max modifiers via re-aggregation)
-            bool expiredAnyEffects = false;
-            for (int i = activeEffects.Count - 1; i >= 0; --i)
-            {
-                var ae = activeEffects[i];
-                if (ae.expireAt.HasValue && now >= ae.expireAt.Value)
-                {
-                    activeEffects.RemoveAt(i);
-                    expiredAnyEffects = true;
-                }
-            }
-
-            if (_hasConditionalMaxMods || expiredAnyEffects || anyAppliedTicks)
-            {
-                // Re-aggregate Max if conditional mods exist (or effects ended, or ticks may have changed conditions)
-                RecalculateAllMaxAndClampCurrent();
-            }
-
-            TickShields(Time.deltaTime);
-        }
-
+        #region Max aggregation
 
         private void RecomputeConditionalFlags()
         {
@@ -455,10 +543,8 @@ namespace Arcatech.Stats
                 activeEffects.Any(ae => ae.persistentMaxMods.Any(m => !m.condition.IsEmpty));
         }
 
-        // Re-aggregate all Max values from base + equipment + effects, evaluating conditions
         private void RecalculateAllMaxAndClampCurrent()
         {
-            // Reset per-stat contributions
             foreach (var kv in stats)
             {
                 kv.Value.equipAddMax = 0f;
@@ -467,9 +553,7 @@ namespace Arcatech.Stats
                 kv.Value.effectMultMax = 0f;
             }
 
-            // Equipment contributions (Max only)
             foreach (var kv in liveEquipMaxModifiers)
-            {
                 foreach (var m in kv.Value)
                 {
                     if (!EvaluateConditionGroup(m.condition)) continue;
@@ -477,11 +561,8 @@ namespace Arcatech.Stats
                     if (m.op == StatOpKind.Add) sr.equipAddMax += m.value;
                     else sr.equipMultMax += m.value;
                 }
-            }
 
-            // Effect contributions (Max only)
             foreach (var ae in activeEffects)
-            {
                 foreach (var m in ae.persistentMaxMods)
                 {
                     if (!EvaluateConditionGroup(m.condition)) continue;
@@ -489,9 +570,7 @@ namespace Arcatech.Stats
                     if (m.op == StatOpKind.Add) sr.effectAddMax += m.value;
                     else sr.effectMultMax += m.value;
                 }
-            }
 
-            // Compute final Max and clamp Current
             foreach (var kv in stats)
             {
                 var st = kv.Value;
@@ -501,255 +580,24 @@ namespace Arcatech.Stats
                 st.max = Mathf.Max(0f, (st.baseMax + st.equipAddMax + st.effectAddMax) * mult);
 
                 if (preserveCurrentRatioOnMaxChange && oldMax > 0f)
-                {
-                    float ratio = st.current / oldMax;
-                    st.current = ratio * st.max;
-                }
+                    st.current = (st.current / oldMax) * st.max;
 
                 float clampMax = st.maxClamp > 0f ? Mathf.Min(st.maxClamp, st.max) : st.max;
-                SetCurrentInternal(kv.Key, Mathf.Clamp(st.current, st.minClamp, clampMax), ExpendType.Equipment, entity);
+                SetCurrentInternal(kv.Key, Mathf.Clamp(st.current, st.minClamp, clampMax),
+                    ExpendType.Equipment, entity);
             }
-        }
-
-        // private void ApplyDelta(StatDelta d, BaseGameEntityComponent source, SourceKey key)
-        // {
-        //     var sr = EnsureStat(d.stat);
-        //
-        //     if (d.target == StatTarget.Max)
-        //     {
-        //         // Treat as temporary additive effect to Max: add to effectAddMax and recompute.
-        //         float before = sr.max;
-        //         sr.effectAddMax += d.amount;
-        //         RecalculateAllMaxAndClampCurrent();
-        //     }
-        //     else
-        //     {
-        //         float clampMax = sr.maxClamp > 0f ? Mathf.Min(sr.maxClamp, sr.max) : sr.max;
-        //         float newCurrent = Mathf.Clamp(sr.current + d.amount, sr.minClamp, clampMax);
-        //         float delta = newCurrent - sr.current;
-        //         
-        //         // NEW
-        //         if (delta < 0f  && _damageDrawer != null)
-        //         {
-        //             float damageAmount = -delta;
-        //             _damageDrawer.DrawResourceChange(damageAmount, isDamage: true, 
-        //                 durationOverride: null, type: d.stat);
-        //         }
-        //         
-        //         //END
-        //         
-        //         if (Mathf.Abs(delta) > 0.0001f)
-        //             SetCurrentInternal(d.stat, newCurrent, key.expendType,key.source);
-        //     }
-        // }
-        private void ApplyDelta(StatDelta d, BaseGameEntityComponent source, SourceKey key)
-        {
-            var sr = EnsureStat(d.stat);
-
-            if (d.target == StatTarget.Max)
-            {
-                sr.effectAddMax += d.amount;
-                RecalculateAllMaxAndClampCurrent();
-                return;
-            }
-
-            float clampMax = sr.maxClamp > 0f
-                ? Mathf.Min(sr.maxClamp, sr.max)
-                : sr.max;
-
-            float newCurrent = Mathf.Clamp(
-                sr.current + d.amount,
-                sr.minClamp,
-                clampMax);
-
-            float delta = newCurrent - sr.current;
-
-            if (delta < 0f && _damageDrawer != null)
-            {
-                _damageDrawer.DrawResourceChange(
-                    -delta,
-                    isDamage: true,
-                    durationOverride: null,
-                    type: d.stat);
-            }
-
-            // Не использовать epsilon здесь:
-            // SetCurrentInternal самостоятельно проверит изменение.
-            SetCurrentInternal(
-                d.stat,
-                newCurrent,
-                key.expendType,
-                key.source);
-        }
-
-        // private void SetCurrentInternal(ResourceStatType stat, float newCurrent, ExpendType type,
-        //     BaseGameEntityComponent contributionSource)
-        // {
-        //     var sr = EnsureStat(stat);
-        //     float delta = newCurrent - sr.current;
-        //     if (Mathf.Abs(delta) <= 0.000001f) return;
-        //     sr.current = newCurrent;
-        //     UpdateViewers(stat, sr.current, sr.max, delta, type,contributionSource);
-        // }
-        private void SetCurrentInternal(
-            ResourceStatType stat,
-            float newCurrent,
-            ExpendType type,
-            BaseGameEntityComponent contributionSource)
-        {
-            var sr = EnsureStat(stat);
-
-            float oldCurrent = sr.current;
-
-            // После Mathf.Clamp точное равенство здесь подходит:
-            // если значение отличается даже незначительно, его нужно сохранить.
-            if (newCurrent == oldCurrent)
-                return;
-
-            sr.current = newCurrent;
-
-            float delta = newCurrent - oldCurrent;
-
-            UpdateViewers(
-                stat,
-                sr.current,
-                sr.max,
-                delta,
-                type,
-                contributionSource);
-        }
-
-        private StatRuntime EnsureStat(ResourceStatType stat)
-        {
-            if (!stats.TryGetValue(stat, out var sr))
-            {
-                sr = new StatRuntime
-                {
-                    baseMax = 0f, current = 0f, max = 0f,
-                    minClamp = 0f, maxClamp = 0f,
-                    equipAddMax = 0f, equipMultMax = 0f, effectAddMax = 0f, effectMultMax = 0f
-                };
-                stats[stat] = sr;
-            }
-
-            return sr;
-        }
-
-
-        #region Public
-
-        bool HasStat(ResourceStatType stat) => stats.ContainsKey(stat);
-
-        public bool TryGetCurrent(ResourceStatType stat, out float value)
-        {
-            value = 0f;
-            if (HasStat(stat)) value = stats[stat].current;
-            return HasStat(stat);
-        }
-
-        public bool TryGetMax(ResourceStatType stat, out float value)
-        {
-            value = 0f;
-            if (HasStat(stat)) value = stats[stat].max;
-            return HasStat(stat);
-        }
-
-        public float GetMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.max : 0f;
-        public float GetBaseMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.baseMax : 0f;
-
-        public bool CanApplyCost(AppliedStatsDeltaEffect cost)
-        {
-            if (cost == null) return true;
-            if (cost.instantDeltas == null || cost.instantDeltas.Count == 0) return true;
-
-            // Aggregate total negative Current deltas per stat
-            var neededByStat = new Dictionary<ResourceStatType, float>();
-            foreach (var d in cost.instantDeltas)
-            {
-                if (d.target != StatTarget.Current) continue;
-                if (d.amount >= 0f) continue; // only costs (negative)
-                if (neededByStat.TryGetValue(d.stat, out var sum))
-                    neededByStat[d.stat] = sum + d.amount; // sum remains negative
-                else
-                    neededByStat[d.stat] = d.amount;
-            }
-
-            if (neededByStat.Count == 0) return true; // no actual cost
-
-            // Validate affordability against current values and clamps
-            foreach (var kvp in neededByStat)
-            {
-                var stat = kvp.Key;
-                float totalNegative = kvp.Value; // negative value
-                float required = -totalNegative; // positive amount required
-
-                // Must have the stat
-                if (!stats.TryGetValue(stat, out var sr)) return false;
-
-                // Available buffer above minClamp
-                float available = Mathf.Max(0f, sr.current - sr.minClamp);
-
-                if (required > available)
-                    return false;
-            }
-
-            return true;
         }
 
         #endregion
 
-        #region IStatUpdatesViewer
+        #region Condition evaluation
 
-        private List<IStatUpdatesViewer> statUpdatesViewers = new();
+        public bool CheckStatsConditionGroup(ConditionGroup group) => EvaluateConditionGroup(group);
 
-        public void RegisterStatsViewer(IStatUpdatesViewer viewer)
-        {
-            if (!statUpdatesViewers.Contains(viewer)) statUpdatesViewers.Add(viewer);
-            StartViewer(viewer);
-        }
-
-        private void StartViewer(IStatUpdatesViewer viewer)
-        {
-            foreach (var stat in stats)
-                viewer.HandleStatsUpdate(stat.Key, stat.Value.current, stat.Value.max, 0, ExpendType.Equipment,entity);
-
-            // initialize shield display 
-            // float total = 0f;
-            // for (int i = 0; i < _shields.Count; i++) total += _shields[i].Current;
-            // viewer.SetShieldValue(total);
-        }
-
-        private void UpdateViewers(ResourceStatType type, float current, float max, float delta,
-            ExpendType expendType,BaseGameEntityComponent source)
-        {
-            foreach (var v in statUpdatesViewers)
-                v.HandleStatsUpdate(type, current, max, delta, expendType,source);
-        }
-        private float _lastNotifiedShield = -1f;
-
-        private void NotifyShieldViewers(ResourceStatType stat)
-        {
-            float total = 0f;
-            for (int i = 0; i < _shields.Count; i++)
-                total += _shields[i].Current;
-
-            // avoid spamming viewers when nothing changed
-            if (Mathf.Approximately(total, _lastNotifiedShield)) return;
-            _lastNotifiedShield = total;
-
-            foreach (var v in statUpdatesViewers)
-                v.SetShieldValue(stat,total);
-        }
-
-        #endregion
-
-
-        // Condition evaluation
         private bool EvaluateConditionGroup(ConditionGroup group)
         {
             if (group.IsEmpty) return true;
             if (!init) InitializeFromConfig();
-
 
             bool result = group.requireAll;
             foreach (var c in group.statConditions)
@@ -757,20 +605,12 @@ namespace Arcatech.Stats
                 bool pass = EvaluateCondition(c);
                 if (group.requireAll)
                 {
-                    if (!pass)
-                    {
-                        result = false;
-                        break;
-                    }
+                    if (!pass) { result = false; break; }
                 }
                 else
                 {
-                    if (pass)
-                    {
-                        result = true;
-                        break;
-                    }
-                    else result = false;
+                    if (pass) { result = true; break; }
+                    result = false;
                 }
             }
 
@@ -779,39 +619,29 @@ namespace Arcatech.Stats
 
         private bool EvaluateCondition(StatCondition c)
         {
-            // Get value to compare
             float val;
             if (c.target == StatTarget.Current)
             {
-                float cur;
-                TryGetCurrent(c.stat, out cur);
-                if (c.usePercentOfMax)
-                {
-                    float max = Mathf.Max(0.00001f, GetMax(c.stat));
-                    val = cur / max; // normalized 0..1
-                }
-                else val = cur;
+                TryGetCurrent(c.stat, out float cur);
+                val = c.usePercentOfMax
+                    ? cur / Mathf.Max(0.00001f, GetMax(c.stat)) // normalized 0..1
+                    : cur;
             }
             else // Max
             {
                 float max = GetMax(c.stat);
-                if (c.usePercentOfMax)
-                {
-                    float d = Mathf.Max(0.00001f, max);
-                    val = max / d; // ≈ 1; mostly not useful but defined
-                }
-                else val = max;
+                val = c.usePercentOfMax ? 1f : max; // percent-of-max для Max всегда ≈ 1
             }
 
             const float eps = 0.0001f;
             switch (c.op)
             {
-                case ConditionOp.Greater: return val > c.a;
+                case ConditionOp.Greater:        return val > c.a;
                 case ConditionOp.GreaterOrEqual: return val >= c.a;
-                case ConditionOp.Less: return val < c.a;
-                case ConditionOp.LessOrEqual: return val <= c.a;
-                case ConditionOp.Equal: return Mathf.Abs(val - c.a) <= eps;
-                case ConditionOp.NotEqual: return Mathf.Abs(val - c.a) > eps;
+                case ConditionOp.Less:           return val < c.a;
+                case ConditionOp.LessOrEqual:    return val <= c.a;
+                case ConditionOp.Equal:          return Mathf.Abs(val - c.a) <= eps;
+                case ConditionOp.NotEqual:       return Mathf.Abs(val - c.a) > eps;
                 case ConditionOp.Between:
                     float min = Mathf.Min(c.a, c.b);
                     float maxv = Mathf.Max(c.a, c.b);
@@ -820,20 +650,99 @@ namespace Arcatech.Stats
             }
         }
 
-        public bool Paused { get; set; }
+        #endregion
 
-        public void SetKilled(IKillerComponent c, bool value)
+        #region Public queries
+
+        public bool HasStat(ResourceStatType stat) => stats.ContainsKey(stat);
+
+        public bool TryGetCurrent(ResourceStatType stat, out float value)
         {
-            _killed = value;
-            if (!value)
-            {
-                InitializeFromConfig(); // reset unit stats, called on reload checkpoint
-            }
+            if (stats.TryGetValue(stat, out var sr)) { value = sr.current; return true; }
+            value = 0f;
+            return false;
         }
 
-        private bool _killed;
-        public bool CheckStatsConditionGroup(ConditionGroup group) => EvaluateConditionGroup(group);
-        
+        public bool TryGetMax(ResourceStatType stat, out float value)
+        {
+            if (stats.TryGetValue(stat, out var sr)) { value = sr.max; return true; }
+            value = 0f;
+            return false;
+        }
 
+        public float GetMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.max : 0f;
+        public float GetBaseMax(ResourceStatType stat) => stats.TryGetValue(stat, out var sr) ? sr.baseMax : 0f;
+
+        public bool CanApplyCost(AppliedStatsDeltaEffect cost)
+        {
+            if (cost?.instantDeltas == null || cost.instantDeltas.Count == 0) return true;
+
+            var neededByStat = new Dictionary<ResourceStatType, float>();
+            foreach (var d in cost.instantDeltas)
+            {
+                if (d.target != StatTarget.Current || d.amount >= 0f) continue;
+                neededByStat.TryGetValue(d.stat, out var sum);
+                neededByStat[d.stat] = sum + d.amount;
+            }
+
+            foreach (var kvp in neededByStat)
+            {
+                if (!stats.TryGetValue(kvp.Key, out var sr)) return false;
+                float required = -kvp.Value;
+                float available = Mathf.Max(0f, sr.current - sr.minClamp);
+                if (required > available) return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        #region Viewers
+
+        public void RegisterStatsViewer(IStatUpdatesViewer viewer)
+        {
+            if (!statUpdatesViewers.Contains(viewer)) statUpdatesViewers.Add(viewer);
+            StartViewer(viewer);
+        }
+
+        // NEW: симметричная отписка, чтобы не держать уничтоженные UI-объекты
+        public void UnregisterStatsViewer(IStatUpdatesViewer viewer)
+        {
+            statUpdatesViewers.Remove(viewer);
+        }
+
+        private void StartViewer(IStatUpdatesViewer viewer)
+        {
+            foreach (var stat in stats)
+                viewer.HandleStatsUpdate(stat.Key, stat.Value.current, stat.Value.max, 0,
+                    ExpendType.Equipment, entity);
+        }
+
+        private void UpdateViewers(ResourceStatType type, float current, float max, float delta,
+            ExpendType expendType, BaseGameEntityComponent source)
+        {
+            foreach (var v in statUpdatesViewers)
+                v.HandleStatsUpdate(type, current, max, delta, expendType, source);
+        }
+
+        private void NotifyShieldViewers(ResourceStatType stat)
+        {
+            // FIX: суммируем только щиты данного стата и дедуплицируем per-stat,
+            // раньше total смешивал все статы и один общий _lastNotifiedShield глушил уведомления
+            float total = 0f;
+            foreach (var shield in _shields)
+                if (shield.Stat == stat) total += shield.Current;
+
+            if (_lastNotifiedShieldByStat.TryGetValue(stat, out float last) &&
+                Mathf.Approximately(total, last)) return;
+
+            _lastNotifiedShieldByStat[stat] = total;
+
+            foreach (var v in statUpdatesViewers)
+                v.SetShieldValue(stat, total);
+        }
+
+        #endregion
     }
 }

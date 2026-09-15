@@ -16,7 +16,7 @@ namespace Arcatech.Usables.Effects
     [RequireComponent(typeof(BaseGameEntityComponent))]
     [RequireComponent(typeof(EntityEffectController))]
     [RequireComponent(typeof(ModifierAggregator))]
-    [RequireComponent(typeof(EntityStatusComponent))]
+    [RequireComponent(typeof(EntityStunEffectApplier))]
     public class EffectsReceiverComponent : MonoBehaviour
     {
         private BaseGameEntityComponent _owner;

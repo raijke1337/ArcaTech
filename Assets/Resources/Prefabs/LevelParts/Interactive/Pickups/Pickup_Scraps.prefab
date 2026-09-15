@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 897531696086615196}
   - component: {fileID: 754868552308480928}
   - component: {fileID: 4740861867446518017}
-  - component: {fileID: 6215770114506928207}
   - component: {fileID: 438787011601951740}
   - component: {fileID: 1647004558200709559}
   - component: {fileID: 5923635334488011330}
@@ -21,6 +20,7 @@ GameObject:
   - component: {fileID: 5907143268600554704}
   - component: {fileID: 5611294500172964572}
   - component: {fileID: 4251877210966973612}
+  - component: {fileID: 3191908664217321387}
   m_Layer: 6
   m_Name: Pickup_Scraps
   m_TagString: Untagged
@@ -60,15 +60,16 @@ MonoBehaviour:
   entity: {fileID: 1647004558200709559}
   trigger: {fileID: 5907143268600554704}
   conditions: []
-  preExecuteEffects:
-  - {fileID: 4784070580617683845}
-  executor: {fileID: 6215770114506928207}
+  preExecuteEffects: []
+  executor: {fileID: 3191908664217321387}
   duringExecuteEffects: []
   successEffects:
+  - {fileID: 4784070580617683845}
   - {fileID: 5923635334488011330}
   failureEffects: []
   cancelEffects: []
   destroyAfterSuccess: 1
+  affectsInteractorState: 1
 --- !u!65 &897531696086615196
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -88,7 +89,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 0.5, z: 2}
+  m_Size: {x: 3, y: 0.5, z: 3}
   m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!54 &754868552308480928
 Rigidbody:
@@ -138,19 +139,6 @@ MonoBehaviour:
   _warningFloorOffset: 0.02
   _warningFadeInDuration: 0.12
   _warningFadeOutDuration: 0.25
---- !u!114 &6215770114506928207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4714043517577227366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
-  willComplete: 1
 --- !u!114 &438787011601951740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,11 +270,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119ef3ebc21a48d29b7ae41857b4379c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractionStatesInjectorComponent
+  ownerEntity: {fileID: 1647004558200709559}
   activeArea: {fileID: 4740861867446518017}
   stateTransitions:
     _serializedList:
-    - Key: 3
+    - Key: 2
       Value: {fileID: 11400000, guid: d909ef16991e56548a9d7dda758d2638, type: 2}
+  StateAnimationExited:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &4251877210966973612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,6 +292,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.SaveObjectID
   uniqueId: e6aa1e30-1ef9-4d96-b821-c1d2d330366a
+--- !u!114 &3191908664217321387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4714043517577227366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16a3a605a9a14f7a89a03eae179ce6dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CompleteAnimationStateExecutor
+  waitForCompletionStateName: TakeItemBend
 --- !u!1 &6761832163387060620
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,6 +455,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ShowTextInteractionEffect
   texts:
     _serializedList:
-    - Key: 1
+    - Key: 3
       Value: {fileID: 11400000, guid: 6a5f50e7ef820cf449fd67f45817a9ae, type: 2}
   blockUntilTextCompletes: 0

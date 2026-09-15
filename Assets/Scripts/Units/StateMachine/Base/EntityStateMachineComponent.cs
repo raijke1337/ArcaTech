@@ -5,13 +5,14 @@ using Arcatech.Interactions;
 using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
+using Arcatech.Usables.Effects;
 using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Units
 {
     [RequireComponent(typeof(BaseGameEntityComponent))]
-    public partial class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent, IStateAugmentorReceiver
+    public partial class EntityStateMachineComponent : ValidatedMonoBehaviour, IPausableComponent, IKillableComponent, IStateAugmentorReceiver,IStunnable
     {
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Child] Animator animator;
@@ -23,7 +24,7 @@ namespace Arcatech.Units
         private UnitState _defaultState;
         [SerializeField] public bool verboseDebugs = false;
 
-        [SerializeField] StateMachineContext _context;
+        [SerializeField] StateMachineContext context;
         UnitState _currentState;
 
         readonly List<StateTransition> _addedTransitions = new();
@@ -79,7 +80,7 @@ namespace Arcatech.Units
         void Start()
         {
 
-            _context = new StateMachineContext
+            context = new StateMachineContext
             {
                 Spawn = gameEntity.transform,
                 Owner = gameEntity,
@@ -90,13 +91,13 @@ namespace Arcatech.Units
 
             _defaultState = defaultState.Build();
             _currentState = _defaultState;
-            _context.CurrentState = _currentState;
-            _context.Owner = gameEntity;
-            _context.Aimers = GetComponentsInChildren<IAim>();
-            _context.Movers = GetComponentsInChildren<IMove>();
-            _context.Invulnerables = GetComponentsInChildren<IInvulnerability>();
-            _context.Stats = GetComponentInChildren<EntityStatsComponent>();
-            _context.Interactor = GetComponentInChildren<IInteractor>();
+            context.CurrentState = _currentState;
+            context.Owner = gameEntity;
+            context.Aimers = GetComponentsInChildren<IAim>();
+            context.Movers = GetComponentsInChildren<IMove>();
+            context.Invulnerables = GetComponentsInChildren<IInvulnerability>();
+            context.Stats = GetComponentInChildren<EntityStatsComponent>();
+            context.Interactor = GetComponentInChildren<IInteractor>();
             
             var aug = GetComponentsInChildren<IStateAugmentor>();
             foreach (var a in aug)
@@ -104,7 +105,7 @@ namespace Arcatech.Units
                 RegisterAugmentor(a);
             }
             
-            _currentState.EnterState(_context, animator);
+            _currentState.EnterState(context, animator);
         }
         
         
@@ -113,7 +114,7 @@ namespace Arcatech.Units
         {
             if (Paused) return;
 
-            _currentState?.UpdateState(_context, animator, Time.deltaTime);
+            _currentState?.UpdateState(context, animator, Time.deltaTime);
 
             if (_killed) return;
             
@@ -137,7 +138,7 @@ namespace Arcatech.Units
             // НЕ сбрасываемся, если есть забуференная команда — пусть она отработает.
            // if (HasPendingCommand) return;
 
-            if (!_currentState.HasCompleted(_context)) return;
+            if (!_currentState.HasCompleted(context)) return;
             if (PickBestTransition(out _) != null) return;
 
             ResetToDefaultState();
@@ -145,26 +146,26 @@ namespace Arcatech.Units
         void ResetToDefaultState()
         {
             if (verboseDebugs && GetMainEntity != null && GetMainEntity.ShowingDebugs)
-                Debug.Log($"[{name}] No valid transition & state finished -> reset to default '{_defaultState.StateName}'.");
+                Debug.Log($"[{name}] No valid transition & state {context.CurrentState} finished -> reset to default '{_defaultState.StateName}'.");
 
             // Mirror the exit/enter flow used by CommitTransition so augmentors stay in sync.
-            _currentState?.ExitState(_context, animator);
+            _currentState?.ExitState(context, animator);
 
             foreach (var aug in _activeAugmentors.ToArray())
-                aug.OnStateExited(_currentState, _context);
+                aug.OnStateExited(_currentState, context);
 
             _currentState = _defaultState;
-            _context.CurrentState = _currentState;
-            _currentState.EnterState(_context, animator);
+            context.CurrentState = _currentState;
+            _currentState.EnterState(context, animator);
 
             foreach (var aug in _activeAugmentors.ToArray())
-                aug.OnStateEntered(_currentState, _context);
+                aug.OnStateEntered(_currentState, context);
 
             // IMPORTANT: a fallback to default is NOT a command rejection.
             // Keep any buffered command alive so it can be re-evaluated from the
             // default state next frame, instead of completing it as failure.
             if (!HasPendingCommand)
-                _context.ClearCommand();
+                context.ClearCommand();
             // else: leave the command buffered. Do NOT call CompletePendingCommand(false).
         }
         void TickCommandTimeout()
@@ -220,7 +221,7 @@ namespace Arcatech.Units
 
             if (Paused ||
                 _killed ||
-                _context.KnockDownState)
+                context.StunnedState)
             {
                 LastCommandRejectReason =
                     CommandRejectReason.IncapacitatedState;
@@ -232,7 +233,7 @@ namespace Arcatech.Units
                 command,
                 commandPerformers);
 
-            _context.SetCommand(command);
+            context.SetCommand(command);
 
             bool committed =
                 ValidateCommandTransition();
@@ -297,7 +298,7 @@ namespace Arcatech.Units
             _pendingCommand = UnitCommand.None;
             _pendingCommandStamp = -1f;
 
-            _context.ClearCommand();
+            context.ClearCommand();
         }
 
         bool ValidateCommandTransition()
@@ -336,13 +337,13 @@ namespace Arcatech.Units
 
             bool consumesPending =
                 HasPendingCommand &&
-                _context.HasPendingCommand;
+                context.HasPendingCommand;
 
             UnitCommand command =
                 _pendingCommand;
 
             _currentState?.ExitState(
-                _context,
+                context,
                 animator);
 
             foreach (IStateAugmentor augmentor
@@ -350,7 +351,7 @@ namespace Arcatech.Units
             {
                 augmentor.OnStateExited(
                     _currentState,
-                    _context);
+                    context);
             }
 
             if (consumesPending)
@@ -367,11 +368,11 @@ namespace Arcatech.Units
             _currentState =
                 transition.NextState;
 
-            _context.CurrentState =
+            context.CurrentState =
                 _currentState;
 
             _currentState.EnterState(
-                _context,
+                context,
                 animator);
 
             foreach (IStateAugmentor augmentor
@@ -379,7 +380,7 @@ namespace Arcatech.Units
             {
                 augmentor.OnStateEntered(
                     _currentState,
-                    _context);
+                    context);
             }
 
             if (consumesPending)
@@ -388,7 +389,7 @@ namespace Arcatech.Units
             }
             else
             {
-                _context.ClearCommand();
+                context.ClearCommand();
             }
         }
         void ProduceTransitionResults(StateTransition tr)
@@ -396,7 +397,7 @@ namespace Arcatech.Units
             if (tr?.OnTransition == null) return;
 
             foreach (var a in tr.OnTransition)
-                a?.ProduceResult(_context.Owner, null, _context.Spawn.position, _context.Spawn.rotation);
+                a?.ProduceResult(context.Owner, null, context.Spawn.position, context.Spawn.rotation);
         }
 
         // ---------------------------------------------------------------------
@@ -424,12 +425,12 @@ namespace Arcatech.Units
             _candidates.Clear();
             if (_currentState == null) return;
 
-            bool canExit = _currentState.CanExitState(_context);
+            bool canExit = _currentState.CanExitState(context);
 
             foreach (var t in _currentState.Transitions ?? Array.Empty<StateTransition>())
             {
                 if (t == null || t.NextState == null) continue;
-                if (!t.CanTransition(_context)) continue;
+                if (!t.CanTransition(context)) continue;
                 if (!canExit && !t.CanOverrideMinimumStateTime) continue;
                 if (!_currentState.TransitionMinTimeInStateSatisfied(animator, t.ExitNormalizedTime)) continue;
                 _candidates.Add((t, true));
@@ -440,7 +441,7 @@ namespace Arcatech.Units
                 if (g == null || g.NextState == null) continue;
                 // Skip transitions that lead into the state we're already in.
                 if (g.NextState.StateName == _currentState.StateName) continue;
-                if (!g.CanTransition(_context)) continue;
+                if (!g.CanTransition(context)) continue;
                 if (!canExit && !g.CanOverrideMinimumStateTime) continue;
                 if (!_currentState.TransitionMinTimeInStateSatisfied(animator, g.ExitNormalizedTime)) continue;
                 _candidates.Add((g, false));
@@ -505,13 +506,19 @@ namespace Arcatech.Units
             {
                 if (HasPendingCommand) CompletePendingCommand(false);
                 _pendingCommand = UnitCommand.None;
-                _context.ClearCommand();
+                context.ClearCommand();
             }
             else
             {
                 Start();
             }
 
+        }
+
+        public bool Stunned
+        {
+            get => context.StunnedState;
+            set => context.StunnedState = value;
         }
     }
 }

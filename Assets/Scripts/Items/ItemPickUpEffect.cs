@@ -23,7 +23,7 @@ namespace Arcatech.Items
             if (ctx.Interactor.Entity
                 .TryGetComponent(out EntityInventoryComponent component))
             {
-                component.PickUpItem(TakeItem().BuildItem(ctx.Interactor.Entity), count);;
+                component.PickUpItem(TakeItem().BuildItem(ctx.Interactor.Entity), count);
             }
         }
 
@@ -38,7 +38,14 @@ namespace Arcatech.Items
         public void PutItem(ItemSO item)
         {
             content = item;
-            if (item.Description!= null) SetBillboard(item.Description);
+            if (item?.Description != null) 
+            {
+                SetBillboard(item.Description);
+            }
+            else if (billboard != null)
+            {
+                billboard.gameObject.SetActive(false);
+            }
         }
         ItemSO TakeItem()
         {

@@ -48,7 +48,7 @@ namespace Arcatech.Usables.Effects
                 GameObject.Instantiate(_prefabs[i], pos, rot);
             }
         }
-
+        public override bool Validate(EffectContext ctx) => true;
         public override void OnExpire(EffectContext ctx) { }
     }
 }

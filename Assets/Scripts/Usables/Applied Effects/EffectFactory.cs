@@ -40,6 +40,7 @@ namespace Arcatech.Usables.Effects
     /// <summary> No-op fallback so a missing mapping never crashes the pipeline. </summary>
     public sealed class NullEffectResult : BaseResult
     {
+        public override bool Validate(EffectContext ctx) => true;
         public NullEffectResult(BaseAppliedEffect def) : base(def)
         {
         }

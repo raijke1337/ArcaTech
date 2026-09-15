@@ -4,6 +4,7 @@ using System.Linq;
 using Arcatech.Units;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
+using Unity.U2D.Physics;
 using UnityEngine;
 
 namespace Arcatech.Stats
@@ -12,7 +13,7 @@ namespace Arcatech.Stats
     /// moved the augment logic to this for clarity
     /// </summary>
     [RequireComponent(typeof(EntityStatsComponent),typeof(EntityStateMachineComponent))]
-    public class StatsStateAugmentorComponent : ValidatedMonoBehaviour, IStateAugmentor, IKillerComponent
+    public class StatsStateAugmentorComponent : ValidatedMonoBehaviour, IStateAugmentor, IKillerComponent,IStatUpdatesViewer
     {
         
         [SerializeField, Self]
@@ -20,59 +21,85 @@ namespace Arcatech.Stats
         [SerializeField,Self] EntityStateMachineComponent stateMachine;
         [SerializeField] private SerializedStateTransition toKilledState;
         [SerializeField] private SerializedStateTransition toKnockDown;
+        [SerializeField] private SerializedStateTransition toDamageInterrupt;
+
+        
         private StateTransition _toKilled;
         private StateTransition _toKnockDown;
+        private StateTransition _toDamageInterrupt;
+
         private UnitState _killState;
-        private UnitState _knockDownStart;
+        private UnitState _knockDownStartState;
+        private UnitState _damageInterruptState;
+
         
         private StateMachineContext _stateMachineCtx;
         private List <IKillableComponent> _components;
+
+        private bool usesKilled;
+        private bool usesKnockDown;
+        private bool usesDamageInterrupt;
+        
+        
+        bool initialized = false;
+        
         private void Start()
         {
+            if (initialized) return;
+            initialized = true;
+            
             _components = GetComponentsInChildren<IKillableComponent>().ToList();
+            usesKilled = toKilledState;
+            usesKnockDown = toKnockDown;
+            usesDamageInterrupt = toDamageInterrupt;
+            
+
         }
 
         public void Attach(IStateAugmentorReceiver machine)
         {
-            if (toKilledState != null)
+            if (!initialized) Start();
+            
+            if (usesKilled)
             {
                 _toKilled = toKilledState.Build();
                 machine.AddTransition(_toKilled);
                 _killState = _toKilled.NextState;
             }
 
-            if (toKnockDown != null)
+            if (usesKnockDown)
             {
                 _toKnockDown = toKnockDown.Build();
                 machine.AddTransition(_toKnockDown);
-                _knockDownStart = _toKnockDown.NextState;
+                _knockDownStartState = _toKnockDown.NextState;
             }
             
-            // if (_damageInterrupt != null)
-            // {
-            //     _damageInterrupt ??= toDamageInterrupt.Build();
-            //     _damage = _damageInterrupt.NextState;
-            //     machine.AddTransition(_damageInterrupt);
-            // }
-            
-            _stateMachineCtx = machine.Context; // TODO: set some trigger for stagger /instead of plain stat condition
+            if (usesDamageInterrupt)
+            {
+                _toDamageInterrupt??= toDamageInterrupt.Build();
+                _damageInterruptState = _toDamageInterrupt.NextState;
+                machine.AddTransition(_toDamageInterrupt);
+            }
+            stats.RegisterStatsViewer(this);
+            _stateMachineCtx = machine.Context;
         }
 
         public void Detach(IStateAugmentorReceiver machine)
         {
-            if (_toKilled != null) machine.RemoveTransition(_toKilled);
-            if (_toKnockDown != null) machine.RemoveTransition(_toKnockDown);
-       //     if (_damageInterrupt!=null) machine.RemoveTransition(_damageInterrupt);
+            if (usesKilled) machine.RemoveTransition(_toKilled);
+            if (usesKnockDown) machine.RemoveTransition(_toKnockDown);
+            if (usesDamageInterrupt) machine.RemoveTransition(_toDamageInterrupt);
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)
         {
-             if (state == _knockDownStart)
+             if (usesKnockDown && state == _knockDownStartState)
              {
-                 context.KnockDownState = true;
+                 context.StunnedState = true;
+                 
              }
 
-            if (state == _killState)
+            if (usesKilled && state == _killState)
             {
                 foreach (var c in _components)
                 {
@@ -81,15 +108,20 @@ namespace Arcatech.Stats
                 context.DeadState = true;
             }
 
-            if (state.StateName == "KnockDownEnd")
+            if (usesKnockDown && state.StateName == "KnockDownEnd")
             {
-                context.KnockDownState = false;
+                context.StunnedState = false;
+            }
+
+            if (usesDamageInterrupt && state == _damageInterruptState)
+            {
+                _stateMachineCtx.InterruptQueued = false;
             }
         }
 
         public void OnStateExited(UnitState state, StateMachineContext context)
         {
-            if (state == _killState)
+            if (usesKilled && state == _killState)
             {
                 var killables = GetComponentsInChildren<IKillableComponent>(true);
                 foreach (var k in killables)
@@ -97,42 +129,31 @@ namespace Arcatech.Stats
                     k.SetKilled(this,true);
                 }
             }
-            if (state == _damage)
+            // if (state == _damage)
+            // {
+            //     context.Animator.SetFloat(dmgFrontHash,0);
+            //     context.Animator.SetFloat(dmgRightHash,0);
+            // }
+        }
+
+        public string KilledBy => $"Transition to Killed State Condition Satisfied";
+
+
+        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
+            BaseGameEntityComponent source)
+        {
+            if (stat == ResourceStatType.Health &&
+                statDelta < 0f &&
+                changeType == EntityStatsComponent.ExpendType.ActionResult &&
+                source != stateMachine.GetMainEntity)
             {
-                context.Animator.SetFloat(dmgFrontHash,0);
-                context.Animator.SetFloat(dmgRightHash,0);
+                // damage was taken
+                _stateMachineCtx.InterruptQueued = true;
             }
         }
 
-        public string KilledBy => "Stats State Augmentor killed state condition satisfied";
-        #region dmg take state NYI
-
-
-
-      //  [SerializeField] private bool canBeInterrupted = true;
-       // [SerializeField] private ConditionGroup interruptCondition;
-      //  [SerializeField] private SerializedStateTransition toDamageInterrupt;
-        [SerializeField] private string dmgFrontAnimatorParameter = "DamageFront";
-        [SerializeField] private string dmgRightAnimatorParameter = "DamageRight";
-
-        private int dmgFrontHash;
-        private int dmgRightHash;
-
-        private void Awake()
-        {
-            dmgFrontHash = Animator.StringToHash(dmgFrontAnimatorParameter);
-            dmgRightHash = Animator.StringToHash(dmgRightAnimatorParameter);
-        }
-
-
-
-        private StateTransition _damageInterrupt;
-        private UnitState _damage;
-
-        
-        #endregion
-
-
+        public void SetShieldValue(ResourceStatType shieldStat, float currentValue)
+        { }
     }
 
 }

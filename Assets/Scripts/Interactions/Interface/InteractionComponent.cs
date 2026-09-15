@@ -23,9 +23,9 @@ namespace Arcatech.Interactions
 
         public event Action<InteractionState> StateChanged;
 
-        // --- State Machine bridge ---
-        [SerializeField] private SerializedStateTransition dummyActivate;
-        private StateTransition _activate;
+        //--- State Machine bridge ---
+       [SerializeField] private SerializedStateTransition dummyActivate;
+       private StateTransition _activate;
 
         public void Attach(IStateAugmentorReceiver machine)
         {
@@ -33,7 +33,7 @@ namespace Arcatech.Interactions
             _activate ??= dummyActivate.Build();
             if (_activate != null) machine.AddTransition(_activate);
         }
-
+        
         public void Detach(IStateAugmentorReceiver machine)
         {
             if (_activate != null) machine.RemoveTransition(_activate);

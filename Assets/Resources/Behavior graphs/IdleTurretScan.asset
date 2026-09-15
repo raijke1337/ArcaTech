@@ -1,0 +1,1049 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bad8f2220607dac4db5082ff333fafb8, type: 3}
+  m_Name: IdleTurretScan
+  m_EditorClassIdentifier: Unity.Behavior.Authoring::Unity.Behavior.BehaviorAuthoringGraph
+  Blackboard: {fileID: 2235420518092150087}
+  m_Description: 
+  m_Nodes:
+  - rid: 4741284571820327929
+  - rid: 5970639790974697977
+  - rid: 5970639790974698039
+  - rid: 5970639790974698247
+  - rid: 5970639837908434977
+  m_VersionTimestamp: 639249954739776906
+  m_SerializedVersion: 3
+  m_DebugInfo: {fileID: 7077800996916688813}
+  m_RuntimeGraph: {fileID: 3918541972323933621}
+  AssetID:
+    m_Value0: 16475621452198178087
+    m_Value1: 5438105199070303546
+  Story:
+    Story: 
+    StoryVariableNames: []
+    Variables: []
+  m_NodeModelsInfo:
+  - Name: On Start
+    Story: 
+    RuntimeTypeString: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+    RuntimeTypeID:
+      m_Value0: 3335272451348827663
+      m_Value1: 11549843281177505721
+    Variables: []
+    NamedChildren: []
+    IsPlaceholder: 0
+  - Name: Assign scanning variables
+    Story: '[Agent] remembers starting Y into [startRotation]. Calculates min [minRotation]
+      and max [maxRotation] based on Wrapper data View Angle'
+    RuntimeTypeString: RememberStartingRotationAction, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeID:
+      m_Value0: 8004938150445056372
+      m_Value1: 13306298017213268885
+    Variables:
+    - Name: Agent
+      Type:
+        m_SerializableType: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+      Tooltip: 
+    - Name: startRotation
+      Type:
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+      Tooltip: 
+    - Name: minRotation
+      Type:
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+      Tooltip: 
+    - Name: maxRotation
+      Type:
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+      Tooltip: 
+    NamedChildren: []
+    IsPlaceholder: 0
+  - Name: Rotate
+    Story: 'Rotate [Transform] by [Rotation]'
+    RuntimeTypeString: Unity.Behavior.RotateEulerAction, Unity.Behavior, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeID:
+      m_Value0: 11266387484989320720
+      m_Value1: 7105787334453813370
+    Variables:
+    - Name: Transform
+      Type:
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+      Tooltip: 
+    - Name: Rotation
+      Type:
+        m_SerializableType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+      Tooltip: 
+    - Name: Duration
+      Type:
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+      Tooltip: 
+    NamedChildren: []
+    IsPlaceholder: 0
+  m_Blackboards:
+  - {fileID: 11400000, guid: 4cfbb73d4f8e3874cbd15055dc8e7943, type: 2}
+  m_MainBlackboardAuthoringAsset: {fileID: 2235420518092150087}
+  m_CommandBuffer:
+    m_Commands: []
+  m_SubgraphsInfo: []
+  m_BlackboardMissingManagedRef: 0
+  m_GraphMissingManagedRef: 0
+  m_HasMissingTypeInManagedRef: 0
+  m_EnumDependencyCache:
+    Entries: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 4741284571820327929
+      type: {class: StartNodeModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        Position: {x: 208.80005, y: -147.99998}
+        ID:
+          m_Value0: 60025241069357866
+          m_Value1: 4036188429844166361
+        Parents: []
+        PortModels:
+        - rid: 4741284571820327930
+        NodeType:
+          m_SerializableType: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        NodeTypeID:
+          m_Value0: 3335272451348827663
+          m_Value1: 11549843281177505721
+        m_FieldValues: []
+        Repeat: 1
+        AllowMultipleRepeatsPerTick: 0
+    - rid: 4741284571820327930
+      type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        m_Name: OutputPort
+        m_PortDataFlowType: 1
+        m_IsFloating: 0
+        m_NodeModel:
+          rid: 4741284571820327929
+        m_Connections:
+        - rid: 5970639790974698248
+    - rid: 5970639790974697977
+      type: {class: StartNodeModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        Position: {x: 20.999865, y: -343.49988}
+        ID:
+          m_Value0: 10395030910708782525
+          m_Value1: 14237944096849388877
+        Parents: []
+        PortModels:
+        - rid: 5970639790974697978
+        NodeType:
+          m_SerializableType: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        NodeTypeID:
+          m_Value0: 3335272451348827663
+          m_Value1: 11549843281177505721
+        m_FieldValues: []
+        Repeat: 0
+        AllowMultipleRepeatsPerTick: 0
+    - rid: 5970639790974697978
+      type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        m_Name: OutputPort
+        m_PortDataFlowType: 1
+        m_IsFloating: 0
+        m_NodeModel:
+          rid: 5970639790974697977
+        m_Connections:
+        - rid: 5970639790974698040
+    - rid: 5970639790974698039
+      type: {class: ActionNodeModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        Position: {x: -11.800396, y: -223.29999}
+        ID:
+          m_Value0: 8163267320643330315
+          m_Value1: 1108712614581324281
+        Parents: []
+        PortModels:
+        - rid: 5970639790974698040
+        - rid: 5970639790974698041
+        NodeType:
+          m_SerializableType: RememberStartingRotationAction, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        NodeTypeID:
+          m_Value0: 8004938150445056372
+          m_Value1: 13306298017213268885
+        m_FieldValues:
+        - rid: 5970639790974698042
+        - rid: 5970639790974698129
+        - rid: 5970639790974698130
+        - rid: 5970639790974698131
+    - rid: 5970639790974698040
+      type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        m_Name: InputPort
+        m_PortDataFlowType: 0
+        m_IsFloating: 0
+        m_NodeModel:
+          rid: 5970639790974698039
+        m_Connections:
+        - rid: 5970639790974697978
+    - rid: 5970639790974698041
+      type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        m_Name: OutputPort
+        m_PortDataFlowType: 1
+        m_IsFloating: 0
+        m_NodeModel:
+          rid: 5970639790974698039
+        m_Connections: []
+    - rid: 5970639790974698042
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: Agent
+        Type:
+          m_SerializableType: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        LocalValue:
+          rid: 5970639790974698044
+        LinkedVariable:
+          rid: 5970639790974698053
+    - rid: 5970639790974698044
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: {fileID: 0}
+    - rid: 5970639790974698053
+      type: {class: 'TypedVariableModel`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: {fileID: 0}
+    - rid: 5970639790974698129
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: startRotation
+        Type:
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        LocalValue:
+          rid: 5970639790974698134
+        LinkedVariable:
+          rid: 5970639790974698142
+    - rid: 5970639790974698130
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: minRotation
+        Type:
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        LocalValue:
+          rid: 5970639790974698135
+        LinkedVariable:
+          rid: 5970639790974698206
+    - rid: 5970639790974698131
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: maxRotation
+        Type:
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        LocalValue:
+          rid: 5970639790974698136
+        LinkedVariable:
+          rid: 5970639790974698219
+    - rid: 5970639790974698134
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 5970639790974698135
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 5970639790974698136
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 5970639790974698142
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 1583570860167102668
+          m_Value1: 11857785556598244481
+        Name: startingY
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 5970639790974698206
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 14275159395601977889
+          m_Value1: 9731862799403191875
+        Name: maxRotation
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 5970639790974698219
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 14874013520619696326
+          m_Value1: 2038602344428963554
+        Name: minRotation
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 5970639790974698247
+      type: {class: ActionNodeModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        Position: {x: 168.20012, y: -31.499989}
+        ID:
+          m_Value0: 8785581317203412062
+          m_Value1: 16874126594083999478
+        Parents: []
+        PortModels:
+        - rid: 5970639790974698248
+        - rid: 5970639790974698249
+        NodeType:
+          m_SerializableType: Unity.Behavior.RotateEulerAction, Unity.Behavior, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        NodeTypeID:
+          m_Value0: 11266387484989320720
+          m_Value1: 7105787334453813370
+        m_FieldValues:
+        - rid: 5970639790974698250
+        - rid: 5970639790974698251
+        - rid: 5970639790974698252
+    - rid: 5970639790974698248
+      type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        m_Name: InputPort
+        m_PortDataFlowType: 0
+        m_IsFloating: 0
+        m_NodeModel:
+          rid: 5970639790974698247
+        m_Connections:
+        - rid: 4741284571820327930
+    - rid: 5970639790974698249
+      type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        m_Name: OutputPort
+        m_PortDataFlowType: 1
+        m_IsFloating: 0
+        m_NodeModel:
+          rid: 5970639790974698247
+        m_Connections:
+        - rid: 5970639837908434978
+    - rid: 5970639790974698250
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: Transform
+        Type:
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        LocalValue:
+          rid: 5970639790974698253
+        LinkedVariable:
+          rid: 5970639790974698264
+    - rid: 5970639790974698251
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: Rotation
+        Type:
+          m_SerializableType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        LocalValue:
+          rid: 5970639790974698254
+        LinkedVariable:
+          rid: 5970639790974698477
+    - rid: 5970639790974698252
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: Duration
+        Type:
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        LocalValue:
+          rid: 5970639790974698255
+        LinkedVariable:
+          rid: -2
+    - rid: 5970639790974698253
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: {fileID: 0}
+    - rid: 5970639790974698254
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: {x: 0, y: 0, z: 0}
+    - rid: 5970639790974698255
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 5970639790974698264
+      type: {class: 'TypedVariableModel`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: {fileID: 0}
+    - rid: 5970639790974698477
+      type: {class: 'TypedVariableModel`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 7514940398732009282
+          m_Value1: 1714395810052468408
+        Name: anglePos
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: {x: 0, y: 60, z: 0}
+    - rid: 5970639837908434977
+      type: {class: ActionNodeModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        Position: {x: 201.00003, y: 70.09998}
+        ID:
+          m_Value0: 16175114254996455299
+          m_Value1: 5157524707750281816
+        Parents: []
+        PortModels:
+        - rid: 5970639837908434978
+        - rid: 5970639837908434979
+        NodeType:
+          m_SerializableType: Unity.Behavior.RotateEulerAction, Unity.Behavior, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        NodeTypeID:
+          m_Value0: 11266387484989320720
+          m_Value1: 7105787334453813370
+        m_FieldValues:
+        - rid: 5970639837908434980
+        - rid: 5970639837908434981
+        - rid: 5970639837908434982
+    - rid: 5970639837908434978
+      type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        m_Name: InputPort
+        m_PortDataFlowType: 0
+        m_IsFloating: 0
+        m_NodeModel:
+          rid: 5970639837908434977
+        m_Connections:
+        - rid: 5970639790974698249
+    - rid: 5970639837908434979
+      type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        m_Name: OutputPort
+        m_PortDataFlowType: 1
+        m_IsFloating: 0
+        m_NodeModel:
+          rid: 5970639837908434977
+        m_Connections: []
+    - rid: 5970639837908434980
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: Transform
+        Type:
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        LocalValue:
+          rid: 5970639837908434983
+        LinkedVariable:
+          rid: 5970639790974698264
+    - rid: 5970639837908434981
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: Rotation
+        Type:
+          m_SerializableType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        LocalValue:
+          rid: 5970639837908434984
+        LinkedVariable:
+          rid: 5970639837908435022
+    - rid: 5970639837908434982
+      type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
+      data:
+        FieldName: Duration
+        Type:
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        LocalValue:
+          rid: 5970639837908434985
+        LinkedVariable:
+          rid: -2
+    - rid: 5970639837908434983
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: {fileID: 0}
+    - rid: 5970639837908434984
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: {x: 0, y: 0, z: 0}
+    - rid: 5970639837908434985
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 5970639837908435022
+      type: {class: 'TypedVariableModel`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 11360122034430184233
+          m_Value1: 17086048997568303000
+        Name: angleNeg
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: {x: 0, y: -60, z: 0}
+--- !u!114 &2235420518092150087
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dd922ae02c94c87a66e46a10a7319b9, type: 3}
+  m_Name: IdleTurretScan Blackboard
+  m_EditorClassIdentifier: Unity.Behavior.Authoring::Unity.Behavior.BehaviorBlackboardAuthoringAsset
+  AssetID:
+    m_Value0: 16475621452198178087
+    m_Value1: 5438105199070303546
+  m_Variables:
+  - rid: 4741284571820327931
+  - rid: 5970639790974697961
+  - rid: 5970639790974698156
+  - rid: 5970639790974698180
+  - rid: 5970639790974698476
+  - rid: 5970639837908435021
+  m_VersionTimestamp: 639249951664444046
+  m_CommandBuffer:
+    m_Commands: []
+  m_RuntimeBlackboardAsset: {fileID: 5044300383691094050}
+  references:
+    version: 2
+    RefIds:
+    - rid: 4741284571820327931
+      type: {class: 'TypedVariableModel`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: {fileID: 0}
+    - rid: 5970639790974697961
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 1583570860167102668
+          m_Value1: 11857785556598244481
+        Name: startingY
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 5970639790974698156
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 14275159395601977889
+          m_Value1: 9731862799403191875
+        Name: maxRotation
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 5970639790974698180
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 14874013520619696326
+          m_Value1: 2038602344428963554
+        Name: minRotation
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 5970639790974698476
+      type: {class: 'TypedVariableModel`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 7514940398732009282
+          m_Value1: 1714395810052468408
+        Name: anglePos
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: {x: 0, y: 60, z: 0}
+    - rid: 5970639837908435021
+      type: {class: 'TypedVariableModel`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 11360122034430184233
+          m_Value1: 17086048997568303000
+        Name: angleNeg
+        IsExposed: 0
+        m_IsShared: 0
+        m_Value: {x: 0, y: -60, z: 0}
+--- !u!114 &3918541972323933621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db920e62f70f420bb33c771449926fa4, type: 3}
+  m_Name: IdleTurretScan
+  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraph
+  Graphs:
+  - rid: 4741284571820327932
+  m_DebugInfo: {fileID: 7077800996916688813}
+  m_WasCompileWithPlaceholderNode: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 4741284571820327932
+      type: {class: BehaviorGraphModule, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        AuthoringAssetID:
+          m_Value0: 16475621452198178087
+          m_Value1: 5438105199070303546
+        m_DebugInfo: {fileID: 7077800996916688813}
+        BlackboardReference:
+          rid: 4741284571820327933
+        BlackboardGroupReferences:
+        - rid: 5970639837908435219
+        Root:
+          rid: 5970639837908435220
+        m_VersionTimestamp: 639249954739776906
+    - rid: 4741284571820327933
+      type: {class: BlackboardReference, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        m_Blackboard:
+          rid: 4741284571820327935
+        m_Source: {fileID: 5044300383691094050}
+    - rid: 4741284571820327935
+      type: {class: Blackboard, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        m_Variables:
+        - rid: 5970639837908435067
+        - rid: 5970639837908435068
+        - rid: 5970639837908435069
+        - rid: 5970639837908435070
+        - rid: 5970639837908435071
+        - rid: 5970639837908435072
+    - rid: 5970639837908435067
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        m_Value: {fileID: 0}
+    - rid: 5970639837908435068
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1583570860167102668
+          m_Value1: 11857785556598244481
+        Name: startingY
+        m_Value: 0
+    - rid: 5970639837908435069
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 14275159395601977889
+          m_Value1: 9731862799403191875
+        Name: maxRotation
+        m_Value: 0
+    - rid: 5970639837908435070
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 14874013520619696326
+          m_Value1: 2038602344428963554
+        Name: minRotation
+        m_Value: 0
+    - rid: 5970639837908435071
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 7514940398732009282
+          m_Value1: 1714395810052468408
+        Name: anglePos
+        m_Value: {x: 0, y: 60, z: 0}
+    - rid: 5970639837908435072
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 11360122034430184233
+          m_Value1: 17086048997568303000
+        Name: angleNeg
+        m_Value: {x: 0, y: -60, z: 0}
+    - rid: 5970639837908435203
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 5970639837908435205
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 5970639837908435219
+      type: {class: BlackboardReference, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        m_Blackboard:
+          rid: 5970639837908435221
+        m_Source: {fileID: -5588179668135849856, guid: 4cfbb73d4f8e3874cbd15055dc8e7943,
+          type: 2}
+    - rid: 5970639837908435220
+      type: {class: ParallelAllComposite, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        ID:
+          m_Value0: 0
+          m_Value1: 0
+        Graph:
+          rid: 4741284571820327932
+        m_Parent:
+          rid: -2
+        m_Children:
+        - rid: 5970639837908435222
+        - rid: 5970639837908435223
+        m_RegisteredObservers: []
+    - rid: 5970639837908435221
+      type: {class: Blackboard, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        m_Variables:
+        - rid: 5970639837908435224
+        - rid: 5970639837908435225
+    - rid: 5970639837908435222
+      type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        ID:
+          m_Value0: 10395030910708782525
+          m_Value1: 14237944096849388877
+        Graph:
+          rid: 4741284571820327932
+        m_Parent:
+          rid: 5970639837908435220
+        m_Child:
+          rid: 5970639837908435226
+        Repeat: 0
+        AllowMultipleRepeatsPerTick: 0
+    - rid: 5970639837908435223
+      type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        ID:
+          m_Value0: 60025241069357866
+          m_Value1: 4036188429844166361
+        Graph:
+          rid: 4741284571820327932
+        m_Parent:
+          rid: 5970639837908435220
+        m_Child:
+          rid: 5970639837908435227
+        Repeat: 1
+        AllowMultipleRepeatsPerTick: 0
+    - rid: 5970639837908435224
+      type: {class: 'SharedBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 14683880180574262744
+          m_Value1: 17899709198601377123
+        Name: PlayerTransform
+        m_Value: {fileID: 0}
+        m_SharedVariablesRuntimeAsset: {fileID: -5588179668135849856, guid: 4cfbb73d4f8e3874cbd15055dc8e7943,
+          type: 2}
+    - rid: 5970639837908435225
+      type: {class: 'SharedBlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 15914685069626257532
+          m_Value1: 16391587594617731550
+        Name: PlayerAlive
+        m_Value: 0
+        m_SharedVariablesRuntimeAsset: {fileID: -5588179668135849856, guid: 4cfbb73d4f8e3874cbd15055dc8e7943,
+          type: 2}
+    - rid: 5970639837908435226
+      type: {class: RememberStartingRotationAction, ns: , asm: Assembly-CSharp}
+      data:
+        ID:
+          m_Value0: 8163267320643330315
+          m_Value1: 1108712614581324281
+        Graph:
+          rid: 4741284571820327932
+        m_Parent:
+          rid: 5970639837908435222
+        Agent:
+          rid: 5970639837908435067
+        startRotation:
+          rid: 5970639837908435068
+        minRotation:
+          rid: 5970639837908435069
+        maxRotation:
+          rid: 5970639837908435070
+    - rid: 5970639837908435227
+      type: {class: SequenceComposite, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        ID:
+          m_Value0: 8785581317203412062
+          m_Value1: 16874126594083999478
+        Graph:
+          rid: 4741284571820327932
+        m_Parent:
+          rid: 5970639837908435223
+        m_Children:
+        - rid: 5970639837908435228
+        - rid: 5970639837908435229
+        m_RegisteredObservers: []
+    - rid: 5970639837908435228
+      type: {class: RotateEulerAction, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        ID:
+          m_Value0: 8785581317203412062
+          m_Value1: 16874126594083999478
+        Graph:
+          rid: 4741284571820327932
+        m_Parent:
+          rid: 5970639837908435227
+        Transform:
+          rid: 5970639837908435230
+        Rotation:
+          rid: 5970639837908435071
+        Duration:
+          rid: 5970639837908435203
+    - rid: 5970639837908435229
+      type: {class: RotateEulerAction, ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        ID:
+          m_Value0: 16175114254996455299
+          m_Value1: 5157524707750281816
+        Graph:
+          rid: 4741284571820327932
+        m_Parent:
+          rid: 5970639837908435227
+        Transform:
+          rid: 5970639837908435231
+        Rotation:
+          rid: 5970639837908435072
+        Duration:
+          rid: 5970639837908435205
+    - rid: 5970639837908435230
+      type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: {fileID: 0}
+        m_LinkedVariable:
+          rid: 5970639837908435067
+    - rid: 5970639837908435231
+      type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: {fileID: 0}
+        m_LinkedVariable:
+          rid: 5970639837908435067
+--- !u!114 &5044300383691094050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
+  m_Name: IdleTurretScan Blackboard
+  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.RuntimeBlackboardAsset
+  VersionTimestamp: 639249951664444046
+  AssetID:
+    m_Value0: 16475621452198178087
+    m_Value1: 5438105199070303546
+  m_Blackboard:
+    m_Variables:
+    - rid: 4741284571833171969
+    - rid: 5970639790974697969
+    - rid: 5970639790974698168
+    - rid: 5970639790974698193
+    - rid: 5970639790974698491
+    - rid: 5970639837908435042
+  m_SharedBlackboardVariableGuids: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 4741284571833171969
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        m_Value: {fileID: 0}
+    - rid: 5970639790974697969
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1583570860167102668
+          m_Value1: 11857785556598244481
+        Name: startingY
+        m_Value: 0
+    - rid: 5970639790974698168
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 14275159395601977889
+          m_Value1: 9731862799403191875
+        Name: maxRotation
+        m_Value: 0
+    - rid: 5970639790974698193
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 14874013520619696326
+          m_Value1: 2038602344428963554
+        Name: minRotation
+        m_Value: 0
+    - rid: 5970639790974698491
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 7514940398732009282
+          m_Value1: 1714395810052468408
+        Name: anglePos
+        m_Value: {x: 0, y: 60, z: 0}
+    - rid: 5970639837908435042
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 11360122034430184233
+          m_Value1: 17086048997568303000
+        Name: angleNeg
+        m_Value: {x: 0, y: -60, z: 0}
+--- !u!114 &7077800996916688813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b27bb6d9a2c8d540a10dff10acc543e, type: 3}
+  m_Name: IdleTurretScan Debug Info
+  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphDebugInfo
+  m_CodeBreakPointsList: []

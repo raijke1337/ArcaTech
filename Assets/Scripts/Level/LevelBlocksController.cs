@@ -7,7 +7,7 @@ namespace Arcatech.Levels
     public class LevelBlocksController : MonoBehaviour
     {
         [SerializeField] private List<LevelBlockComponent> blocks = new();
-
+        [SerializeField] private bool showDebugs = false;
         private LevelBlockComponent _currentRoom;
 
         // Больше не влияет на видимость (см. комментарий в UpdateAllRooms),
@@ -42,7 +42,7 @@ namespace Arcatech.Levels
 
         private void OnRoomHasPlayerEvent(LevelBlockComponent b, bool hasPlayer)
         {
-            Debug.Log($"Room changed event {b}: {(hasPlayer ? "Player in" : "Player Out")}");
+            if (showDebugs) Debug.Log($"Room changed event {b}: {(hasPlayer ? "Player in" : "Player Out")}");
 
             if (!hasPlayer) return;
             if (_currentRoom == b) return; // Уже в этой комнате

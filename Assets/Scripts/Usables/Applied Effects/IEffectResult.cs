@@ -18,12 +18,14 @@ namespace Arcatech.Usables.Effects
         /// No-op for instant results.
         /// </summary>
         void OnExpire(EffectContext ctx);
+        public bool Validate(EffectContext ctx);
     }
 
     public abstract class BaseResult : IEffectResult
     {
         public abstract void Apply(EffectContext ctx);
         public abstract void OnExpire(EffectContext ctx);
+        public abstract bool Validate(EffectContext ctx);
         public Description Description { get; }
         public BaseResult(BaseAppliedEffect def) => Description =  def.description;
     }

@@ -17,19 +17,7 @@ namespace Arcatech.Units
     [RequireComponent(typeof(BaseGameEntityComponent))]
     public class EntityInventoryComponent : ValidatedMonoBehaviour
     {
-        [ProButton]
-        public void DEBUG_WriteItems()
-        {
-            foreach (var inv in _model.ListInventory)
-            {
-                Debug.Log(inv.ToString());
-            }
-        }
-        
-        
-        
         [Self, SerializeField] BaseGameEntityComponent baseGameEntity;
-
         [Space, Header("Items list"), SerializeField]
         protected UnitItemsSO defaultEquips;
 
@@ -41,7 +29,6 @@ namespace Arcatech.Units
         
         private void OnEnable()
         {
-           // Debug.Log("Inventory enable");
             _views??= new();
             IEntityItemsList itemsData = defaultEquips;
             // if (useSaveSystem)
@@ -50,7 +37,6 @@ namespace Arcatech.Units
             //     data.TryGetInventoryForEntity(baseGameEntity.GetID, out itemsData);
             // }
             _model = new UnitInventoryModel(itemsData, baseGameEntity);
-            
             var views = gameObject.GetComponentsInChildren<IUnitInventoryView>();
             foreach (var view in views)
             {
@@ -112,7 +98,7 @@ namespace Arcatech.Units
 
         private void HandleViewChange()
         {
-            Debug.Log($"view changed inventory");
+            // implement if needed: change of inventory in some menu
         }
 
         #endregion
@@ -137,10 +123,8 @@ namespace Arcatech.Units
             }
             else
             {
-                _model.PickUpItem(item as Item, amount);
+                _model.PickUpItem(item, amount);
             }
-
-            Debug.Log($"Picked up {amount} {item.Description.Title}");
         }
 
         public bool TryUseItem(ItemSO what, int amount)

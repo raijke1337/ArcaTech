@@ -105,7 +105,7 @@ namespace Arcatech.UI
                     {
                         HideFillSmooth();
                     }
-                    else if (fill.gameObject.activeSelf && !_isHiding)
+                    else if (fill && fill.gameObject.activeSelf && !_isHiding)
                     {
                         fill.DOKill();
                         fill.fillAmount = 0f;
@@ -114,8 +114,8 @@ namespace Arcatech.UI
                     break;
             }
 
-            activatingFrame.gameObject.SetActive(data.CurrentState == OverchargeModuleState.Activation);
-
+            if (activatingFrame != null) activatingFrame?.gameObject.SetActive(data.CurrentState == OverchargeModuleState.Activation);
+            
             _previousState = data.CurrentState;
         }
 

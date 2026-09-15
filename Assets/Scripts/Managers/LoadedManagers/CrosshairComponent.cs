@@ -6,7 +6,7 @@ using Unity.Cinemachine;
 namespace Arcatech.UI
 {
 
-    public class CrosshairComponent : ValidatedMonoBehaviour
+    public class CrosshairComponent : MonoBehaviour
     {
 
         public BaseGameEntityComponent CurrentTarget { get; set; }

@@ -27,7 +27,7 @@ namespace Arcatech.Cameras
         void Awake()
         {
             _cam = Camera.main;
-            _player = FindAnyObjectByType<PlayerComponent>()?.transform;
+            _player = FindAnyObjectByType<PlayerComponent>().Entity.EffectSpawn.transform;
         }
 
         void LateUpdate()

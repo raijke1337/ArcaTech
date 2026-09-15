@@ -19,4 +19,5 @@ namespace Arcatech.Interactions
             foreach (var e in denyEffects) e.Play(ctx);
         }
     }
+    
 }

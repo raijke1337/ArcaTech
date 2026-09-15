@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Arcatech.Stats
 {
     [DisallowMultipleComponent]
-    public class HitstopPlayerComponent : ValidatedMonoBehaviour, IStatReceiver
+    public class HitstopPlayerComponent : MonoBehaviour, IStatReceiver
     {
         public bool Invulnerable { get; set; }
         public bool ApplyInstantDelta(StatDelta delta, BaseGameEntityComponent source, EffectKey key)

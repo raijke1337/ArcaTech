@@ -32,6 +32,9 @@ GameObject:
   - component: {fileID: -2281744422382432745}
   - component: {fileID: -1964986680528136209}
   - component: {fileID: 8943116983315701113}
+  - component: {fileID: 8528722862445907844}
+  - component: {fileID: 305671713140248637}
+  - component: {fileID: 5125304463136380564}
   m_Layer: 6
   m_Name: BaseEnemyPrefab
   m_TagString: Untagged
@@ -48,10 +51,11 @@ Transform:
   m_GameObject: {fileID: 1748869539384168759}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.5, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2282247260871901939}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &3358253959190684131
@@ -151,6 +155,7 @@ MonoBehaviour:
   destroyOnDeath: 1
   timerToDestroy: 2
   _showDebugs: 0
+  targetable: 0
   AnnounceDead:
     m_PersistentCalls:
       m_Calls: []
@@ -188,6 +193,14 @@ MonoBehaviour:
   startingConfig: {fileID: 11400000, guid: 6e85c602f2faf7542abce9200d39533f, type: 2}
   preserveCurrentRatioOnMaxChange: 1
   entity: {fileID: 493588014704688078}
+  useKillCondition: 0
+  killCondition:
+    stat: 0
+    target: 0
+    usePercentOfMax: 0
+    op: 0
+    a: 0
+    b: 0
 --- !u!114 &6751449872417151823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,8 +217,12 @@ MonoBehaviour:
   animator: {fileID: 0}
   defaultState: {fileID: 0}
   verboseDebugs: 0
-  _context:
-    PendingCommand: 0
+  context:
+    PendingCommand:
+      Type: 0
+      Direction: {x: 0, y: 0, z: 0}
+      Target: {fileID: 0}
+      TargetPoint: {x: 0, y: 0, z: 0}
     Spawn: {fileID: 0}
     Owner: {fileID: 0}
     Stats: {fileID: 0}
@@ -227,14 +244,7 @@ MonoBehaviour:
   stateMachine: {fileID: 6751449872417151823}
   toKilledState: {fileID: 11400000, guid: aa806e69f163ab043a5541d5106fee78, type: 2}
   toKnockDown: {fileID: 0}
-  canBeInterrupted: 1
-  interruptCondition:
-    requireAll: 0
-    invert: 0
-    statConditions: []
   toDamageInterrupt: {fileID: 0}
-  dmgFrontAnimatorParameter: DamageFront
-  dmgRightAnimatorParameter: DamageRight
 --- !u!114 &2570717753917066261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,8 +345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
-  m_Graph: {fileID: -2594185013037641441, guid: 0d0a27ad063041b47a294e525d76ad56,
-    type: 2}
+  m_Graph: {fileID: 0}
   m_BlackboardVariableOverridesList:
   - rid: 5078712839912292439
   m_OriginalGraph: {fileID: 0}
@@ -362,7 +371,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1748869539384168759}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -1372625422
   m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
@@ -441,8 +450,10 @@ MonoBehaviour:
   entity: {fileID: 493588014704688078}
   unitInputs: {fileID: -7124048337738276817}
   stats: {fileID: 7098992623433518216}
-  animator: {fileID: 0}
   effectsReceiver: {fileID: -2281744422382432745}
+  animator: {fileID: 0}
+  data: {fileID: 0}
+  CombatGroup: 
 --- !u!114 &8943116983315701113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -456,3 +467,172 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.DamageDrawerComponent
   entity: {fileID: 493588014704688078}
+--- !u!114 &8528722862445907844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748869539384168759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86bfabcd908b4f72a920b64c1c949f70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.HitstopPlayerComponent
+--- !u!114 &305671713140248637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748869539384168759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9861cf096c4544538b64076b9365823f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractableComponent
+  entity: {fileID: 493588014704688078}
+  trigger: {fileID: 5125304463136380564}
+  conditions:
+  - {fileID: 3691991534288245688}
+  preExecuteEffects: []
+  executor: {fileID: 7057987780975839337}
+  duringExecuteEffects: []
+  successEffects:
+  - {fileID: 0}
+  failureEffects: []
+  cancelEffects: []
+  destroyAfterSuccess: 0
+  interactorAlignTransform: {fileID: 2282247260871901939}
+  alignInteractor: 1
+  disableInteractorCollisionDuringPlay: 1
+  affectsInteractorState: 1
+--- !u!114 &5125304463136380564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748869539384168759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d648679973b6421ba965c903fc77b17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.ManualInteractionTrigger
+  triggerTrackerComponent: {fileID: 4633613834305153455}
+  interactableComponent: {fileID: 305671713140248637}
+  expirationTime: 0
+  destroyAfterExpiry: 0
+  triggerOnce: 1
+  cooldown: 0
+  description: {fileID: 0}
+--- !u!1001 &6875618518237365287
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7507394785724001239}
+    m_Modifications:
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4777703419411058713, guid: b224abb21f3931d42868859b2def7b30,
+        type: 3}
+      propertyPath: m_Name
+      value: UnitFinisher
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b224abb21f3931d42868859b2def7b30, type: 3}
+--- !u!4 &2282247260871901939 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4667753791330846420, guid: b224abb21f3931d42868859b2def7b30,
+    type: 3}
+  m_PrefabInstance: {fileID: 6875618518237365287}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3691991534288245688 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7806862549573621663, guid: b224abb21f3931d42868859b2def7b30,
+    type: 3}
+  m_PrefabInstance: {fileID: 6875618518237365287}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15136229dc9044ebb2335fb58de689c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.StatusInteractionCondition
+--- !u!114 &4633613834305153455 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2244760355353587080, guid: b224abb21f3931d42868859b2def7b30,
+    type: 3}
+  m_PrefabInstance: {fileID: 6875618518237365287}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Triggers.TriggerTrackerComponent
+--- !u!114 &7057987780975839337 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4510382381135170638, guid: b224abb21f3931d42868859b2def7b30,
+    type: 3}
+  m_PrefabInstance: {fileID: 6875618518237365287}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16a3a605a9a14f7a89a03eae179ce6dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CompleteAnimationStateExecutor
