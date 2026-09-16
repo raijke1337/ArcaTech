@@ -6,9 +6,13 @@ namespace Arcatech.Levels
 {
     public class LevelBlocksController : MonoBehaviour
     {
-        [SerializeField] private List<LevelBlockComponent> blocks = new();
+        private List<LevelBlockComponent> blocks = new();
         [SerializeField] private bool showDebugs = false;
         private LevelBlockComponent _currentRoom;
+
+        [SerializeField] private Material hiddenMaterial;
+        [SerializeField] private Material inactiveMaterial;
+        
 
         // Больше не влияет на видимость (см. комментарий в UpdateAllRooms),
         // но оставлен на будущее (миникарта, ачивки и т.п.)
@@ -60,7 +64,7 @@ namespace Arcatech.Levels
 
                 if (_currentRoom != null && block == _currentRoom)
                 {
-                    block.SetState(RoomState.Active);
+                    block.SetState(RoomState.Active,null);
                     continue;
                 }
 
@@ -69,7 +73,7 @@ namespace Arcatech.Levels
                 // элементами уровня выше игрока.
                 if (_currentRoom != null && block.Floor > _currentRoom.Floor)
                 {
-                    block.SetState(RoomState.Hidden);
+                    block.SetState(RoomState.Hidden,hiddenMaterial);
                     continue;
                 }
 
@@ -78,11 +82,11 @@ namespace Arcatech.Levels
                     && _exploredRooms.Contains(block)
                     && AreNeighbors(_currentRoom, block))
                 {
-                    block.SetState(RoomState.Inactive);
+                    block.SetState(RoomState.Inactive,inactiveMaterial);
                 }
                 else
                 {
-                    block.SetState(RoomState.Hidden);
+                    block.SetState(RoomState.Hidden,hiddenMaterial);
                 }
             }
         }

@@ -11,19 +11,20 @@ namespace Arcatech.Levels
 {
     public class LevelBlockComponent : MonoBehaviour, ITriggerNotificationReceiver
     {
-        [Header("References")] [SerializeField]
-        private List<Renderer> _renderers = new();
+        [Header("References")]
+        private List<Renderer> _renderers = new(); 
+        private List<Light> _lights = new();
 
-        [SerializeField] private List<Light> _lights = new();
-        [SerializeField] private Material inactiveMaterial;
-        [SerializeField] private Material hiddenMaterial;
-
+        [SerializeField] private Transform boundsParent;
+        [SerializeField, ReadOnlyText] private string boundsCount = "ERROR!";
+        [SerializeField, ReadOnlyText] private string renderersCount = "0"; 
+        [SerializeField, ReadOnlyText] private string lightsCount = "0"; 
         [Header("Settings")]
-        [SerializeField] private int _floor = 0; // 0 = базовый этаж, +1 выше, -1 ниже
-
+        [SerializeField] private int floor = 0; // 0 = базовый этаж, +1 выше, -1 ниже
         [SerializeField] private CamerasController.CameraViewType roomView;
-        public int Floor => _floor;
 
+        
+        public int Floor => floor;
         private Material[] _originalMaterials;
         private RoomState _currentState = RoomState.Hidden;
         private bool _initialized = false; // теперь реально используется
@@ -33,10 +34,15 @@ namespace Arcatech.Levels
 
         public RoomState CurrentState => _currentState;
 
-        [SerializeField] private List<TriggerTrackerComponent> _roomTriggers = new(); // инициализировано!
+        [SerializeField] private List<TriggerTrackerComponent> roomTriggers = new(); // инициализировано!
         private readonly HashSet<object> _entitiesInside = new();
 
         public UnityAction<LevelBlockComponent, bool> RoomHasPlayerEvent = delegate { };
+
+        private void OnValidate()
+        {
+            AutoCollect();
+        }
 
         private void OnEnable()
         {
@@ -47,8 +53,9 @@ namespace Arcatech.Levels
                     _originalMaterials[i] = _renderers[i].sharedMaterial;
             }
 
-            _roomTriggers = GetComponentsInChildren<TriggerTrackerComponent>().ToList();
-            foreach (var t in _roomTriggers)
+            roomTriggers = boundsParent.GetComponentsInChildren<TriggerTrackerComponent>().ToList();
+            boundsCount = roomTriggers.Count.ToString();
+            foreach (var t in roomTriggers)
             {
                 t.RegisterReceiver(this);
                 t.Active = true;
@@ -57,19 +64,18 @@ namespace Arcatech.Levels
 
         private void OnDisable()
         {
-            if (_roomTriggers == null || _roomTriggers.Count == 0) return;
-            foreach (var t in _roomTriggers) t.UnregisterReceiver(this);
+            if (roomTriggers == null || roomTriggers.Count == 0) return;
+            foreach (var t in roomTriggers) t.UnregisterReceiver(this);
         }
 
         private void Start()
         {
             // to prevent race condition
-            if (_roomTriggers == null || _roomTriggers.Count == 0) return;
-            foreach (var t in _roomTriggers) t.AreaCast(this);
+            if (roomTriggers == null || roomTriggers.Count == 0) return;
+            foreach (var t in roomTriggers) t.AreaCast(this);
         }
 
-        [ProButton]
-        public void SetState(RoomState newState)
+        public void SetState(RoomState newState,Material material)
         {
             // ключевой фикс: первый вызов всегда должен применяться,
             // даже если newState совпадает с дефолтным _currentState
@@ -87,7 +93,7 @@ namespace Arcatech.Levels
                         if (r != null)
                         {
                             r.enabled = true;
-                            r.sharedMaterial = hiddenMaterial;
+                            r.sharedMaterial = material;
                         }
                     }
                     foreach (var l in _lights)
@@ -102,7 +108,7 @@ namespace Arcatech.Levels
                         if (r != null)
                         {
                             r.enabled = true;
-                            r.sharedMaterial = inactiveMaterial;
+                            r.sharedMaterial = material;
                         }
                     }
 
@@ -131,14 +137,17 @@ namespace Arcatech.Levels
         }
 
 #if UNITY_EDITOR
-        [ProButton]
-        public void AutoCollect()
+         void AutoCollect()
         {
             _renderers.Clear();
             _lights.Clear();
             _renderers.AddRange(GetComponentsInChildren<Renderer>(true));
             _lights.AddRange(GetComponentsInChildren<Light>(true));
-            Debug.Log($"Collected {_renderers.Count} renderers and {_lights.Count} lights");
+            Debug.Log($"{name} Collected {_renderers.Count} renderers and {_lights.Count} lights");
+            renderersCount = _renderers.Count.ToString();
+            lightsCount = _lights.Count.ToString();
+            if (!boundsParent) return;
+            boundsCount = "OK";
         }
 #endif
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
