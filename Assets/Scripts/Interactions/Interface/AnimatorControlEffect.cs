@@ -9,7 +9,7 @@ namespace Arcatech.Interactions
     public class AnimatorControlEffect : InteractionEffect
     {
         [SerializeField] SerializedDictionary<InteractionState,string> _states;
-        [SerializeField] private Transform interactorPlace;
+      //  [SerializeField] private Transform interactorPlace;
         private Animator _animator;
         
         private bool _blockingComplete;
@@ -22,7 +22,7 @@ namespace Arcatech.Interactions
         private void Awake()
         {
             _animator = GetComponent<Animator>();
-            if (interactorPlace ==  null) interactorPlace = transform;
+         //   if (interactorPlace ==  null) interactorPlace = transform;
         }
         public override void OnCancelled()
         {
@@ -37,11 +37,11 @@ namespace Arcatech.Interactions
             StopWaiting();
 
             // Ставим игрока в точку (с защитой от null для автоактивации)
-            if (interactorPlace != null && ctx.Interactor?.Entity != null)
-            {
-                ctx.Interactor.Entity.transform.SetPositionAndRotation(
-                    interactorPlace.position, interactorPlace.rotation);
-            }
+            // if (interactorPlace != null && ctx.Interactor?.Entity != null)
+            // {
+            //     ctx.Interactor.Entity.transform.SetPositionAndRotation(
+            //         interactorPlace.position, interactorPlace.rotation);
+            // }
 
             if (_animator != null && _states.TryGetValue(ctx.State, out var anim))
             {
@@ -79,25 +79,21 @@ namespace Arcatech.Interactions
                 _waitCoroutine = null;
             }
         }
-        public void ANIM_NotifyAnimationFinished()
-        {
-            _blockingComplete = true;
-        }
         
-        private void OnDrawGizmos()
-        {
-            if (interactorPlace == null) return;
-
-            Gizmos.color = Color.green;
-            
-            // Draw a wire cube (rectangle) to represent the interactor's body placement
-            Gizmos.DrawWireCube(interactorPlace.position, new Vector3(0.5f, 1.8f, 0.5f)); // Approximate human proportions: width 0.5, height 1.8, depth 0.5
-            
-            // Draw a ray for the line of sight (forward direction)
-            Gizmos.DrawRay(interactorPlace.position, interactorPlace.forward * 0.5f); // Forward ray of length 2 units
-            
-            // Optional: Add a small sphere at the forward endpoint for clarity
-            Gizmos.DrawSphere(interactorPlace.position + interactorPlace.forward * 0.5f, 0.1f);
-        }
+        // private void OnDrawGizmos()
+        // {
+        //     if (interactorPlace == null) return;
+        //
+        //     Gizmos.color = Color.green;
+        //     
+        //     // Draw a wire cube (rectangle) to represent the interactor's body placement
+        //     Gizmos.DrawWireCube(interactorPlace.position, new Vector3(0.5f, 1.8f, 0.5f)); // Approximate human proportions: width 0.5, height 1.8, depth 0.5
+        //     
+        //     // Draw a ray for the line of sight (forward direction)
+        //     Gizmos.DrawRay(interactorPlace.position, interactorPlace.forward * 0.5f); // Forward ray of length 2 units
+        //     
+        //     // Optional: Add a small sphere at the forward endpoint for clarity
+        //     Gizmos.DrawSphere(interactorPlace.position + interactorPlace.forward * 0.5f, 0.1f);
+        // }
     }
 }

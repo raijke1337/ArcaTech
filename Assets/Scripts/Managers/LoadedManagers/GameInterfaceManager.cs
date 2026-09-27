@@ -11,12 +11,14 @@ using Arcatech.Texts;
 using Arcatech.UI;
 using ArcaTech.UI;
 using Arcatech.Units;
+using Arcatech.Units.Control;
 using AYellowpaper.SerializedCollections;
 using DG.Tweening;
 using KBCore.Refs;
 using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
@@ -28,19 +30,30 @@ namespace Arcatech.Managers
         [SerializeField] private PanelAnimator koWindow;
         [SerializeField] private PanelAnimator fade;
         [SerializeField] private PanelAnimator pauseWindow;
-        
+
         [SerializeField] private PlayerUnitPanel playerPanel;
         [SerializeField] private MiniGameWindow miniGameWindow;
-
+        [SerializeField] private MinigamePanel minigamePanel;
         [SerializeField] private EquipmentNotificationWindow inspectItemCard;
-       // [SerializeField] public Transform miniGame;
-        
-        [Space]
-        [SerializeField] private bool showTooltip = true;
+        // [SerializeField] public Transform miniGame;
+
+        [Space] [SerializeField] private bool showTooltip = true;
         [SerializeField] private FloatingTooltipComponent floatingTooltip;
-        [Space]
-        [SerializeField] private GameTextWindowComponent _text;
+        [Space] [SerializeField] private GameTextWindowComponent _text;
         [SerializeField] private bool showDialogues = true;
+
+        public ArcatechPalette ColorReference
+        {
+            get
+            {
+                if (_colorReference == null)
+                    _colorReference = new ArcatechPalette();
+                return _colorReference;
+            }
+        }
+
+        private ArcatechPalette _colorReference;
+
 
         /// <summary>
         /// called by inputs
@@ -56,7 +69,7 @@ namespace Arcatech.Managers
         private void Start()
         {
             if (!FindAnyObjectByType<PlayerComponent>()) return;
-            
+
             playerPanel.gameObject.SetActive(true);
             playerPanel.Show();
             koWindow.Hide();
@@ -86,6 +99,7 @@ namespace Arcatech.Managers
 
 
         #region game dialogues and texts
+
         public void ShowDialoguePart(DialoguePart dialogue, UnityAction onDialogueCompleted = null)
         {
             if (!dialogue || !showDialogues) return;
@@ -100,19 +114,23 @@ namespace Arcatech.Managers
             {
                 yield return null;
             }
+
             onDialogueCompleted.Invoke();
         }
+
         public bool IsDialogueShowing => _text.gameObject.activeSelf;
-        
+
         #endregion
-        
+
         #region targeting
+
         [SerializeField] private bool showCrosshair = true;
         [SerializeField] private CrosshairComponent crosshair;
         [SerializeField] private Camera gameplayCamera;
 
         private RectTransform _crosshairRect;
         private Canvas _crosshairCanvas;
+
         public void NotifyTargetable(ITargetable targetable, bool show)
         {
             if (!showTooltip) return;
@@ -122,10 +140,12 @@ namespace Arcatech.Managers
                 floatingTooltip.PanelAnimator.Hide();
                 return;
             }
+
             floatingTooltip.gameObject.SetActive(true);
             floatingTooltip.Set(targetable);
             floatingTooltip.PanelAnimator.Show();
         }
+
         public void LockOnTarget(BaseGameEntityComponent target)
         {
             if (crosshair == null)
@@ -138,7 +158,7 @@ namespace Arcatech.Managers
             crosshair.gameObject.SetActive(shouldShow);
 
         }
-        
+
         private void UpdateCrosshairPosition()
         {
             if (!showCrosshair ||
@@ -212,6 +232,7 @@ namespace Arcatech.Managers
             if (!crosshair.gameObject.activeSelf)
                 crosshair.gameObject.SetActive(true);
         }
+
         #endregion
 
         #region menus
@@ -240,6 +261,7 @@ namespace Arcatech.Managers
         {
             EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(false));
         }
+
         public void ShowPlayerDeadMenu()
         {
             koWindow.gameObject.SetActive(true);
@@ -248,21 +270,24 @@ namespace Arcatech.Managers
             koWindow.Show();
             fade.Show();
         }
+
         public void ToMain()
         {
             LevelProgressController.Instance.ExitAfterDeath();
             GameManager.Instance.OnReturnToMain();
         }
+
         public void OnRestart()
         {
-            GlitchController.Instance.TriggerGlitch(1,0.5f);
+            GlitchController.Instance.TriggerGlitch(1, 0.5f);
             LevelProgressController.Instance.RestartLevelFromScratch();
-            
+
         }
+
         public void OnRestartAtCheckpoint()
         {
-            
-            GlitchController.Instance.TriggerGlitch(1,0.5f);
+
+            GlitchController.Instance.TriggerGlitch(1, 0.5f);
             LevelProgressController.Instance.ReturnToCheckpoint();
             playerPanel.gameObject.SetActive(true);
             playerPanel.Show();
@@ -273,14 +298,38 @@ namespace Arcatech.Managers
         #region minigame
 
         private UnityAction<InteractionState> _gameCallback;
+        private MiniGameBase _runningGame;
         public void StartMinigame(MiniGameBase game, UnityAction<InteractionState> callback)
         {
-            miniGameWindow.gameObject.SetActive(true);
-            miniGameWindow.Animator.Show();
+            if (_runningGame)
+            {
+                _runningGame.onGameCompleteResult.RemoveListener(OnGameCompleted);
+                Destroy(_runningGame);
+            }
             _gameCallback = callback;
-            miniGameWindow.LoadGame(game,OnGameCompleted);
-            fade.gameObject.SetActive(true);
-            fade.Show();
+            if (game.ShowInGadget)
+            {
+                miniGameWindow.gameObject.SetActive(true);
+                miniGameWindow.Animator.Show();
+                miniGameWindow.LoadGame(game, OnGameCompleted);
+                fade.gameObject.SetActive(true);
+                fade.Show();
+            }
+            else
+            {
+                _runningGame = Instantiate(game, transform); // for "overlay" controller aka scene controller
+                _runningGame.StartGame();
+                _runningGame.onGameCompleteResult.AddListener(OnGameCompleted);
+            }
+        }
+        
+
+        public void StartQuickTime(MiniGameBase game, UnityAction<InteractionState> callback)
+        {
+            minigamePanel.gameObject.SetActive(true);
+            minigamePanel.Animator.Show();
+            _gameCallback = callback;
+            minigamePanel.LoadGame(game, OnGameCompleted);
         }
 
         private void OnGameCompleted(InteractionState state)
@@ -288,13 +337,13 @@ namespace Arcatech.Managers
             fade.Hide();
             _gameCallback?.Invoke(state);
             _gameCallback = null;
+            if (_runningGame) _runningGame.Animator.Hide();
+            _runningGame = null;
         }
 
         #endregion
-        
-        
-        
-    #region draw damage
+
+        #region draw damage
 
 
 
@@ -303,15 +352,20 @@ namespace Arcatech.Managers
         // ---------------------------
         [Header("Floating Texts")]
         [Tooltip("Canvas to draw floating texts (Screen Space - Overlay/Camera or World Space).")]
-        [SerializeField] private Canvas uiCanvas;
-        [Tooltip("Optional container under the canvas for floating texts.")]
-        [SerializeField] private RectTransform floatingTextsParent;
-        [Tooltip("UI prefab with DamageTextUI component.")]
-        [SerializeField] private DamageTextUI damageTextPrefab;
+        [SerializeField]
+        private Canvas uiCanvas;
+
+        [Tooltip("Optional container under the canvas for floating texts.")] [SerializeField]
+        private RectTransform floatingTextsParent;
+
+        [Tooltip("UI prefab with DamageTextUI component.")] [SerializeField]
+        private DamageTextUI damageTextPrefab;
+
         [SerializeField, Min(1)] private int damageTextPoolSize = 16;
 
-        [Header("Floating Texts Look & Feel")]
-        [SerializeField] private float pixelOffsetMagnitude = 50f;
+        [Header("Floating Texts Look & Feel")] [SerializeField]
+        private float pixelOffsetMagnitude = 50f;
+
         [SerializeField] private float upwardTravel = 80f;
         [SerializeField] private float defaultDisplayDuration = 0.9f;
         [SerializeField] private Color damageColor = new Color(0.95f, 0.25f, 0.25f);
@@ -329,6 +383,7 @@ namespace Arcatech.Managers
                 if (uiCanvas == null)
                     Debug.LogError("GameInterfaceManager: No Canvas assigned/found for floating texts.");
             }
+
             if (floatingTextsParent == null && uiCanvas != null)
                 floatingTextsParent = uiCanvas.transform as RectTransform;
 
@@ -341,7 +396,8 @@ namespace Arcatech.Managers
 
         private DamageTextUI CreateDamageTextInstance()
         {
-            var parent = floatingTextsParent != null ? floatingTextsParent
+            var parent = floatingTextsParent != null
+                ? floatingTextsParent
                 : (uiCanvas != null ? uiCanvas.transform as RectTransform : null);
 
             var inst = Instantiate(damageTextPrefab, parent);
@@ -358,6 +414,7 @@ namespace Arcatech.Managers
                 inst.gameObject.SetActive(true);
                 return inst;
             }
+
             Debug.LogWarning("GameInterfaceManager: Floating text pool exhausted. Expanding pool.");
             return CreateDamageTextInstance();
         }
@@ -370,7 +427,8 @@ namespace Arcatech.Managers
             _damagePool.Enqueue(inst);
         }
 
-        public void ShowFloatingNumber(float amount, Vector3 worldPosition, bool isDamage, float? durationOverride = null)
+        public void ShowFloatingNumber(float amount, Vector3 worldPosition, bool isDamage,
+            float? durationOverride = null)
         {
             if (amount <= 0f) return;
 
@@ -415,7 +473,11 @@ namespace Arcatech.Managers
         }
         // ---------------------------
 
-#endregion
+        #endregion
 
+        public Sprite GetButtonImage(MiniGameButton buttonToPress)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

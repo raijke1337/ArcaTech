@@ -229,6 +229,11 @@ namespace Arcatech.Items
                         _trackedTargets.Add(hitCollider, state);
                     }
 
+                    // Классифицируем слой хита той же логикой, что и обычные триггеры
+                    // (TriggerTrackerComponent), чтобы получатели видели одинаковый
+                    // Valid/Invalid/Unknown вне зависимости от источника попадания.
+                    var layerKind = TriggerLayerUtility.Resolve(hitCollider);
+
                     // Always update the LastTriggerHitInfo with the most recent hit details
                     state.LastTriggerHitInfo = new TriggerHitInfo(
                         triggerNotificationProvider: this,
@@ -236,6 +241,7 @@ namespace Arcatech.Items
                         hitPosition: hit.point,
                         impactDirection: beamDirection,
                         hitNormal: hit.normal,
+                        layerKind: layerKind,
                         time: Time.time
                     );
 

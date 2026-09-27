@@ -2,8 +2,6 @@
 using UnityEngine;
 namespace Arcatech.Managers
 {
-
-
     public class HitstopPlayer : GenericLazySingleton<HitstopPlayer>
     {
         private Coroutine _routine;
@@ -15,11 +13,31 @@ namespace Arcatech.Managers
             // Перезаписываем предыдущий hitstop, если ещё идёт
             if (_routine != null)
                 StopCoroutine(_routine);
-
-            _savedTimeScale  = Time.timeScale;
-            _savedFixedDt    = Time.fixedDeltaTime;
+            else
+            {
+                // Сохраняем "чистое" значение только если сейчас не внутри другого hitstop —
+                // иначе при перезаписи мы бы сохранили уже уменьшенный timeScale.
+                _savedTimeScale = Time.timeScale;
+                _savedFixedDt = Time.fixedDeltaTime;
+            }
 
             _routine = StartCoroutine(Routine(realtime, speedFraction));
+        }
+
+        /// <summary>
+        /// Немедленно прерывает текущий hitstop и восстанавливает исходный timeScale.
+        /// Нужно, когда событие, вызвавшее hitstop, завершилось раньше таймера
+        /// (например, игрок успешно нажал кнопку в QTE до истечения slowmo).
+        /// </summary>
+        public void StopHitstop()
+        {
+            if (_routine == null) return;
+
+            StopCoroutine(_routine);
+            _routine = null;
+
+            Time.timeScale = _savedTimeScale;
+            Time.fixedDeltaTime = _savedFixedDt;
         }
 
         private IEnumerator Routine(float realtime, float speedFraction)

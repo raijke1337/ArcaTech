@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Arcatech.Interactions;
+using Arcatech.Managers;
 using TMPro;
+using UnityEngine.InputSystem;
 
 namespace Arcatech.MiniGames
 {
@@ -22,11 +25,8 @@ namespace Arcatech.MiniGames
             public float targetAngle;
 
             [Header("Input")]
-            [Tooltip("Клавиша для остановки этого кольца (клавиатура)")]
-            public KeyCode stopKey;
-
-            [Tooltip("Кнопка геймпада для остановки этого кольца")]
-            public KeyCode gamepadButton;
+            [Tooltip("Клавиша для остановки этого кольца")]
+            public MiniGameButton stopKey;
 
             [Header("Visual Feedback")]
             [Tooltip("Image компонента кольца для подсветки результата")]
@@ -37,8 +37,9 @@ namespace Arcatech.MiniGames
         }
 
         [Header("Rings")]
-        public Ring[] rings;
-
+        [SerializeField]private Ring[] ringSettings;
+        private Dictionary<MiniGameButton,Ring> rings;
+        
         [Header("Settings")]
         [Tooltip("Допустимое отклонение от целевого угла в градусах")]
         public float angleTolerance = 10f;
@@ -62,17 +63,6 @@ namespace Arcatech.MiniGames
         private float _currentTime;
         private int _currentFails;
 
-        // Кэшированные цвета палитры Arcatech
-        private static readonly Color ColorSuccess = ParseHex("#5EE6A8");
-        private static readonly Color ColorDanger  = ParseHex("#FF5268");
-        private static readonly Color ColorCyan    = ParseHex("#29D7FF");
-        private static readonly Color ColorBlocked = ParseHex("#566174");
-
-        private static Color ParseHex(string hex)
-        {
-            return ColorUtility.TryParseHtmlString(hex, out var c) ? c : Color.white;
-        }
-
         // ---------------------------------------------------------------
         //  Жизненный цикл MiniGameBase
         // ---------------------------------------------------------------
@@ -82,9 +72,13 @@ namespace Arcatech.MiniGames
             _currentSessionId = SessionId;
             _currentTime = 0f;
             _currentFails = 0;
-
+            rings =  new Dictionary<MiniGameButton,Ring>();
+            foreach (var ring in ringSettings)
+            {
+                rings[ring.stopKey] = ring;
+            }
             // Инициализация колец
-            foreach (var ring in rings)
+            foreach (var ring in rings.Values)
             {
                 ring.isStopped = false;
                 ring.currentAngle = UnityEngine.Random.Range(0f, 360f);
@@ -92,7 +86,7 @@ namespace Arcatech.MiniGames
                 if (ring.transform != null)
                     ring.transform.localEulerAngles = new Vector3(0, 0, ring.currentAngle);
 
-                SetRingColor(ring, ColorCyan, instant: true);
+                SetRingColor(ring, GameInterfaceManager.Instance.ColorReference.ArcaCyan, instant: true);
             }
 
             // Показываем UI условий проигрыша
@@ -116,16 +110,17 @@ namespace Arcatech.MiniGames
             if (attemptsText != null) attemptsText.gameObject.SetActive(false);
 
             // Сбрасываем цвета колец
-            foreach (var ring in rings)
+            foreach (var ring in rings.Values)
             {
                 if (ring.ringImage != null)
-                    SetRingColor(ring, ColorCyan, instant: true);
+                    SetRingColor(ring, GameInterfaceManager.Instance.ColorReference.ArcaCyan, instant: true);
             }
 
             // Останавливаем все корутины, чтобы ResetFailedRings
             // от предыдущей сессии не сработал
             StopAllCoroutines();
         }
+        
 
         public override void ResetGame()
         {
@@ -133,7 +128,7 @@ namespace Arcatech.MiniGames
             _currentTime = 0f;
             _currentFails = 0;
 
-            foreach (var ring in rings)
+            foreach (var ring in rings.Values)
             {
                 ring.isStopped = false;
                 ring.currentAngle = UnityEngine.Random.Range(0f, 360f);
@@ -142,7 +137,7 @@ namespace Arcatech.MiniGames
                     ring.transform.localEulerAngles = new Vector3(0, 0, ring.currentAngle);
 
                 if (ring.ringImage != null)
-                    SetRingColor(ring, ColorCyan, instant: true);
+                    SetRingColor(ring, GameInterfaceManager.Instance.ColorReference.ArcaCyan, instant: true);
             }
         }
 
@@ -167,7 +162,7 @@ namespace Arcatech.MiniGames
 
                     // Визуальный акцент: последние 3 секунды — красный (#FF5268)
                     if (remaining <= 3f)
-                        timerText.color = ColorDanger;
+                        timerText.color = GameInterfaceManager.Instance.ColorReference.AlertRed;
                 }
 
                 if (_currentTime >= timeLimit)
@@ -180,7 +175,7 @@ namespace Arcatech.MiniGames
             // === Вращение колец и обработка ввода ===
             bool allStopped = true;
 
-            foreach (var ring in rings)
+            foreach (var ring in rings.Values) 
             {
                 if (ring.isStopped) continue;
 
@@ -193,32 +188,31 @@ namespace Arcatech.MiniGames
 
                 if (ring.transform != null)
                     ring.transform.localEulerAngles = new Vector3(0, 0, ring.currentAngle);
-
-                // Ввод: клавиатура ИЛИ геймпад
-                bool keyPressed = false;
-                if (ring.stopKey != KeyCode.None)
-                    keyPressed |= Input.GetKeyDown(ring.stopKey);
-                if (ring.gamepadButton != KeyCode.None)
-                    keyPressed |= Input.GetKeyDown(ring.gamepadButton);
-
-                if (keyPressed)
-                {
-                    ring.isStopped = true;
-
-                    // Мгновенный фидбек: проверяем позицию и красим кольцо
-                    float diff = Mathf.Abs(Mathf.DeltaAngle(ring.currentAngle, ring.targetAngle));
-                    if (ring.ringImage != null)
-                    {
-                        Color feedbackColor = diff <= angleTolerance ? ColorSuccess : ColorDanger;
-                        SetRingColor(ring, feedbackColor, instant: reduceMotion);
-                    }
-                }
             }
 
             // === Проверка результата, когда все кольца остановлены ===
             if (allStopped)
             {
                 CheckResult();
+            }
+        }
+
+        protected override void HandleButtonPress(MiniGameButton button, InputAction.CallbackContext context)
+        {            
+            if (!context.started) return; 
+            if (!rings.TryGetValue(button, out var ring)) return;
+            if (ring.isStopped) return;
+            
+            ring.isStopped = true;
+
+            // Мгновенный фидбек: проверяем позицию и красим кольцо
+            float diff = Mathf.Abs(Mathf.DeltaAngle(ring.currentAngle, ring.targetAngle));
+            if (ring.ringImage != null)
+            {
+                Color feedbackColor = diff <= angleTolerance
+                    ? GameInterfaceManager.Instance.ColorReference.ConfirmGreen
+                    : GameInterfaceManager.Instance.ColorReference.AlertRed;
+                SetRingColor(ring, feedbackColor, instant: reduceMotion);
             }
         }
 
@@ -230,7 +224,7 @@ namespace Arcatech.MiniGames
         {
             bool allCorrect = true;
 
-            foreach (var ring in rings)
+            foreach (var ring in rings.Values)
             {
                 float diff = Mathf.Abs(Mathf.DeltaAngle(ring.currentAngle, ring.targetAngle));
                 if (diff > angleTolerance)
@@ -263,7 +257,7 @@ namespace Arcatech.MiniGames
                 {
                     int remaining = Mathf.Max(0, allowedFailures - _currentFails);
                     attemptsText.text = remaining.ToString();
-                    attemptsText.color = ColorDanger;
+                    attemptsText.color = GameInterfaceManager.Instance.ColorReference.AlertRed;
                 }
 
                 // Проверяем, не исчерпан ли лимит
@@ -290,13 +284,13 @@ namespace Arcatech.MiniGames
             if (!IsRunning || IsFinishing || SessionId != _currentSessionId)
                 yield break;
 
-            foreach (var ring in rings)
+            foreach (var ring in rings.Values)
             {
                 ring.isStopped = false;
 
                 // Сбрасываем цвет к исходному
                 if (ring.ringImage != null)
-                    SetRingColor(ring, ColorCyan, instant: reduceMotion);
+                    SetRingColor(ring, GameInterfaceManager.Instance.ColorReference.ArcaCyan, instant: reduceMotion);
             }
         }
 

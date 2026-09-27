@@ -1,5 +1,139 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4744258502860579503
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7205886766807007}
+  - component: {fileID: 3983991575587951526}
+  - component: {fileID: 1659995730444011619}
+  - component: {fileID: 3424407247904483559}
+  - component: {fileID: 3971576131331452936}
+  - component: {fileID: 8857000959099741528}
+  m_Layer: 5
+  m_Name: QTE
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7205886766807007
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4744258502860579503}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5511956440346932750}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 200}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &3983991575587951526
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4744258502860579503}
+  m_CullTransparentMesh: 1
+--- !u!114 &1659995730444011619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4744258502860579503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!225 &3424407247904483559
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4744258502860579503}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &3971576131331452936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4744258502860579503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4291d51050243604fb0f84754374569c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpankyBoy.JuiceUI.Free.PanelAnimator
+  inAnimation: 0
+  outAnimation: 0
+  inDirection: 3
+  outDirection: 2
+  inDuration: 0.2
+  outDuration: 0.1
+  inDelay: 0
+  outDelay: 0
+  inEase: 6
+  outEase: 5
+  playInOnEnable: 1
+  disableOnOutComplete: 1
+  resetStateAfterOut: 1
+  inSound: {fileID: 0}
+  outSound: {fileID: 0}
+  customAudioSource: {fileID: 0}
+  volume: 1
+  canvasGroup: {fileID: 3424407247904483559}
+--- !u!114 &8857000959099741528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4744258502860579503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40de2c976ffa4ee39aa354f2b518267d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.UI.QuickTimeEventPanel
+  gamePanelParent: {fileID: 7205886766807007}
+  Animator: {fileID: 3971576131331452936}
 --- !u!1 &6246020051542258885
 GameObject:
   m_ObjectHideFlags: 0
@@ -38,6 +172,7 @@ RectTransform:
   - {fileID: 8797106939711552054}
   - {fileID: 6947444787809902673}
   - {fileID: 731390546883694742}
+  - {fileID: 7205886766807007}
   - {fileID: 1785629395871097102}
   - {fileID: 1167430582120183305}
   - {fileID: 2855363605140646182}
@@ -130,6 +265,7 @@ MonoBehaviour:
   pauseWindow: {fileID: 442373809109579122}
   playerPanel: {fileID: 7555763097646910889}
   miniGameWindow: {fileID: 3443207343387442323}
+  minigamePanel: {fileID: 8857000959099741528}
   inspectItemCard: {fileID: 8566327518651930660}
   showTooltip: 0
   floatingTooltip: {fileID: 2607128107979219707}
@@ -1160,7 +1296,7 @@ PrefabInstance:
     - target: {fileID: 6537112079393895273, guid: bf69886f3f57ad642bac06485803325a,
         type: 3}
       propertyPath: m_Name
-      value: MiniGame
+      value: MiniGameWindow (Gadget)
       objectReference: {fileID: 0}
     - target: {fileID: 6537112079393895273, guid: bf69886f3f57ad642bac06485803325a,
         type: 3}
@@ -2090,7 +2226,7 @@ PrefabInstance:
     - target: {fileID: 5912169782893391841, guid: c610c595798b54248bb163a82065b123,
         type: 3}
       propertyPath: m_Name
-      value: ItemInspect
+      value: ItemInspect (gadget with hand)
       objectReference: {fileID: 0}
     - target: {fileID: 5912169782893391841, guid: c610c595798b54248bb163a82065b123,
         type: 3}

@@ -2,6 +2,7 @@
 using Arcatech.Units;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcatech.Interactions
 {
@@ -16,13 +17,18 @@ namespace Arcatech.Interactions
             Assert.IsNotNull(itemNeeded);
         }
 
-        public override bool Check(InteractionContext context)
+        bool Check(InteractionContext context)
         {
             if (context.Interactor.Entity.TryGetComponent(out EntityInventoryComponent inventory))
             {
                 return inventory.TryUseItem(itemNeeded,itemsConsumed);
             }
             return false;
+        }
+
+        public override void Check(InteractionContext ctx, UnityAction<InteractionState> callback)
+        {
+            callback.Invoke(Check(ctx) ? InteractionState.Success : InteractionState.Failure);
         }
     }
 }

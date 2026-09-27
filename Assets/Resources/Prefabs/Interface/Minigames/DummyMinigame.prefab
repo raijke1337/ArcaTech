@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8723155762435405561}
   - component: {fileID: 1113776903482001049}
   - component: {fileID: 3427297566741944561}
+  - component: {fileID: 7994245915635151995}
   m_Layer: 5
   m_Name: DummyMinigame
   m_TagString: Untagged
@@ -38,7 +39,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 500, y: 300}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9221615356898157403
 CanvasRenderer:
@@ -90,12 +91,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fffe167d0214fe8aabc28055b8926c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.MiniGames.DummyMinigame
-  canvasGroup: {fileID: 0}
-  fadeInDuration: 0.2
-  fadeOutDuration: 0.2
-  OnGameCompleteResult:
+  FadeScreen: 1
+  CenterOnScreen: 1
+  onGameCompleteResult:
     m_PersistentCalls:
       m_Calls: []
+  description: {fileID: 11400000, guid: 0d30fa13512d61442b3a3a72bf253c02, type: 2}
 --- !u!225 &3427297566741944561
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -104,10 +105,40 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7391615696769634339}
   m_Enabled: 1
-  m_Alpha: 0.34
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &7994245915635151995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7391615696769634339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4291d51050243604fb0f84754374569c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpankyBoy.JuiceUI.Free.PanelAnimator
+  inAnimation: 0
+  outAnimation: 0
+  inDirection: 3
+  outDirection: 2
+  inDuration: 0.5
+  outDuration: 0.4
+  inDelay: 0
+  outDelay: 0
+  inEase: 6
+  outEase: 5
+  playInOnEnable: 1
+  disableOnOutComplete: 1
+  resetStateAfterOut: 1
+  inSound: {fileID: 0}
+  outSound: {fileID: 0}
+  customAudioSource: {fileID: 0}
+  volume: 1
+  canvasGroup: {fileID: 3427297566741944561}
 --- !u!1001 &1131587345182529115
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -508,6 +539,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.a
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3711968220285980887, guid: c1c84e390960cec43bb351b18b467522,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 0.27058825
       objectReference: {fileID: 0}
     - target: {fileID: 6531112567380270732, guid: c1c84e390960cec43bb351b18b467522,
         type: 3}

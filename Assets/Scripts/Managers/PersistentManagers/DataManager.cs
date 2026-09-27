@@ -1,13 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
 using Arcatech.Scenes;
+using Arcatech.Triggers;
 using Arcatech.Usables;
+using Arcatech.Usables.Effects;
 using UnityEngine;
 
 namespace Arcatech.Managers
 {
-    public class DataManager : GenericLazySingleton<DataManager>
+    public class DataManager : GenericLazySingleton<DataManager>, IDifficultyDamageProvider
     {
         
         public static class GameRules
@@ -15,8 +18,14 @@ namespace Arcatech.Managers
             public const string ValidHitsLayer = "Entities";
             public const string InvalidHitsLayer = "SolidObject";
         }
-        
-        
+
+        private void Awake()
+        {
+            TriggerLayerUtility.InvalidateCache();
+        }
+
+        public float GetOutgoingMult(BaseGameEntityComponent _) => 1f;
+        public float GetIncomingMult(BaseGameEntityComponent _) => 1f;
 
 
         #region SceneContainers
@@ -86,6 +95,7 @@ namespace Arcatech.Managers
 
         
         #endregion
-        
+
+
     }
 }

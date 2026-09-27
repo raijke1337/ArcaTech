@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcatech.Interactions
 {
@@ -6,10 +7,14 @@ namespace Arcatech.Interactions
     {
         [SerializeField] private bool entityIsStunned = true;
 
-
-        public override bool Check(InteractionContext ctx)
+        bool Check(InteractionContext ctx)
         {
             return ctx.Target.Stunned ==  entityIsStunned;
         }
+        public override void Check(InteractionContext ctx, UnityAction<InteractionState> callback)
+        {
+            callback.Invoke(Check(ctx) ? InteractionState.Success : InteractionState.Failure);
+        }
+
     }
 }

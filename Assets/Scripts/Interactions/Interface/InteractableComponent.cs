@@ -19,7 +19,7 @@ namespace Arcatech.Interactions
         [SerializeField, Self] private BaseGameEntityComponent entity;
         public BaseGameEntityComponent Entity => entity;
 
-        [Header("Pipeline")] [SerializeField, Self]
+        [Header("Pipeline")] [SerializeField,Self]
         protected InteractionTrigger trigger;
 
         [SerializeField] private List<InteractionCondition> conditions;
@@ -43,7 +43,7 @@ namespace Arcatech.Interactions
 
         private bool _colliderWasTrigger;
         private Collider _alignedCollider;
-
+        private InteractionCondition _currentCondition;
         private bool _isExecuting;
         private InteractionContext _currentCtx;
         private int _executionId; // защита от stale callbacks
@@ -85,12 +85,34 @@ namespace Arcatech.Interactions
 
             _currentCtx = ctx;
             ctx.Target = entity;
-
+            int myExecutionId = _executionId;
             // ─── 1. Conditions ───
             foreach (var condition in conditions)
             {
                 if (condition == null) continue;
-                if (!condition.Check(ctx))
+
+                _currentCondition = condition;
+
+                bool conditionDone = false;
+                InteractionState conditionResult = InteractionState.Failure;
+
+
+                condition.Check(ctx, result =>
+                {
+                    if (myExecutionId != _executionId) return; // pipeline уже инвалидирован (Cancel/новый Start)
+                    conditionResult = result;
+                    conditionDone = true;
+                });
+
+                yield return new WaitUntil(() => conditionDone || myExecutionId != _executionId);
+
+                // Пайплайн отменили, пока ждали результат условия — выходим молча,
+                // CancelInteraction уже сделал всё нужное (в т.ч. condition.CancelCheck).
+                if (myExecutionId != _executionId) yield break;
+
+                _currentCondition = null;
+
+                if (conditionResult != InteractionState.Success)
                 {
                     ctx.State = InteractionState.Failure;
                     condition.PlayDenyEffects(ctx);
@@ -100,7 +122,6 @@ namespace Arcatech.Interactions
                     yield break;
                 }
             }
-            
             // ─── 1.5. Alignment (один раз, ДО pre-effects, чтобы анимация стартовала в правильной позе) ───
             AlignInteractor(ctx);
 
@@ -117,10 +138,7 @@ namespace Arcatech.Interactions
 
             bool executorDone = false;
             InteractionState result = InteractionState.Failure;
-
-            // Локальный id, чтобы отсечь поздние колбэки после Cancel
-            int myExecutionId = _executionId;
-
+            
             executor.Execute(ctx, r =>
             {
                 if (myExecutionId != _executionId) return; // игнорируем устаревший колбэк
@@ -176,6 +194,10 @@ namespace Arcatech.Interactions
             _isExecuting = false;
 
             StopAllCoroutines();
+
+            // Если отмена пришла во время ожидания результата condition — даём ему шанс прибраться
+            _currentCondition?.CancelCheck(_currentCtx);
+            _currentCondition = null;
 
             // Оповещаем эффекты, чтобы сняли блокировки
             if (preExecuteEffects != null)

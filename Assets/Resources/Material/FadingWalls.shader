@@ -4,12 +4,12 @@ Shader "ARCA/WallFade"
     {
         [Header(Base)]
         _BaseColor ("Base Color", Color) = (0.1, 0.13, 0.18, 1) // #1B2230
-        
+
         [Header(Overlay Texture)]
         _OverlayMap ("Overlay Texture (RGB)", 2D) = "white" {}
         _OverlayScale ("Overlay Scale (World Units)", Float) = 1.0
         _OverlayStrength ("Overlay Strength", Range(0.0, 1.0)) = 1.0
-        
+
         [Header(Toon  Halftone)]
         _StepThreshold ("Step Threshold", Range(0.0, 1.0)) = 0.5
         _HalftoneScale ("Halftone Scale", Float) = 80.0
@@ -17,12 +17,12 @@ Shader "ARCA/WallFade"
 
         [Header(Outline)]
         _OutlineColor ("Outline Color", Color) = (0.05, 0.05, 0.05, 1)
-        _OutlineWidth ("Outline Width", Range(0.0, 0.05)) = 0.01 
+        _OutlineWidth ("Outline Width", Range(0.0, 0.05)) = 0.01
 
         [Header(Fade Control)]
         // Новое свойство для управления из C#
         _FadeAmount ("Global Fade Amount (Script Controlled)", Range(0.0, 1.0)) = 0.0
-        
+
         // Старые свойства для локального градиента (остаются для совместимости)
         _FadeStartX ("Fade Start (Local X)", Float) = 0.0
         _FadeEndX ("Fade End (Local X)", Float) = -1.0
@@ -38,14 +38,23 @@ Shader "ARCA/WallFade"
         {
             Name "Forward"
             Tags { "LightMode"="UniversalForward" }
-            AlphaToMask On 
+            AlphaToMask On
 
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature_local _INVERTFADE_ON
+
+            // Тени главного света: без этого GetMainLight(shadowCoord) всегда
+            // возвращал бы shadowAttenuation = 1, и стены игнорировали бы тени
+            // от других объектов сцены.
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile _ _SHADOWS_SOFT
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Common/ARCADither.hlsl"
+            #include "Common/ARCAToonLighting.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseColor;
@@ -57,7 +66,7 @@ Shader "ARCA/WallFade"
                 float _HalftoneStrength;
                 float4 _OutlineColor;
                 float _OutlineWidth;
-                
+
                 // Параметры фейда
                 float _FadeAmount;      // Глобальный (из скрипта)
                 float _FadeStartX;      // Локальный старт
@@ -67,37 +76,27 @@ Shader "ARCA/WallFade"
             TEXTURE2D(_OverlayMap); SAMPLER(sampler_OverlayMap);
 
             struct Attributes { float4 positionOS : POSITION; float3 normalOS : NORMAL; float2 uv : TEXCOORD0; };
-            
-            struct Varyings 
-            { 
-                float4 positionCS : SV_POSITION; 
-                float3 positionWS : TEXCOORD0; 
-                float3 normalWS : TEXCOORD1; 
-                float localX : TEXCOORD2; 
-            };
 
-            float GetDither(float2 uv, float threshold)
+            struct Varyings
             {
-                int x = int(uv.x) % 4;
-                int y = int(uv.y) % 4;
-                int index = x + y * 4;
-                float bayer[16] = { 0.0/16.0, 8.0/16.0, 2.0/16.0, 10.0/16.0,
-                                    12.0/16.0, 4.0/16.0, 14.0/16.0, 6.0/16.0,
-                                    3.0/16.0, 11.0/16.0, 1.0/16.0, 9.0/16.0,
-                                    15.0/16.0, 7.0/16.0, 13.0/16.0, 5.0/16.0 };
-                return threshold - bayer[index];
-            }
+                float4 positionCS : SV_POSITION;
+                float3 positionWS : TEXCOORD0;
+                float3 normalWS : TEXCOORD1;
+                float localX : TEXCOORD2;
+                float4 shadowCoord : TEXCOORD3;
+            };
 
             Varyings vert(Attributes input)
             {
                 Varyings output;
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
                 VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS);
-                
+
                 output.positionCS = vertexInput.positionCS;
                 output.positionWS = vertexInput.positionWS;
                 output.normalWS = normalInput.normalWS;
                 output.localX = input.positionOS.x;
+                output.shadowCoord = TransformWorldToShadowCoord(vertexInput.positionWS);
                 return output;
             }
 
@@ -119,41 +118,24 @@ Shader "ARCA/WallFade"
 
                 half4 overlayTex = texX * blendWeights.x + texY * blendWeights.y + texZ * blendWeights.z;
                 float luminance = dot(overlayTex.rgb, float3(0.299, 0.587, 0.114));
-                float mask = 1.0 - luminance; 
-                
+                float mask = 1.0 - luminance;
+
                 finalColor = lerp(finalColor, overlayTex.rgb, mask * _OverlayStrength);
 
-                // 2. Освещение и Halftone
-                Light mainLight = GetMainLight();
-                float NdotL = max(0.0, dot(input.normalWS, mainLight.direction));
-                float stepLight = smoothstep(_StepThreshold - 0.05, _StepThreshold + 0.05, NdotL);
-                
-                float2 screenUV = input.positionCS.xy * _HalftoneScale / _ScreenParams.xy;
-                float halftonePattern = sin(screenUV.x) * sin(screenUV.y);
-                float halftone = step(halftonePattern, NdotL * (1.0 + _HalftoneStrength));
-                
-                finalColor = finalColor * (stepLight * 0.6 + 0.4);
-                finalColor = lerp(finalColor, finalColor * 1.3, halftone * _HalftoneStrength);
+                // 2. Освещение и Halftone (теперь с учётом теней от сцены)
+                finalColor = ApplyArcaToonLighting(finalColor, input.positionCS, input.normalWS,
+                                                    input.shadowCoord, _StepThreshold,
+                                                    _HalftoneScale, _HalftoneStrength);
 
-                // 3. Расчет прозрачности (Гибридный режим)
-                
-                // А. Локальный расчет (по оси X)
-                float localFade = saturate((input.localX - _FadeStartX) / (_FadeEndX - _FadeStartX));
+                // 3. Прозрачность и дизеринг (гибридный режим: глобальный fade
+                //    из скрипта приоритетнее локального градиента по X)
                 #if defined(_INVERTFADE_ON)
-                    localFade = 1.0 - localFade;
+                    bool invertFade = true;
+                #else
+                    bool invertFade = false;
                 #endif
-
-                // Б. Глобальный расчет (из скрипта)
-                float globalFade = _FadeAmount;
-
-                // В. Итоговое значение: Если глобальный фейд активен (> 0.01), он имеет приоритет.
-                // Иначе используется локальный градиент.
-                float finalFade = (globalFade > 0.01) ? globalFade : localFade;
-
-                // 4. Dithering
-                float2 ditherUV = input.positionCS.xy * 0.5;
-                float alphaThreshold = 1.0 - finalFade;
-                clip(GetDither(ditherUV, alphaThreshold));
+                ClipArcaFade(input.positionCS, input.localX, _FadeStartX, _FadeEndX,
+                             _FadeAmount, invertFade, 0.5);
 
                 return half4(finalColor, 1.0);
             }
@@ -173,6 +155,7 @@ Shader "ARCA/WallFade"
             #pragma fragment frag
             #pragma shader_feature_local _INVERTFADE_ON
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Common/ARCADither.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _OutlineColor;
@@ -185,17 +168,10 @@ Shader "ARCA/WallFade"
             struct Attributes { float4 positionOS : POSITION; float3 normalOS : NORMAL; };
             struct Varyings { float4 positionCS : SV_POSITION; float localX : TEXCOORD0; };
 
-            float GetDither(float2 uv, float threshold)
-            {
-                int x = int(uv.x) % 4; int y = int(uv.y) % 4; int index = x + y * 4;
-                float bayer[16] = { 0.0/16.0, 8.0/16.0, 2.0/16.0, 10.0/16.0, 12.0/16.0, 4.0/16.0, 14.0/16.0, 6.0/16.0, 3.0/16.0, 11.0/16.0, 1.0/16.0, 9.0/16.0, 15.0/16.0, 7.0/16.0, 13.0/16.0, 5.0/16.0 };
-                return threshold - bayer[index];
-            }
-
             Varyings vert(Attributes input)
             {
                 Varyings output;
-                float3 positionOS = input.positionOS.xyz + input.normalOS * _OutlineWidth; 
+                float3 positionOS = input.positionOS.xyz + input.normalOS * _OutlineWidth;
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(positionOS);
                 output.positionCS = vertexInput.positionCS;
                 output.localX = input.positionOS.x;
@@ -204,19 +180,93 @@ Shader "ARCA/WallFade"
 
             half4 frag(Varyings input) : SV_Target
             {
-                // Та же логика гибридного фейда для обводки
-                float localFade = saturate((input.localX - _FadeStartX) / (_FadeEndX - _FadeStartX));
                 #if defined(_INVERTFADE_ON)
-                    localFade = 1.0 - localFade;
+                    bool invertFade = true;
+                #else
+                    bool invertFade = false;
                 #endif
-                
-                float finalFade = (_FadeAmount > 0.01) ? _FadeAmount : localFade;
+                ClipArcaFade(input.positionCS, input.localX, _FadeStartX, _FadeEndX,
+                             _FadeAmount, invertFade, 0.5);
 
-                float2 ditherUV = input.positionCS.xy * 0.5;
-                float alphaThreshold = 1.0 - finalFade;
-                clip(GetDither(ditherUV, alphaThreshold));
-                
                 return _OutlineColor;
+            }
+            ENDHLSL
+        }
+
+        // PASS 3: ShadowCaster
+        // Раньше отсутствовал: стены либо не отбрасывали тени, либо
+        // URP подставлял дефолтный ShadowCaster, который НЕ знает про
+        // _FadeAmount/дизеринг - зафейженная в 0 (визуально невидимая)
+        // стена всё равно отбрасывала бы полную тень. Здесь тень клипуется
+        // той же дизеринг-маской, что и основной цвет.
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags { "LightMode"="ShadowCaster" }
+
+            ZWrite On
+            ZTest LEqual
+            ColorMask 0
+            Cull Back
+
+            HLSLPROGRAM
+            #pragma vertex ShadowPassVertex
+            #pragma fragment ShadowPassFragment
+            #pragma shader_feature_local _INVERTFADE_ON
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
+            #include "Common/ARCADither.hlsl"
+
+            CBUFFER_START(UnityPerMaterial)
+                float _FadeAmount;
+                float _FadeStartX;
+                float _FadeEndX;
+            CBUFFER_END
+
+            float3 _LightDirection;
+            float3 _LightPosition;
+
+            struct Attributes { float4 positionOS : POSITION; float3 normalOS : NORMAL; };
+            struct Varyings { float4 positionCS : SV_POSITION; float localX : TEXCOORD0; };
+
+            Varyings ShadowPassVertex(Attributes input)
+            {
+                Varyings output;
+                float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                float3 normalWS = TransformObjectToWorldNormal(input.normalOS);
+
+                #if _CASTING_PUNCTUAL_LIGHT_SHADOW
+                    float3 lightDirectionWS = normalize(_LightPosition - positionWS);
+                #else
+                    float3 lightDirectionWS = _LightDirection;
+                #endif
+
+                positionWS = ApplyShadowBias(positionWS, normalWS, lightDirectionWS);
+                output.positionCS = TransformWorldToHClip(positionWS);
+                output.localX = input.positionOS.x;
+
+                #if UNITY_REVERSED_Z
+                    output.positionCS.z = min(output.positionCS.z, output.positionCS.w * UNITY_NEAR_CLIP_VALUE);
+                #else
+                    output.positionCS.z = max(output.positionCS.z, output.positionCS.w * UNITY_NEAR_CLIP_VALUE);
+                #endif
+
+                return output;
+            }
+
+            half4 ShadowPassFragment(Varyings input) : SV_TARGET
+            {
+                #if defined(_INVERTFADE_ON)
+                    bool invertFade = true;
+                #else
+                    bool invertFade = false;
+                #endif
+                ClipArcaFade(input.positionCS, input.localX, _FadeStartX, _FadeEndX,
+                             _FadeAmount, invertFade, 0.5);
+
+                return 0;
             }
             ENDHLSL
         }

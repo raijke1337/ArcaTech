@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcatech.Interactions
 {
@@ -7,9 +8,10 @@ namespace Arcatech.Interactions
     {
         [SerializeField] private bool _result;
 
-        public override bool Check(InteractionContext ctx)
+
+        public override void Check(InteractionContext ctx, UnityAction<InteractionState> callback)
         {
-            return _result; 
+            callback.Invoke(_result? InteractionState.Success : InteractionState.Failure);
         }
     }
 }

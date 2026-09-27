@@ -1,13 +1,20 @@
 ﻿using System.Collections;
 using Arcatech.Interactions;
 using Arcatech.Texts;
+using Arcatech.Units.Control;
+using KBCore.Refs;
+using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace Arcatech.MiniGames
 {
-    public abstract class MiniGameBase : MonoBehaviour
+    [RequireComponent(typeof(PanelAnimator))]
+    public abstract class MiniGameBase : ValidatedMonoBehaviour,PlayerControls.IMinigameActions
     {
+        [SerializeField,Self]public PanelAnimator Animator;
+        public bool ShowInGadget = true;
         public UnityEvent<InteractionState> onGameCompleteResult;
 
         private Coroutine _transitionRoutine;
@@ -20,6 +27,7 @@ namespace Arcatech.MiniGames
         protected bool IsRunning => _isRunning;
         protected bool IsFinishing => _isFinishing;
         [SerializeField] Description description;
+        
         public Description Description => description;
         
         /// <summary>
@@ -28,32 +36,13 @@ namespace Arcatech.MiniGames
         public void StartGame()
         {
             _sessionId++;
-
-
             _isRunning = true;
             _isFinishing = false;
             ResetGame();
+            PlayerInputGateway.Instance?.EnableMinigameInput(this);
             OnGameStarted();
         }
 
-        /// <summary>
-        /// Завершает игру без отправки результата.
-        /// Используется, например, при отмене interaction.
-        /// </summary>
-        public void CancelGame()
-        {
-            if (!_isRunning && !gameObject.activeSelf)
-            {
-                return;
-            }
-
-            _sessionId++;
-            _isRunning = false;
-            _isFinishing = true;
-
-            OnGameEnded();
-
-        }
 
         /// <summary>
         /// Этот метод должен сбрасывать игровое состояние:
@@ -88,6 +77,15 @@ namespace Arcatech.MiniGames
             _isFinishing = true;
             OnGameEnded();
             onGameCompleteResult?.Invoke(result);
+            PlayerInputGateway.Instance?.EnableGameplayInput();
         }
+
+        protected abstract void HandleButtonPress(MiniGameButton button, InputAction.CallbackContext context);
+
+        public void OnButtonN(InputAction.CallbackContext context) => HandleButtonPress(MiniGameButton.ButtonN, context);
+        public void OnButtonE(InputAction.CallbackContext context) => HandleButtonPress(MiniGameButton.ButtonE,context);
+        public void OnButtonW(InputAction.CallbackContext context) => HandleButtonPress(MiniGameButton.ButtonW,context);
+        public void OnButtonS(InputAction.CallbackContext context) => HandleButtonPress(MiniGameButton.ButtonS,context);
     }
+    
 }

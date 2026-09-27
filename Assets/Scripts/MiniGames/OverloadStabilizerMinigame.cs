@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Arcatech.Interactions;
+using Arcatech.Managers;
 using TMPro;
+using UnityEngine.InputSystem;
 
 namespace Arcatech.MiniGames
 {
@@ -19,6 +21,7 @@ namespace Arcatech.MiniGames
         public float safeZoneWidth = 0.15f; // Ширина зоны в % (0-1)
         public float fillRate = 0.5f; // Скорость заполнения прогресса
         public float drainRate = 1.0f; // Скорость падения прогресса вне зоны
+        public MiniGameButton buttonToActivate = MiniGameButton.ButtonS;
 
         [Header("Lose Conditions")]
         [SerializeField] private bool timeExpires = false;
@@ -38,12 +41,6 @@ namespace Arcatech.MiniGames
         private float _currentTime;
         private int _currentFails;
         private bool _isHoldingInput;
-        
-        // Colors
-        private static readonly Color ColorSuccess = ParseHex("#5EE6A8");
-        private static readonly Color ColorDanger = ParseHex("#FF5268");
-        private static readonly Color ColorCyan = ParseHex("#29D7FF");
-        private static Color ParseHex(string hex) => ColorUtility.TryParseHtmlString(hex, out var c) ? c : Color.white;
 
         protected override void OnGameStarted()
         {
@@ -53,14 +50,33 @@ namespace Arcatech.MiniGames
             _isHoldingInput = false;
             progressSlider.value = 0;
             if (markerSlider != null) markerSlider.value = 0.5f;
-            
+
             UpdateUI();
         }
 
         protected override void OnGameEnded()
         {
+            _isHoldingInput = false;
+
             if (timerText != null) timerText.gameObject.SetActive(false);
             if (attemptsText != null) attemptsText.gameObject.SetActive(false);
+        }
+
+        protected override void HandleButtonPress(MiniGameButton button, InputAction.CallbackContext context)
+        {
+            if (button != buttonToActivate) return;
+
+            // Button-интеракция вызывает callback на started (нажали) и canceled (отпустили).
+            // started может прийти вместе с performed — держим состояние по обеим границам,
+            // а не полагаемся на конкретную фазу.
+            if (context.started)
+            {
+                _isHoldingInput = true;
+            }
+            else if (context.canceled)
+            {
+                _isHoldingInput = false;
+            }
         }
 
         public override void ResetGame()
@@ -71,33 +87,20 @@ namespace Arcatech.MiniGames
             if (markerSlider != null) markerSlider.value = 0.5f;
         }
 
+
         void Update()
         {
             if (!IsRunning || IsFinishing || SessionId != _currentSessionId) return;
 
             _currentTime += Time.deltaTime;
 
-            // === Input Handling (Hold) ===
-            bool inputActive = Input.GetKey(KeyCode.Space) || 
-                               Input.GetMouseButton(0) || 
-                               Input.GetKey(KeyCode.JoystickButton0); // A / Cross
-            
-            _isHoldingInput = inputActive;
-
             // === Marker Movement ===
             if (markerSlider != null)
             {
-                float currentSpeed = _isHoldingInput ? baseSpeed * holdSlowFactor : baseSpeed;
-                
-                // Простое движение туда-сюда
-                float direction = Mathf.PingPong(Time.time * baseSpeed, 2f) - 1f; 
-                // Более контролируемое движение:
-                float moveDir = _isHoldingInput ? 0f : 1f; // Если держим - стоим/медленно, если нет - быстро
-                
                 // Реализация "дрейфа": маркер всегда хочет уйти вправо, игрок тянет влево
                 float drift = 1.0f;
                 float playerControl = _isHoldingInput ? -2.5f : 0f;
-                
+
                 markerSlider.value += (drift + playerControl) * Time.deltaTime;
                 markerSlider.value = Mathf.Clamp01(markerSlider.value);
             }
@@ -105,26 +108,12 @@ namespace Arcatech.MiniGames
             // === Zone Check & Progress ===
             if (IsInSafeZone())
             {
-                if (markerSlider != null)
-                {
-                    markerSlider.value = Mathf.Clamp(markerSlider.value, 0f, 1f);
-                    // Заполняем скрытый прогресс бар (можно использовать тот же slider или отдельный)
-                    // Для прототипа используем value самого слайдера как прогресс? Нет, лучше отдельный.
-                    // Допустим, у нас есть progressSlider в базовом классе? Нет, здесь свой UI.
-                    // Используем markerSlider.visuals или добавим отдельный Slider для прогресса взлома.
-                    // Для простоты: предположим, что markerSlider - это позиция, а прогресс считается внутри.
-                }
-                
-                // Визуальный фидбек успеха
-                if (markerImage != null) markerImage.color = ColorSuccess;
-                
-                // Здесь должна быть логика заполнения прогресса взлома. 
-                // Так как в базовом классе нет поля прогресса, добавим локальное.
+                if (markerImage != null) markerImage.color = GameInterfaceManager.Instance.ColorReference.ConfirmGreen;
                 HandleProgress(fillRate * Time.deltaTime);
             }
             else
             {
-                if (markerImage != null) markerImage.color = ColorCyan;
+                if (markerImage != null) markerImage.color = GameInterfaceManager.Instance.ColorReference.ArcaCyan;
                 HandleProgress(-drainRate * Time.deltaTime);
             }
 
@@ -135,7 +124,7 @@ namespace Arcatech.MiniGames
                 if (timerText != null)
                 {
                     timerText.text = remaining.ToString("F1");
-                    if (remaining <= 3f) timerText.color = ColorDanger;
+                    if (remaining <= 3f) timerText.color = GameInterfaceManager.Instance.ColorReference.AlertRed;
                 }
 
                 if (_currentTime >= timeLimit)
@@ -147,16 +136,15 @@ namespace Arcatech.MiniGames
 
         // Простая эмуляция прогресса взлома через локальную переменную или UI
         private float _hackProgress = 0f;
-        
+
         void HandleProgress(float delta)
         {
             _hackProgress += delta;
             _hackProgress = Mathf.Clamp01(_hackProgress);
-            progressSlider.value =  _hackProgress;
-            // Можно привязать к визуальному элементу, например, scale safeZone или color alpha
+            progressSlider.value = _hackProgress;
+
             if (safeZoneRect != null)
             {
-                // Мигаем зоной при прогрессе
                 float alpha = 0.5f + _hackProgress * 0.5f;
                 Color c = safeZoneRect.GetComponent<Image>().color;
                 c.a = alpha;
@@ -172,12 +160,11 @@ namespace Arcatech.MiniGames
         bool IsInSafeZone()
         {
             if (markerSlider == null || safeZoneRect == null) return false;
-            
+
             float markerPos = markerSlider.value;
-            // SafeZone задается через Anchor Min/Max в RectTransform
             float zoneMin = safeZoneRect.anchorMin.x;
             float zoneMax = safeZoneRect.anchorMax.x;
-            
+
             return markerPos >= zoneMin && markerPos <= zoneMax;
         }
 

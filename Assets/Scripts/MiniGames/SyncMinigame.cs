@@ -2,8 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Arcatech.Interactions;
+using Arcatech.Managers;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.InputSystem;
 
 namespace Arcatech.MiniGames
 {
@@ -12,10 +14,10 @@ namespace Arcatech.MiniGames
         [Header("UI References")]
         public Slider progressSlider; 
         public RectTransform targetWave; 
-        public RectTransform playerWave; 
-        
-        
-        [Header("Settings")]
+        public RectTransform playerWave;
+        public Image buttonImage;
+
+        [Header("Settings")] public MiniGameButton ActivateButton = MiniGameButton.ButtonS;
         public float targetFrequency = 1.0f; 
         public float playerFrequencyBase = 0.8f; 
         public float syncTolerance = 0.1f; 
@@ -83,6 +85,14 @@ namespace Arcatech.MiniGames
             if (attemptsText != null) attemptsText.gameObject.SetActive(false);
         }
 
+        protected override void HandleButtonPress(MiniGameButton button, InputAction.CallbackContext context)
+        {
+            if (button == ActivateButton && context.started)
+            {
+                CheckSync();
+            }
+        }
+
         public override void ResetGame()
         {
             _sliderTween?.Kill();
@@ -112,7 +122,7 @@ namespace Arcatech.MiniGames
                     timerText.text = remainingTime.ToString("F1");
                     if (remainingTime <= 3f)
                     {
-                        timerText.color = ColorUtility.TryParseHtmlString("#FF5268", out var red) ? red : Color.red;
+                        timerText.color = GameInterfaceManager.Instance.ColorReference.AlertRed;
                     }
                 }
 
@@ -142,20 +152,20 @@ namespace Arcatech.MiniGames
                     if (_currentCooldown > 0f)
                     {
                         // Во время отката волна становится серой/заблокированной (#566174)
-                        Color targetColor = ColorUtility.TryParseHtmlString("#566174", out var c) ? c : Color.gray;
+                        Color targetColor = GameInterfaceManager.Instance.ColorReference.PanelSurface;
                         _playerWaveImage.color = Color.Lerp(_playerWaveImage.color, targetColor, Time.deltaTime * 15f);
                     }
                     else
                     {
                         // В обычном состоянии волна розово-магентовая (#FF4FA3)
-                        Color targetColor = ColorUtility.TryParseHtmlString("#FF4FA3", out var c) ? c : Color.magenta;
+                        Color targetColor = GameInterfaceManager.Instance.ColorReference.ResonanceMagenta;
                         _playerWaveImage.color = Color.Lerp(_playerWaveImage.color, targetColor, Time.deltaTime * 15f);
                     }
                 }
             }
         }
 
-        public void CheckSync()
+        void CheckSync()
         {
             // ИГНОРИРУЕМ ВВОД, ЕСЛИ ИДЕТ ОТКАТ
             if (_currentCooldown > 0f) return;
@@ -195,7 +205,7 @@ namespace Arcatech.MiniGames
                     if (attemptsText != null)
                     {
                         attemptsText.text = Mathf.Max(0, allowedFailures - _currentFails).ToString();
-                        attemptsText.color = ColorUtility.TryParseHtmlString("#FF5268", out var red) ? red : Color.red;
+                        attemptsText.color = GameInterfaceManager.Instance.ColorReference.AlertRed;
                     }
 
                     if (_currentFails >= allowedFailures)

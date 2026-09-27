@@ -1,5 +1,6 @@
 ﻿using Arcatech.Interactions;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace Arcatech.MiniGames
 {
@@ -30,6 +31,10 @@ namespace Arcatech.MiniGames
         }
 
         protected override void OnGameEnded()
+        {
+        }
+
+        protected override void HandleButtonPress(MiniGameButton button, InputAction.CallbackContext context)
         {
         }
     }

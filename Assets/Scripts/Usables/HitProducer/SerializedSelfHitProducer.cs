@@ -1,5 +1,6 @@
 ﻿using System;
 using Arcatech.Items;
+using Arcatech.Managers;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
@@ -36,7 +37,7 @@ namespace Arcatech.Usables
                     break;
                 case StateMachineNotifyType.Use:
                     HitCallback(new TriggerHitInfo(this, _tgt, Owner.EffectSpawn.position, Vector3.up,
-                        Vector3.up, Time.time));
+                        Vector3.up, HitLayerKind.Valid,Time.time));
                     break;
                 case StateMachineNotifyType.EndUse:
                     break;

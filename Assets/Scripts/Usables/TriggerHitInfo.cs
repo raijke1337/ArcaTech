@@ -10,13 +10,15 @@ namespace Arcatech
         public TriggerHitInfo(ITriggerNotificationProvider triggerNotificationProvider,
             Collider hit,
             Vector3 hitPosition, Vector3 impactDirection, Vector3 hitNormal,
-            float time) // Added impactDir and hitNormal
+            HitLayerKind layerKind,
+            float time)
         {
             Source = triggerNotificationProvider;
             TargetCollider = hit;
             Position = hitPosition;
             ImpactDirection = impactDirection; // From the incoming projectile
             Normal = hitNormal; // Normal of the surface hit
+            LayerKind = layerKind;
             Time = time;
             TargetCollider.TryGetComponent(out _targetEntity);
         }
@@ -27,7 +29,7 @@ namespace Arcatech
         /// helper method to avoid endless TryGetComponent()s
         /// </summary>
         /// <param name="entity"></param>
-        /// <returns></returns>
+        /// <returns>hit on entity</returns>
         public bool TryGetEntityTarget(out BaseGameEntityComponent entity)
         {
             entity = _targetEntity;
@@ -36,7 +38,7 @@ namespace Arcatech
         public ITriggerNotificationProvider Source { get; }
 
         /// <summary>
-        /// The hit collider. 
+        /// The hit collider.
         /// </summary>
         public Collider TargetCollider { get; }
 
@@ -56,8 +58,33 @@ namespace Arcatech
         public Vector3 Normal { get; }
 
         /// <summary>
+        /// На каком из настроенных слоёв (Valid/Invalid) произошло попадание.
+        /// Позволяет получателям отличать "полезные" хиты от "невалидных" без
+        /// повторной проверки маски слоя коллайдера.
+        /// </summary>
+        public HitLayerKind LayerKind { get; }
+
+        /// <summary>
         /// The Unity Time.time when the hit occurred.
         /// </summary>
         public float Time { get; }
+    }
+    /// <summary>
+    /// К какому из настроенных слоёв (см. DataManager.GameRules.ValidHitsLayer /
+    /// InvalidHitsLayer) относится объект, по которому было зарегистрировано попадание.
+    /// Кладётся в <see cref="Arcatech.TriggerHitInfo"/>, чтобы получателям не приходилось
+    /// заново проверять слой коллайдера.
+    /// </summary>
+    public enum HitLayerKind
+    {
+        /// <summary>
+        /// Коллайдер не входит ни в ValidHitsLayer, ни в InvalidHitsLayer.
+        /// В обычном физическом OnTriggerEnter такого не бывает (включённые слои
+        /// триггера уже это отфильтровывают), но возможно, например, если маски
+        /// не сконфигурированы.
+        /// </summary>
+        Unknown = 0,
+        Valid,
+        Invalid
     }
 }

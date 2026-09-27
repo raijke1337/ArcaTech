@@ -6,6 +6,8 @@ namespace Arcatech.Interactions
     {
         
         [SerializeField,Header("Unassigned = apply to all")] Side affectedSide = Side.PlayerSide;
+        [SerializeField] private InteractionEffect[] onTriggerEffects;
+        
         public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             if (interactableComponent == null) return;
@@ -22,7 +24,10 @@ namespace Arcatech.Interactions
                 Interactor = component,
                 State = InteractionState.Starting
             };
-            
+            foreach (var effect in onTriggerEffects)
+            {
+                effect.Play(ctx);
+            }
             interactableComponent.StartInteraction(ctx);
             HasTriggered = true;
             LastTriggerTime = Time.time;
@@ -32,6 +37,5 @@ namespace Arcatech.Interactions
         {
             
         }
-
     }
 }

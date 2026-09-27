@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Arcatech.Managers;
+using DG.Tweening;
 using KBCore.Refs;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -21,8 +22,6 @@ namespace Arcatech.Cameras
             [Tooltip("Значение вертикальной оси CinemachineOrbitalFollow.")]
             public float verticalAxisValue;
         }
-
-
 
         [Header("Gameplay camera")]
         [SerializeField] private CinemachineCamera gameplayCamera;
@@ -44,7 +43,7 @@ namespace Arcatech.Cameras
             BackwardZ, // 180 / 45
             BackwardX // 270 /45
         }
-        
+
         public event UnityAction OnRotateStarted =  delegate { };
         public event UnityAction OnRotateFinished =  delegate { };
 
@@ -57,12 +56,18 @@ namespace Arcatech.Cameras
         [SerializeField, Min(0.01f)] private float rotationDuration = 0.35f;
         [SerializeField] private bool clockwiseDirectionIsPositive = true;
 
+        [Header("Zoom")]
+        [SerializeField, Tooltip("0 = взять текущий FOV камеры как базовый автоматически при старте.")]
+        private float defaultFieldOfView = 0f;
+        [SerializeField] private Ease zoomEase = Ease.OutQuad;
+
         [Header("Debug")]
         [SerializeField] private bool enableDebugLogs = true;
 
         private int currentViewIndex;
         private Coroutine rotationRoutine;
         private int rotationVersion;
+        private Tween _zoomTween;
 
         private void Awake()
         {
@@ -84,6 +89,9 @@ namespace Arcatech.Cameras
             currentViewIndex = FindClosestViewIndex();
             ApplyViewImmediately(currentViewIndex);
 
+            if (defaultFieldOfView <= 0f)
+                defaultFieldOfView = gameplayCamera.Lens.FieldOfView;
+
             Log(
                 $"Initialized. Current view: {currentViewIndex}, " +
                 $"angle: {views[currentViewIndex].horizontalAngle}.");
@@ -102,8 +110,6 @@ namespace Arcatech.Cameras
 
             int direction = clockwise ? 1 : -1;
 
-            // Если визуально камера едет в противоположную сторону,
-            // просто включите этот флаг в Inspector.
             if (!clockwiseDirectionIsPositive)
                 direction *= -1;
 
@@ -183,6 +189,43 @@ namespace Arcatech.Cameras
                     onComplete));
         }
 
+        #region Zoom
+
+        /// <summary>
+        /// Плавно меняет FieldOfView геймплейной камеры. Твин идёт на unscaled-времени,
+        /// поэтому не замедляется вместе с HitstopPlayer — зум остаётся резким и чётким
+        /// даже во время slowmo.
+        /// </summary>
+        public void ZoomTo(float targetFieldOfView, float duration, UnityAction onComplete = null)
+        {
+            if (!ValidateReferences())
+                return;
+
+            _zoomTween?.Kill();
+            _zoomTween = DOTween.To(
+                    () => gameplayCamera.Lens.FieldOfView,
+                    SetFieldOfView,
+                    targetFieldOfView,
+                    duration)
+                .SetEase(zoomEase)
+                .SetUpdate(true) // unscaled time — не зависит от Time.timeScale
+                .OnComplete(() => InvokeCallbackSafely(onComplete));
+        }
+
+        public void ResetZoom(float duration, UnityAction onComplete = null)
+        {
+            ZoomTo(defaultFieldOfView, duration, onComplete);
+        }
+
+        private void SetFieldOfView(float value)
+        {
+            var lens = gameplayCamera.Lens;
+            lens.FieldOfView = value;
+            gameplayCamera.Lens = lens;
+        }
+
+        #endregion
+
         private IEnumerator RotateToView(
             CameraView targetView,
             int direction,
@@ -218,7 +261,6 @@ namespace Arcatech.Cameras
 
                 float progress = Mathf.Clamp01(elapsed / rotationDuration);
 
-                // Плавность без резкого старта и остановки.
                 progress = Mathf.SmoothStep(0f, 1f, progress);
 
                 float horizontalAngle = Mathf.Lerp(
@@ -238,7 +280,6 @@ namespace Arcatech.Cameras
 
             SetOrbitAxes(targetHorizontalAngle, targetView.verticalAxisValue);
 
-            // Даём CinemachineBrain обработать последнее изменение осей.
             yield return new WaitForEndOfFrame();
 
             if (expectedVersion != rotationVersion)
@@ -256,19 +297,16 @@ namespace Arcatech.Cameras
 
             InvokeCallbackSafely(onComplete);
             OnRotateFinished.Invoke();
-            
         }
 
         private void ApplyViewImmediately(int viewIndex)
         {
             CameraView view = views[viewIndex];
-
             SetOrbitAxes(view.horizontalAngle, view.verticalAxisValue);
         }
 
         private void SetOrbitAxes(float horizontalAngle, float verticalAxisValue)
         {
-            // При включённом Wrap Cinemachine сам приведёт угол к диапазону оси.
             orbitalFollow.HorizontalAxis.Value = horizontalAngle;
             orbitalFollow.VerticalAxis.Value = verticalAxisValue;
         }
@@ -368,11 +406,13 @@ namespace Arcatech.Cameras
 
         private void OnDisable()
         {
-            if (rotationRoutine == null)
-                return;
+            if (rotationRoutine != null)
+            {
+                StopCoroutine(rotationRoutine);
+                rotationRoutine = null;
+            }
 
-            StopCoroutine(rotationRoutine);
-            rotationRoutine = null;
+            _zoomTween?.Kill();
         }
 
         private void Log(string message)

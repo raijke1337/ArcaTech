@@ -621,6 +621,142 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Minigame"",
+            ""id"": ""83bdbf26-f316-4d70-a11e-7d07e661d5b4"",
+            ""actions"": [
+                {
+                    ""name"": ""ButtonN"",
+                    ""type"": ""Button"",
+                    ""id"": ""c7ed6185-d0a0-4d85-87e5-97f438dcdba5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""ButtonW"",
+                    ""type"": ""Button"",
+                    ""id"": ""380c6036-e639-492b-8b23-6aad70741122"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""ButtonE"",
+                    ""type"": ""Button"",
+                    ""id"": ""565f1c38-9500-4246-b2e3-cae9ae1bd375"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""ButtonS"",
+                    ""type"": ""Button"",
+                    ""id"": ""88808e70-e08a-4569-855a-472b6b6c3cde"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""27794390-c295-48ce-84fd-84e4c09691a7"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""ButtonN"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""041477df-201b-4aef-b55b-5344dde971b7"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""ButtonN"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6f66625d-595b-449d-a3df-6d12b4f71294"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""ButtonW"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d235f425-a06b-4f67-9d44-d7afc2411c62"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""ButtonW"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""78b603e4-a2b6-4bf6-a6d8-0b2f5a91a5c6"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""ButtonE"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0710451a-dae6-4fd1-8e82-990bdb6bdd00"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""ButtonE"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""31238982-9df9-46e0-b101-f4c695d471e4"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KBM"",
+                    ""action"": ""ButtonS"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""abe4d7e5-14bb-4cf8-9d51-bde162708af7"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";GamePad"",
+                    ""action"": ""ButtonS"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -668,11 +804,18 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Game_SpecialMelee = m_Game.FindAction("SpecialMelee", throwIfNotFound: true);
         m_Game_SpecialRanged = m_Game.FindAction("SpecialRanged", throwIfNotFound: true);
         m_Game_SpecialBattery = m_Game.FindAction("SpecialBattery", throwIfNotFound: true);
+        // Minigame
+        m_Minigame = asset.FindActionMap("Minigame", throwIfNotFound: true);
+        m_Minigame_ButtonN = m_Minigame.FindAction("ButtonN", throwIfNotFound: true);
+        m_Minigame_ButtonW = m_Minigame.FindAction("ButtonW", throwIfNotFound: true);
+        m_Minigame_ButtonE = m_Minigame.FindAction("ButtonE", throwIfNotFound: true);
+        m_Minigame_ButtonS = m_Minigame.FindAction("ButtonS", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
     {
         UnityEngine.Debug.Assert(!m_Game.enabled, "This will cause a leak and performance issues, PlayerControls.Game.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Minigame.enabled, "This will cause a leak and performance issues, PlayerControls.Minigame.Disable() has not been called.");
     }
 
     /// <summary>
@@ -972,6 +1115,135 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="GameActions" /> instance referencing this action map.
     /// </summary>
     public GameActions @Game => new GameActions(this);
+
+    // Minigame
+    private readonly InputActionMap m_Minigame;
+    private List<IMinigameActions> m_MinigameActionsCallbackInterfaces = new List<IMinigameActions>();
+    private readonly InputAction m_Minigame_ButtonN;
+    private readonly InputAction m_Minigame_ButtonW;
+    private readonly InputAction m_Minigame_ButtonE;
+    private readonly InputAction m_Minigame_ButtonS;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Minigame".
+    /// </summary>
+    public struct MinigameActions
+    {
+        private @PlayerControls m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public MinigameActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Minigame/ButtonN".
+        /// </summary>
+        public InputAction @ButtonN => m_Wrapper.m_Minigame_ButtonN;
+        /// <summary>
+        /// Provides access to the underlying input action "Minigame/ButtonW".
+        /// </summary>
+        public InputAction @ButtonW => m_Wrapper.m_Minigame_ButtonW;
+        /// <summary>
+        /// Provides access to the underlying input action "Minigame/ButtonE".
+        /// </summary>
+        public InputAction @ButtonE => m_Wrapper.m_Minigame_ButtonE;
+        /// <summary>
+        /// Provides access to the underlying input action "Minigame/ButtonS".
+        /// </summary>
+        public InputAction @ButtonS => m_Wrapper.m_Minigame_ButtonS;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Minigame; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="MinigameActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(MinigameActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="MinigameActions" />
+        public void AddCallbacks(IMinigameActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MinigameActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MinigameActionsCallbackInterfaces.Add(instance);
+            @ButtonN.started += instance.OnButtonN;
+            @ButtonN.performed += instance.OnButtonN;
+            @ButtonN.canceled += instance.OnButtonN;
+            @ButtonW.started += instance.OnButtonW;
+            @ButtonW.performed += instance.OnButtonW;
+            @ButtonW.canceled += instance.OnButtonW;
+            @ButtonE.started += instance.OnButtonE;
+            @ButtonE.performed += instance.OnButtonE;
+            @ButtonE.canceled += instance.OnButtonE;
+            @ButtonS.started += instance.OnButtonS;
+            @ButtonS.performed += instance.OnButtonS;
+            @ButtonS.canceled += instance.OnButtonS;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="MinigameActions" />
+        private void UnregisterCallbacks(IMinigameActions instance)
+        {
+            @ButtonN.started -= instance.OnButtonN;
+            @ButtonN.performed -= instance.OnButtonN;
+            @ButtonN.canceled -= instance.OnButtonN;
+            @ButtonW.started -= instance.OnButtonW;
+            @ButtonW.performed -= instance.OnButtonW;
+            @ButtonW.canceled -= instance.OnButtonW;
+            @ButtonE.started -= instance.OnButtonE;
+            @ButtonE.performed -= instance.OnButtonE;
+            @ButtonE.canceled -= instance.OnButtonE;
+            @ButtonS.started -= instance.OnButtonS;
+            @ButtonS.performed -= instance.OnButtonS;
+            @ButtonS.canceled -= instance.OnButtonS;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="MinigameActions.UnregisterCallbacks(IMinigameActions)" />.
+        /// </summary>
+        /// <seealso cref="MinigameActions.UnregisterCallbacks(IMinigameActions)" />
+        public void RemoveCallbacks(IMinigameActions instance)
+        {
+            if (m_Wrapper.m_MinigameActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="MinigameActions.AddCallbacks(IMinigameActions)" />
+        /// <seealso cref="MinigameActions.RemoveCallbacks(IMinigameActions)" />
+        /// <seealso cref="MinigameActions.UnregisterCallbacks(IMinigameActions)" />
+        public void SetCallbacks(IMinigameActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MinigameActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MinigameActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="MinigameActions" /> instance referencing this action map.
+    /// </summary>
+    public MinigameActions @Minigame => new MinigameActions(this);
     private int m_KBMSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -1096,5 +1368,41 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSpecialBattery(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Minigame" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="MinigameActions.AddCallbacks(IMinigameActions)" />
+    /// <seealso cref="MinigameActions.RemoveCallbacks(IMinigameActions)" />
+    public interface IMinigameActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "ButtonN" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnButtonN(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ButtonW" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnButtonW(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ButtonE" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnButtonE(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ButtonS" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnButtonS(InputAction.CallbackContext context);
     }
 }

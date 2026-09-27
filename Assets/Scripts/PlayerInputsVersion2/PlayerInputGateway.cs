@@ -14,7 +14,6 @@ namespace Arcatech.Units.Control
         [SerializeField] private float aimDeadZone = 0.2f;
 
         private PlayerControls _controls;
-
         public event Action<Vector2> MoveChanged = delegate { };
         public event Action<Vector2> AimChanged = delegate { };
 
@@ -47,6 +46,7 @@ namespace Arcatech.Units.Control
         private void OnEnable()
         {
             _controls.Game.Enable();
+            Instance = this; // простая регистрация, см. ниже
         }
 
         private void OnDisable()
@@ -56,6 +56,9 @@ namespace Arcatech.Units.Control
             CameraModifierHeld = false;
 
             _controls.Game.Disable();
+            _controls.Minigame.Disable();
+
+            if (Instance == this) Instance = null;
         }
 
         private void OnDestroy()
@@ -63,6 +66,27 @@ namespace Arcatech.Units.Control
             _controls.Game.SetCallbacks(null);
             _controls.Dispose();
         }
+        
+        #region Input mode switching
+
+        public static PlayerInputGateway Instance { get; private set; }
+
+        public void EnableGameplayInput()
+        {
+            _controls.Minigame.Disable();
+            _controls.Minigame.SetCallbacks(null);
+            _controls.Game.Enable();
+        }
+
+        public void EnableMinigameInput(PlayerControls.IMinigameActions actions)
+        {
+            _controls.Game.Disable();
+            _controls.Minigame.SetCallbacks(actions);
+            _controls.Minigame.Enable();
+        }
+
+        #endregion
+        
 
         public void OnMoveDirection(InputAction.CallbackContext context)
         {

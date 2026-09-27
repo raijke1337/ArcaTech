@@ -1,4 +1,6 @@
-﻿namespace Arcatech.Usables.Effects
+﻿using Arcatech.Managers;
+
+namespace Arcatech.Usables.Effects
 {
     /// <summary>
     /// Single choke-point for combat damage scaling. Because outgoing damage is
@@ -11,7 +13,7 @@
     /// </summary>
     public static class DamagePipeline
     {
-        public static IDifficultyDamageProvider Difficulty { get; set; } = new NullDifficultyProvider();
+        private static IDifficultyDamageProvider _difficulty;
         public static bool HitStopEnabled { get; } = true;
 
         /// <summary>
@@ -22,12 +24,13 @@
         public static float Resolve(float rawAmount,
             EffectsReceiverComponent attacker, EffectsReceiverComponent defender)
         {
+            _difficulty= DataManager.Instance;
             if (rawAmount >= 0f) return rawAmount;
             float amount = rawAmount;
             if (attacker != null && attacker.TryGetModifierAggregator(out var atk))
                 amount *= atk.GetMultiplier(ModifierParam.OutgoingDamage);
-            amount *= Difficulty.GetOutgoingMult(attacker?.Owner);
-            amount *= Difficulty.GetIncomingMult(defender?.Owner);
+            amount *= _difficulty.GetOutgoingMult(attacker?.Owner);
+            amount *= _difficulty.GetIncomingMult(defender?.Owner);
             if (defender != null && defender.TryGetModifierAggregator(out var def))
                 amount *= def.GetMultiplier(ModifierParam.IncomingDamage);
             return amount;

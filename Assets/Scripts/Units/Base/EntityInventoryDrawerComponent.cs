@@ -94,6 +94,11 @@ namespace Arcatech.Units
             DrawItems(defaultItemsDrawStrat);
         }
 
+        public void OverrideDrawStrategy(IDrawItemStrategy strat)
+        {
+            currentDrawStrategy = strat;
+            DrawItems(currentDrawStrategy);
+        }
         private void Update()
         {
             if (drawItemsStrategyProvider is { NeedsRedraw: true })

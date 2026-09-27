@@ -54,18 +54,9 @@ namespace Arcatech.Usables.Effects
         }
     }
 
-    public enum DamageDirection { Outgoing, Incoming }
-
     public interface IDifficultyDamageProvider
     {
         float GetOutgoingMult(BaseGameEntityComponent attacker);
         float GetIncomingMult(BaseGameEntityComponent defender);
-    }
-
-    /// <summary> Dummy: no scaling. Replace by wiring GameManager.GetDamageMults(). </summary>
-    public sealed class NullDifficultyProvider : IDifficultyDamageProvider
-    {
-        public float GetOutgoingMult(BaseGameEntityComponent _) => 1f;
-        public float GetIncomingMult(BaseGameEntityComponent _) => 1f;
     }
 }
