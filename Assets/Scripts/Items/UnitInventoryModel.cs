@@ -160,6 +160,7 @@ namespace Arcatech.Items
             }
     
             _equipments[toEquip.Slot] = toEquip;
+            toEquip.OnEquip();
     
             if (_initialized)
                 ModelUpdatedEvent.Invoke(new InventoryChangeNotification()

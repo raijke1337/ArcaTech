@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Arcatech.Items
 {
-    public class EquipmentComponent : MonoBehaviour,IUsableComponent
+    public sealed class EquipmentComponent : MonoBehaviour,IUsableComponent,IEquippable
     {
         [SerializeField] private Transform spawner;
         public Transform EffectSpawn => spawner;
@@ -25,7 +25,19 @@ namespace Arcatech.Items
         {
             foreach (var part in _parts) part.TriggerState(notifyType);
         }
+
+        public void OnEquip()
+        {
+            foreach (var part in _parts) part.OnEquip();
+        }
+
+        public void OnUnequip()
+        {
+            foreach (var part in _parts) part.OnUnequip();
+        }
     }
+    
+    
 }
 
 

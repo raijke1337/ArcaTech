@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Arcatech.Items
 {
 
-    public class Equipment : Item, IEquipmentStatsProvider
+    public class Equipment : Item, IEquipmentStatsProvider,IEquippable
     {
         public Equipment (EquipSO cfg, BaseGameEntityComponent ow) : base (cfg,ow)
         {
@@ -28,11 +28,19 @@ namespace Arcatech.Items
         public IEnumerable<StatModifier> GetPersistentModifiers() => mods;
         public IEnumerable<PeriodicDelta> GetPeriodicDeltas() => deltas;
         public BaseGameEntityComponent Source => Owner;
-    /// <summary>
-    /// called when the item is removed completely
-    /// </summary>
-        public virtual void OnUnequip()
-        { }
+
+        /// <summary>
+        /// called when the item is removed completely
+        /// </summary>
+        public void OnUnequip()
+        {
+            DisplayItem.OnUnequip();
+        }
+
+        public void OnEquip()
+        {
+            DisplayItem.OnEquip();
+        }
 
     }
 

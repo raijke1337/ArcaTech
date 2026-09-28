@@ -8,7 +8,7 @@ namespace Arcatech.Interactions
         [SerializeField]SoundDefinition soundDefinition;
         public override void Play(InteractionContext ctx)
         {
-            AudioCall.Play(soundDefinition, ctx.Interactor.Entity.transform.position);
+            AudioEvents.Play(soundDefinition, ctx.Interactor.Entity.transform.position);
         }
     }
 }

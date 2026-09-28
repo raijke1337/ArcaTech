@@ -27,5 +27,13 @@ namespace Arcatech.Items
         {
             if (_hashes.TryGetValue(notification, out var hash)) animator.SetTrigger(hash);
         }
+
+        public void OnEquip()
+        {// TODO some animations if needed
+        }
+
+        public void OnUnequip()
+        {
+        }
     }
 }

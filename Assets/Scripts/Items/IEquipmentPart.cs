@@ -2,7 +2,7 @@
 
 namespace Arcatech.Items
 {
-    public interface IEquipmentPart
+    public interface IEquipmentPart : IEquippable
     {
         public void TriggerState (StateMachineNotifyType notification);
     }

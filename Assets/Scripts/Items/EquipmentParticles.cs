@@ -39,5 +39,13 @@ namespace Arcatech.Items
                 particle.Stop();
             }
         }
+
+        public void OnEquip()
+        {
+        }
+
+        public void OnUnequip()
+        {
+        }
     }
 }
