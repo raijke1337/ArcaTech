@@ -14,8 +14,12 @@ namespace Arcatech.Items
        
        public void TriggerState(StateMachineNotifyType notification)
         {
-            if (oldSound.IsValid) AudioEvents.Stop(oldSound);
-            if (sounds.TryGetValue(notification, out var sound)) AudioEvents.Play(sound,transform.position,null,HandlePlayed);
+
+            if (sounds.TryGetValue(notification, out var sound))
+            {
+                if (oldSound.IsValid) AudioEvents.Stop(oldSound);
+                AudioEvents.Play(sound,transform.position,null,HandlePlayed);
+            }
         }
 
         private void HandlePlayed(SoundHandle obj)
@@ -29,7 +33,7 @@ namespace Arcatech.Items
             AudioEvents.Play(equipSound,transform.position,null,HandlePlayed);
         }
 
-        public void OnUnequip()
+        public void OnRemove()
         {
             if (!unequipSound) return;
             AudioEvents.Play(unequipSound,transform.position,null,HandlePlayed);

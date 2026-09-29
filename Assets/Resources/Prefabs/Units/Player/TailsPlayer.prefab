@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 5981646239584641546}
   - component: {fileID: 9103845225237627509}
   - component: {fileID: 1836545175343542454}
+  - component: {fileID: 4764128200971329217}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -355,7 +356,7 @@ MonoBehaviour:
   _canEverJump: 1
   _canJumpWhileCrouching: 1
   _jumpMaxCount: 1
-  _jumpImpulse: 5
+  _jumpImpulse: 8
   _jumpMaxHoldTime: 0
   _jumpMaxPreGroundedTime: 0
   _jumpMaxPostGroundedTime: 0
@@ -367,7 +368,7 @@ MonoBehaviour:
   _swimmingFriction: 0
   _buoyancy: 1
   _gravity: {x: 0, y: -9.81, z: 0}
-  _gravityScale: 1
+  _gravityScale: 2
   _useRootMotion: 0
   _impartPlatformMovement: 1
   _impartPlatformRotation: 1
@@ -380,7 +381,6 @@ MonoBehaviour:
   _standingDownwardForceScale: 1
   _camera: {fileID: 0}
   minCrossYToRotate: 0.15
-  _impulseSpeed: 20
   _impulseGroundConstraintPause: 0.15
 --- !u!114 &8462650149815504940
 MonoBehaviour:
@@ -747,6 +747,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.PlayerInputGateway
   moveDeadZone: 0.15
   aimDeadZone: 0.2
+--- !u!114 &4764128200971329217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e04225e74ff28e428b290b12723a9c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Usables.HeatComponent
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0

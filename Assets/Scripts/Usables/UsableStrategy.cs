@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Texts;
@@ -12,7 +13,7 @@ namespace Arcatech.Usables
     {
         public UsableStrategy(SerializedUsableStrategy config, BaseGameEntityComponent owner, EquipmentComponent equipment)
         {
-            GetStateTransition = config.useStateTransition?.Build();
+            GetActivationTransition = config.useStateTransition?.Build();
             Description = config.description;
             GetCost = config.settings.useCost;
             _owner =  owner;
@@ -24,6 +25,8 @@ namespace Arcatech.Usables
                 t.Deserialize(owner, equipment)).ToArray();
             
             _reload = config.settings.charge.Deserialize();
+            // стратегиям, которым нужен владелец (например, перегрев), сообщаем его
+            if (_reload is IOwnerAware ownerAware) ownerAware.SetOwner(owner);
         }
 
         public Description Description { get; }
@@ -42,7 +45,10 @@ namespace Arcatech.Usables
             return ok;
         }
 
-        public StateTransition GetStateTransition { get; }
+        public StateTransition GetActivationTransition { get; }
+
+        /// <summary>Стратегия перезарядки (нужна, чтобы узнать, есть ли у применения перегрев)</summary>
+        public IReloadStrategy Reload => _reload;
         
         private readonly CompositeUsableApplication[] _usableEffects;
         private readonly IReloadStrategy _reload;
@@ -55,6 +61,8 @@ namespace Arcatech.Usables
 
         public void CleanUp()
         {
+            // стратегии с подписками (перегрев) отписываются от событий
+            if (_reload is IDisposable disposable) disposable.Dispose();
             foreach (var effect in _usableEffects)
             {
                 effect.Clear();

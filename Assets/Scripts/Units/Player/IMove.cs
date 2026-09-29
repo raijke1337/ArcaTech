@@ -10,8 +10,8 @@ namespace Arcatech.Units.Control
         public bool IsGrounded { get; }
         public bool UseRootMotion { get; set; }
         public float SpeedMultiplier { get; set; }
-        public void ApplyImpulse(Vector3 impulse);
-        public void ApplyImpulse(float impulseRelative);
+        /// <summary>Единая точка для отталкиваний и рывков. Направление и скорость считает вызывающий.</summary>
+        public void ApplyMotion(in MotionRequest request);
         public bool IsGamepadInput { get; set; }
     }
 }

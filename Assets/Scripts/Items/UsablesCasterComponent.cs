@@ -28,6 +28,7 @@ namespace Arcatech.Items
         
         public TriggerTrackerComponent HitArea => meleeHitbox;
         private EntityStatsComponent _stats;
+        private WeaponHeatComponent _weaponHeat;
         
         Dictionary<UnitActionType, IUsable> _usables;
         private IUsable _currentUsable;
@@ -37,6 +38,7 @@ namespace Arcatech.Items
         {
             _usables??= new();
             _stats = GetComponent<EntityStatsComponent>();
+            _weaponHeat = WeaponHeatComponent.Find(this);
         }
         public void RefreshView(InventoryChangeNotification notification)
         {
@@ -49,8 +51,8 @@ namespace Arcatech.Items
             {
                 foreach (var usable in _usables.Values)
                 {
-                    if (usable.GetStateTransition != null)
-                        stateUnit.RemoveTransition(usable.GetStateTransition);
+                    if (usable.GetActivationTransition != null)
+                        stateUnit.RemoveTransition(usable.GetActivationTransition);
                     usable.CleanUp();
                 }
             }
@@ -71,11 +73,49 @@ namespace Arcatech.Items
 
             foreach (var usable in _usables.Values)
             {
-                if (usable.GetStateTransition != null)
-                    stateUnit.AddTransition(usable.GetStateTransition);
+                if (usable.GetActivationTransition != null)
+                    stateUnit.AddTransition(usable.GetActivationTransition);
             }
 
+            UpdateWeaponHeat();
+
             _redraw = true;
+        }
+
+        /// <summary>
+        /// Перегрев активен, только если среди экипированных применений есть оружие с OverheatStrategy.
+        /// Индикатор показывается и прячется по этому признаку (WeaponHeatComponent.Changed).
+        /// </summary>
+        private void UpdateWeaponHeat()
+        {
+            if (_weaponHeat == null) return;
+
+            SerializedOverheatStrategy overheat = null;
+            foreach (var usable in _usables.Values)
+            {
+                if (usable is UsableStrategy strategy && strategy.Reload is OverheatStrategy o)
+                {
+                    overheat = o.Config;
+                    break;
+                }
+            }
+
+            if (_weaponHeat.DebugEnabled)
+            {
+                var sb = new System.Text.StringBuilder();
+                foreach (var pair in _usables)
+                {
+                    string reload = pair.Value is UsableStrategy s && s.Reload != null
+                        ? s.Reload.GetType().Name
+                        : pair.Value.GetType().Name;
+                    sb.Append($"{pair.Key}={reload}; ");
+                }
+
+                _weaponHeat.DebugLog($"UsablesCaster refresh: equipped usables [{sb}] -> overheat weapon: " +
+                                     (overheat != null ? overheat.name : "none"));
+            }
+
+            _weaponHeat.SetActiveWeapon(overheat);
         }
 
 

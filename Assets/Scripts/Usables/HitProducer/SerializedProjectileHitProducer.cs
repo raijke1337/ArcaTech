@@ -207,7 +207,6 @@ namespace Arcatech.Usables
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
-         //   Debug.Log($"Hit callback! {triggerHitInfo.TargetCollider.gameObject.name}");
             HitCallback(triggerHitInfo);
         }
 

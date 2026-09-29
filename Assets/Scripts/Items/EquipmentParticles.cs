@@ -44,7 +44,7 @@ namespace Arcatech.Items
         {
         }
 
-        public void OnUnequip()
+        public void OnRemove()
         {
         }
     }

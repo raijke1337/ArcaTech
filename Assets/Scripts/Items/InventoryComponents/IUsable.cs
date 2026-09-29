@@ -8,7 +8,7 @@ namespace Arcatech
         IUsable : ICosted, IActionIconContent,IAffectsItemDisplay
     {
         public bool UsableIsReady();
-        public StateTransition GetStateTransition { get; }
+        public StateTransition GetActivationTransition { get; }
         void DoUpdate(float delta);
         void Notify(StateMachineNotifyType notifyType);
         void CleanUp();

@@ -32,9 +32,9 @@ namespace Arcatech.Items
         /// <summary>
         /// called when the item is removed completely
         /// </summary>
-        public void OnUnequip()
+        public void OnRemove()
         {
-            DisplayItem.OnUnequip();
+            DisplayItem.OnRemove();
         }
 
         public void OnEquip()

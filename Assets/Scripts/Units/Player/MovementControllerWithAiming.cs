@@ -273,49 +273,33 @@ namespace Arcatech.Units.Control
 
         [Header("Impulse Settings")]
 
-        [Tooltip("Горизонтальная скорость (м/с), сообщаемая импульсом ±1 (додж игрока).")]
-        [SerializeField] private float _impulseSpeed = 8f;
-
         [Tooltip("Сколько секунд снимать привязку к земле после импульса, чтобы додж отрывал от пола.")]
         [SerializeField] private float _impulseGroundConstraintPause = 0.15f;
 
         /// <summary>
-        /// Knockback / отдача от внешнего источника (взрыв, удар босса) в мировых координатах.
-        /// Заменяет текущую боковую скорость — knockback должен ощущаться резко и коммитить.
+        /// Единая точка для отталкиваний и рывков (скорость в м/с уже посчитана вызывающим).
+        /// Knockback  - заменяет боковую скорость (резкий откидывающий удар).
+        /// Dash       - добавляется к текущей боковой скорости (бегущий юнит тормозит трением, а не телепортируется).
         /// </summary>
-        public void ApplyImpulse(Vector3 impulse)
-        {
-            if (Paused || impulse.sqrMagnitude < 0.0001f) return;
-
-            LaunchCharacter(
-                launchVelocity:           impulse,
-                overrideVerticalVelocity: false,  // гравитацию и текущую вертикаль не трогаем
-                overrideLateralVelocity:  true);  // knockback перебивает боковую инерцию
-
-            PauseGroundConstraint(_impulseGroundConstraintPause);
-        }
-
-        /// <summary>
-        /// Додж игрока: импульс относительно moveDir игрока.
-        /// -1 = полный назад, 0 = нет, +1 = полный вперёд.
-        /// Добавляется к текущей боковой скорости — бегущий юнит тормозит трением, а не телепортируется.
-        /// </summary>
-        public void ApplyImpulse(float impulseRelative)
+        public void ApplyMotion(in MotionRequest request)
         {
             if (Paused) return;
 
-            float t = Mathf.Clamp(impulseRelative, -1f, 1f);
-            if (Mathf.Approximately(t, 0f)) return;
+            Vector3 v = request.Velocity;
+            bool isDash = request.Kind == MotionKind.Dash;
+            if (isDash) v.y = 0f;
+            if (v.sqrMagnitude < 0.0001f) return;
 
-            Vector3 worldImpulse = MovementVector * (t * _impulseSpeed);
+            bool hasVertical = v.y > 0.01f;
 
             LaunchCharacter(
-                launchVelocity:           worldImpulse,
-                overrideVerticalVelocity: false,
-                overrideLateralVelocity:  false);  // додж складывается с инерцией
+                launchVelocity:           v,
+                overrideVerticalVelocity: hasVertical,      // без подброса гравитацию и вертикаль не трогаем
+                overrideLateralVelocity:  !isDash);         // knockback перебивает боковую инерцию, dash складывается с ней
 
             PauseGroundConstraint(_impulseGroundConstraintPause);
         }
+
         #endregion
     }
 }

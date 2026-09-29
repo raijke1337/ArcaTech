@@ -151,7 +151,7 @@ namespace Arcatech.Items
 
             if (_equipments.Remove(toEquip.Slot, out var drop))
             {
-                drop.OnUnequip();
+                drop.OnRemove();
                 dropped = drop;
         
                 // УДАЛИТЬ ОТ СЮДА:

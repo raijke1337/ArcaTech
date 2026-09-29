@@ -57,7 +57,7 @@ namespace Arcatech.UI
 
         public void SetPartialAndBlink(float normalizedValue, float blinkDuration)
         {
-            _fill.fillAmount = Mathf.Clamp01(normalizedValue);
+            //_fill.fillAmount = Mathf.Clamp01(normalizedValue);
 
             StartBlink(blinkDuration);
         }

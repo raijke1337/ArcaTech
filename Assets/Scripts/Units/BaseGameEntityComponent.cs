@@ -63,7 +63,10 @@ namespace Arcatech
         {
             components = GetComponentsInChildren<IKillableComponent>().ToList();
             components.Add(this);
-            _rb.isKinematic = setKinematic;
+            // NavMeshAgent сам владеет позицией: динамический Rigidbody (гравитация, толчки от ECM2) с ним несовместим.
+            bool agentDriven = TryGetComponent<UnityEngine.AI.NavMeshAgent>(out _);
+            _rb.isKinematic = setKinematic || agentDriven;
+            if (_rb.isKinematic) _rb.useGravity = false;
         }
         
         public bool Invulnerable { get; set; }

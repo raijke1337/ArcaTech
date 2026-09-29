@@ -52,7 +52,6 @@ namespace Arcatech.Items.Projectiles
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
-         //   Debug.Log($"{name} projectile trigger reporting hit {triggerHitInfo.TargetCollider.gameObject.name}");
             _receiver?.TriggerEntered(triggerHitInfo);
             _behavior.NotifyCollision(triggerHitInfo);
         }

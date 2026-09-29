@@ -55,7 +55,7 @@ namespace Arcatech.Items
             }
         }
 
-        public void OnUnequip()
+        public void OnRemove()
         {
             foreach (var pair in saved)
             {
@@ -78,7 +78,7 @@ namespace Arcatech.Items
         private void OnDestroy()
         {
             // Если костюм удалили, не вызвав OnUnequip, шейп не останется нажатым
-            OnUnequip();
+            OnRemove();
         }
 
         public void TriggerState(StateMachineNotifyType notification)

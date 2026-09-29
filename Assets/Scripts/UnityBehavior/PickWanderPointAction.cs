@@ -23,10 +23,15 @@ public partial class PickWanderPointAction : Action
     protected override Status OnStart()
     {
         var go = Agent?.Value;
-        if (go == null) { LogFailure("Agent == null"); return Status.Failure; }
+        if (go == null)
+        {
+            LogFailure("Agent == null"); return Status.Failure;
+        }
 
         if (_wrapper == null && !go.TryGetComponent(out _wrapper))
-        { LogFailure("Wrapper not found"); return Status.Failure; }
+        {
+            LogFailure("Wrapper not found"); return Status.Failure;
+        }
 
         if (_wrapper.Nav == null || !_wrapper.Nav.isOnNavMesh)
             return Status.Failure;

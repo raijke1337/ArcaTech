@@ -99,7 +99,7 @@ namespace Arcatech.Items
             isEquipped = true;
         }
 
-        public void OnUnequip()
+        public void OnRemove()
         {
             if (!isEquipped)
                 return;

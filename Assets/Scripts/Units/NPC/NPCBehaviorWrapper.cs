@@ -1,11 +1,9 @@
-
 using System;
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
-using NUnit.Framework.Constraints;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -38,6 +36,7 @@ namespace Arcatech.Units
         private bool _paused;
         private float _speedMultiplier = 1f;
         private bool _canMove;
+        private bool _canMoveAssigned;
 
         #region BLACKBOARD actions
 
@@ -46,6 +45,11 @@ namespace Arcatech.Units
         private BlackboardVariable<Vector3> _start;
         private void OnEnable()
         {
+            // Достаём/создаём исполнителя импульсов ДО любых return ниже: раньше при пустом CombatState
+            // он не создавался, и первый же ApplyImpulse падал с NullReferenceException.
+            if (!TryGetComponent(out _impulse)) _impulse = gameObject.AddComponent<ImpulseApplier>();
+            _impulse.MotionEnded += OnExternalMotionEnded;
+
             behavior.GetVariable("CombatState", out var combatState);
             _combateventChannel = combatState.ObjectValue as EnterCombatEventChannel;
             if (_combateventChannel == null)
@@ -55,13 +59,20 @@ namespace Arcatech.Units
             }
             _combateventChannel.Event += OnCombatStateChanged;
             behavior.GetVariable("StartingPosition", out _start);
-            if (!TryGetComponent(out _impulse)) _impulse = gameObject.AddComponent<ImpulseApplier>();
         }
 
         private void OnDisable()
         {
+            if (_impulse != null) _impulse.MotionEnded -= OnExternalMotionEnded;
             if (_combateventChannel != null)
             _combateventChannel.Event -= OnCombatStateChanged;
+        }
+
+        /// <summary>Толчок закончился: возвращаем агенту «намерение» (двигаться / стоять).</summary>
+        private void OnExternalMotionEnded(ImpulseApplier _)
+        {
+            if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
+            agent.isStopped = _paused || (_canMoveAssigned && !_canMove);
         }
         private void OnCombatStateChanged(bool state) => _inCombat =  state;
         public NavMeshAgent Nav => agent;
@@ -115,7 +126,7 @@ namespace Arcatech.Units
             set
             {
                 _paused = value;
-                agent.isStopped = _paused;
+                if (agent.enabled && agent.isOnNavMesh) agent.isStopped = _paused;
 
                 if (!behavior) return;
                 behavior.enabled = !_paused;
@@ -143,7 +154,8 @@ namespace Arcatech.Units
             set
             {
                 _canMove = value;                 // намерение запоминаем ВСЕГДА
-                if (ImpulseActive) return;        // во время импульса агентом рулит физика
+                _canMoveAssigned = true;
+                if (ImpulseActive) return;        // во время импульса агентом рулит ImpulseApplier (вернёт isStopped в OnExternalMotionEnded)
                 if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
                 agent.isStopped = !value;
             }
@@ -151,14 +163,20 @@ namespace Arcatech.Units
 
         public Vector3 MovementVector
         {
-            get => agent.velocity;
-            set => agent.velocity = value;
+            get => AgentActive ? agent.velocity : Vector3.zero;
+            set { if (AgentActive) agent.velocity = value; }
         }
 
-        public float ActualMovementVelocity => agent.velocity.magnitude;
+        private bool AgentActive => agent != null && agent.enabled && agent.isOnNavMesh;
+
+        public float ActualMovementVelocity => AgentActive ? agent.velocity.magnitude : 0f;
         public bool IsGrounded => agent.isOnNavMesh;
-        public void ApplyImpulse(Vector3 impulse) => _impulse.ApplyImpulse(impulse);
-        public void ApplyImpulse(float impulseRelative)=>  _impulse.ApplyImpulse(impulseRelative);
+
+        public void ApplyMotion(in MotionRequest request)
+        {
+            if (_impulse == null) return;
+            _impulse.Apply(request);
+        }
         public bool IsGamepadInput { get; set; } = false;
 
         public float SpeedMultiplier
@@ -175,9 +193,15 @@ namespace Arcatech.Units
             get => animator !=null && animator.applyRootMotion;
             set
             {
+                if (agent.enabled && agent.isOnNavMesh)
+                {
+                    // Выходим из root motion: transform ушёл от внутренней позиции агента.
+                    // Без этой синхронизации агент «откатывает» юнита назад к старой точке.
+                    if (!value && !agent.updatePosition) agent.nextPosition = transform.position;
+                    if (value) agent.velocity = Vector3.zero;
+                }
                 agent.updatePosition = !value;
                 agent.updateRotation = !value;
-                if (value) agent.velocity = Vector3.zero;
                 if (!animator) return;
                 animator.applyRootMotion = value;
             }
@@ -197,4 +221,3 @@ namespace Arcatech.Units
         
     }
 }
-

@@ -31,12 +31,11 @@ namespace Arcatech.Items
             foreach (var part in _parts) part.OnEquip();
         }
 
-        public void OnUnequip()
+        public void OnRemove()
         {
-            foreach (var part in _parts) part.OnUnequip();
+            foreach (var part in _parts) part.OnRemove();
         }
     }
-    
     
 }
 

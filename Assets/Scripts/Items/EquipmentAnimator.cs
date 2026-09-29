@@ -32,7 +32,7 @@ namespace Arcatech.Items
         {// TODO some animations if needed
         }
 
-        public void OnUnequip()
+        public void OnRemove()
         {
         }
     }
