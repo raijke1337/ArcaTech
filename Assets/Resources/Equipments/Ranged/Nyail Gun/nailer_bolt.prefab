@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6257123444707222210}
   - component: {fileID: 7701038555419399617}
   - component: {fileID: 632831668744006439}
+  - component: {fileID: 277117223468393235}
   m_Layer: 6
   m_Name: nailer_bolt
   m_TagString: Untagged
@@ -35,7 +36,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8636720163595473208}
+  - {fileID: 702900610451987155}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &-8910277167135363517
@@ -84,7 +85,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9552d5b93bf38ad4c9a26806c62092d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collider: {fileID: -8910277167135363517}
+  triggerCollider: {fileID: -8910277167135363517}
+  cachedRigidbody: {fileID: 6257123444707222210}
+  _warningLineWidth: 0.1
+  _warningFloorOffset: 0.02
+  _warningFadeInDuration: 0.12
+  _warningFadeOutDuration: 0.25
 --- !u!54 &6257123444707222210
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -92,10 +98,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8117081725990939304}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -138,11 +144,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pauser: {fileID: 7701038555419399617}
   _name: Nailer bolt
+  id: {fileID: 277117223468393235}
+  _rb: {fileID: 6257123444707222210}
+  setKinematic: 1
   entitySide: 0
-  _effectSpawn: {fileID: 8117081725991375668}
+  effectSpawn: {fileID: 8117081725991375668}
   destroyOnDeath: 1
   timerToDestroy: 0
   _showDebugs: 0
+  targetable: 0
+  AnnounceDead:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &277117223468393235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8117081725990939304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
+  uniqueId: 5daad032-f55e-4ede-8919-9143e359f4f3
 --- !u!1001 &3089906224212401277
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -151,74 +177,69 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8117081725991375668}
     m_Modifications:
-    - target: {fileID: 610712695170277850, guid: d61d51e8bb93e99448d034e166e29ac7,
-        type: 3}
-      propertyPath: m_Name
-      value: CFXR4 Laser Trail (Blue)
-      objectReference: {fileID: 0}
-    - target: {fileID: 1567451910987910631, guid: d61d51e8bb93e99448d034e166e29ac7,
-        type: 3}
-      propertyPath: m_Materials.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalRotation.y
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+    - target: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8530750831024712241, guid: e4e49ef4be54cf241a54c2a98a92c05b,
+        type: 3}
+      propertyPath: m_Name
+      value: CFXR4 Laser Trail (Yellow)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: d61d51e8bb93e99448d034e166e29ac7, type: 3}
---- !u!4 &8636720163595473208 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: e4e49ef4be54cf241a54c2a98a92c05b, type: 3}
+--- !u!4 &702900610451987155 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 6717759231312596293, guid: d61d51e8bb93e99448d034e166e29ac7,
+  m_CorrespondingSourceObject: {fileID: 2531226634528720558, guid: e4e49ef4be54cf241a54c2a98a92c05b,
     type: 3}
   m_PrefabInstance: {fileID: 3089906224212401277}
   m_PrefabAsset: {fileID: 0}

@@ -23,7 +23,8 @@ namespace Arcatech
         RangedEmpty,
         Hidden,
         ArmatureRoot,
-        BatteryEmpty
+        BatteryEmpty,
+        Sheathed
     }
     public enum ItemSlot
     {

@@ -19,6 +19,7 @@ MonoBehaviour:
   itemPrefab: {fileID: 627181971408993533, guid: af6a90fe8b767024090d9f914c97e12e,
     type: 3}
   slot: 3
+  stance: {fileID: 0}
   statModifiers:
   - stat: 2
     target: 1
@@ -33,7 +34,6 @@ MonoBehaviour:
       stat: 2
       target: 0
       amount: 1
-      onApply: {fileID: 0}
     intervalSeconds: 0.33
     condition:
       requireAll: 0
@@ -41,15 +41,14 @@ MonoBehaviour:
       statConditions:
       - stat: 2
         target: 0
-        usePercentOfMax: 1
+        usePercentOfMax: 0
         op: 2
-        a: 0.3
+        a: 20
         b: 0
   - delta:
       stat: 2
       target: 0
       amount: -1
-      onApply: {fileID: 0}
     intervalSeconds: 0.33
     condition:
       requireAll: 0
@@ -57,15 +56,14 @@ MonoBehaviour:
       statConditions:
       - stat: 2
         target: 0
-        usePercentOfMax: 1
+        usePercentOfMax: 0
         op: 0
-        a: 0.3
+        a: 21
         b: 0
   - delta:
       stat: 1
       target: 0
       amount: 1
-      onApply: {fileID: 0}
     intervalSeconds: 0.1
     condition:
       requireAll: 0

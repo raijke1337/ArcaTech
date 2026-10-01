@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using Arcatech.Actions;
+using Arcatech.Cameras;
 using Arcatech.Items;
+using Arcatech.Managers;
 using Arcatech.UI;
 using Arcatech.Units;
 using Arcatech.Units.Control;
@@ -268,6 +270,8 @@ namespace Arcatech.Stats
 
             // Фаза Activation: продлится до выхода из стейта Overcharge (конец анимации).
             // Корутину баффа здесь НЕ запускаем.
+            CamerasController.Instance.ZoomTo(20, 2f);
+            HitstopPlayer.Instance.PlayHitstop(2f,0.5f);
             _isInActivationPhase = true;
             SetOverchargeTriggerPending(true);
             UpdateState();
@@ -285,7 +289,7 @@ namespace Arcatech.Stats
         private void StartOverchargeBuff()
         {
             LogDebug("Activation finished -> buff started");
-
+            CamerasController.Instance.ResetZoom(0.5f);
             _isInActivationPhase = false;
             _isOverchargeActive = true;
 
