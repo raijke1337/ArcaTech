@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Arcatech.Items;
 using Arcatech.Triggers;
@@ -58,6 +58,11 @@ namespace Arcatech.Usables
             if (!triggerExitInfo.TargetCollider.TryGetComponent(out BaseGameEntityComponent component)) return;
                 _bufferedHits.Remove(component);
 
+        }
+
+        public override void Detach()
+        {
+            if (_beamActive) StopBeam();
         }
 
         public override void OnChangeUsableState(StateMachineNotifyType info)

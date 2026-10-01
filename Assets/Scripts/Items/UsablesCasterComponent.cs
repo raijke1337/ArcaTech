@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Arcatech.Stats;
 using Arcatech.Triggers;
 using Arcatech.Units;
@@ -47,29 +47,33 @@ namespace Arcatech.Items
             
             var model = notification.InventorySnapshot;
             _currentUsable = null;
+
+            // новый набор применений: UsablesItem создаёт свои IUsable ОДИН раз в конструкторе,
+            // поэтому у предмета, который остался экипированным, это те же самые экземпляры
+            var newUsables = new Dictionary<UnitActionType, IUsable>();
+            foreach (var item in model.ListEquipped)
+            {
+                if (item is UsablesItem usablesItem)
+                {
+                    foreach (var u in usablesItem.GetUsables)
+                    {
+                        newUsables[u.Key] = u.Value;
+                    }
+                }
+            }
+
             if (_usables != null)
             {
                 foreach (var usable in _usables.Values)
                 {
                     if (usable.GetActivationTransition != null)
                         stateUnit.RemoveTransition(usable.GetActivationTransition);
-                    usable.CleanUp();
                 }
             }
+            // Жизненным циклом применений (подписки, пул снарядов) управляет UsablesItem.OnEquip/OnRemove.
+            // Вызывать CleanUp здесь нельзя: обновление затрагивает и предметы, оставшиеся экипированными.
 
-            _usables = new();
-            
-            var newEquips = model.ListEquipped;
-            foreach (var item in newEquips)
-            {
-                if (item is UsablesItem usablesItem)
-                {
-                    foreach (var u in usablesItem.GetUsables)
-                    {
-                        _usables[u.Key] = u.Value;
-                    }
-                }
-            }
+            _usables = newUsables;
 
             foreach (var usable in _usables.Values)
             {

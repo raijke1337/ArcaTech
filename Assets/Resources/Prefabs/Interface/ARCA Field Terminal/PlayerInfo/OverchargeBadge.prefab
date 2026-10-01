@@ -317,7 +317,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.6156863, b: 1, a: 1}
+  m_Color: {r: 0.26666668, g: 0.48235294, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -346,6 +346,8 @@ GameObject:
   - component: {fileID: 7947334239190939770}
   - component: {fileID: 5402130620416607285}
   - component: {fileID: 3375336949695335483}
+  - component: {fileID: 7711171983950012891}
+  - component: {fileID: 3441955594860020539}
   m_Layer: 5
   m_Name: OverchargeBadge
   m_TagString: Untagged
@@ -416,9 +418,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d47017a3d8064251af7c6e8032a714c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.UI.OverchargeUIMain
+  panelAnimator: {fileID: 3441955594860020539}
   fill: {fileID: 2869833403986482033}
   activatingFrame: {fileID: 6437888924967194066}
   text: {fileID: 795930091881221459}
+--- !u!225 &7711171983950012891
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1797258954844946850}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &3441955594860020539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1797258954844946850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4291d51050243604fb0f84754374569c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpankyBoy.JuiceUI.Free.PanelAnimator
+  inAnimation: 0
+  outAnimation: 0
+  inDirection: 3
+  outDirection: 2
+  inDuration: 0.5
+  outDuration: 0.4
+  inDelay: 0
+  outDelay: 0
+  inEase: 6
+  outEase: 5
+  playInOnEnable: 1
+  disableOnOutComplete: 1
+  resetStateAfterOut: 1
+  inSound: {fileID: 0}
+  outSound: {fileID: 0}
+  customAudioSource: {fileID: 0}
+  volume: 1
+  canvasGroup: {fileID: 7711171983950012891}
 --- !u!1 &4117958765080560135
 GameObject:
   m_ObjectHideFlags: 0
@@ -512,8 +557,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -594,7 +639,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -80}
+  m_SizeDelta: {x: -64, y: -96}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &203007133899964344
 CanvasRenderer:

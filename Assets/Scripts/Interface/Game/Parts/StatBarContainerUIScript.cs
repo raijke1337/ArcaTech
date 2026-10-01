@@ -94,7 +94,7 @@ namespace Arcatech.UI
 
             valueText.text = $"{Mathf.CeilToInt(statCurrent)}";
 
-            AnimateHp(statCurrent, statMax);
+            AnimateChange(statCurrent, statMax);
 
             float normalizedDelta = Mathf.Abs(statDelta) / statMax;
 
@@ -166,7 +166,7 @@ namespace Arcatech.UI
             }
         }
 
-        private void AnimateHp(float targetHp, float maxHp)
+        private void AnimateChange(float targetHp, float maxHp)
         {
             _hpTween?.Kill();
 

@@ -1,4 +1,4 @@
-﻿using Arcatech.Items;
+using Arcatech.Items;
 using Arcatech.Units;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,7 +21,7 @@ namespace Arcatech.Usables
         public abstract IHitProducer Deserialize(BaseGameEntityComponent owner, EquipmentComponent item,bool indicateHitBox);
     }
 
-    public abstract class HitProducer : IHitProducer
+    public abstract class HitProducer : IHitProducer, IAttachable
     {
         protected readonly int MaxHits;
         protected readonly EquipmentComponent Item;
@@ -39,6 +39,12 @@ namespace Arcatech.Usables
         }
 
 
+        /// <summary>Предмет экипирован: подключить источники попаданий.</summary>
+        public virtual void Attach() { }
+
+        /// <summary>Предмет снят: отключить источники и освободить ресурсы.</summary>
+        public virtual void Detach() { }
+
         public virtual void OnChangeUsableState(StateMachineNotifyType info)
         {
             if (info == StateMachineNotifyType.Starting)
@@ -50,14 +56,20 @@ namespace Arcatech.Usables
         public event UnityAction<TriggerHitInfo> EntityHit;
         public event UnityAction<TriggerHitInfo> EnvironmentHit;
 
+        // Наследники не могут вызвать event напрямую - нужны обёртки.
+        protected void RaiseEntityHit(TriggerHitInfo info) => EntityHit?.Invoke(info);
+        protected void RaiseEnvironmentHit(TriggerHitInfo info) => EnvironmentHit?.Invoke(info);
+
         protected void HitCallback(TriggerHitInfo info)
         {
-            if (!info.TryGetEntityTarget(out var entity))
+            bool hasEntity = info.TryGetEntityTarget(out var entity);
+            if (!hasEntity)
             {
                 EnvironmentHit?.Invoke(info);
             }
             if (HitsThisUse >= MaxHits) return;
-            if (entity != Owner) HitsThisUse++;
+            // FIX: попадание в стену (entity == null) раньше тратило бюджет валидных попаданий
+            if (hasEntity && entity != Owner) HitsThisUse++;
             // this is actually a band-aid but should work fine
 
             EntityHit?.Invoke(info);

@@ -1,4 +1,4 @@
-﻿using Arcatech.Items;
+using Arcatech.Items;
 using Arcatech.Triggers;
 using Arcatech.Units;
 using UnityEngine;
@@ -26,9 +26,21 @@ namespace Arcatech.Usables
                 Debug.LogError($"{owner.GetName} has no fixed hitbox attached for {item} to cast from");
                 return;
             }
-                
+            // приёмник регистрируется в Attach(): зона ближнего боя ОБЩАЯ для всех предметов игрока,
+            // и неэкипированный предмет не должен получать её попадания
+        }
+
+        public override void Attach()
+        {
+            if (provider == null) return;
             provider.RegisterReceiver(this);
             provider.Active = false;
+        }
+
+        public override void Detach()
+        {
+            if (provider == null) return;
+            provider.UnregisterReceiver(this);
         }
 
         public override void OnChangeUsableState(StateMachineNotifyType info)

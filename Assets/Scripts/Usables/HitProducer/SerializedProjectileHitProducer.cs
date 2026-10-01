@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Arcatech.Items;
@@ -11,7 +11,9 @@ using UnityEngine.Pool;
 namespace Arcatech.Usables
 {
     /// <summary>
-    /// uses projectiles to report hits
+    /// uses projectiles to report hits.
+    /// ВАЖНО: поле maxValidHitsPerUse здесь НЕ используется. Лимит поражаемых целей задаётся
+    /// на снаряд: SerializedProjectileConfiguration -> Hit Rules -> Max Targets.
     /// </summary>
     [CreateAssetMenu(fileName = "hitProducer_projectile_", menuName = "Usables/Hit Producer/Projectile")]
     public class SerializedProjectileHitProducer : SerializedHitProducer
@@ -27,7 +29,7 @@ namespace Arcatech.Usables
     }
 
 
-    public class ProjectileHitProducer : HitProducer,IKillerComponent, ITriggerNotificationReceiver
+    public class ProjectileHitProducer : HitProducer, IKillerComponent
     {
         public string KilledBy => "Hits producer";
         private SerializedProjectileConfiguration _projectile;
@@ -81,47 +83,78 @@ namespace Arcatech.Usables
 
         private ProjectileComponent CreateProjectile()
         {
-            // Create a new projectile instance
             var projectile = _projectile.ProduceProjectile(Owner, Vector3.zero, Quaternion.identity);
+            // объект принадлежит этому пулу всю жизнь -> подписываемся один раз
+            projectile.ProjectileFinished += HandleProjectileFinished;
+            projectile.ProjectileHit += HandleProjectileHit;
             return projectile;
         }
 
         private void OnProjectileGet(ProjectileComponent projectile)
         {
-            // Reset projectile state when retrieved from pool
             projectile.Reset();
-            projectile.gameObject.SetActive(true);  
-            projectile.RegisterReceiver(this);
+            projectile.gameObject.SetActive(true);
             projectile.Active = true;
             _activeProjectiles.Add(projectile);
-            
         }
 
-        private void HandleProjectileExpiry(ProjectileComponent projectile)
+        private void HandleProjectileFinished(ProjectileComponent projectile, ProjectileFinishReason reason)
         {
-            // Return projectile to pool instead of destroying
+            // ProjectileComponent.Finish() идемпотентна, двойного Release не будет
             _projectilePool.Release(projectile);
         }
 
         private void OnProjectileRelease(ProjectileComponent projectile)
         {
-            projectile.ProjectileFinished -= HandleProjectileExpiry;
-            projectile.UnregisterReceiver(this);
-
             projectile.Active = false;
             projectile.gameObject.SetActive(false);
-
             _activeProjectiles.Remove(projectile);
         }
 
         private void OnProjectileDestroy(ProjectileComponent projectile)
         {
-            // Destroy the projectile GameObject when pool is destroyed
             if (projectile != null && projectile.gameObject != null)
             {
-                projectile.UnregisterReceiver(this);
-                projectile.Entity.SetKilled(this,true);
+                projectile.ProjectileFinished -= HandleProjectileFinished;
+                projectile.ProjectileHit -= HandleProjectileHit;
+                projectile.Entity.SetKilled(this, true);
             }
+        }
+
+        /// <summary>
+        /// Снаряд уже разобрал столкновение по правилам пробития (стена / владелец / повтор / лимит),
+        /// здесь остаётся только превратить его в события применения.
+        /// </summary>
+        private void HandleProjectileHit(ProjectileComponent projectile, ProjectileCollision collision)
+        {
+            if (collision.IsEnvironment)
+            {
+                RaiseEnvironmentHit(collision.Hit);
+                // TODO: legacy - AoE-аппликаторы (ракета) должны срабатывать и по стене, а раньше
+                // это работало через EntityHit без цели. Заменить флагом AppliesOnEnvironment у аппликатора.
+                RaiseEntityHit(collision.Hit);
+                return;
+            }
+
+            if (collision.Accepted) RaiseEntityHit(collision.Hit);
+        }
+
+        /// <summary>
+        /// Предмет снят: останавливает стрельбу, возвращает в пул летящие снаряды и уничтожает пул.
+        /// Пул создаётся заново при следующем Get(), так что после повторной экипировки всё работает.
+        /// </summary>
+        public override void Detach()
+        {
+            if (_shootingCor != null && Owner != null) Owner.StopCoroutine(_shootingCor);
+            _shootingCor = null;
+
+            // Cancel() возвращает снаряд в пул и меняет _activeProjectiles - работаем с копией
+            foreach (var projectile in _activeProjectiles.ToArray())
+            {
+                if (projectile != null) projectile.Cancel();
+            }
+
+            _projectilePool.Clear();
         }
 
         private IEnumerator ShootingCoroutine()
@@ -156,25 +189,8 @@ namespace Arcatech.Usables
                 // Spawn multiple projectiles in a ring
                 foreach (var rot in _placementStrategy.GetRotations(baseRot, _shooting))
                 {
-                    var projectile = _projectilePool.Get();
-                    projectile.Reset();
-
-                    // Calculate position around the character
-                    Vector3 spawnPosition = centerPlace;
-            
-                    
-                    // // Add ring offset - projectiles spawn at a distance from center
-                    // float ringRadius = _shooting.PelletSpawnRadius > 0f ? _shooting.PelletSpawnRadius : 1f;
-                    // Vector3 ringOffset = rot * Vector3.forward * ringRadius;
-                    // spawnPosition += ringOffset;
-
-                    // Set position and rotation
-                    projectile.transform.SetPositionAndRotation(spawnPosition, rot);
-                 //   Debug.Log($"Set projectile spawn {spawnPosition} at {Time.time}");
-
-                    projectile.gameObject.SetActive(true);
-                    projectile.RegisterReceiver(this);
-                    projectile.ProjectileFinished += HandleProjectileExpiry;
+                    var projectile = _projectilePool.Get(); // Reset/Active выставляются в OnProjectileGet
+                    projectile.transform.SetPositionAndRotation(centerPlace, rot);
                 }
 
                 yield return new WaitForSeconds(_shooting.BetweenBurstsDelay);
@@ -202,17 +218,6 @@ namespace Arcatech.Usables
                 default:
                     throw new ArgumentOutOfRangeException(nameof(info), info, null);
             }
-        }
-
-
-        public void TriggerEntered(TriggerHitInfo triggerHitInfo)
-        {
-            HitCallback(triggerHitInfo);
-        }
-
-        public void TriggerExited(TriggerHitInfo triggerExitInfo)
-        {
-            
         }
     }
 }

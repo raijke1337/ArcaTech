@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Arcatech.Items;
 using Arcatech.Stats;
@@ -9,7 +9,7 @@ using Arcatech.Usables.Effects;
 
 namespace Arcatech.Usables
 {
-    public class UsableStrategy : IUsable
+    public class UsableStrategy : IUsable, IAttachable
     {
         public UsableStrategy(SerializedUsableStrategy config, BaseGameEntityComponent owner, EquipmentComponent equipment)
         {
@@ -59,14 +59,21 @@ namespace Arcatech.Usables
             _reload.Tick(delta);
         }
 
+        public void Attach()
+        {
+            foreach (var effect in _usableEffects) effect.Attach();
+        }
+
+        public void Detach()
+        {
+            foreach (var effect in _usableEffects) effect.Detach();
+        }
+
+        /// <summary>Окончательная очистка (обратимый вариант - Detach).</summary>
         public void CleanUp()
         {
-            // стратегии с подписками (перегрев) отписываются от событий
+            Detach();
             if (_reload is IDisposable disposable) disposable.Dispose();
-            foreach (var effect in _usableEffects)
-            {
-                effect.Clear();
-            }
         }
         public void Notify(StateMachineNotifyType notifyType)
         {

@@ -1,4 +1,4 @@
-﻿
+
 using Arcatech.Items;
 using Arcatech.Triggers;
 using Arcatech.Units;
@@ -30,8 +30,20 @@ namespace Arcatech.Usables
                 Debug.LogError($"{item.name} has no hitbox to cast from!");
                 return;
             }
+        }
+
+        public override void Attach()
+        {
+            if (provider == null) return;
             provider.Active = false;
             provider.RegisterReceiver(this);
+        }
+
+        public override void Detach()
+        {
+            if (provider == null) return;
+            provider.Active = false;
+            provider.UnregisterReceiver(this);
         }
 
             public override void OnChangeUsableState(StateMachineNotifyType info)

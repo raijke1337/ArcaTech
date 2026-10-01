@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Actions;
@@ -43,7 +43,7 @@ namespace Arcatech.Usables
         }
     }
 
-    public class CompositeUsableApplication : IUsableComponent
+    public class CompositeUsableApplication : IUsableComponent, IAttachable
     {
         private readonly BaseGameEntityComponent _owner;
         private readonly EquipmentComponent _equipment;
@@ -70,8 +70,6 @@ namespace Arcatech.Usables
             _owner =  owner;
             invalidHitEffect = config.onInvalidHit;
             _proceedOnSelfHit = config.proceedOnSelfHit;
-            _hitProducer.EntityHit += HandleEntityHit;
-            _hitProducer.EnvironmentHit += HandleEnvironmentHit;
             _sound = config.applicationSound;
         }
 
@@ -94,10 +92,26 @@ namespace Arcatech.Usables
             _hitProducer.OnChangeUsableState(notifyType);
         }
 
-        public void Clear()
+        private bool _attached;
+
+        public void Attach()
         {
+            if (_attached) return;
+            _attached = true;
+            _hitProducer.EntityHit += HandleEntityHit;
+            _hitProducer.EnvironmentHit += HandleEnvironmentHit;
+            (_hitProducer as IAttachable)?.Attach();
+        }
+
+        public void Detach()
+        {
+            if (!_attached) return;
+            _attached = false;
             _hitProducer.EntityHit -= HandleEntityHit;
             _hitProducer.EnvironmentHit -= HandleEnvironmentHit;
+            (_hitProducer as IAttachable)?.Detach();
         }
+
+        public void Clear() => Detach();
     }
 }

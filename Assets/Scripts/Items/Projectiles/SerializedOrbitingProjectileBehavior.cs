@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Arcatech.Items.Projectiles
 {
@@ -23,6 +23,10 @@ namespace Arcatech.Items.Projectiles
     }
 
 
+    /// <summary>
+    /// Орбита (вид "f" из диздока): летает вокруг владельца, стены игнорирует и исчезает,
+    /// когда исчерпан лимит поражаемых целей (ProjectileHitRules.maxTargets; 1 = "до первой цели").
+    /// </summary>
     public class OrbitingProjectileBehavior : BaseProjectileBehavior
     {
         private readonly float _orbitRadius;
@@ -37,6 +41,13 @@ namespace Arcatech.Items.Projectiles
             _orbitRadius = serialized.orbitRadius;
             _orbitAxis = serialized.orbitAxis.sqrMagnitude <= 0f ? Vector3.up : serialized.orbitAxis.normalized;
             _clockwise = serialized.clockwise;
+        }
+
+        public override ProjectileCollisionResult OnCollision(in ProjectileCollision c)
+        {
+            // орбита проходит сквозь стены и владельца; заканчивается только лимитом целей
+            if (c.IsOwner || c.IsEnvironment) return ProjectileCollisionResult.Continue;
+            return c.BudgetExhausted ? ProjectileCollisionResult.Finish : ProjectileCollisionResult.Continue;
         }
 
         protected override void Init(Transform projectileTransform)
@@ -55,8 +66,8 @@ namespace Arcatech.Items.Projectiles
 
         protected override void RotateProjectile(float distanceThisFrame, Transform projectileTransform, float deltaTime)
         {
-            
-            // rotate 
+
+            // rotate
             float linearSpeed = _settings.baseSpeed;
             float angularSpeedRad = linearSpeed / _orbitRadius;
             float deltaAngleDegrees = angularSpeedRad * deltaTime * Mathf.Rad2Deg;
@@ -64,7 +75,7 @@ namespace Arcatech.Items.Projectiles
 
             Quaternion rotation = Quaternion.AngleAxis(deltaAngleDegrees * directionMultiplier, _orbitAxis);
             _orbitOffset = rotation * _orbitOffset;
-            
+
             projectileTransform.position = Owner.EffectSpawn.transform.position + _orbitOffset;
 
             Vector3 tangent = Vector3.Cross(_orbitAxis, _orbitOffset).normalized;
@@ -73,7 +84,7 @@ namespace Arcatech.Items.Projectiles
                 projectileTransform.rotation = Quaternion.LookRotation(tangent, _orbitAxis);
             }
         }
-        
+
         public override void Reset()
         {
             _orbitOffset = Vector3.zero;

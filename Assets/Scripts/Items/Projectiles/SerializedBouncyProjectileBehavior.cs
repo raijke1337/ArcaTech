@@ -1,4 +1,3 @@
-﻿
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,9 +7,12 @@ namespace Arcatech.Items.Projectiles
     public class SerializedBouncyProjectileBehavior : SerializedBasicProjectileBehavior
     {
         [Min(1)] public float targetSearchRadius;
-        
+
+        [Min(0), Tooltip("Сколько раз снаряд может отскочить (от цели или стены). После этого следующее столкновение его уничтожает.")]
+        public int maxBounces = 3;
+
         [Header("Homing (Optional)")]
-        [Range(0f, 10f)] 
+        [Range(0f, 10f)]
         [Tooltip("How strongly projectile tracks toward target between bounces. 0 = straight line, higher = tighter tracking")]
         public float homingStrength;
         public override ProjectileBehavior Deserialize(BaseGameEntityComponent owner)
@@ -19,105 +21,126 @@ namespace Arcatech.Items.Projectiles
         }
     }
 
+    /// <summary>
+    /// Отскоки (вид "g" из диздока): после столкновения с целью летит к ближайшей валидной цели,
+    /// если целей нет - отражается зеркально. Стена - всегда зеркальное отражение.
+    /// </summary>
     public class BouncyProjectileBehavior : BaseProjectileBehavior
     {
+        private const float BounceNudge = 1f; // отступ от точки удара, чтобы не задеть ту же поверхность
+
         private readonly float _rad;
+        private readonly int _maxBounces;
+        private readonly float _homingStrength;
         private BaseGameEntityComponent _currentTarget;
-        private float _homingStrength;
-        private Transform _cachedTransform;
-        
-        private List <BaseGameEntityComponent> _targets;
-        
+        private int _bounces;
+
+        private readonly List<BaseGameEntityComponent> _targets;
+        private readonly Collider[] _searchBuffer = new Collider[32];
+
         public BouncyProjectileBehavior(SerializedBouncyProjectileBehavior b, BaseProjectileSettings settings,BaseGameEntityComponent owner) : base(settings,owner)
         {
             _rad = b.targetSearchRadius;
+            _maxBounces = Mathf.Max(0, b.maxBounces);
             _homingStrength = b.homingStrength;
             _targets  = new List<BaseGameEntityComponent>();
         }
 
         protected override void RotateProjectile(float distanceThisFrame, Transform projectileTransform, float deltaTime)
         {
+            if (_currentTarget && !_currentTarget.gameObject.activeInHierarchy) _currentTarget = null;
+
             if (_currentTarget && _homingStrength > 0f)
             {
                 Vector3 directionToTarget = (_currentTarget.transform.position - projectileTransform.position).normalized;
                 Vector3 currentForward = projectileTransform.forward;
-            
+
                 // Smoothly interpolate toward target
                 Vector3 newDirection = Vector3.Slerp(currentForward, directionToTarget, _homingStrength * deltaTime);
                 projectileTransform.rotation = Quaternion.LookRotation(newDirection);
             }
         }
 
-        public override void NotifyCollision(TriggerHitInfo hit)
+        public override ProjectileCollisionResult OnCollision(in ProjectileCollision c)
         {
-            if (!hit.TargetCollider.TryGetComponent(out BaseGameEntityComponent entity))
-            { 
-                // --- Ricochet off wall
-                Vector3 incomingDirection = hit.ImpactDirection; // Use the precise impact direction
-                Vector3 surfaceNormal = hit.Normal; // Use the accurate surface normal
+            if (c.IsOwner) return ProjectileCollisionResult.Continue;
 
-                // Calculate the reflected direction
-                Vector3 reflectedDirection = Vector3.Reflect(incomingDirection, surfaceNormal);
+            if (c.IsEnvironment)
+                return Bounce(c, null);
 
-                // Apply a small random spread to the reflection for more natural bounces (optional)
-                // Example: apply +/- 5 degrees on Y axis (for mostly horizontal surfaces)
-                // You might want to adjust based on the normal for more generalized spread.
-                float randomAngle = Random.Range(-5f, 5f);
-                reflectedDirection = Quaternion.AngleAxis(randomAngle, Vector3.up) * reflectedDirection;
-                // Or rotate around an axis perpendicular to both normal and incoming direction for more complex spread if needed.
+            // повторное касание уже поражённой цели / лимит исчерпан ранее - не отскакиваем
+            if (!c.Accepted) return ProjectileCollisionResult.Continue;
 
-                // Update projectile's rotation to the new reflected direction
-                _cachedTransform.rotation = Quaternion.LookRotation(reflectedDirection);
+            _targets.Add(c.Target);
 
-                // Move the projectile slightly away from the collision point to prevent immediate re-collision
-                _cachedTransform.position = hit.Position + reflectedDirection;
+            // последнее из разрешённых правилами попадание
+            if (c.BudgetExhausted) return ProjectileCollisionResult.Finish;
 
-                Debug.Log(
-                    $"Ricochet! Initial dir: {incomingDirection}, Normal: {surfaceNormal}, Reflected: {reflectedDirection}");
-
-                // IMPORTANT: If you want the normalized speed curve to restart after a ricochet,
-                // or if ricochet should reset its "distance traveled", you need to handle that here.
-                // Resetting `_distanceTraveled` might be appropriate depending on game design.
-                // _distanceTraveled = 0f; // Reset distance for this new "phase" of flight.
-                // This would make the speed curve restart from 0, potentially making the projectile fast again right after a bounce.
-                // Or, keep tracking total distance but evaluate the curve differently.
-                // It depends on your desired gameplay.
-            }
-            if (entity ==  Owner) return;
-            // hit an enemy
-            
-            _targets.Add(entity);
-            BaseGameEntityComponent nextTarget = FindNearestTarget(hit.Position);
-            if (nextTarget)
-            {
-                _currentTarget = nextTarget;
-                Vector3 directionToTarget = (nextTarget.transform.position - hit.Position).normalized;
-                _cachedTransform.rotation = Quaternion.LookRotation(directionToTarget);
-            }
+            return Bounce(c, c.Target);
         }
 
-
-        private BaseGameEntityComponent FindNearestTarget(Vector3 searchPosition)
+        private ProjectileCollisionResult Bounce(in ProjectileCollision c, BaseGameEntityComponent hitTarget)
         {
-            Collider[] hitColliders = Physics.OverlapSphere(searchPosition, _rad);
-        
+            if (_bounces >= _maxBounces) return ProjectileCollisionResult.Finish;
+            _bounces++;
+
+            Transform t = c.Projectile;
+
+            if (hitTarget != null)
+            {
+                // отскок от цели: к ближайшей валидной цели
+                BaseGameEntityComponent next = FindNearestTarget(c.Hit.Position, t);
+                if (next)
+                {
+                    _currentTarget = next;
+                    Vector3 toNext = (next.transform.position - c.Hit.Position).normalized;
+                    if (toNext.sqrMagnitude > 0.0001f)
+                    {
+                        t.rotation = Quaternion.LookRotation(toNext);
+                        return ProjectileCollisionResult.Continue;
+                    }
+                }
+            }
+
+            // нет цели (или стена): зеркальное отражение
+            _currentTarget = null;
+            Vector3 reflected = Vector3.Reflect(c.Hit.ImpactDirection, c.Hit.Normal);
+
+            if (hitTarget == null)
+            {
+                // небольшой разброс на стенах, чтобы рикошет выглядел естественнее
+                reflected = Quaternion.AngleAxis(Random.Range(-5f, 5f), Vector3.up) * reflected;
+            }
+
+            if (reflected.sqrMagnitude < 0.0001f) reflected = -t.forward;
+            reflected.Normalize();
+
+            t.rotation = Quaternion.LookRotation(reflected);
+            t.position = c.Hit.Position + reflected * BounceNudge;
+
+            return ProjectileCollisionResult.Continue;
+        }
+
+        private BaseGameEntityComponent FindNearestTarget(Vector3 searchPosition, Transform projectileTransform)
+        {
+            int count = Physics.OverlapSphereNonAlloc(searchPosition, _rad, _searchBuffer);
+
             BaseGameEntityComponent nearestEntity = null;
             float nearestDistance = float.MaxValue;
 
-            foreach (var hitCollider in hitColliders)
+            for (int i = 0; i < count; i++)
             {
-                
-                BaseGameEntityComponent entity = hitCollider.GetComponent<BaseGameEntityComponent>();
-            
+                BaseGameEntityComponent entity = _searchBuffer[i].GetComponent<BaseGameEntityComponent>();
+
                 // Skip invalid targets
                 if (entity == null) continue;
-                if (entity.transform == _cachedTransform) continue;
+                if (entity.transform == projectileTransform) continue;
                 if (Owner != null && entity == Owner) continue;
-                if (entity == _currentTarget) continue; // Don't bounce back to same target
-                if (_targets.Contains(entity)) continue; // already hit this
-            
-                // faction filtering 
-                if (entity.GetEntitySide == Owner.GetEntitySide || entity.GetEntitySide == Side.Unassigned) continue;
+                if (_targets.Contains(entity)) continue; // already hit this (в том числе только что поражённая цель)
+
+                // faction filtering
+                if (entity.GetEntitySide == Side.Unassigned) continue;
+                if (Owner != null && entity.GetEntitySide == Owner.GetEntitySide) continue;
 
                 float distance = Vector3.Distance(searchPosition, entity.transform.position);
 
@@ -128,19 +151,13 @@ namespace Arcatech.Items.Projectiles
             return nearestEntity;
         }
 
-        protected override void Init(Transform projectileTransform)
-        {
-            base.Init(projectileTransform);
-            _cachedTransform =  projectileTransform;
-        }
-
         public override void Reset()
         {
-            _cachedTransform = null;
             _currentTarget = null;
+            _bounces = 0;
             _targets.Clear();
             base.Reset();
         }
     }
-    
+
 }

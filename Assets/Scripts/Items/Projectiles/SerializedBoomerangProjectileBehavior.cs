@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Arcatech.Items.Projectiles
 {
@@ -7,21 +7,24 @@ namespace Arcatech.Items.Projectiles
     {
         [Tooltip("How aggressively the projectile turns back toward the owner once returning.")]
         public float returnHomingStrength = 8f;
-        
+
         public override ProjectileBehavior Deserialize(BaseGameEntityComponent owner)
         {
             return new BoomerangProjectileBehavior(this, baseProjectileSettings, owner);
         }
     }
 
+    /// <summary>
+    /// Бумеранг (вид "b" из диздока): летит вперёд, при первом столкновении (цель или стена)
+    /// или на половине дистанции разворачивается к владельцу и исчезает, когда тот его "ловит".
+    /// Лимит целей (ProjectileHitRules) считается за весь полёт туда и обратно; исчерпание лимита
+    /// бумеранг НЕ уничтожает - он просто перестаёт наносить попадания и возвращается.
+    /// </summary>
     public class BoomerangProjectileBehavior : BaseProjectileBehavior
     {
         private readonly float _returnHomingStrength;
-        private Transform _cachedTransform;
         private bool _returning;
         private bool _initDirection;
-        private Vector3 _initialDirection;
-        private Vector3 _curvePerpendicular; // Perpendicular vector for oscillation (e.g., up in world space)
 
         public BoomerangProjectileBehavior(SerializedBoomerangProjectileBehavior serialized,
             BaseProjectileSettings settings, BaseGameEntityComponent owner)
@@ -51,15 +54,10 @@ namespace Arcatech.Items.Projectiles
                 Vector3 launchDirection = GetLaunchDirection();
                 projectileTransform.rotation = Quaternion.LookRotation(launchDirection);
                 _initDirection = true;
-                _cachedTransform = projectileTransform;
             }
 
             if (_returning)
             {
-                if (DistanceTraveled >= _settings.maxFlightDistance * 2f)
-                {
-                    BehaviorCompleted = true;
-                }
                 if (Owner)
                 {
                     // HOMING: Calculate direction to owner with homing strength
@@ -69,7 +67,6 @@ namespace Arcatech.Items.Projectiles
                     projectileTransform.rotation = Quaternion.LookRotation(newDirection);
                 }
             }
-
             else
             {
                 float halfDistance = _settings.maxFlightDistance * 0.5f;
@@ -85,39 +82,31 @@ namespace Arcatech.Items.Projectiles
             base.Init(projectileTransform);
             _returning = false;
             _initDirection = false;
-            // NEW: Set curve direction perpendicular to launch (use world up for simplicity)
-            _curvePerpendicular = Vector3.Cross(GetLaunchDirection(), Vector3.up).normalized;
-            // Fallback if cross product is zero (rare)
-            if (_curvePerpendicular.sqrMagnitude < 0.001f)
-                _curvePerpendicular = Vector3.right;
         }
-        
+
         private void BeginReturnPhase(Transform projectileTransform)
         {
             if (_returning) return;
-            //Debug.Log(projectileTransform);
             _returning = true;
-            // _distanceTraveled = 0f;  // Keep for curve continuity, or reset if you want a fresh wave
             if (Owner)
             {
                 Vector3 directionToOwner = (Owner.transform.position - projectileTransform.position).normalized;
                 projectileTransform.rotation = Quaternion.LookRotation(directionToOwner);
             }
         }
-    
 
-        public override void NotifyCollision(TriggerHitInfo hit)
+        public override ProjectileCollisionResult OnCollision(in ProjectileCollision c)
         {
-            if (!hit.TargetCollider.TryGetComponent(out BaseGameEntityComponent entity)) return;
-            if (entity == Owner && _returning)
+            if (c.IsOwner)
             {
-                BehaviorCompleted = true;
-                return;
+                // владелец поймал вернувшийся бумеранг
+                return _returning ? ProjectileCollisionResult.Finish : ProjectileCollisionResult.Continue;
             }
-            if (entity != Owner)
-                BeginReturnPhase(_cachedTransform);
+
+            // стена или цель - разворот; лимит целей бумеранг не уничтожает
+            BeginReturnPhase(c.Projectile);
+            return ProjectileCollisionResult.Continue;
         }
-        
 
         public override void Reset()
         {

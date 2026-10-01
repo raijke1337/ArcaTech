@@ -1,5 +1,6 @@
-﻿namespace Arcatech.Items.Projectiles
+namespace Arcatech.Items.Projectiles
 {
+    using System.Collections.Generic;
     using UnityEngine;
 
     [CreateAssetMenu(fileName = "projectileBehavior_", menuName = "Projectiles/Behavior/Homing")]
@@ -19,6 +20,9 @@
         }
     }
 
+    /// <summary>
+    /// Слабое наведение (вид "d" из диздока): летит вперёд и доворачивает к цели в радиусе захвата.
+    /// </summary>
     public class HomingProjectileBehavior : BaseProjectileBehavior
     {
         private readonly float _scanRadius;
@@ -28,6 +32,10 @@
 
         private float _timeSinceLastScan;
         private BaseGameEntityComponent _currentTarget;
+
+        // уже поражённые цели - не захватываем повторно, иначе снаряд будет кружить вокруг них
+        private readonly List<BaseGameEntityComponent> _hitTargets = new();
+        private readonly Collider[] _scanBuffer = new Collider[32];
 
         public HomingProjectileBehavior(SerializedHomingProjectileBehavior serialized, BaseProjectileSettings settings,
             BaseGameEntityComponent owner)
@@ -41,20 +49,23 @@
 
         protected override void RotateProjectile(float distanceThisFrame, Transform projectileTransform, float deltaTime)
         {
+            // FIX: раньше таймер сканирования никогда не увеличивался, и если первый скан
+            // не находил цель, повторного скана не происходило вообще.
+            _timeSinceLastScan += deltaTime;
 
-           if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
-           {
-               TryAcquireTarget(projectileTransform);
-           }
-           
-           else if (_homingStrength > 0f)
-           {
-               Vector3 directionToTarget =
-                   (_currentTarget.transform.position - projectileTransform.position).normalized;
-               Vector3 newDirection =
-                   Vector3.Slerp(projectileTransform.forward, directionToTarget, _homingStrength * deltaTime);
-               projectileTransform.rotation = Quaternion.LookRotation(newDirection);
-           }
+            if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
+            {
+                _currentTarget = null;
+                TryAcquireTarget(projectileTransform);
+            }
+            else if (_homingStrength > 0f)
+            {
+                Vector3 directionToTarget =
+                    (_currentTarget.transform.position - projectileTransform.position).normalized;
+                Vector3 newDirection =
+                    Vector3.Slerp(projectileTransform.forward, directionToTarget, _homingStrength * deltaTime);
+                projectileTransform.rotation = Quaternion.LookRotation(newDirection);
+            }
         }
 
         protected override void Init(Transform projectileTransform)
@@ -69,21 +80,24 @@
                 return;
 
             _timeSinceLastScan = 0f;
-            Collider[] colliders = Physics.OverlapSphere(projectileTransform.position, _scanRadius, _targetLayers);
+            int count = Physics.OverlapSphereNonAlloc(projectileTransform.position, _scanRadius, _scanBuffer, _targetLayers);
 
             BaseGameEntityComponent bestTarget = null;
             float bestDistance = float.MaxValue;
 
-            foreach (var collider in colliders)
+            for (int i = 0; i < count; i++)
             {
-                BaseGameEntityComponent candidate = collider.GetComponent<BaseGameEntityComponent>();
+                BaseGameEntityComponent candidate = _scanBuffer[i].GetComponent<BaseGameEntityComponent>();
                 if (candidate == null || candidate == Owner)
                     continue;
 
-                if (Owner != null && candidate.GetEntitySide == Owner.GetEntitySide || candidate.GetEntitySide == Side.Unassigned)
+                if (candidate.GetEntitySide == Side.Unassigned)
+                    continue;
+                if (Owner != null && candidate.GetEntitySide == Owner.GetEntitySide)
                     continue;
 
                 if (candidate.transform == projectileTransform) continue;
+                if (_hitTargets.Contains(candidate)) continue;
 
                 float distance = Vector3.Distance(projectileTransform.position, candidate.transform.position);
                 if (distance >= bestDistance)
@@ -99,27 +113,33 @@
             }
         }
 
-        public override void NotifyCollision(TriggerHitInfo hit)
+        public override ProjectileCollisionResult OnCollision(in ProjectileCollision c)
         {
-            if (hit.TargetCollider == null)
-                return;
+            // FIX: раньше здесь сравнивался Collider с BaseGameEntityComponent (всегда false),
+            // поэтому реакция на цели и владельца не работала.
+            if (c.IsOwner) return ProjectileCollisionResult.Continue;
 
-            if (hit.TargetCollider == Owner)
+            if (c.IsEnvironment)
             {
-                BehaviorCompleted = true;
-                return;
+                return _settings.environmentResponse == EnvironmentResponse.Destroy
+                    ? ProjectileCollisionResult.Finish
+                    : ProjectileCollisionResult.Continue;
             }
 
-            if (_currentTarget == hit.TargetCollider)
+            if (c.Target != null)
             {
-                _currentTarget = null;
+                if (!_hitTargets.Contains(c.Target)) _hitTargets.Add(c.Target);
+                if (_currentTarget == c.Target) _currentTarget = null;
             }
+
+            return c.BudgetExhausted ? ProjectileCollisionResult.Finish : ProjectileCollisionResult.Continue;
         }
 
         public override void Reset()
         {
             _currentTarget = null;
             _timeSinceLastScan = 0f;
+            _hitTargets.Clear();
             base.Reset();
         }
     }
