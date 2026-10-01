@@ -75,6 +75,15 @@ namespace Arcatech.Items
             saved.Clear();
         }
 
+        public void OnActivate()
+        {
+            
+        }
+
+        public void OnDeactivate()
+        {
+        }
+
         private void OnDestroy()
         {
             // Если костюм удалили, не вызвав OnUnequip, шейп не останется нажатым

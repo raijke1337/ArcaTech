@@ -16,6 +16,40 @@ namespace Arcatech.Units
         // Храним список активных объектов, чтобы скрывать их при смене инвентаря
         private HashSet<GameObject> _activeDisplayItems = new HashSet<GameObject>();
 
+        #region held stance
+
+        [Header("Weapon stance")]
+        [SerializeField, Tooltip("Какие места отрисовки считаются 'в руках'. Предмет в таком месте определяет стойку (idle и бег).")]
+        private ItemPlaceType[] handPlaces;
+
+        public bool HandPlacesConfigured => handPlaces != null && handPlaces.Length > 0;
+
+        /// <summary>Стойка оружия, которое сейчас в руках. null - оружия со стойкой в руках нет.</summary>
+        public WeaponStanceSO HeldStance { get; private set; }
+
+        public event UnityAction<WeaponStanceSO> HeldStanceChanged;
+
+        private void UpdateHeldStance(IDrawItemStrategy strat)
+        {
+            WeaponStanceSO best = null;
+
+            if (strat != null && inventoryModel != null && HandPlacesConfigured)
+            {
+                foreach (var e in inventoryModel.ListEquipped)
+                {
+                    if (e.Stance == null) continue;
+                    if (System.Array.IndexOf(handPlaces, strat.GetPlaces[e.Slot]) < 0) continue;
+                    if (best == null || e.Stance.Priority > best.Priority) best = e.Stance;
+                }
+            }
+
+            if (best == HeldStance) return;
+            HeldStance = best;
+            HeldStanceChanged?.Invoke(best);
+        }
+
+        #endregion
+
         #region model view
         
         private UnitInventoryModel inventoryModel;
@@ -54,7 +88,11 @@ namespace Arcatech.Units
 
             currentDrawStrategy = strat;
             
-            if (inventoryModel == null) return;
+            if (inventoryModel == null)
+            {
+                UpdateHeldStance(strat);   // сбросит стойку
+                return;
+            }
 
             // 2. Отрисовываем текущее экипированное оружие
             foreach (var e in inventoryModel.ListEquipped)
@@ -71,6 +109,8 @@ namespace Arcatech.Units
                     _activeDisplayItems.Add(e.DisplayItem.gameObject);
                 }
             }
+
+            UpdateHeldStance(strat);
         }
         
         #endregion

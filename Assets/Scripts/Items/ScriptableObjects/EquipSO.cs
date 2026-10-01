@@ -15,6 +15,10 @@ namespace Arcatech.Items
         [SerializeField] public EquipmentComponent itemPrefab;
         public ItemSlot slot;
 
+        [Header("Animation")]
+        [Tooltip("Стойка (клипы idle и бега), пока предмет в руках. Пусто - стойку не меняет.")]
+        public WeaponStanceSO stance;
+
 
         public List <StatModifier> statModifiers;
         public List <PeriodicDelta> periodicDeltas;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Interactions;
-using Arcatech.Items;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
 using Arcatech.Usables.Effects;

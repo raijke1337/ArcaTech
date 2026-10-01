@@ -133,6 +133,8 @@ GameObject:
   - component: {fileID: 9103845225237627509}
   - component: {fileID: 1836545175343542454}
   - component: {fileID: 4764128200971329217}
+  - component: {fileID: 6781747816026390099}
+  - component: {fileID: 3107538716206129910}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -530,6 +532,7 @@ MonoBehaviour:
         Value: {fileID: 2313672852005489865}
   defaultItemsDrawStrat: {fileID: 11400000, guid: 9642c790993fcee4ebfa0ad78750b90c,
     type: 2}
+  handPlaces: 0000000001000000
 --- !u!114 &1089328251400730155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -762,6 +765,39 @@ MonoBehaviour:
   resetHeatOnWeaponChange: 1
   debugLog: 0
   debugCoolLogInterval: 0.25
+--- !u!114 &6781747816026390099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e5fd6742d632ce4ebb6fcab8bf50fe7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Items.SuitDamageComponent
+  entity: {fileID: 3413998453285093005}
+  receiver: {fileID: 5597438670505072981}
+  startingStage: 0
+  intactEffects: []
+  damagedEffects: []
+  destroyedEffects: []
+--- !u!114 &3107538716206129910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cc4af163176f074aaa485d2e41c63a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.StanceClipSwitcher
+  animator: {fileID: 2244779132007733205}
+  drawer: {fileID: 4056496551489463538}
+  slotMap: {fileID: 11400000, guid: 1906a8ba57d9e804c9eec74dee518d4a, type: 2}
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0

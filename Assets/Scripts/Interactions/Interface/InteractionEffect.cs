@@ -24,4 +24,12 @@ namespace Arcatech.Interactions
 
        // public abstract void OnLoadLevelState(ProgressItemState stateToLoad);
     }
+
+    public class InterruptInteractorEffect : InteractionEffect
+    {
+        public override void Play(InteractionContext ctx)
+        {
+            
+        }
+    }
 }

@@ -41,11 +41,14 @@ namespace Arcatech.Usables.Effects
             if (_killed) return;
             _active.TryGetValue(instance.Key, out var sameKey);
 
-            if (!instance.Result.Validate(_ctx)) return; // 
-
-            var decision = _stacking.Resolve(sameKey, instance.StackType, instance.MaxStacks);
+            // контекст нужно заполнить до Validate, иначе проверка видит цель предыдущего эффекта
             _ctx.SetTarget(receiver, place, placeRot);
-            instance.Tick(0f, _ctx);
+            _ctx.Source = instance.Source;
+            _ctx.Instance = instance;
+            if (!instance.Result.Validate(_ctx)) return;
+
+            // решение стакера принимается ДО любого тика: отклонённый эффект не должен ни сработать, ни тикнуть
+            var decision = _stacking.Resolve(sameKey, instance.StackType, instance.MaxStacks);
             switch (decision)
             {
                 case StackDecision.Reject:
@@ -63,6 +66,19 @@ namespace Arcatech.Usables.Effects
                     if (instance.IsFinished) Remove(instance);
                     return;
             }
+        }
+
+        /// <summary>
+        /// Досрочно снимает конкретный эффект (вызывает OnExpire и убирает из учёта).
+        /// Нужен для эффектов, привязанных к состоянию (например, стадии повреждения костюма).
+        /// Безопасно вызывать для уже снятого/отклонённого эффекта.
+        /// </summary>
+        public void RemoveEffect(ActiveEffectInstance instance)
+        {
+            if (instance == null || !_flat.Contains(instance)) return;
+            _ctx.SetTarget(_receiver, _owner.transform.position, Quaternion.identity);
+            instance.ForceExpire(_ctx);
+            RemoveInternal(instance);
         }
 
         public bool HasEffect(string ID, out ActiveEffectInstance instance)

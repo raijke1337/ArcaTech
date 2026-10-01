@@ -43,7 +43,8 @@ namespace Arcatech.Usables
 
         public override void OnChangeUsableState(StateMachineNotifyType notifyType)
         {
-            base.OnChangeUsableState(notifyType);
+            // base.OnChangeUsableState здесь не вызываем: он взводит CurrentCooldown на каждом Use,
+            // а перезарядка обоймы должна стартовать только после расхода последнего заряда
             switch (notifyType)
             {
                 case StateMachineNotifyType.Use:

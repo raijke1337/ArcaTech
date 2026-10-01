@@ -40,11 +40,14 @@ namespace Arcatech.Usables
 
         public override void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
         {
-            if (Physics.OverlapSphereNonAlloc(hit.Position, _radius, _hits,_collisionMask) ==0 ) return;
+            int count = Physics.OverlapSphereNonAlloc(hit.Position, _radius, _hits, _collisionMask);
+            if (count == 0) return;
             hit.TryGetEntityTarget(out var initTarget);
-            
-            foreach (var h in _hits)
+
+            // буфер переиспользуется: за пределами count лежат коллайдеры с прошлых срабатываний
+            for (int i = 0; i < count; i++)
             {
+                var h = _hits[i];
                 if (!h) continue;
                 if (!h.TryGetComponent<BaseGameEntityComponent>(out var unit)) continue;
 

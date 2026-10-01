@@ -24,6 +24,7 @@ public class ItemSOEditor : Editor
     private SerializedProperty worldItemContainerPrefabProp;
     private SerializedProperty itemPrefabProp;
     private SerializedProperty slotProp;
+    private SerializedProperty stanceProp;
     private SerializedProperty statModifiersProp;
     private SerializedProperty periodicDeltasProp;
     private SerializedProperty usedActionsProp;
@@ -44,6 +45,7 @@ public class ItemSOEditor : Editor
         // EquipSO properties
         itemPrefabProp = serializedObject.FindProperty("itemPrefab");
         slotProp = serializedObject.FindProperty("slot");
+        stanceProp = serializedObject.FindProperty("stance");
         statModifiersProp = serializedObject.FindProperty("statModifiers");
         periodicDeltasProp = serializedObject.FindProperty("periodicDeltas");
         
@@ -272,6 +274,11 @@ public class ItemSOEditor : Editor
                 if (slotProp != null)
                 {
                     EditorGUILayout.PropertyField(slotProp, new GUIContent("Equipment Slot"));
+                }
+                
+                if (stanceProp != null)
+                {
+                    EditorGUILayout.PropertyField(stanceProp, new GUIContent("Weapon Stance"));
                 }
                 
                 EditorGUILayout.Space(10);

@@ -11,6 +11,7 @@ namespace Arcatech.Items
             mods = new List<StatModifier>(cfg.statModifiers);
             deltas = new List<PeriodicDelta>(cfg.periodicDeltas);
             Slot =  cfg.slot;
+            Stance = cfg.stance;
             DisplayItem = GameObject.Instantiate(cfg.itemPrefab,ow.transform);
             DisplayItem.gameObject.SetActive(false);
         }          
@@ -22,6 +23,9 @@ namespace Arcatech.Items
         }
 
         public EquipmentComponent DisplayItem { get; protected set; }
+
+        /// <summary>Стойка (клипы idle и бега), пока предмет в руках. Может быть null.</summary>
+        public WeaponStanceSO Stance { get; protected set; }
 
         private IEnumerable<StatModifier> mods;
         private IEnumerable<PeriodicDelta> deltas;
