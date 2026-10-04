@@ -252,7 +252,7 @@ MonoBehaviour:
   effectsReceiver: {fileID: 4201277184077725860}
   animator: {fileID: 8819702953013112412}
   data: {fileID: 11400000, guid: 3fa9a5c78c0b6d34c94a231ef3ac2249, type: 2}
-  CombatGroup: debug1
+  CombatGroup: 
 --- !u!195 &3092874308524416317
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -326,7 +326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 96410ff2-5ada-404f-b74c-3988ad78d1dd
+  uniqueId: 
 --- !u!114 &7980303944722158138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -515,6 +515,7 @@ MonoBehaviour:
         Value: {fileID: 40640390865327336}
   defaultItemsDrawStrat: {fileID: 11400000, guid: 0c8284373a6a2eb45b8a719e3880974e,
     type: 2}
+  handPlaces: 00000000
 --- !u!114 &5148202008020930969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -604,11 +605,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3254c267037b4c5fade4d0018738e12f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.ImpulseApplier
-  _impulseSpeed: 10
   _impulseDuration: 2
   _impulseEndSpeed: 0.5
-  _warpSampleDistance: 2
-  _warpSampleDistanceExtended: 5
+  _slideDrag: 0
+  _maxSpeed: 30
+  _gravityScale: 1
+  _groundDrag: 6
+  _airDrag: 0
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 72
+  _collisionRadius: 0
+  _reattachDistance: 1
+  _strandedTimeout: 3
+  _fallKillDepth: 5
 --- !u!136 &4353145260266332986
 CapsuleCollider:
   m_ObjectHideFlags: 0

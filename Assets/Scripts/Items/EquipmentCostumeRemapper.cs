@@ -134,9 +134,11 @@ namespace Arcatech.Items
             foreach (var t in skeletonRoot.GetComponentsInChildren<Transform>(true))
             {
                 // TryAdd: при дубликатах имён берётся первая кость, остальные пропускаются
-                if (!boneMap.TryAdd(t.name, t))
-                    Debug.LogWarning(
-                        $"{nameof(EquipmentCostumeRemapper)}: дубликат имени кости '{t.name}' в скелете персонажа", this);
+
+                boneMap.TryAdd(t.name, t);
+                // if (!boneMap.TryAdd(t.name, t))
+                //     Debug.LogWarning(
+                //         $"{nameof(EquipmentCostumeRemapper)}: дубликат имени кости '{t.name}' в скелете персонажа", this);
             }
         }
     }

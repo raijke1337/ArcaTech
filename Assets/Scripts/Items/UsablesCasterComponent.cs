@@ -177,7 +177,8 @@ namespace Arcatech.Items
         public void PrepareCommand(UnitCommand command)
         {
             if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs)  Debug.Log($"[Usables] {Time.time} Prepare {command}");
-            if (!_usables.TryGetValue(command.Type, out var usable)) return;
+            // всегда перезаписываем: иначе уведомления уйдут в предыдущее применение (например, дальнобойное)
+            _usables.TryGetValue(command.Type, out var usable);
             _currentUsable = usable;
         }
 
@@ -205,7 +206,7 @@ namespace Arcatech.Items
 
         public void StateMachineNotification(StateMachineNotifyType notifyType)
         {
-         //   if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs) Debug.Log($"[Usables] {Time.time}Notify {notifyType} in {_currentUsable?.Description.Title}");
+            if (stateUnit.GetMainEntity.ShowingDebugs && stateUnit.verboseDebugs) Debug.Log($"[Usables] {Time.time} Notify {notifyType} -> {_currentUsable?.Description.Title ?? "null"}");
             _currentUsable?.Notify(notifyType);
             if (notifyType == StateMachineNotifyType.EndUse) _currentUsable = null;
         }

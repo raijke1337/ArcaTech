@@ -96,9 +96,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Triggers.TriggerTrackerComponent
   triggerCollider: {fileID: 3432437847192042030}
   cachedRigidbody: {fileID: 8672739047354605646}
-  _hitVisualizationDuration: 2
-  _hitSphereRadius: 0.1
-  _lineLength: 0.5
   _warningLineWidth: 0.1
   _warningFloorOffset: 0.02
   _warningFadeInDuration: 0.12
@@ -252,6 +249,10 @@ MonoBehaviour:
   cancelEffects:
   - {fileID: 6836967032417363760}
   destroyAfterSuccess: 0
+  interactorAlignTransform: {fileID: 0}
+  alignInteractor: 0
+  disableInteractorCollisionDuringPlay: 1
+  affectsInteractorState: 1
 --- !u!114 &5887240669043196477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,11 +369,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119ef3ebc21a48d29b7ae41857b4379c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractionStatesInjectorComponent
+  ownerEntity: {fileID: 0}
   activeArea: {fileID: 2262326607726006872}
   stateTransitions:
     _serializedList:
     - Key: 3
       Value: {fileID: 11400000, guid: 1d88dd4e9998f25438b50c1fdd962226, type: 2}
+  StateAnimationExited:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &7788467925517885437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -403,17 +408,17 @@ PrefabInstance:
     - target: {fileID: 965250288883705572, guid: 83f82edea99f99f4bb2605d67bc8a6c9,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 965250288883705572, guid: 83f82edea99f99f4bb2605d67bc8a6c9,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 965250288883705572, guid: 83f82edea99f99f4bb2605d67bc8a6c9,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 965250288883705572, guid: 83f82edea99f99f4bb2605d67bc8a6c9,
         type: 3}
