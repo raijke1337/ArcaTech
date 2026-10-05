@@ -12,11 +12,14 @@
 //             опционально домноженные на масштаб дизеринга)
 // threshold - порог "прозрачности" (1.0 - finalFadeAmount), 0..1
 // Возвращает значение, которое передаётся в clip(): >=0 - пиксель рисуется.
-float GetDither(float2 screenPos, float threshold)
+// Значение 4x4 Bayer-матрицы в точке экрана, 0..15/16.
+// Используется и для прозрачности (GetDither), и для дизеринга
+// границы "кошачьего зрения" (ARCAToonLighting).
+float GetBayer(float2 screenPos)
 {
-    int x = int(screenPos.x) % 4;
-    int y = int(screenPos.y) % 4;
-    int index = x + y * 4;
+    uint x = (uint)screenPos.x & 3u;
+    uint y = (uint)screenPos.y & 3u;
+    uint index = x + y * 4u;
 
     float bayer[16] = {
         0.0 / 16.0,  8.0 / 16.0,  2.0 / 16.0, 10.0 / 16.0,
@@ -25,7 +28,12 @@ float GetDither(float2 screenPos, float threshold)
         15.0 / 16.0, 7.0 / 16.0, 13.0 / 16.0,  5.0 / 16.0
     };
 
-    return threshold - bayer[index];
+    return bayer[index];
+}
+
+float GetDither(float2 screenPos, float threshold)
+{
+    return threshold - GetBayer(screenPos);
 }
 
 // Удобный хелпер: считает итоговый fade (гибрид "глобальный из скрипта" /
@@ -48,6 +56,14 @@ void ClipArcaFade(float4 positionCS, float localX, float fadeStartX, float fadeE
     float2 ditherUV = positionCS.xy * ditherScale;
     float alphaThreshold = 1.0 - finalFade;
     clip(GetDither(ditherUV, alphaThreshold));
+}
+
+// Дизеринговое отсечение пикселя по итоговой прозрачности:
+// fade = 0 - пиксель виден всегда, fade = 1 - остаётся 1/16 пикселей.
+// Ячейка Bayer - 2x2 пикселя экрана (как во всех ARCA-шейдерах).
+void ArcaClipDither(float4 positionCS, float fade)
+{
+    clip(GetDither(positionCS.xy * 0.5, 1.0 - fade));
 }
 
 #endif // ARCA_DITHER_INCLUDED
