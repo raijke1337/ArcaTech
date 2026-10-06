@@ -264,7 +264,11 @@ MonoBehaviour:
   - {fileID: 969436773682063856}
   failureEffects: []
   cancelEffects: []
-  destroyAfterSuccess: 0
+  destroyAfterSuccess: 1
+  interactorAlignTransform: {fileID: 0}
+  alignInteractor: 0
+  disableInteractorCollisionDuringPlay: 1
+  affectsInteractorState: 1
 --- !u!114 &1024457263129548233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,9 +336,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Triggers.TriggerTrackerComponent
   triggerCollider: {fileID: 3577122678013653651}
   cachedRigidbody: {fileID: 630690213340571465}
-  _hitVisualizationDuration: 2
-  _hitSphereRadius: 0.1
-  _lineLength: 0.5
   _warningLineWidth: 0.1
   _warningFloorOffset: 0.02
   _warningFadeInDuration: 0.12
@@ -351,11 +352,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119ef3ebc21a48d29b7ae41857b4379c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractionStatesInjectorComponent
+  ownerEntity: {fileID: 0}
   activeArea: {fileID: 929633802921902084}
   stateTransitions:
     _serializedList:
     - Key: 3
       Value: {fileID: 11400000, guid: 5ab7cd98cc8ea9d47b8fce43e4562a1c, type: 2}
+  StateAnimationExited:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &969436773682063856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -465,5 +470,5 @@ MonoBehaviour:
   texts:
     _serializedList:
     - Key: 3
-      Value: {fileID: 11400000, guid: 691cc558f2cd5bb4a8288726e7af847a, type: 2}
+      Value: {fileID: 11400000, guid: df1791599da76fc448c445c722326601, type: 2}
   blockUntilTextCompletes: 0

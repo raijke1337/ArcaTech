@@ -8,6 +8,7 @@ namespace Arcatech.Interactions
     [RequireComponent(typeof(BaseGameEntityComponent))]
     public partial class ItemMovesEffect : InteractionEffect, IPausableComponent
     {
+        [SerializeField] private Transform moveTargetOverride;
         
         // TODO: this whole part is now in "Item moves with Tween".
         // remove duplication
@@ -40,7 +41,8 @@ namespace Arcatech.Interactions
         }
         private void OnEnable()
         {
-            cached ??= tween.GetTween(transform).Pause();
+            if (!moveTargetOverride) moveTargetOverride = transform;
+            cached ??= tween.GetTween(moveTargetOverride).Pause();
             
             if (runFromEnable)
             {

@@ -163,6 +163,8 @@ GameObject:
   - component: {fileID: 5995715631273522776}
   - component: {fileID: 3701643450870597744}
   - component: {fileID: 9205959252525866450}
+  - component: {fileID: 5477079709492463691}
+  - component: {fileID: 6534587525705009176}
   m_Layer: 5
   m_Name: RingsMinigame
   m_TagString: Untagged
@@ -215,33 +217,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0a854953e9a4561a6cad8c868c64e68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.MiniGames.OpticalCalibrationMinigame
+  Animator: {fileID: 6534587525705009176}
+  ShowInGadget: 1
   onGameCompleteResult:
     m_PersistentCalls:
       m_Calls: []
   description: {fileID: 11400000, guid: 0d30fa13512d61442b3a3a72bf253c02, type: 2}
-  rings:
+  ringSettings:
   - transform: {fileID: 1443973293717228807}
-    rotationSpeed: 30
+    rotationSpeed: 0
     targetAngle: 0
-    stopKey: 113
-    gamepadButton: 0
-    ringImage: {fileID: 2154485351678587149}
+    stopKey: 3
+    ringImage: {fileID: 0}
     isStopped: 0
     currentAngle: 0
   - transform: {fileID: 8618355382400534392}
-    rotationSpeed: 60
+    rotationSpeed: 0
     targetAngle: 0
-    stopKey: 119
-    gamepadButton: 0
-    ringImage: {fileID: 7587253089957705898}
+    stopKey: 1
+    ringImage: {fileID: 0}
     isStopped: 0
     currentAngle: 0
   - transform: {fileID: 2648205597948292845}
-    rotationSpeed: 90
+    rotationSpeed: 0
     targetAngle: 0
-    stopKey: 101
-    gamepadButton: 0
-    ringImage: {fileID: 3548009899395010360}
+    stopKey: 2
+    ringImage: {fileID: 0}
     isStopped: 0
     currentAngle: 0
   angleTolerance: 10
@@ -252,6 +253,48 @@ MonoBehaviour:
   allowedFailures: 3
   attemptsText: {fileID: 0}
   reduceMotion: 0
+--- !u!225 &5477079709492463691
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519995544742168216}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &6534587525705009176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519995544742168216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4291d51050243604fb0f84754374569c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpankyBoy.JuiceUI.Free.PanelAnimator
+  inAnimation: 0
+  outAnimation: 0
+  inDirection: 3
+  outDirection: 2
+  inDuration: 0.5
+  outDuration: 0.4
+  inDelay: 0
+  outDelay: 0
+  inEase: 6
+  outEase: 5
+  playInOnEnable: 1
+  disableOnOutComplete: 1
+  resetStateAfterOut: 1
+  inSound: {fileID: 0}
+  outSound: {fileID: 0}
+  customAudioSource: {fileID: 0}
+  volume: 1
+  canvasGroup: {fileID: 5477079709492463691}
 --- !u!1 &1952895353502555333
 GameObject:
   m_ObjectHideFlags: 0

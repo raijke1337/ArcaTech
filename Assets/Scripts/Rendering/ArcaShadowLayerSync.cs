@@ -18,7 +18,11 @@ namespace Arcatech.Rendering
     [DisallowMultipleComponent]
     public sealed class ArcaShadowLayerSync : MonoBehaviour
     {
-        [Tooltip("GameObject-слои, чьи рендереры нужно перевести.")]
+        [Tooltip("Переводить все MeshRenderer/SkinnedMeshRenderer в иерархии, не глядя на GameObject-слой. " +
+                 "Нужно, когда модель и костюм спавнятся в рантайме на слое Default.")]
+        [SerializeField] private bool ignoreGameObjectLayer = true;
+
+        [Tooltip("GameObject-слои, чьи рендереры нужно перевести (если ignoreGameObjectLayer выключен).")]
         [SerializeField] private LayerMask sourceLayers;
 
         [Tooltip("Rendering Layer, который получат рендереры (например, Entities). " +
@@ -30,9 +34,22 @@ namespace Arcatech.Rendering
             sourceLayers = LayerMask.GetMask("Entities");
         }
 
+        private int _lastHierarchyCount = -1;
+
         private void Awake() => Apply();
         private void OnValidate() => Apply();
         private void OnTransformChildrenChanged() => Apply();
+
+        // Костюмы и оружие спавнятся в рантайме и не всегда прямыми детьми корня
+        // (OnTransformChildrenChanged их не видит), поэтому следим за размером иерархии.
+        private void LateUpdate()
+        {
+            if (!Application.isPlaying) return;
+            int count = transform.hierarchyCount;
+            if (count == _lastHierarchyCount) return;
+            _lastHierarchyCount = count;
+            Apply();
+        }
 
         /// <summary>Применить ко всем дочерним рендерерам (включая неактивные).</summary>
         public void Apply()
@@ -41,7 +58,8 @@ namespace Arcatech.Rendering
 
             foreach (var r in GetComponentsInChildren<Renderer>(true))
             {
-                if ((sourceLayers.value & (1 << r.gameObject.layer)) == 0) continue;
+                if (!(r is MeshRenderer || r is SkinnedMeshRenderer)) continue;
+                if (!ignoreGameObjectLayer && (sourceLayers.value & (1 << r.gameObject.layer)) == 0) continue;
                 r.renderingLayerMask = renderingLayer;
             }
         }

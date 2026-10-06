@@ -58,7 +58,7 @@ Transform:
   m_GameObject: {fileID: 1159375333872072860}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.5, z: 0}
+  m_LocalPosition: {x: 0, y: 4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -77,8 +77,8 @@ Light:
   m_Color: {r: 1, g: 0.8509804, b: 0.627451, a: 1}
   m_Intensity: 30
   m_Range: 12
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
+  m_SpotAngle: 86.06044
+  m_InnerSpotAngle: 30
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
     m_Type: 1
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 1
-  m_CustomShadowLayers: 0
+  m_CustomShadowLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
@@ -294,6 +294,7 @@ GameObject:
   - component: {fileID: 6781747816026390099}
   - component: {fileID: 3107538716206129910}
   - component: {fileID: 7583641227977036609}
+  - component: {fileID: 2602505934636855958}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -976,6 +977,25 @@ MonoBehaviour:
   radius: 7
   visionLight: {fileID: 8921552075354218533}
   lightRangeMultiplier: 1.2
+--- !u!114 &2602505934636855958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98b9141766ee0ea4a95548a831f88f26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Rendering.ArcaShadowLayerSync
+  ignoreGameObjectLayer: 1
+  sourceLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  renderingLayer:
+    serializedVersion: 0
+    m_Bits: 2
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0
@@ -1177,17 +1197,17 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[0].lossyScale
-      value: 1.0000004
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[1].lossyScale
-      value: 1.0000004
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].lossyScale
-      value: 1.0000005
+      value: 1.0000006
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
@@ -1327,12 +1347,12 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].normalizedDistanceFromRoot
-      value: 0.05938385
+      value: 0.05938389
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[3].normalizedDistanceFromRoot
-      value: 0.11777254
+      value: 0.117772415
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1446,12 +1466,12 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[0].lossyScale
-      value: 1.0000002
+      value: 1.0000004
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[1].lossyScale
-      value: 1.0000002
+      value: 1.0000004
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
@@ -1461,7 +1481,7 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[3].lossyScale
-      value: 1.0000008
+      value: 1.0000007
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
@@ -1596,12 +1616,12 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].normalizedDistanceFromRoot
-      value: 0.0593838
+      value: 0.059383973
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 1d245bf9ddcadcb408cc5fa923480229,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[3].normalizedDistanceFromRoot
-      value: 0.11777242
+      value: 0.11777249
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1672,6 +1692,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8227537610646203725, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8170175869282193976, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: -8170175869282193976, guid: 10f4037531ab26d47afa16a7d9641a42,
         type: 3}
       propertyPath: 'm_BlendShapeWeights.Array.data[0]'
@@ -1704,6 +1734,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1206874426333947015, guid: 10f4037531ab26d47afa16a7d9641a42,
         type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -1206874426333947015, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
       propertyPath: 'm_BlendShapeWeights.Array.data[0]'
       value: 0
       objectReference: {fileID: 0}
@@ -1716,6 +1751,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Tails
+      objectReference: {fileID: 0}
+    - target: {fileID: 2321523695958950486, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2321523695958950486, guid: 10f4037531ab26d47afa16a7d9641a42,
         type: 3}
@@ -1742,6 +1782,11 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[3]'
       value: 
       objectReference: {fileID: 2100000, guid: e91a32bf9b2b351419ceb0ad4203a8cd, type: 2}
+    - target: {fileID: 4320098735860348617, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5365703983676164795, guid: 10f4037531ab26d47afa16a7d9641a42,
         type: 3}
       propertyPath: m_IsActive
@@ -2569,7 +2614,7 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: 79642db2f57d8f745956976b10f9b615,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[2].normalizedDistanceFromRoot
-      value: 0.0053688255
+      value: 0.005368832
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 79642db2f57d8f745956976b10f9b615,
         type: 3}
@@ -2579,7 +2624,7 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: 79642db2f57d8f745956976b10f9b615,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[4].normalizedDistanceFromRoot
-      value: 0.01610649
+      value: 0.016106496
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 79642db2f57d8f745956976b10f9b615,
         type: 3}
@@ -2594,12 +2639,12 @@ PrefabInstance:
     - target: {fileID: 6815912497921372218, guid: 79642db2f57d8f745956976b10f9b615,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[7].normalizedDistanceFromRoot
-      value: 0.03221299
+      value: 0.032212995
       objectReference: {fileID: 0}
     - target: {fileID: 6815912497921372218, guid: 79642db2f57d8f745956976b10f9b615,
         type: 3}
       propertyPath: jiggleRigData.transformCachedData.Array.data[8].normalizedDistanceFromRoot
-      value: 0.03758182
+      value: 0.037581824
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

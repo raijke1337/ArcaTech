@@ -8,10 +8,11 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Assets_Set_10_URP
-  m_Shader: {fileID: 4800000, guid: 60e29b7951f20da47b11861d166b7036, type: 3}
+  m_Shader: {fileID: 4800000, guid: d077c5e9421f1064a80fbacb4102e32a, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _OUTLINETYPE_NORMAL
   - _OVERLAYMODE1_NONE
   - _OVERLAYMODE_NONE
@@ -21,7 +22,6 @@ Material:
   - _USELIGHTRAMP_STEP
   - _USEOUTLINE_ON
   - _USEPURESKETCH_ON
-  m_InvalidKeywords:
   - _USESHADOWS_ON
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
@@ -39,6 +39,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _AmbientOcclusion:
         m_Texture: {fileID: 2800000, guid: 6a0d6091dfd611e4d90ac001ff34c709, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseMap:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -87,6 +91,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 5b55fcc48640b5e499b396751a7be381, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MatCap:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Metallic:
@@ -156,15 +164,19 @@ Material:
     m_Ints: []
     m_Floats:
     - _AdaptiveThicnkess: 0
+    - _AddLightStep: 0.3
     - _AdditionalLightsAmount: 1
     - _AdditionalLightsFaloff: 1
     - _AdditionalLightsIntesity: 1
     - _AdditionalLightsSmoothnessMultiplier: 1
     - _AlphaCutoff: 0.5
+    - _AmbientInfluence: 0.6
+    - _ArcaOccluder: 0
     - _BacklightAmount: 0.5
     - _BacklightHardness: 0
     - _BacklightIntensity: 1
     - _BumpScale: 1
+    - _Cull: 2
     - _Cutoff: 1
     - _Darken: 0
     - _DetailNormalMapScale: 1
@@ -175,6 +187,7 @@ Material:
     - _DiffuseWarpBrightnessOffset: 1.12
     - _DstBlend: 0
     - _Emission_Intensity: 3
+    - _FadeAmount: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -189,7 +202,9 @@ Material:
     - _LightRampOffset: 0
     - _Lighten: 0
     - _MainLightIntesity: 1
+    - _MatCapStrength: 0.5
     - _MaxScaleDependingOnCamera: 1
+    - _Metal: 0
     - _Metallic: 0
     - _Metallic_Intensity: 1
     - _Mode: 0
@@ -199,8 +214,10 @@ Material:
     - _OutlineDynamicSpeed: 0
     - _OutlineNoiseIntesity: 1
     - _OutlineNoiseScale: 10
+    - _OutlineSmoothNormals: 0
     - _OutlineTextureStrength: 0
     - _OutlineType: 0
+    - _OutlineWidthPx: 2
     - _OverlayMode: 0
     - _OverlayMode1: 0
     - _OverlayRotation: 0
@@ -215,6 +232,7 @@ Material:
     - _RimSmoothness: 0
     - _RimSplitColor: 0
     - _RimThickness: 1
+    - _RimThreshold: 0.55
     - _Roughness_Intensity: 9.14
     - _ShapeSmoothness: 0.2
     - _SideShineAmount: 0.2717647
@@ -222,6 +240,7 @@ Material:
     - _SideShineIntensity: 1
     - _SmoothnessMultiplier: 1
     - _SmoothnessTextureChannel: 0
+    - _SpecSize: 0.3
     - _SpecularFaloff: 0
     - _SpecularHighlights: 1
     - _SpecularMaskRotation: 0
@@ -233,6 +252,8 @@ Material:
     - _SrcBlend: 1
     - _StepHalftoneTexture: 0
     - _StepOffset: 0
+    - _StepSmooth: 0.02
+    - _StepThreshold: 0.45
     - _Strength: 0
     - _Thicnkess: 0.02
     - _UVAnimationSpeed: 0
@@ -272,6 +293,8 @@ Material:
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:
+    - _ArcaSpecColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HalftoneColor: {r: 0, g: 0, b: 0, a: 1}
