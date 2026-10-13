@@ -1,4 +1,4 @@
-using Arcatech.Cameras;
+﻿using Arcatech.Cameras;
 using Arcatech.EventBus;
 using KBCore.Refs;
 using UnityEngine;
@@ -92,8 +92,15 @@ namespace Arcatech.Units.Control
               //  inputGateway.CameraRotateRightPressed -= () => RotateCamera(false);
             }
             
-            CamerasController.Instance.OnRotateStarted-= OnCameraBlendStarted;
-            CamerasController.Instance.OnRotateFinished-= OnCameraBlendFinished;
+            // TryGetInstance, а не Instance: при выгрузке сцены CamerasController может
+            // быть уже уничтожен, и Instance создал бы новый пустой контроллер,
+            // который переживёт перезагрузку сцены.
+            var cameras = CamerasController.TryGetInstance();
+            if (cameras != null)
+            {
+                cameras.OnRotateStarted -= OnCameraBlendStarted;
+                cameras.OnRotateFinished -= OnCameraBlendFinished;
+            }
 
             // CinemachineCore.BlendCreatedEvent
             //     .RemoveListener(OnCameraBlendStarted);

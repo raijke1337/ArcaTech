@@ -8,7 +8,7 @@ using UnityEngine.Rendering;
 
 namespace Arcatech.Triggers
 {
-    [RequireComponent(typeof(Collider), typeof(Rigidbody))]
+    [RequireComponent(typeof(Collider))]
     public class TriggerTrackerComponent : ValidatedMonoBehaviour, ITriggerNotificationProvider
     {
         #region ITriggerNotificationProvider
@@ -26,12 +26,12 @@ namespace Arcatech.Triggers
         #endregion
 
         [SerializeField, Self] private Collider triggerCollider;
-        [SerializeField, Self] private Rigidbody cachedRigidbody;
+
 
         // Доступ для наследников (например, AdvancedTriggerTracker) без расширения
         // публичного API самого компонента.
         protected Collider TriggerCollider => triggerCollider;
-        protected Rigidbody CachedRigidbody => cachedRigidbody;
+          
         protected int ReceiverCount => _receivers.Count;
 
         // Дедупликация попаданий в пределах одного кадра: без этого AreaCast,
@@ -41,10 +41,9 @@ namespace Arcatech.Triggers
         private readonly HashSet<Collider> _notifiedThisFrame = new();
         private int _dedupeFrame = -1;
 
-        private void Start()
+        protected virtual void Start()
         {
             triggerCollider.isTrigger = true;
-            cachedRigidbody.isKinematic = true;
 
             triggerCollider.includeLayers = TriggerLayerUtility.HitMask;
 
@@ -56,6 +55,14 @@ namespace Arcatech.Triggers
         protected bool CanNotify() =>
             Active && _receivers.Count > 0;
 
+
+        private void OnEnable()
+        {
+            if (TryGetComponent(out Rigidbody rigidbody))
+            {
+                rigidbody.isKinematic = true;
+            }
+        }
 
         public void AreaCast(ITriggerNotificationReceiver receiver)
         {

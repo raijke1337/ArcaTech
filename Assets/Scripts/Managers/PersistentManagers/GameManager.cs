@@ -1,5 +1,6 @@
-//using Newtonsoft.Json;
+﻿//using Newtonsoft.Json;
 
+using Arcatech.SaveSystem;
 using Arcatech.Scenes;
 using Arcatech.UI;
 using DG.Tweening;
@@ -25,8 +26,6 @@ namespace Arcatech.Managers
         }
         #endregion
        
-      //  [SerializeField] private MenuPrefabControllerComp _mainMenuPrefab;
-      //  [SerializeField] private GameInterfaceManager gameInterfaceManagerPrefab;
 
         private void OnEnable()
         {
@@ -44,51 +43,14 @@ namespace Arcatech.Managers
         [Space(10f), SerializeField] private SceneContainer _mainScene;
         [SerializeField] private SceneContainer _galleryScene;
         [SerializeField] private SceneContainer _newgameScene;
-        [SerializeField] private SceneContainer _noEquipsLevel; // tutorial
-        [SerializeField] private SceneContainer _equipsScene;
+        [Tooltip("Сцена «Выбор уровня». «Продолжить» ведёт сюда, если нет сохранённого чекпоинта.")]
+        [SerializeField] private SceneContainer _levelSelectScene;
 
         public SceneContainer GetCurrentLevelData { get => _currentLevel; }
         private SceneContainer _currentLevel;
 
         private bool _equipsDone = false;
         private SceneContainer _cachedGameLevel;
-        // public void RequestLoadSceneFromContainer(SceneContainer sc)
-        // {
-        //     DOTween.KillAll();
-        //    // Debug.Log($"Placeholder - starting level as GAME level");
-        //
-        //     if (sc == _mainScene)
-        //     {
-        //         //Instantiate(_mainMenuPrefab);
-        //     }
-        //
-        //     switch (sc.LevelType)
-        //     {
-        //         default:
-        //             DoLoadScene(sc.SceneLoaderIndex);
-        //             break;
-        //         case LevelType.Game:
-        //             if (sc == _noEquipsLevel)
-        //             {
-        //                 _cachedGameLevel = sc;
-        //                 DoLoadScene(_noEquipsLevel.SceneLoaderIndex);
-        //                 break;
-        //             }// override default equips menu
-        //
-        //             if (_equipsDone)
-        //             {
-        //                 _equipsDone = false;
-        //                 DoLoadScene(_cachedGameLevel.SceneLoaderIndex);
-        //             }
-        //             else
-        //             {
-        //                 _cachedGameLevel = sc;
-        //                 DoLoadScene(_equipsScene.SceneLoaderIndex);
-        //             }
-        //
-        //             break;
-        //     }
-        // }
 
         void DoLoadScene(int index)
         {            
@@ -98,16 +60,53 @@ namespace Arcatech.Managers
 
         }
         #endregion
+        #region save system
+
+        /// <summary>Есть что продолжать: чекпоинт уровня или пройденные уровни.</summary>
+        public bool HasSaveToContinue =>
+            SaveManager.Instance.HasCheckpoint || SaveManager.Instance.MetaProgress.HasAnyProgress;
+
+        /// <summary>«Продолжить»: уровень с сохранённого чекпоинта, иначе - «Выбор уровня».</summary>
+        public void OnContinueButton()
+        {
+            if (SaveManager.Instance.TryGetCheckpoint(out var checkpoint) && checkpoint.sceneBuildIndex >= 0)
+            {
+                // LevelProgressController на загруженной сцене сам найдёт чекпоинт и применит его.
+                DoLoadScene(checkpoint.sceneBuildIndex);
+                return;
+            }
+
+            var target = _levelSelectScene != null ? _levelSelectScene : _newgameScene;
+            DoLoadScene(target.SceneLoaderIndex);
+        }
+
+        /// <summary>Переход в сцену «Выбор уровня» (например, из «Сводки прохождения уровня»).</summary>
+        public void OnLevelSelectButton()
+        {
+            var target = _levelSelectScene != null ? _levelSelectScene : _mainScene;
+            DoLoadScene(target.SceneLoaderIndex);
+        }
+
+        /// <summary>Запуск уровня из «Выбора уровня». Старый чекпоинт (если был) стирается.</summary>
+        public void StartLevel(SceneContainer level)
+        {
+            if (level == null) return;
+            SaveManager.Instance.ClearCheckpoint();
+            DoLoadScene(level.SceneLoaderIndex);
+        }
+
+        #endregion
+
         #region UNITY UI
+        /// <summary>«Новая игра»: стирает прогресс (подтверждение показывает меню) и запускает первую сцену.</summary>
         public void OnStartNewGameButton()
         {
+            SaveManager.Instance.ResetGameProgress();
             DoLoadScene(_newgameScene.SceneLoaderIndex);
-           // RequestLoadSceneFromContainer(_newgameScene);
         }
         public void OnGalleryButton()
         {
             DoLoadScene(_galleryScene.SceneLoaderIndex);
-           // RequestLoadSceneFromContainer(_galleryScene);
         }
         public void OnExitButton()
         {
@@ -120,13 +119,6 @@ namespace Arcatech.Managers
         {
             DoLoadScene(_mainScene.SceneLoaderIndex);
         }
-
-        // public void OnFinishedEquips()
-        // {
-        //     _equipsDone = true;
-        //     RequestLoadSceneFromContainer(_cachedGameLevel);
-        // }
-
         
         #endregion
     }

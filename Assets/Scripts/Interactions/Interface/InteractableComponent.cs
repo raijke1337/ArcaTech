@@ -247,8 +247,7 @@ namespace Arcatech.Interactions
 
                 if (state == InteractionState.Success)
                 {
-                    _currentCtx.Interactor?.UnregisterInteractive(this);
-                    if (destroyAfterSuccess) gameObject.SetActive(false);
+                    AliveInteractor(_currentCtx)?.UnregisterInteractive(this);
                 }
             }
 
@@ -258,15 +257,30 @@ namespace Arcatech.Interactions
             if (state is InteractionState.Success or InteractionState.Failure or InteractionState.Cancelled)
             {
                 RestoreInteractorCollision();
-                _currentCtx?.Interactor?.ResetToIdle();
+                var interactor = AliveInteractor(_currentCtx);
+                interactor?.ResetToIdle();
             }
+
+            // Выключаем объект последним: подписчики StateChangedEvent (например, объекты
+            // прогресса системы сохранений) должны успеть получить Success до OnDisable.
+            if (state == InteractionState.Success && destroyAfterSuccess)
+                gameObject.SetActive(false);
         }
 
         private void UpdateStateInInteractor(InteractionState state)
         {
             if (affectsInteractorState)
-                _currentCtx?.Interactor?.SetInteractionState(state);
+                AliveInteractor(_currentCtx)?.SetInteractionState(state);
             StateChangedEvent?.Invoke(state);
+        }
+
+        /// <summary>Интерактор контекста или null, если он не задан либо уже уничтожен Unity
+        /// (например, при выгрузке сцены). Обычный `?.` уничтоженный UnityEngine.Object не отсекает.</summary>
+        private static IInteractor AliveInteractor(InteractionContext ctx)
+        {
+            var interactor = ctx?.Interactor;
+            if (interactor is UnityEngine.Object obj && obj == null) return null;
+            return interactor;
         }
 
         public Action<InteractionState> StateChangedEvent;

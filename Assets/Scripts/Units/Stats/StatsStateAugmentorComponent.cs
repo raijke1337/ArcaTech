@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Arcatech.Actions;
 using Arcatech.Units;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
@@ -23,6 +24,7 @@ namespace Arcatech.Stats
         [SerializeField] private SerializedStateTransition toKnockDown;
         [SerializeField] private SerializedStateTransition toDamageInterrupt;
 
+        [SerializeField] private SerializedActionResult onDeathPlaceholder;
         
         private StateTransition _toKilled;
         private StateTransition _toKnockDown;
@@ -96,7 +98,6 @@ namespace Arcatech.Stats
              if (usesKnockDown && state == _knockDownStartState)
              {
                  context.StunnedState = true;
-                 
              }
 
             if (usesKilled && state == _killState)
@@ -104,6 +105,7 @@ namespace Arcatech.Stats
                 foreach (var c in _components)
                 {
                     c.SetKilled(this,true);
+                    onDeathPlaceholder?.Deserialize().ProduceResult(stateMachine.GetMainEntity,stateMachine.GetMainEntity,stateMachine.GetMainEntity.EffectSpawn.position,stateMachine.GetMainEntity.EffectSpawn.rotation);
                 }
                 context.DeadState = true;
             }

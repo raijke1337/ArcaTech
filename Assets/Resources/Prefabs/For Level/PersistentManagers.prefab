@@ -112,10 +112,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainScene: {fileID: 11400000, guid: 1a7dd2b70d74d3442aab05b374a1260a, type: 2}
-  _galleryScene: {fileID: 11400000, guid: 4cc22c7e5437e0d4999d5d30a2ea89f4, type: 2}
-  _newgameScene: {fileID: 11400000, guid: 7469dc556a8805f49ae7255c1c5611c1, type: 2}
-  _noEquipsLevel: {fileID: 11400000, guid: 1e35031eea38b9a45899849ba5b6e5ae, type: 2}
-  _equipsScene: {fileID: 11400000, guid: 708b65122885bdd46b9f0c374c22c1ca, type: 2}
+  _galleryScene: {fileID: 11400000, guid: a2293c695f192064d9cdb6e6c2ad2612, type: 2}
+  _newgameScene: {fileID: 11400000, guid: 25c4b511d53bd3346a599ebd6f12e1b2, type: 2}
+  _levelSelectScene: {fileID: 11400000, guid: 3f0d1511248fc5b4db9eafbe33426a7c, type: 2}
 --- !u!114 &3960432742461820630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,6 +142,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ed7b160ebd48de43b0a2daff4e9e902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemsRegistry:
+  - {fileID: 11400000, guid: 90cbf86507312d94c94e1d2adfd7240a, type: 2}
+  - {fileID: 11400000, guid: 6d5e46f7abf230449a0b8ec6b9dc1126, type: 2}
+  - {fileID: 11400000, guid: 941e03b83f31fd24586632e6af6b8149, type: 2}
+  - {fileID: 11400000, guid: 69afd6211b6bd6a4ebac008737170eb0, type: 2}
+  - {fileID: 11400000, guid: a35a9b0a1e7085f499a343970511d212, type: 2}
+  - {fileID: 11400000, guid: b5453cecf3cca2740935b646f840a0bb, type: 2}
+  - {fileID: 11400000, guid: fc9c8e77b17c1e5489343fbc66307e6e, type: 2}
+  - {fileID: 11400000, guid: 505cf122383beaa4f929874c849008b3, type: 2}
+  - {fileID: 11400000, guid: 11247c97ee570fa41aceb362de29f46e, type: 2}
+  - {fileID: 11400000, guid: ccc286800176b7442a3abbeef0e96d26, type: 2}
+  - {fileID: 11400000, guid: 6b75f283871a2b74e893ed020d0ebdd6, type: 2}
+  - {fileID: 11400000, guid: 3f73c5d16fc10534aaa3aaed891983cd, type: 2}
+  - {fileID: 11400000, guid: 2550097edf15c2442ad20893f84df1fe, type: 2}
+  - {fileID: 11400000, guid: 53f53957b50feed4184de43c53f1053f, type: 2}
+  - {fileID: 11400000, guid: 820a123828705fe4da32a9e3227bd98c, type: 2}
+  - {fileID: 11400000, guid: 3386f4b9bbddabb4c8ac845eaeb4d77c, type: 2}
+  - {fileID: 11400000, guid: 0de78822fefd6f446ad2d9cde1c3d0d1, type: 2}
+  - {fileID: 11400000, guid: 4861873c410c6b44fa3cd0e78e28563b, type: 2}
+  - {fileID: 11400000, guid: 1d98d9845a3d22f4799d5c29b706d897, type: 2}
+  - {fileID: 11400000, guid: ac95c65d1b3589a48bf31a583e2efc26, type: 2}
+  - {fileID: 11400000, guid: b6849194b5963a340988ca9a09a5e492, type: 2}
+  - {fileID: 11400000, guid: d66af1a454dacf54c85cc9d48c3663cc, type: 2}
+  - {fileID: 11400000, guid: b5bfab46f86654e4eb8eb3631b1a8399, type: 2}
+  - {fileID: 11400000, guid: 0ffa7736f1d83b042a40b563b02e3ec8, type: 2}
+  - {fileID: 11400000, guid: 716c0d7b2af34034db64049eeb63f651, type: 2}
+  - {fileID: 11400000, guid: ec8d4635a6063264b98049d13f4a81d2, type: 2}
+  - {fileID: 11400000, guid: ac90a8cf960dd9b47abebcd7c7c0a4ed, type: 2}
+  - {fileID: 11400000, guid: baa85423ff5093a4eb673771e21afd45, type: 2}
 --- !u!114 &8102464925495723776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,8 +197,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.SaveManager
   service: {fileID: 11400000, guid: a488e2bd51e2cc44faa4e727c428753d, type: 2}
-  saveVersion: 3
+  settingsVersion: 1
+  metaVersion: 1
+  checkpointVersion: 1
   showDebugs: 0
+  settingsSaveDebounceSeconds: 0.5
 --- !u!114 &8701763222896216281
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,7 +15,8 @@ namespace Arcatech.Units
     [RequireComponent(typeof(EffectsReceiverComponent))]
     public class NPCBehaviorWrapper : ValidatedMonoBehaviour, IKillableComponent, 
         IPausableComponent, IMove,
-        ITierProvider
+        ITierProvider,
+        IStatUpdatesViewer
     {
         [SerializeField, Self] protected NavMeshAgent agent;
         [SerializeField, Self] protected BehaviorGraphAgent behavior;
@@ -26,7 +27,8 @@ namespace Arcatech.Units
         [SerializeField] protected Animator animator;
 
         [SerializeField] private EnemyData_SO data;
-        [SerializeField] string CombatGroup;
+        [SerializeField] string combatGroup;
+        public string CombatGroup => combatGroup;
         public Side EntitySide => entity.GetEntitySide;
         public EnemyData_SO Config => data;
         
@@ -59,6 +61,8 @@ namespace Arcatech.Units
             }
             _combateventChannel.Event += OnCombatStateChanged;
             behavior.GetVariable("StartingPosition", out _start);
+            
+            stats.RegisterStatsViewer(this);
         }
 
         private void OnDisable()
@@ -66,6 +70,7 @@ namespace Arcatech.Units
             if (_impulse != null) _impulse.MotionEnded -= OnExternalMotionEnded;
             if (_combateventChannel != null)
             _combateventChannel.Event -= OnCombatStateChanged;
+            stats.UnregisterStatsViewer(this);
         }
 
         /// <summary>Толчок закончился: возвращаем агенту «намерение» (двигаться / стоять).</summary>
@@ -74,7 +79,11 @@ namespace Arcatech.Units
             if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
             agent.isStopped = _paused || (_canMoveAssigned && !_canMove);
         }
-        private void OnCombatStateChanged(bool state) => _inCombat =  state;
+
+        private void OnCombatStateChanged(bool state, string group)
+        {
+            if (group == CombatGroup) _inCombat = state;
+        }
         public NavMeshAgent Nav => agent;
         public float CurrentMoveSpeed  => _inCombat? 
             Config.CombatMoveSpeed * _speedMultiplier :
@@ -218,6 +227,20 @@ namespace Arcatech.Units
             }
         }
         #endregion
-        
+
+        #region enter combat
+        public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
+            BaseGameEntityComponent source)
+        {
+            if (source.GetEntitySide == Side.PlayerSide && statDelta < 0)
+            {
+                _combateventChannel.SendEventMessage(true,combatGroup);
+            }
+        }
+
+        public void SetShieldValue(ResourceStatType shieldStat, float currentValue)
+        {
+        }
+        #endregion
     }
 }

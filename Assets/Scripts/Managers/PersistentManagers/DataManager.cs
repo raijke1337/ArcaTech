@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
@@ -33,26 +33,39 @@ namespace Arcatech.Managers
         
         public SceneContainer GetSceneContainer(int index)
         {
-            if (_scenes == null)
-            {
-                _scenes = new List<SceneContainer>(Resources.FindObjectsOfTypeAll<SceneContainer>());
-            }
+            EnsureScenes();
             return _scenes.FirstOrDefault(t=>t.SceneLoaderIndex == index);
         }
 
 
-        public List <SceneContainer> GetAvailableLevels
+        private void EnsureScenes()
+        {
+            _scenes ??= new List<SceneContainer>(Resources.FindObjectsOfTypeAll<SceneContainer>());
+        }
+
+        /// <summary>Игровые уровни, открытые по умолчанию или в мета-прогрессе.</summary>
+        public List<SceneContainer> GetAvailableLevels
         {
             get
             {
-                var containers = _scenes.Where((t) =>
-                {
-                   return _scenes.First((q) => t.ID == q.ID);
-                }
-                );
-                Debug.Log($"check this : found {containers.Count()} unlocked levels");
-                return null;
+                EnsureScenes();
+                var meta = SaveSystem.SaveManager.Instance.MetaProgress;
+                return _scenes
+                    .Where(s => s.LevelType == LevelType.Game)
+                    .Where(s => s.IsUnlockedByDefault
+                                || (meta.TryGetLevelRecord(GetLevelID(s), out var r) && r.isUnlocked))
+                    .Distinct()
+                    .OrderBy(s => s.SceneLoaderIndex)
+                    .ToList();
             }
+        }
+
+        /// <summary>ID уровня в сохранениях - имя сцены (так же его определяет LevelProgressController).</summary>
+        public static string GetLevelID(SceneContainer container)
+        {
+            if (container == null) return string.Empty;
+            var path = UnityEngine.SceneManagement.SceneUtility.GetScenePathByBuildIndex(container.SceneLoaderIndex);
+            return System.IO.Path.GetFileNameWithoutExtension(path);
         }
         #endregion
 
@@ -60,8 +73,36 @@ namespace Arcatech.Managers
 
         #region items
 
+        [Tooltip("Все ItemSO игры. Нужен, чтобы в билде собрать предмет по ID из сохранения, " +
+                 "даже если на него нет ссылок в загруженной сцене.")]
+        [SerializeField] private List<ItemSO> itemsRegistry = new();
+
         private Dictionary<string, ItemSO> _itemsData;
-        
+
+        private void EnsureItemsDatabase()
+        {
+            if (_itemsData != null) return;
+            _itemsData = new Dictionary<string, ItemSO>();
+
+            foreach (var item in itemsRegistry)
+            {
+                if (item != null) _itemsData[item.ID] = item;
+            }
+            // Дополнительно - всё, что уже загружено (в редакторе это обычно все ассеты).
+            foreach (var item in Resources.FindObjectsOfTypeAll<ItemSO>())
+            {
+                if (item != null && !string.IsNullOrEmpty(item.ID)) _itemsData.TryAdd(item.ID, item);
+            }
+            Debug.Log($"Init items database. Total items: {_itemsData.Count}");
+        }
+
+        public bool TryGetItemConfig(string id, out ItemSO config)
+        {
+            EnsureItemsDatabase();
+            config = null;
+            return !string.IsNullOrEmpty(id) && _itemsData.TryGetValue(id, out config);
+        }
+
         public Item MakeItem(ItemSO config, BaseGameEntityComponent owner)
         {
             return config switch
@@ -72,28 +113,34 @@ namespace Arcatech.Managers
             };
         }
 
+        /// <returns>null, если предмета с таким ID нет в базе.</returns>
         public Item MakeItem(string id, BaseGameEntityComponent owner)
         {
-            if (_itemsData == null)
+            if (!TryGetItemConfig(id, out var config))
             {
-                _itemsData = new Dictionary<string, ItemSO>();
-                var found = Resources.FindObjectsOfTypeAll(typeof(ItemSO)) as ItemSO[];
-                if (found == null)
-                {
-                    Debug.LogError($"No ItemSO found for ID {id}! Failed to init database.");
-                    return null;
-                }
-                foreach (var item in found)
-                {
-                    _itemsData[item.ID.ToString()] = item;
-                }
-                Debug.Log($"Init items database. Total items: {_itemsData.Count}");
+                Debug.LogError($"No ItemSO with ID {id}! Add it to DataManager.itemsRegistry.");
+                return null;
             }
-            
-            return MakeItem(_itemsData[id], owner);
+            return MakeItem(config, owner);
         }
 
-        
+#if UNITY_EDITOR
+        /// <summary>Заполняет реестр всеми ItemSO проекта. Запускать после добавления новых предметов.</summary>
+        [ContextMenu("Собрать все ItemSO в реестр")]
+        private void CollectAllItems()
+        {
+            UnityEditor.Undo.RecordObject(this, "Collect ItemSO into registry");
+            itemsRegistry = UnityEditor.AssetDatabase.FindAssets("t:ItemSO")
+                .Select(g => UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSO>(UnityEditor.AssetDatabase.GUIDToAssetPath(g)))
+                .Where(i => i != null)
+                .OrderBy(i => i.name)
+                .ToList();
+            UnityEditor.EditorUtility.SetDirty(this);
+            _itemsData = null;
+            Debug.Log($"DataManager: itemsRegistry содержит {itemsRegistry.Count} предметов.", this);
+        }
+#endif
+
         #endregion
 
 

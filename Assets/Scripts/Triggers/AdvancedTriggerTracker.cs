@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.Triggers
@@ -8,12 +9,14 @@ namespace Arcatech.Triggers
     /// удара (с учётом скоростей риджидбоди — своей и объекта, в который попали) и
     /// отладочной визуализацией последних попаданий через гизмо в редакторе.
     /// </summary>
+    [RequireComponent(typeof(Rigidbody))]
     public class AdvancedTriggerTracker : TriggerTrackerComponent
     {
         // todo: maybe move into a game rule config
         private const float ImpactDirectionEpsilon = 1e-6f;
         private const float RayOriginOffset = 0.05f;
         private const float RaycastRange = RayOriginOffset * 3f;
+        [SerializeField, Self] private Rigidbody cachedRigidbody;
 
         // updated for better precision
         protected override (Vector3 position, Vector3 direction, Vector3 normal) CalculateHitGeometry(Collider other)
@@ -30,6 +33,12 @@ namespace Arcatech.Triggers
             return (hitPosition, impactDirection, hitNormal);
         }
 
+        protected override void Start()
+        {
+            base.Start();
+            cachedRigidbody.isKinematic = true;
+        }
+
         private Vector3 ResolveImpactDirection(Vector3 candidate, Rigidbody otherRigidbody = null)
         {
             // hit on a moving enemy or a platform with a rigidbody
@@ -38,13 +47,13 @@ namespace Arcatech.Triggers
                 // 1. Try 'other' object's velocity if trigger doesn't move much
 
                 if (otherRigidbody.linearVelocity.sqrMagnitude > ImpactDirectionEpsilon &&
-                    CachedRigidbody.linearVelocity.sqrMagnitude <= ImpactDirectionEpsilon)
+                    cachedRigidbody.linearVelocity.sqrMagnitude <= ImpactDirectionEpsilon)
                 {
                     return otherRigidbody.linearVelocity.normalized;
                 }
                 // 2. Try relative velocity, for example, an enemy hit
 
-                Vector3 relativeVelocity = otherRigidbody.linearVelocity - CachedRigidbody.linearVelocity;
+                Vector3 relativeVelocity = otherRigidbody.linearVelocity - cachedRigidbody.linearVelocity;
                 if (relativeVelocity.sqrMagnitude > ImpactDirectionEpsilon)
                 {
                     return relativeVelocity.normalized;
@@ -54,9 +63,9 @@ namespace Arcatech.Triggers
             else
             {
                 // 3. Try trigger's velocity if it has one
-                if (CachedRigidbody.linearVelocity.sqrMagnitude > ImpactDirectionEpsilon)
+                if (cachedRigidbody.linearVelocity.sqrMagnitude > ImpactDirectionEpsilon)
                 {
-                    return CachedRigidbody.linearVelocity.normalized;
+                    return cachedRigidbody.linearVelocity.normalized;
                 }
             }
 

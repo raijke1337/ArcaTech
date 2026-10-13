@@ -1,14 +1,17 @@
-﻿using System;
-using Arcatech.Triggers;
+﻿using Arcatech.Triggers;
 using KBCore.Refs;
 using UnityEngine;
 
 namespace Arcatech.SaveSystem
 {
+    /// <summary>Чекпоинт. Срабатывает один раз: фиксирует прогресс и пишет его на диск.
+    /// Игрок возрождается в позиции этого объекта.</summary>
     [RequireComponent(typeof(TriggerTrackerComponent))]
-    public class CheckpointTrigger: SavedProgressItemBase, ITriggerNotificationReceiver
+    public class CheckpointTrigger : SavedProgressItemBase, ITriggerNotificationReceiver
     {
-        [SerializeField, Self] private TriggerTrackerComponent trigger; 
+        [SerializeField, Self] private TriggerTrackerComponent trigger;
+
+        public override ProgressItemKind Kind => ProgressItemKind.Checkpoint;
 
         protected override void OnEnable()
         {
@@ -22,37 +25,41 @@ namespace Arcatech.SaveSystem
             trigger.UnregisterReceiver(this);
         }
 
-        public override void ApplySaveState(ProgressItemState state, ILevelProgressContext ctx)
+        protected override void OnApplySaveState(ProgressItemState state, ILevelProgressContext ctx)
         {
-            switch (state)
-            {
-                case ProgressItemState.Default:
-                    break;
-                case ProgressItemState.Completed:
-                    
-                    trigger.UnregisterReceiver(this);
-                    gameObject.SetActive(false);
-                    break;
-                case ProgressItemState.Failed:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
-            }
+            if (state == ProgressItemState.Completed) Deactivate();
         }
 
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
-            if (triggerHitInfo.TryGetEntityTarget(out var tgt) 
+            if (ReadItemState == ProgressItemState.Completed) return;
+
+            if (triggerHitInfo.TryGetEntityTarget(out var tgt)
                 && tgt.CompareTag("Player"))
             {
                 Announce(ProgressItemState.Completed);
                 LevelProgressController.Instance.OnCheckPointReached(this);
+                // Не выключаем объект прямо в колбэке триггера (идёт обход списка получателей) -
+                // повторные входы отсекает проверка состояния выше.
             }
         }
 
         public void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
             //noop
+        }
+
+        // CheckpointTrigger: публичная программная активация
+        public void Reach()
+        {
+            Announce(ProgressItemState.Completed);
+            LevelProgressController.Instance.OnCheckPointReached(this);
+        }
+        
+        private void Deactivate()
+        {
+            trigger.UnregisterReceiver(this);
+            gameObject.SetActive(false);
         }
     }
 }

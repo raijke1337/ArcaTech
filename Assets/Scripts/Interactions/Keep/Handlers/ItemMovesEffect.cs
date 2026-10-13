@@ -55,6 +55,7 @@ namespace Arcatech.Interactions
         public override void Play(InteractionContext ctx)
         {
             if (ctx.State != InteractionState.Success) return;
+        //    Debug.Log($"Playing {tween} on {moveTargetOverride.name}");
             if (!runFromEnable) 
                 cached.Play();
             toggled = true;

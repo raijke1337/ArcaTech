@@ -73,6 +73,8 @@ namespace Arcatech.Cameras
         {
             if (gameplayCamera == null)
                 gameplayCamera = GetComponent<CinemachineCamera>();
+            if (!gameplayCamera)
+                gameplayCamera = FindAnyObjectByType<CinemachineCamera>();
 
             if (orbitalFollow == null && gameplayCamera != null)
                 orbitalFollow = gameplayCamera.GetComponent<CinemachineOrbitalFollow>();

@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace Arcatech.SaveSystem
@@ -13,6 +14,7 @@ namespace Arcatech.SaveSystem
         // Соль не сериализуется как публичное поле ассета, чтобы её нельзя было
         // случайно/намеренно поменять через инспектор в билде.
         private const string HashSalt = "KittyTitties";
+        private const string BackupSuffix = ".bak";
 
         private string GetFilePath(string fileName) => Path.Combine(Application.persistentDataPath, fileName);
 
@@ -50,7 +52,8 @@ namespace Arcatech.SaveSystem
 
                 if (File.Exists(filePath))
                 {
-                    File.Replace(tempPath, filePath, filePath + ".bak");
+                    // Предыдущая версия файла становится резервной копией (*.bak).
+                    File.Replace(tempPath, filePath, filePath + BackupSuffix);
                 }
                 else
                 {
@@ -67,9 +70,34 @@ namespace Arcatech.SaveSystem
         }
 
         public override LoadDataResult TryLoadData<T>(string fileName, out T data)
+            => LoadFromPath(GetFilePath(fileName), out data);
+
+        public override LoadDataResult TryLoadBackup<T>(string fileName, out T data)
+            => LoadFromPath(GetFilePath(fileName) + BackupSuffix, out data);
+
+        public override void DeleteData(string fileName)
+        {
+            var filePath = GetFilePath(fileName);
+            try
+            {
+                if (File.Exists(filePath)) File.Delete(filePath);
+                if (File.Exists(filePath + BackupSuffix)) File.Delete(filePath + BackupSuffix);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"DeleteData({fileName}) failed: {ex}");
+            }
+        }
+
+        private static readonly JsonSerializerSettings ReadSettings = new()
+        {
+            // Иначе строки, похожие на дату (timestamp), будут переформатированы, и хеш не сойдётся.
+            DateParseHandling = DateParseHandling.None
+        };
+
+        private LoadDataResult LoadFromPath<T>(string filePath, out T data) where T : class
         {
             data = null;
-            var filePath = GetFilePath(fileName);
 
             if (!File.Exists(filePath))
             {
@@ -79,26 +107,31 @@ namespace Arcatech.SaveSystem
             try
             {
                 var json = File.ReadAllText(filePath, Encoding.UTF8);
-                var wrapper = JsonConvert.DeserializeObject<SaveFileWrapper<T>>(json);
+                var root = JsonConvert.DeserializeObject<JObject>(json, ReadSettings);
+                var dataToken = root?["Data"];
+                var hash = root?["Hash"]?.Value<string>();
 
-                if (wrapper.Data == null || string.IsNullOrEmpty(wrapper.Hash))
+                if (dataToken == null || dataToken.Type == JTokenType.Null || string.IsNullOrEmpty(hash))
                 {
-                    Debug.LogWarning($"Corrupted save file structure: {fileName}");
-                    return LoadDataResult.Missing;
+                    // Файл есть, но структура сломана - это повреждение, а не отсутствие.
+                    Debug.LogWarning($"Corrupted save file structure: {filePath}");
+                    return LoadDataResult.HashFail;
                 }
 
-                var recalculatedHash = ComputeHash(JsonConvert.SerializeObject(wrapper.Data));
-                if (!string.Equals(wrapper.Hash, recalculatedHash, StringComparison.Ordinal))
+                // Хеш считается по JSON из файла, а не по повторной сериализации объекта:
+                // так добавление новых полей в классы сохранения не ломает старые сейвы.
+                var recalculatedHash = ComputeHash(dataToken.ToString(Formatting.None));
+                if (!string.Equals(hash, recalculatedHash, StringComparison.Ordinal))
                 {
                     return LoadDataResult.HashFail;
                 }
 
-                data = wrapper.Data;
-                return LoadDataResult.Success;
+                data = dataToken.ToObject<T>();
+                return data != null ? LoadDataResult.Success : LoadDataResult.HashFail;
             }
             catch (Exception ex)
             {
-                Debug.LogError($"TryLoadData<{typeof(T).Name}> failed: {ex}");
+                Debug.LogError($"Load {typeof(T).Name} from {filePath} failed: {ex}");
                 return LoadDataResult.HashFail;
             }
         }

@@ -21,6 +21,7 @@ namespace Arcatech.Units
         [Space, Header("Items list"), SerializeField]
         protected UnitItemsSO defaultEquips;
 
+        [Tooltip("Включить у игрока: инвентарь берётся из чекпоинта / экипировки «Персонажа» и пишется в прогресс уровня")]
         [SerializeField] private bool useSaveSystem = false;
         private List<IUnitInventoryView> _views;
         [SerializeField] private UnitInventoryModel _model;
@@ -31,11 +32,13 @@ namespace Arcatech.Units
         {
             _views??= new();
             IEntityItemsList itemsData = defaultEquips;
-            // if (useSaveSystem)
-            // {
-            //     var data = SaveManager.Instance.GetGameData;
-            //     data.TryGetInventoryForEntity(baseGameEntity.GetID, out itemsData);
-            // }
+            if (useSaveSystem)
+            {
+                // Чекпоинт -> инвентарь из чекпоинта; новый старт -> экипировка из «Персонажа»;
+                // null -> пресет по умолчанию (defaultEquips).
+                var saved = LevelProgressController.Instance.GetStartingInventory(gameObject.scene);
+                if (saved != null) itemsData = saved;
+            }
             _model = new UnitInventoryModel(itemsData, baseGameEntity);
             var views = gameObject.GetComponentsInChildren<IUnitInventoryView>();
             foreach (var view in views)
@@ -43,6 +46,25 @@ namespace Arcatech.Units
                 SetModelView(view);
             }
             _model.ModelUpdatedEvent += RefreshViews;
+
+            if (useSaveSystem)
+            {
+                _model.ModelUpdatedEvent += RecordToProgress;
+                RecordSnapshot();
+            }
+        }
+
+        private void RecordToProgress(InventoryChangeNotification notification)
+        {
+            if (notification.ChangeType == InventoryChangeType.Equip && notification.ChangedItem != null)
+                LevelProgressController.TryGetInstance()?.RecordFoundEquipment(notification.ChangedItem.ID);
+            RecordSnapshot();
+        }
+
+        private void RecordSnapshot()
+        {
+            LevelProgressController.TryGetInstance()?
+                .RecordInventory(SavedEntityInventory.FromModel(_model, baseGameEntity.GetID));
         }
 
 
@@ -50,6 +72,7 @@ namespace Arcatech.Units
         {
            // Debug.Log("Inventory disable");
             _model.ModelUpdatedEvent -= RefreshViews;
+            _model.ModelUpdatedEvent -= RecordToProgress;
             foreach (var view in _views)
             {
                 view.ViewChangedInventory -= HandleViewChange;

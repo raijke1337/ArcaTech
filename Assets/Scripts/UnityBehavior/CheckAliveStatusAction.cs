@@ -16,7 +16,7 @@ public partial class CheckAliveStatusAction : Action
     
     protected override Status OnStart()
     {
-        if (_entityComponent == null) return Status.Failure;
+        if (!Agent.Value.TryGetComponent(out _entityComponent)) return Status.Failure;
         return Status.Running;
     }
 

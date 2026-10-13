@@ -49,8 +49,9 @@ namespace Arcatech.Rendering
 
         private void OnDisable()
         {
-            // w = 0 -> шейдеры выключают зрение
+            // w = 0 -> шейдеры выключают зрение и пропуск тени фонаря
             Shader.SetGlobalVector(ArcaShaderIds.VisionCenter, Vector4.zero);
+            Shader.SetGlobalVector(ArcaShaderIds.LanternPosition, Vector4.zero);
         }
 
         private void Push()
@@ -68,6 +69,11 @@ namespace Arcatech.Rendering
 
             if (visionLight != null)
                 visionLight.range = (radius + night.transitionWidth * 0.5f) * lightRangeMultiplier;
+
+            // Фонарь: персонажи и враги (CharacterToon) не отбрасывают от него тень.
+            bool lanternOn = visionLight != null && visionLight.isActiveAndEnabled;
+            Vector3 lp = lanternOn ? visionLight.transform.position : Vector3.zero;
+            Shader.SetGlobalVector(ArcaShaderIds.LanternPosition, new Vector4(lp.x, lp.y, lp.z, lanternOn ? 1f : 0f));
         }
 
         private void OnDrawGizmosSelected()

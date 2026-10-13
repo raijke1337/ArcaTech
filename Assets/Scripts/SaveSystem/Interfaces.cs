@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Arcatech.SaveSystem
 {
@@ -21,12 +21,19 @@ namespace Arcatech.SaveSystem
     {
         bool SaveData<T>(T data, string fileName) where T : class;
         LoadDataResult TryLoadData<T>(string fileName, out T data) where T : class;
+
+        /// <summary>Читает резервную копию (предыдущее успешное сохранение, *.bak).</summary>
+        LoadDataResult TryLoadBackup<T>(string fileName, out T data) where T : class;
+
+        void DeleteData(string fileName);
     }
 
     public abstract class SaveService : ScriptableObject, ISaveLoadService
     {
         public abstract bool SaveData<T>(T data, string fileName) where T : class;
         public abstract LoadDataResult TryLoadData<T>(string fileName, out T data) where T : class;
+        public abstract LoadDataResult TryLoadBackup<T>(string fileName, out T data) where T : class;
+        public abstract void DeleteData(string fileName);
     }
 
     /// <summary>Интерфейс объекта прогресса на сцене. Идентифицируется через
@@ -35,6 +42,7 @@ namespace Arcatech.SaveSystem
     {
         string SavedItemID { get; }
         string Name { get; }
+        ProgressItemKind Kind { get; }
         ProgressItemState ReadItemState { get; }
         void ApplySaveState(ProgressItemState state, ILevelProgressContext ctx);
     }

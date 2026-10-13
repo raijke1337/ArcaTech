@@ -56,8 +56,8 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -74,7 +74,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Triggers.TriggerTrackerComponent
   triggerCollider: {fileID: 7436433440464641340}
-  cachedRigidbody: {fileID: 8530854132773680270}
   _warningLineWidth: 0.1
   _warningFloorOffset: 0.02
   _warningFadeInDuration: 0.12
@@ -314,6 +313,135 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f41ea9aa566a4e929019803e53f16137, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.CinemachineSwitcherEffect
+--- !u!1 &8031010367125743798
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 932944934327975424}
+  - component: {fileID: 9049691196229318382}
+  - component: {fileID: 699414623486791852}
+  - component: {fileID: 4452246990356550493}
+  - component: {fileID: 6311186128529870262}
+  - component: {fileID: 8585272220439211483}
+  m_Layer: 6
+  m_Name: EvadeEffects (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &932944934327975424
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8031010367125743798}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1867672902883979798}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &9049691196229318382
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8031010367125743798}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &699414623486791852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8031010367125743798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 509040d4559bd5541831ed4c7167c285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.LittlePauseHelperComponent
+--- !u!114 &4452246990356550493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8031010367125743798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
+  uniqueId: 621be365-359f-4873-a9e6-2ef47f939716
+--- !u!114 &6311186128529870262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8031010367125743798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01f7953c7fb5574cb807e26164548b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.BaseGameEntityComponent
+  _pauser: {fileID: 699414623486791852}
+  _name: 
+  id: {fileID: 4452246990356550493}
+  _rb: {fileID: 9049691196229318382}
+  setKinematic: 1
+  entitySide: 0
+  effectSpawn: {fileID: 932944934327975424}
+  destroyOnDeath: 1
+  timerToDestroy: 2
+  _showDebugs: 0
+  targetable: 0
+  AnnounceDead:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &8585272220439211483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8031010367125743798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92eb99bc95b294f4e9e8f7eb1d175275, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Items.ItemPickUpEffect
+  content: {fileID: 11400000, guid: 2550097edf15c2442ad20893f84df1fe, type: 2}
+  count: 1
+  billboard: {fileID: 0}
 --- !u!1001 &2189303441291531773
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -375,7 +503,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.006
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
@@ -385,7 +513,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.00000058114523
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
@@ -395,7 +523,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
@@ -1062,6 +1190,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 932944934327975424}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1737847279865771968}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
@@ -1108,6 +1240,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4748321033937601102}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: df9238db259ff2a499dfb90b728c8d7d,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2628430651658708489}
     - targetCorrespondingSourceObject: {fileID: 8025953748417623358, guid: df9238db259ff2a499dfb90b728c8d7d,
         type: 3}
       insertIndex: -1
@@ -1174,7 +1310,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: cd4808a4-011a-48f2-ab4f-cb3c19564392
 --- !u!114 &7123925573047558499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1223,13 +1359,14 @@ MonoBehaviour:
   duringExecuteEffects:
   - {fileID: 5901219680522526169}
   - {fileID: 3881898891158391011}
+  - {fileID: 4579333890972700850}
   successEffects:
   - {fileID: 3881898891158391011}
   failureEffects:
   - {fileID: 3881898891158391011}
   cancelEffects:
   - {fileID: 3881898891158391011}
-  destroyAfterSuccess: 0
+  destroyAfterSuccess: 1
   interactorAlignTransform: {fileID: 1867672902883979798}
   alignInteractor: 1
   disableInteractorCollisionDuringPlay: 1
@@ -1267,7 +1404,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0300bab93c5492aa3af3fba21d3b214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.QuickTimeEventCondition
-  denyEffects: []
+  denyEffects:
+  - {fileID: 5549666696056164115}
+  - {fileID: 8585272220439211483}
   prefab: {fileID: 40181641842683890, guid: b01cc30cf2459154c8eefecabd4e841b, type: 3}
   invertResult: 1
 --- !u!114 &6999738749933289331
@@ -1282,7 +1421,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e932322c16e4aff8e54bd98f72dfdbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.MiniGameExecutor
-  miniGamePrefab: {fileID: 818701742379783445, guid: 95743431bfa207e40aa3c45874794694,
+  miniGamePrefab: {fileID: 5863191936681129359, guid: 95743431bfa207e40aa3c45874794694,
     type: 3}
 --- !u!114 &4006020975587832336
 MonoBehaviour:
@@ -1319,6 +1458,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.OverrideDrawStrategyEffect
   interactorStrategy: {fileID: 11400000, guid: 9642c790993fcee4ebfa0ad78750b90c, type: 2}
   targetStrategy: {fileID: 11400000, guid: 9642c790993fcee4ebfa0ad78750b90c, type: 2}
+--- !u!114 &2628430651658708489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342246620228872364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d50e7436921bf440bbc0f02f779aa41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.CollectibleProgress
+  entity: {fileID: 7123925573047558499}
+  comp: {fileID: 5475822236366328362}
 --- !u!4 &1867672902883979798 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: df9238db259ff2a499dfb90b728c8d7d,

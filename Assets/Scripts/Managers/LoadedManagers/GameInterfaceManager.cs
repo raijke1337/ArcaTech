@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +18,7 @@ using KBCore.Refs;
 using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
@@ -27,9 +28,13 @@ namespace Arcatech.Managers
     public class GameInterfaceManager : GenericLazySingleton<GameInterfaceManager>
     {
 
-        [SerializeField] private PanelAnimator koWindow;
+        [SerializeField] private KnockOutPanel koWindow;
         [SerializeField] private PanelAnimator fade;
         [SerializeField] private PanelAnimator pauseWindow;
+        [Tooltip("Кнопка «Попробовать ещё раз» на экране поражения - выключается, когда жизней не осталось")]
+        [SerializeField] private UnityEngine.UI.Button retryAtCheckpointButton;
+        [Tooltip("Окно «Сводка прохождения уровня»")]
+        [SerializeField] private LevelResultsWindow levelResultsWindow;
 
         [SerializeField] private PlayerUnitPanel playerPanel;
         [SerializeField] private MiniGameWindow miniGameWindow;
@@ -39,6 +44,8 @@ namespace Arcatech.Managers
 
         [Space] [SerializeField] private bool showTooltip = true;
         [SerializeField] private FloatingTooltipComponent floatingTooltip;
+        [Tooltip("Логика подсказок. Если не назначен - берётся/добавляется на этот же объект.")]
+        [SerializeField] private TargetTooltipController tooltipController;
         [Space] [SerializeField] private GameTextWindowComponent _text;
         [SerializeField] private bool showDialogues = true;
 
@@ -64,6 +71,9 @@ namespace Arcatech.Managers
         {
             _pauseToggleBind = new EventBinding<PauseToggleEvent>(ShowPauseMenu);
             EventBus<PauseToggleEvent>.Register(_pauseToggleBind);
+
+            Tooltips.Bind(floatingTooltip);
+            Tooltips.TooltipsEnabled = showTooltip;
         }
 
         private void Start()
@@ -73,6 +83,7 @@ namespace Arcatech.Managers
             playerPanel.gameObject.SetActive(true);
             playerPanel.Show();
             koWindow.Hide();
+            if (levelResultsWindow != null) levelResultsWindow.gameObject.SetActive(false);
 
             if (gameplayCamera == null)
                 gameplayCamera = Camera.main;
@@ -118,6 +129,46 @@ namespace Arcatech.Managers
             onDialogueCompleted.Invoke();
         }
 
+        private bool _levelCompleted;
+
+        /// <summary>Уровень пройден: фиксирует результат, отключает ввод игрока,
+        /// прячет игровой интерфейс и показывает «Сводку прохождения уровня».</summary>
+        public void OnLevelCompleted()
+        {
+            if (_levelCompleted) return;
+            _levelCompleted = true;
+
+            var progress = LevelProgressController.Instance;
+            var result = progress.CompleteLevel();
+
+            // Весь игровой ввод выключается так же, как на время мини-игр.
+            PlayerInputGateway.Instance?.DisableAllInput();
+
+            var player = FindAnyObjectByType<PlayerComponent>();
+            if (player != null)
+            {
+                // Враги ещё на уровне: игрок не должен умереть, пока открыты итоги.
+                player.Entity.Invulnerable = true;
+            }
+
+            LockOnTarget(null);
+            SetTooltipsSuppressed(true);
+            playerPanel.Hide();
+
+            fade.gameObject.SetActive(true);
+            fade.Show();
+
+            if (levelResultsWindow != null)
+            {
+                levelResultsWindow.gameObject.SetActive(true);
+                levelResultsWindow.Show(result, progress.CurrentLevelTitle);
+            }
+            else
+            {
+                Debug.LogWarning($"GameInterfaceManager: LevelResultsWindow не назначен. Результат: {result}");
+            }
+        }
+        
         public bool IsDialogueShowing => _text.gameObject.activeSelf;
 
         #endregion
@@ -131,19 +182,43 @@ namespace Arcatech.Managers
         private RectTransform _crosshairRect;
         private Canvas _crosshairCanvas;
 
-        public void NotifyTargetable(ITargetable targetable, bool show)
+        private TargetTooltipController Tooltips
         {
-            if (!showTooltip) return;
-            if (!floatingTooltip) return;
-            if (!show)
+            get
             {
-                floatingTooltip.PanelAnimator.Hide();
-                return;
+                if (tooltipController == null)
+                {
+                    tooltipController = GetComponent<TargetTooltipController>();
+                    if (tooltipController == null)
+                        tooltipController = gameObject.AddComponent<TargetTooltipController>();
+                }
+                return tooltipController;
             }
+        }
 
-            floatingTooltip.gameObject.SetActive(true);
-            floatingTooltip.Set(targetable);
-            floatingTooltip.PanelAnimator.Show();
+        /// <summary>Теилс вошла/вышла из зоны взаимодействия объекта с подсказкой
+        /// (нужно для геймпада: подсказка показывается без курсора).</summary>
+        public void NotifyTargetInRange(ITargetTooltip target, bool inRange)
+        {
+            Tooltips.SetInRange(target, inRange);
+        }
+
+        /// <summary>Объект с подсказкой выключен или уничтожен - подсказка пропадает сразу.</summary>
+        public void OnTargetableDisabled(ITargetTooltip targetTooltip)
+        {
+            if (tooltipController != null) tooltipController.Forget(targetTooltip);
+        }
+
+        /// <summary>Временно скрыть все подсказки (итоги уровня, кат-сцены).</summary>
+        public void SetTooltipsSuppressed(bool suppressed)
+        {
+            Tooltips.Suppressed = suppressed;
+        }
+
+        [Obsolete("Наведение теперь определяет TargetTooltipController. Используйте NotifyTargetInRange / OnTargetableDisabled.")]
+        public void NotifyTargetable(ITargetTooltip targetTooltip, bool isEnter, PointerEventData data = null)
+        {
+            if (!isEnter) OnTargetableDisabled(targetTooltip);
         }
 
         public void LockOnTarget(BaseGameEntityComponent target)
@@ -262,36 +337,55 @@ namespace Arcatech.Managers
             EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(false));
         }
 
-        public void ShowPlayerDeadMenu()
+        public void ShowPlayerDeadMenu(bool canRetry)
         {
+            if (retryAtCheckpointButton != null) retryAtCheckpointButton.interactable = canRetry;
+
             koWindow.gameObject.SetActive(true);
             fade.gameObject.SetActive(true);
             playerPanel.Hide();
             koWindow.Show();
+            koWindow.UpdateText(LevelProgressController.Instance.LivesRemaining);
             fade.Show();
         }
 
+        // --- Экран поражения ---
+
+        /// <summary>«Перерыв» на экране поражения: выход после смерти.</summary>
         public void ToMain()
         {
             LevelProgressController.Instance.ExitAfterDeath();
             GameManager.Instance.OnReturnToMain();
         }
 
+        /// <summary>«Заново» (экран поражения или пауза): уровень с начала.</summary>
         public void OnRestart()
         {
+            ResumeTime();
             GlitchController.Instance.TriggerGlitch(1, 0.5f);
             LevelProgressController.Instance.RestartLevelFromScratch();
-
         }
 
+        /// <summary>«Попробовать ещё раз»: перезагрузка с последнего чекпоинта.</summary>
         public void OnRestartAtCheckpoint()
         {
-
+            if (!LevelProgressController.Instance.CanRetry) return;
             GlitchController.Instance.TriggerGlitch(1, 0.5f);
             LevelProgressController.Instance.ReturnToCheckpoint();
-            playerPanel.gameObject.SetActive(true);
-            playerPanel.Show();
         }
+
+        // --- Пауза ---
+
+        /// <summary>«Выйти в главное меню» из паузы: последний чекпоинт сохраняется для «Продолжить».</summary>
+        public void ClickExitToMainKeepCheckpoint()
+        {
+            ResumeTime();
+            LevelProgressController.Instance.LeaveLevelKeepingCheckpoint();
+            GameManager.Instance.OnReturnToMain();
+        }
+
+        // Снимаем паузу перед сменой сцены, чтобы новая сцена не загрузилась «замороженной».
+        private void ResumeTime() => EventBus<PauseToggleEvent>.Raise(new PauseToggleEvent(false));
 
         #endregion
 
@@ -480,4 +574,4 @@ namespace Arcatech.Managers
             throw new NotImplementedException();
         }
     }
-}
+}

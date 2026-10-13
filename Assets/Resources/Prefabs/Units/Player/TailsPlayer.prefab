@@ -372,7 +372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 9495f3ca-9fcd-4a2e-a51b-504e2d63ac48
+  uniqueId: a24d5364-e0c1-4e59-a60b-2162c72e210e
 --- !u!114 &3413998453285093005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,7 +412,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.EntityStateMachineComponent
   gameEntity: {fileID: 3413998453285093005}
-  animator: {fileID: 2244779132007733205}
+  animator: {fileID: 2922888538314744481}
   defaultState: {fileID: 11400000, guid: 0feb9fd035117c14bbe6bb4a0cedc03f, type: 2}
   verboseDebugs: 0
   context:
@@ -665,8 +665,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.EntityInventoryComponent
   baseGameEntity: {fileID: 3413998453285093005}
-  defaultEquips: {fileID: 11400000, guid: fb4ced8f96949854faf12cb4afa34649, type: 2}
-  useSaveSystem: 0
+  defaultEquips: {fileID: 11400000, guid: bad0242a05b2c7341ac8632ca43b47da, type: 2}
+  useSaveSystem: 1
 --- !u!114 &4056496551489463538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -822,6 +822,7 @@ MonoBehaviour:
   toKilledState: {fileID: 11400000, guid: aa806e69f163ab043a5541d5106fee78, type: 2}
   toKnockDown: {fileID: 11400000, guid: aa2c57c1ff12e6d47b27770c3affa4b8, type: 2}
   toDamageInterrupt: {fileID: 11400000, guid: be028d6c5f31df44aac5f9398e8f81ca, type: 2}
+  onDeathPlaceholder: {fileID: 0}
 --- !u!114 &-367359324892275855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -958,7 +959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cc4af163176f074aaa485d2e41c63a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Control.StanceClipSwitcher
-  animator: {fileID: 2244779132007733205}
+  animator: {fileID: 2922888538314744481}
   drawer: {fileID: 4056496551489463538}
   slotMap: {fileID: 11400000, guid: 1906a8ba57d9e804c9eec74dee518d4a, type: 2}
 --- !u!114 &7583641227977036609
@@ -984,7 +985,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6934539185133570580}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 98b9141766ee0ea4a95548a831f88f26, type: 3}
   m_Name: 
@@ -1091,7 +1092,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Triggers.TriggerTrackerComponent
   triggerCollider: {fileID: 6944565704269025568}
-  cachedRigidbody: {fileID: 7971591224842378761}
   _warningLineWidth: 0.1
   _warningFloorOffset: 0.02
   _warningFadeInDuration: 0.12
@@ -1745,7 +1745,7 @@ PrefabInstance:
     - target: {fileID: -1206874426333947015, guid: 10f4037531ab26d47afa16a7d9641a42,
         type: 3}
       propertyPath: 'm_BlendShapeWeights.Array.data[1]'
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 10f4037531ab26d47afa16a7d9641a42,
         type: 3}
@@ -1833,10 +1833,26 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6748397875112897118}
-    - targetCorrespondingSourceObject: {fileID: -8892560543982585706, guid: 10f4037531ab26d47afa16a7d9641a42,
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10f4037531ab26d47afa16a7d9641a42,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6034733106438763620}
+      addedObject: {fileID: 2922888538314744481}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2245787244377089013}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7888515061395788815}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2023881695727083421}
+    - targetCorrespondingSourceObject: {fileID: -4819223349682164798, guid: 10f4037531ab26d47afa16a7d9641a42,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8949256996982351362}
   m_SourcePrefab: {fileID: 100100000, guid: 10f4037531ab26d47afa16a7d9641a42, type: 3}
 --- !u!4 &175755604001861833 stripped
 Transform:
@@ -1859,12 +1875,6 @@ Transform:
 --- !u!4 &1107144815982453271 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4534907895379408813, guid: 10f4037531ab26d47afa16a7d9641a42,
-    type: 3}
-  m_PrefabInstance: {fileID: 5642336417582901828}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &2244779132007733205 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 10f4037531ab26d47afa16a7d9641a42,
     type: 3}
   m_PrefabInstance: {fileID: 5642336417582901828}
   m_PrefabAsset: {fileID: 0}
@@ -1904,6 +1914,153 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 838519e5d02343249e0d4ddd7578cba4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ECM2::ECM2.RootMotionController
+--- !u!95 &2922888538314744481
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4795474619174377237}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 10f4037531ab26d47afa16a7d9641a42, type: 3}
+  m_Controller: {fileID: 9100000, guid: b3ae35948a293104485404a1315d2b0a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2245787244377089013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4795474619174377237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c69bde0b2743cb8ab4bbfe2313ee66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Animation.ProceduralStyleController
+  defaultProfile: {fileID: 11400000, guid: c391dc8bd4114ba099747babe5676cc6, type: 2}
+  inlineSettings:
+    locomotionWeight: 1
+    hipRollDeg: 6
+    hipShift: 0.025
+    hipYawDeg: 6
+    chestCounter: 1.3
+    crossStep: 0.03
+    idleWeight: 1
+    idleHipRollDeg: 5
+    idleHipShift: 0.04
+    idleSwayPeriod: 7
+    idleSwayAmount: 0.6
+    leftArmAntiClip: 1
+    rightArmAntiClip: 1
+  masterWeight: 1
+  ikLayer: 0
+  speedParameter: LinearVelocity
+  idleSpeed: 0.15
+  locomotionBySpeed:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.3
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 2.5
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 0.4
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  footLiftReference: 0.08
+  strideReference: 0.35
+  gaitSmoothing: 0.06
+  bodyDropCompensation: 1
+  antiClip: {fileID: 0}
+--- !u!114 &7888515061395788815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4795474619174377237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ddcfb6939ea49c58497211f681b9cc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Animation.ArmAntiClip
+  leftWeight: 1
+  rightWeight: 1
+  pelvisRadius: 0.13
+  pelvisExtraWidth: 0.04
+  pelvisOffset: {x: 0, y: 0.02, z: -0.01}
+  thighRadiusTop: 0.19
+  thighRadiusBottom: 0.19
+  thighTopOffset: {x: 0.02, y: 0, z: 0}
+  thighBottomOffset: {x: 0, y: 0, z: 0}
+  thighLength: 0.7
+  extraCapsules: []
+  elbowRadius: 0.045
+  wristRadius: 0.035
+  handRadius: 0.03
+  handLength: 0.08
+  margin: 0.005
+  outwardBias: 0.5
+  iterations: 3
+  drawGizmos: 1
+--- !u!114 &2023881695727083421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4795474619174377237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 794256636f7041fba557634e9b739f30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Animation.StanceStyleBinder
+  switcher: {fileID: 3107538716206129910}
+  style: {fileID: 2245787244377089013}
+  profiles:
+    _serializedList: []
 --- !u!4 &5099042955103103800 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 616689265252204924, guid: 10f4037531ab26d47afa16a7d9641a42,
@@ -1922,24 +2079,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5642336417582901828}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &5393865804326638290 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -8892560543982585706, guid: 10f4037531ab26d47afa16a7d9641a42,
-    type: 3}
-  m_PrefabInstance: {fileID: 5642336417582901828}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6034733106438763620
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5393865804326638290}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edacc9b36aba39b4bb5feed1959cfb70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!4 &5456898484151220991 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8793463738885467973, guid: 10f4037531ab26d47afa16a7d9641a42,
@@ -1988,6 +2127,34 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5642336417582901828}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8310046168787337606 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -4819223349682164798, guid: 10f4037531ab26d47afa16a7d9641a42,
+    type: 3}
+  m_PrefabInstance: {fileID: 5642336417582901828}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &8949256996982351362
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8310046168787337606}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2c7b761d6d789134dbfd304456ea55f9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!4 &8946470576988998512 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3631489565944881460, guid: 10f4037531ab26d47afa16a7d9641a42,

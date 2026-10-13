@@ -1,10 +1,14 @@
 Shader "ARCA/CharacterToon"
 {
     // Персонажи и металлы: замена Toon Pro на общем ядре ARCA.
+    // По умолчанию не отбрасывает тень от фонаря Теилс (галка в Shadows):
+    // ни Теилс, ни враги не дают теней от лампы над героиней.
     // Реагирует на свет так же, как окружение: Intensity point-света задаёт
     // размер пятна, а не яркость (больше никакого "светящегося" персонажа).
     //
     // Металл (_METAL): ступенчатый блик + matcap.
+    // Без шейдинга (_UNSHADED): плоский цвет альбедо без света и теней;
+    // matcap, эмиссия, обводка, кошачье зрение и прозрачность сохраняются.
     // Обводка: толщина в пикселях; для мягкого контура без разрывов
     // запеките сглаженные нормали в UV3 (Toon Pro > SmoothNormalsBaker,
     // канал "UV3") и включите "Сглаженные нормали".
@@ -24,32 +28,43 @@ Shader "ARCA/CharacterToon"
         [HDR] _EmissionColor ("Emission Color", Color) = (0, 0, 0, 1)
 
         [Header(Toon  Shadow)]
+        [Toggle(_UNSHADED)] _Unshaded ("Без шейдинга (плоский цвет)", Float) = 0
+        _UnshadedBrightness ("Unshaded Brightness", Range(0.0, 2.0)) = 1.0
         _StepThreshold ("Step Threshold", Range(0.0, 1.0)) = 0.45
-        _StepSmooth ("Step Smoothness", Range(0.001, 0.1)) = 0.02
-        _ShadowColor ("Shadow Tint (доля света в тени)", Color) = (0.62, 0.45, 0.5, 1)
-        _AmbientInfluence ("Ambient Influence", Range(0.0, 1.0)) = 0.6
+        _StepSmooth ("Step Smoothness", Range(0.001, 0.1)) = 0.008
+        _ShadowColor ("Shadow Tint (доля света в тени)", Color) = (0.72, 0.6, 0.7, 1)
+        _ShadowSaturation ("Shadow Saturation (насыщенность тени)", Range(0.0, 1.0)) = 0.7
+        _AmbientInfluence ("Ambient Influence", Range(0.0, 1.0)) = 0.35
+        _FlatAmbient ("Flat Ambient (без градиента)", Range(0.0, 1.0)) = 1.0
+        _LightColorInfluence ("Light Color Influence (тон от ламп)", Range(0.0, 1.0)) = 0.35
+        _MinLight ("Min Light (яркость в темноте)", Range(0.0, 1.5)) = 0.85
         _AddLightStep ("Point Light Step", Range(0.0, 1.0)) = 0.3
+        _AddLightSoftness ("Point Light Softness (0 toon, 1 мягко)", Range(0.0, 1.0)) = 0.8
 
         [Header(Rim)]
-        _RimColor ("Rim Color", Color) = (0.35, 0.35, 0.35, 1)
+        _RimColor ("Rim Color", Color) = (0, 0, 0, 1)
         _RimThreshold ("Rim Threshold", Range(0.0, 1.0)) = 0.55
         _RimPower ("Rim Power", Range(0.5, 8.0)) = 3.0
 
         [Header(Metal)]
-        [Toggle(_METAL)] _Metal ("Металл", Float) = 0
+        [Toggle(_METAL)] _Metal ("Металл (matcap + блик)", Float) = 0
+        [Toggle(_SPECULAR)] _Specular ("Блик (без matcap)", Float) = 0
         _ArcaSpecColor ("Specular Color", Color) = (1, 1, 1, 1)
         _SpecSize ("Specular Size", Range(0.0, 1.0)) = 0.3
         _MatCap ("MatCap", 2D) = "gray" {}
         _MatCapStrength ("MatCap Strength", Range(0.0, 1.0)) = 0.5
 
         [Header(Outline)]
-        _OutlineColor ("Outline Color", Color) = (0.05, 0.04, 0.06, 1)
-        _OutlineWidthPx ("Outline Width (px)", Range(0.0, 8.0)) = 2.0
+        _OutlineColor ("Outline Color", Color) = (0.04, 0.045, 0.08, 1)
+        _OutlineWidthPx ("Outline Width (px)", Range(0.0, 8.0)) = 2.5
         [Toggle(_OUTLINE_SMOOTHNORMALS)] _OutlineSmoothNormals ("Сглаженные нормали (UV3)", Float) = 0
 
         [Header(Transparency)]
         _FadeAmount ("Fade Amount (скрипт)", Range(0.0, 1.0)) = 0.0
         [HideInInspector] _ArcaOccluder ("Occluder", Float) = 0.0
+
+        [Header(Shadows)]
+        [Toggle] _ArcaNoLanternShadow ("Без тени от фонаря Теилс", Float) = 1.0
     }
     SubShader
     {
@@ -65,11 +80,17 @@ Shader "ARCA/CharacterToon"
             float  _BumpScale;
             float  _OcclusionStrength;
             float4 _EmissionColor;
+            float  _UnshadedBrightness;
             float  _StepThreshold;
             float  _StepSmooth;
             float4 _ShadowColor;
+            float  _ShadowSaturation;
             float  _AmbientInfluence;
+            float  _FlatAmbient;
+            float  _LightColorInfluence;
+            float  _MinLight;
             float  _AddLightStep;
+            float  _AddLightSoftness;
             float4 _RimColor;
             float  _RimThreshold;
             float  _RimPower;
@@ -80,7 +101,11 @@ Shader "ARCA/CharacterToon"
             float  _OutlineWidthPx;
             float  _FadeAmount;
             float  _ArcaOccluder;
+            float  _ArcaNoLanternShadow;
         CBUFFER_END
+
+        // ShadowCaster умеет пропускать тень от фонаря Теилс (ArcaPasses.hlsl).
+        #define ARCA_LANTERN_SHADOW_SKIP 1
 
         #include "Common/ArcaGlobals.hlsl"
         #include "Common/ARCADither.hlsl"
@@ -99,13 +124,16 @@ Shader "ARCA/CharacterToon"
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature_local _METAL
+            #pragma shader_feature_local _SPECULAR
+            #pragma shader_feature_local_fragment _UNSHADED
 
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile_fragment _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
-            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            // SSAO на персонажах не применяется (грязнит рисованную заливку);
+            // контактные тени на полу от них остаются - DepthNormals пишется.
             #pragma multi_compile_fog
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -172,18 +200,25 @@ Shader "ARCA/CharacterToon"
                 tp.shadowColor      = _ShadowColor.rgb;
                 tp.ambientInfluence = _AmbientInfluence;
                 tp.addLightStep     = _AddLightStep;
+                tp.addLightSoftness = _AddLightSoftness;
                 tp.rimColor         = _RimColor.rgb;
                 tp.rimThreshold     = _RimThreshold;
                 tp.rimPower         = _RimPower;
+                tp.shadowSaturation    = _ShadowSaturation;
+                tp.flatAmbient         = _FlatAmbient;
+                tp.lightColorInfluence = _LightColorInfluence;
+                tp.minLight            = _MinLight;
+
+                #if defined(_METAL) || defined(_SPECULAR)
+                    tp.specColor = _ArcaSpecColor.rgb;
+                    tp.specSize  = _SpecSize;
+                #endif
 
                 #if defined(_METAL)
                     // MatCap по нормали в пространстве камеры - "отражение" металла
                     float3 normalVS = mul((float3x3)UNITY_MATRIX_V, normalWS);
                     half3  matcap   = SAMPLE_TEXTURE2D(_MatCap, sampler_MatCap, normalVS.xy * 0.5 + 0.5).rgb;
                     albedo *= lerp(half3(1, 1, 1), matcap * 2.0, _MatCapStrength);
-
-                    tp.specColor = _ArcaSpecColor.rgb;
-                    tp.specSize  = _SpecSize;
                 #endif
 
                 ArcaSurface s;
@@ -193,7 +228,12 @@ Shader "ARCA/CharacterToon"
                 s.normalWS   = normalWS;
                 s.positionCS = input.positionCS;
 
-                half3 color = ArcaToonLighting(s, tp);
+                #if defined(_UNSHADED)
+                    // Шейдинг выключен: ни света, ни теней, ни ambient - чистая заливка.
+                    half3 color = albedo * _UnshadedBrightness;
+                #else
+                    half3 color = ArcaToonLighting(s, tp);
+                #endif
 
                 float vis = ArcaVisionFactor(input.positionWS, input.positionCS);
                 color  = ArcaApplyCatVision(color, vis);

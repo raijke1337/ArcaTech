@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Arcatech.Items;
 using Arcatech.Managers;
 
@@ -34,6 +35,31 @@ namespace Arcatech.SaveSystem
                 : Array.Empty<int>();
         }
 
+        /// <summary>Снимок живой модели инвентаря. Одинаковые предметы
+        /// (разные экземпляры Item с одним ID) складываются в одну запись.</summary>
+        public static SavedEntityInventory FromModel(UnitInventoryModel model, string entityID)
+        {
+            var result = new SavedEntityInventory { EntityID = entityID };
+            if (model == null) return result;
+
+            result.EntityEquipmentIDs = model.ListEquipped
+                .Where(e => e != null)
+                .Select(e => e.ID)
+                .ToList();
+
+            var counts = new Dictionary<string, int>();
+            foreach (var pair in model.ListInventory)
+            {
+                if (pair.Key == null || pair.Value <= 0) continue;
+                counts.TryGetValue(pair.Key.ID, out var c);
+                counts[pair.Key.ID] = c + pair.Value;
+            }
+
+            result.EntityItemIDs = counts.Keys.ToArray();
+            result.EntityItemsCount = counts.Values.ToArray();
+            return result;
+        }
+
         public List<Item> GetEquipment(BaseGameEntityComponent owner)
         {
             var equipList = new List<Item>();
@@ -41,7 +67,8 @@ namespace Arcatech.SaveSystem
 
             foreach (var equip in EntityEquipmentIDs)
             {
-                equipList.Add(DataManager.Instance.MakeItem(equip, owner));
+                var item = DataManager.Instance.MakeItem(equip, owner);
+                if (item != null) equipList.Add(item);
             }
             return equipList;
         }
@@ -61,7 +88,8 @@ namespace Arcatech.SaveSystem
 
             for (int i = 0; i < EntityItemIDs.Length; i++)
             {
-                invList[DataManager.Instance.MakeItem(EntityItemIDs[i], owner)] = EntityItemsCount[i];
+                var item = DataManager.Instance.MakeItem(EntityItemIDs[i], owner);
+                if (item != null) invList[item] = EntityItemsCount[i];
             }
             return invList;
         }

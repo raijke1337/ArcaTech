@@ -1,19 +1,21 @@
-﻿using System;
-using Arcatech.Managers;
+﻿using Arcatech.Managers;
 using Arcatech.Texts;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Arcatech.Interactions
 {
-    public class ManualInteractionTrigger : InteractionTrigger, ITargetable
+    public class ManualInteractionTrigger : InteractionTrigger, ITargetTooltip
     {
+        [Space, SerializeField] Description commandDescription;
+
         public override void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
             if (triggerHitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
             {
                 interactor.RegisterInteractive(interactableComponent);
-                if (interactor.Entity.ShowingDebugs)Debug.Log($"{interactor.Entity.GetName} has entered trigger area {name}");
+                if (IsPlayer(interactor))
+                    GameInterfaceManager.Instance.NotifyTargetInRange(this, true);
+                if (interactor.Entity.ShowingDebugs) Debug.Log($"{interactor.Entity.GetName} has entered trigger area {name}");
             }
         }
 
@@ -22,32 +24,39 @@ namespace Arcatech.Interactions
             if (triggerExitInfo.TargetCollider.TryGetComponent(out IInteractor interactor))
             {
                 interactor.UnregisterInteractive(interactableComponent);
+                // TryGetInstance: при выгрузке сцены менеджер может быть уже уничтожен.
+                if (IsPlayer(interactor))
+                    GameInterfaceManager.TryGetInstance()?.NotifyTargetInRange(this, false);
                 if (interactor.Entity.ShowingDebugs) Debug.Log($"{interactor.Entity.GetName} has exited trigger area {name}");
             }
         }
-        
-        public void OnPointerEnter(PointerEventData eventData)
+
+        protected override void OnDisable()
         {
-          //  GameInterfaceManager.Instance?.NotifyTargetable(this,true);
+            base.OnDisable();
+            // Объект выключен или уничтожен - подсказка пропадает сразу, не дожидаясь следующего кадра.
+            GameInterfaceManager.TryGetInstance()?.OnTargetableDisabled(this);
         }
 
-        public void OnPointerExit(PointerEventData eventData)
-        {
-           // GameInterfaceManager.Instance?.NotifyTargetable(this,false);
-        }
+        private static bool IsPlayer(IInteractor interactor) =>
+            interactor.Entity != null && interactor.Entity.CompareTag("Player");
 
-        private void OnEnable()
-        {
-            interactableComponent.Entity.AssignName(GetInfo.Title);
-        }
+        #region ITargetTooltip
 
-        // protected override void OnDisable()
-        // {
-        //     base.OnDisable();
-        //     GameInterfaceManager.Instance?.NotifyTargetable(this,false);
-        // }
+        public Description GetInfo => commandDescription;
 
-        [Space,SerializeField] Description description;
-        public Description GetInfo => description;
+        // Пока идёт взаимодействие или объект "выключен" - подсказку не показываем.
+        public bool CanShowTooltip =>
+            commandDescription != null &&
+            isActiveAndEnabled &&
+            interactableComponent != null &&
+            interactableComponent.IsAvailable;
+
+        public Vector3 TooltipAnchor =>
+            interactableComponent != null && interactableComponent.Entity != null && interactableComponent.Entity.EffectSpawn != null
+                ? interactableComponent.Entity.EffectSpawn.position
+                : transform.position;
+
+        #endregion
     }
 }

@@ -37,6 +37,7 @@ struct ArcaToonParams
     half3  shadowColor;       // доля света в тени (цветная, не чёрная)
     float  ambientInfluence;  // вклад ambient
     float  addLightStep;      // порог первой ступени для point/spot
+    float  addLightSoftness;  // 0 - ступенчатый toon-свет ламп, 1 - мягкий градиент (персонажи)
     half3  rimColor;
     float  rimThreshold;
     float  rimPower;
@@ -44,6 +45,12 @@ struct ArcaToonParams
     float  halftoneStrength;  // 0..1
     half3  specColor;         // ступенчатый блик (металл)
     float  specSize;          // 0 - выключен, 0.05..0.4 - размер блика
+
+    // --- "анимешный" режим для персонажей (у окружения - нейтральные значения) ---
+    float  shadowSaturation;     // 0..1: тень насыщеннее и со сдвигом тона (жёлтый -> янтарный)
+    float  flatAmbient;          // 0..1: ambient без градиента по нормали (плоская заливка)
+    float  lightColorInfluence;  // 0..1: насколько цвет ламп тонирует объект (1 - полностью)
+    float  minLight;             // мин. яркость главного света (персонаж читается в темноте)
 };
 
 ArcaToonParams ArcaDefaultToonParams()
@@ -54,6 +61,7 @@ ArcaToonParams ArcaDefaultToonParams()
     p.shadowColor      = half3(0.35, 0.33, 0.5);
     p.ambientInfluence = 0.5;
     p.addLightStep     = 0.3;
+    p.addLightSoftness = 0.0;
     p.rimColor         = half3(0, 0, 0);
     p.rimThreshold     = 0.6;
     p.rimPower         = 3.0;
@@ -61,6 +69,10 @@ ArcaToonParams ArcaDefaultToonParams()
     p.halftoneStrength = 0.0;
     p.specColor        = half3(0, 0, 0);
     p.specSize         = 0.0;
+    p.shadowSaturation    = 0.0;
+    p.flatAmbient         = 0.0;
+    p.lightColorInfluence = 1.0;
+    p.minLight            = 0.0;
     return p;
 }
 
@@ -95,16 +107,31 @@ half3 ArcaToonLighting(ArcaSurface s, ArcaToonParams p)
     // Координата тени - попиксельно (при каскадах по вершине - артефакты).
     float4 shadowCoord = TransformWorldToShadowCoord(s.positionWS);
     Light  mainLight   = GetMainLight(shadowCoord);
-    half3  mainColor   = mainLight.color * directAO;
     float  NdotL       = saturate(dot(normalWS, mainLight.direction));
+
+    // Цвет света: персонажи сохраняют свою палитру (цвет ламп тонирует лишь
+    // частично) и не проваливаются в темноту (минимальная яркость).
+    const half3 lumW  = half3(0.299, 0.587, 0.114);
+    half  mainLum     = dot(mainLight.color, lumW);
+    half3 mainColor   = lerp(mainLum.xxx, mainLight.color, p.lightColorInfluence);
+    mainColor        *= max(1.0, p.minLight / max(mainLum, 0.001));
+    mainColor        *= directAO;
 
     float litStep    = smoothstep(p.stepThreshold - p.stepSmooth, p.stepThreshold + p.stepSmooth, NdotL);
     float shadowStep = smoothstep(0.4, 0.6, mainLight.shadowAttenuation); // жёсткая тень
     float lit        = litStep * shadowStep;
 
     // --- цветная тень: доля того же света + ambient ---
-    half3 ambient   = ArcaAmbient(normalWS) * p.ambientInfluence * indirectAO;
-    half3 shadowCol = s.albedo * (mainColor * p.shadowColor * s.occlusion + ambient);
+    half3 ambient   = lerp(ArcaAmbient(normalWS), ArcaAmbient(float3(0, 1, 0)), p.flatAmbient);
+    ambient         = lerp(dot(ambient, lumW).xxx, ambient, p.lightColorInfluence);
+    ambient        *= p.ambientInfluence * indirectAO;
+
+    // Насыщенная тень: альбедо, умноженное на свой же нормированный цвет -
+    // жёлтая шерсть уходит в янтарь, тёмно-синяя броня - в глубокий синий,
+    // как в рисованном референсе, а не в серость.
+    half  albMax       = max(max(s.albedo.r, s.albedo.g), max(s.albedo.b, 0.001));
+    half3 shadowAlbedo = s.albedo * lerp(half3(1, 1, 1), s.albedo / albMax, p.shadowSaturation);
+    half3 shadowCol    = shadowAlbedo * (mainColor * p.shadowColor * s.occlusion + ambient);
     half3 litCol    = s.albedo * (mainColor + ambient);
     half3 col       = lerp(shadowCol, litCol, lit);
 
@@ -127,7 +154,19 @@ half3 ArcaToonLighting(ArcaSurface s, ArcaToonParams p)
             float a   = saturate(dot(normalWS, l.direction)) * l.distanceAttenuation * lsh * lum;
             float s1  = smoothstep(p.addLightStep - p.stepSmooth, p.addLightStep + p.stepSmooth, a);
             float s2  = smoothstep(step2 - p.stepSmooth, step2 + p.stepSmooth, a);
-            col += s.albedo * (l.color / lum) * (s1 * 0.5 + s2 * 0.5) * directAO;
+            float toonL = s1 * 0.5 + s2 * 0.5;
+
+            // Мягкий режим (персонажи): без резкой границы на объёме.
+            // Half-Lambert даёт плавный переход вокруг тела, а дистанция лишь
+            // мягко гасит свет к краю пятна.
+            float ndl    = dot(normalWS, l.direction);
+            float wrap   = saturate(ndl * 0.5 + 0.5);
+            float dist   = l.distanceAttenuation * lsh * lum;
+            float softL  = wrap * wrap * saturate(dist / max(step2, 0.001));
+            float lightL = lerp(toonL, softL, saturate(p.addLightSoftness));
+
+            half3 lc = lerp(half3(1, 1, 1), l.color / lum, p.lightColorInfluence);
+            col += s.albedo * lc * lightL * directAO;
         LIGHT_LOOP_END
     #endif
 

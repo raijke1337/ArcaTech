@@ -58,6 +58,14 @@ namespace SpankyBoy.JuiceUI.Free
         private AudioSource audioSource;
         private bool isAnimating = false;
 
+        // Arcatech: анимации прерываемые. Hide во время появления (и Show во время исчезания)
+        // больше не игнорируются - текущая анимация останавливается, новая идёт с текущих значений.
+        private enum PanelState { Hidden, Showing, Shown, Hiding }
+        private PanelState state = PanelState.Hidden;
+        private Sequence currentSequence;
+
+        public bool IsShownOrShowing => state == PanelState.Showing || state == PanelState.Shown;
+
         void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
@@ -81,17 +89,32 @@ namespace SpankyBoy.JuiceUI.Free
             }
         }
 
+        void OnDisable()
+        {
+            // Объект выключили посреди анимации - не даём твину доиграть на выключенном объекте.
+            KillCurrentSequence();
+            isAnimating = false;
+            state = PanelState.Hidden;
+        }
+
         /// <summary>
         /// Play the In animation
         /// </summary>
         public void AnimateIn()
         {
-            if (isAnimating) return;
+            if (state == PanelState.Showing || state == PanelState.Shown) return;
+
+            // Прервали исчезание - появляемся с текущего состояния, без резкого сброса.
+            // Если анимации входа и выхода разные (например, выход Slide, вход Fade), продолжать нельзя -
+            // панель осталась бы сдвинутой. Тогда начинаем вход с начала.
+            bool interrupted = state == PanelState.Hiding && inAnimation == outAnimation;
+
             isAnimating = true;
+            state = PanelState.Showing;
 
             PlaySound(inSound);
             KillAllTweens();
-            PrepareInAnimation();
+            if (!interrupted) PrepareInAnimation();
             ExecuteInAnimation();
         }
 
@@ -100,8 +123,11 @@ namespace SpankyBoy.JuiceUI.Free
         /// </summary>
         public void AnimateOut()
         {
-            if (isAnimating) return;
+            if (state == PanelState.Hiding) return;
+            if (!gameObject.activeInHierarchy) return;
+
             isAnimating = true;
+            state = PanelState.Hiding;
 
             PlaySound(outSound);
             KillAllTweens();
@@ -152,9 +178,15 @@ namespace SpankyBoy.JuiceUI.Free
                     break;
             }
 
+            currentSequence = sequence;
             sequence.SetDelay(inDelay)
                 .SetUpdate(true)
-                .OnComplete(() => isAnimating = false);
+                .OnComplete(() =>
+                {
+                    isAnimating = false;
+                    state = PanelState.Shown;
+                    currentSequence = null;
+                });
         }
 
         private void ExecuteOutAnimation()
@@ -180,11 +212,14 @@ namespace SpankyBoy.JuiceUI.Free
                     break;
             }
 
+            currentSequence = sequence;
             sequence.SetDelay(outDelay)
                 .SetUpdate(true)
                 .OnComplete(() =>
                 {
                     isAnimating = false;
+                    state = PanelState.Hidden;
+                    currentSequence = null;
                     
                     if (disableOnOutComplete)
                     {
@@ -232,8 +267,17 @@ namespace SpankyBoy.JuiceUI.Free
             return offscreenPos;
         }
 
+        private void KillCurrentSequence()
+        {
+            if (currentSequence != null && currentSequence.IsActive())
+                currentSequence.Kill(); // без complete: OnComplete старой анимации не сработает
+            currentSequence = null;
+        }
+
         private void KillAllTweens()
         {
+            // DOKill по цели не останавливает твины внутри Sequence - убиваем саму последовательность.
+            KillCurrentSequence();
             rectTransform.DOKill();
             transform.DOKill();
             canvasGroup.DOKill();
@@ -251,4 +295,4 @@ namespace SpankyBoy.JuiceUI.Free
         public void Show() => AnimateIn();
         public void Hide() => AnimateOut();
     }
-}
+}

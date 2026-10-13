@@ -11,7 +11,7 @@ namespace Arcatech.Interactions
             if (ctx.State == InteractionState.Success)
             {
                 var unit = Instantiate(prefab, transform.position, Quaternion.identity);
-                Debug.Log($"Spawned {unit.GetName} at {transform.position}");
+               // Debug.Log($"Spawned {unit.GetName} at {transform.position}");
             }
         }
 

@@ -95,7 +95,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Triggers.TriggerTrackerComponent
   triggerCollider: {fileID: 2341529034408735821}
-  cachedRigidbody: {fileID: 2031679518169361969}
   _warningLineWidth: 0.1
   _warningFloorOffset: 0.02
   _warningFadeInDuration: 0.12
@@ -134,6 +133,7 @@ GameObject:
   - component: {fileID: 5036760355422192530}
   - component: {fileID: 4353145260266332986}
   - component: {fileID: 8576500820958298715}
+  - component: {fileID: -1599032999417212795}
   m_Layer: 6
   m_Name: Scrap Spider
   m_TagString: Untagged
@@ -178,8 +178,7 @@ MonoBehaviour:
   - rid: 306638638652850454
   - rid: 306638638931772254
   - rid: 306638638931772255
-  m_OriginalGraph: {fileID: 5059491024574770053, guid: 2a37bca9bcf68b84b8b36a37f3795459,
-    type: 2}
+  m_OriginalGraph: {fileID: 0}
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
@@ -252,7 +251,7 @@ MonoBehaviour:
   effectsReceiver: {fileID: 4201277184077725860}
   animator: {fileID: 8819702953013112412}
   data: {fileID: 11400000, guid: 3fa9a5c78c0b6d34c94a231ef3ac2249, type: 2}
-  CombatGroup: 
+  combatGroup: undefined
 --- !u!195 &3092874308524416317
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -326,7 +325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: e356ae95-f733-48c7-ba46-987adff6ead5
 --- !u!114 &7980303944722158138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -654,6 +653,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bfabcd908b4f72a920b64c1c949f70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.HitstopPlayerComponent
+--- !u!114 &-1599032999417212795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9022434418627609629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e089015100d21e74787fa7bd243757e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EnemyProgress
+  entity: {fileID: 7980303944722158138}
 --- !u!1001 &6880721350146677199
 PrefabInstance:
   m_ObjectHideFlags: 0

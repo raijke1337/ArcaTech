@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Arcatech.Texts;
 using Arcatech.UI;
 using UnityEngine;
@@ -20,6 +20,7 @@ namespace Arcatech.Items
             Config = cfg;
         }
         public ItemSlot Slot { get; protected set; }
+        public ItemCategory Category => Config != null ? Config.Category : ItemCategory.LevelOnly;
         public virtual Description Description { get; }
 
     }

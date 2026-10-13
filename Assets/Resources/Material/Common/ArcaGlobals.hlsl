@@ -30,4 +30,9 @@ float4 _ArcaCutoutRayOrigin;  // xyz - начало луча, w - расстоя
 float4 _ArcaCutoutRayDir;     // xyz - направление луча (норм.), w - радиус трубки (<= 0 -> выключено)
 float4 _ArcaCutoutParams;     // x - мягкость края (м), y - мин. высота мира, z - запас по глубине (м), w - сила 0..1
 
+// --- Фонарь Теилс (ArcaVisionController) ------------------------------------
+// Позиция лампы-фонаря. Материалы с _ArcaNoLanternShadow не отбрасывают от
+// неё тень (персонажи и враги), остальные тени от фонаря сохраняются.
+float4 _ArcaLanternPosition;  // xyz - позиция лампы, w = 1 -> активно
+
 #endif // ARCA_GLOBALS_INCLUDED

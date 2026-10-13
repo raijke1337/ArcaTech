@@ -1,4 +1,4 @@
-// Place in Editor folder
+﻿// Place in Editor folder
 // File: ItemSOEditor.cs
 
 using Arcatech.Items;
@@ -17,11 +17,13 @@ public class ItemSOEditor : Editor
     private bool showItemSettings = true;
     private bool showEquipmentSettings = true;
     private bool showUsablesSettings = true;
+    private bool showSaveSettings = true;
     
     // Properties
     private SerializedProperty descriptionProp;
     private SerializedProperty maxStackProp;
     private SerializedProperty worldItemContainerPrefabProp;
+    private SerializedProperty categoryProp;
     private SerializedProperty itemPrefabProp;
     private SerializedProperty slotProp;
     private SerializedProperty stanceProp;
@@ -41,6 +43,7 @@ public class ItemSOEditor : Editor
         descriptionProp = serializedObject.FindProperty("description");
         maxStackProp = serializedObject.FindProperty("MaxStack");
         worldItemContainerPrefabProp = serializedObject.FindProperty("worldItemContainerPrefab");
+        categoryProp = serializedObject.FindProperty("Category");
         
         // EquipSO properties
         itemPrefabProp = serializedObject.FindProperty("itemPrefab");
@@ -111,6 +114,9 @@ public class ItemSOEditor : Editor
         
         // Item Settings Section
         DrawItemSettingsSection();
+
+        // Save System Section
+        DrawSaveSystemSection();
         
         // Equipment Section (if applicable)
         if (target is EquipSO)
@@ -253,6 +259,103 @@ public class ItemSOEditor : Editor
                     EditorGUILayout.PropertyField(worldItemContainerPrefabProp, 
                         new GUIContent("World Item Prefab"));
                 }
+            }
+        }
+    }
+
+    private void DrawSaveSystemSection()
+    {
+        EditorGUILayout.Space(5);
+        showSaveSettings = EditorGUILayout.Foldout(showSaveSettings, "Save System", true, EditorStyles.foldoutHeader);
+        if (!showSaveSettings) return;
+
+        using (new EditorGUILayout.VerticalScope(boxStyle))
+        {
+            // Категория: экипировка определяется по типу ассета, у неё поле не используется.
+            if (target is EquipSO)
+            {
+                EditorGUILayout.HelpBox(
+                    "Экипировка. При прохождении уровня попадает в список доступной экипировки игрока " +
+                    "(поле Category для неё не используется).",
+                    MessageType.None);
+            }
+            else if (categoryProp != null)
+            {
+                EditorGUILayout.PropertyField(categoryProp, new GUIContent("Category",
+                    "Как предмет переносится в мета-прогресс при прохождении уровня"));
+
+                if (!categoryProp.hasMultipleDifferentValues)
+                {
+                    EditorGUILayout.HelpBox(CategoryHelp((ItemCategory)categoryProp.enumValueIndex), MessageType.None);
+                }
+            }
+
+            // ID: по нему предмет хранится в сохранениях и ищется в DataManager.
+            if (targets.Length == 1)
+            {
+                DrawIdField((ItemSO)target);
+            }
+        }
+    }
+
+    private static string CategoryHelp(ItemCategory category) => category switch
+    {
+        ItemCategory.Part =>
+            "Деталь. При прохождении уровня количество прибавляется к деталям игрока (валюта Мастерской).",
+        ItemCategory.CostumeBlueprint =>
+            "Чертёж костюма. При прохождении уровня становится «найденным», в Мастерской его можно разблокировать за детали.",
+        ItemCategory.GalleryBlueprint =>
+            "Чертёж сцены галереи. При прохождении уровня становится «найденным», в Мастерской его можно разблокировать за детали.",
+        _ =>
+            "Только для уровня (ключи и т.п.). Хранится в чекпоинте, в мета-прогресс не переносится."
+    };
+
+    private void DrawIdField(ItemSO item)
+    {
+        EditorGUILayout.Space(5);
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            EditorGUILayout.PrefixLabel("ID");
+            EditorGUILayout.SelectableLabel(string.IsNullOrEmpty(item.ID) ? "—" : item.ID,
+                EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        }
+
+        if (string.IsNullOrEmpty(item.ID))
+        {
+            EditorGUILayout.HelpBox("У предмета нет ID: его нельзя сохранить в инвентаре.", MessageType.Error);
+            if (GUILayout.Button("Generate ID")) ItemIdIndex.RegenerateId(item);
+            return;
+        }
+
+        var duplicates = ItemIdIndex.GetDuplicates(item);
+        if (duplicates.Count == 0) return;
+
+        EditorGUILayout.HelpBox(
+            $"Этот ID есть ещё у {duplicates.Count} ассетов (скорее всего, копия через Ctrl+D). " +
+            "Сохранения и DataManager не различат такие предметы. Выдайте новый ID копии, а не оригиналу.",
+            MessageType.Error);
+
+        foreach (var other in duplicates)
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.ObjectField(other, typeof(ItemSO), false);
+                if (GUILayout.Button("New ID", GUILayout.Width(70)))
+                {
+                    ItemIdIndex.RegenerateId(other);
+                    GUIUtility.ExitGUI();
+                }
+            }
+        }
+
+        if (GUILayout.Button("Выдать новый ID этому ассету"))
+        {
+            if (EditorUtility.DisplayDialog("Новый ID",
+                    $"Выдать «{item.name}» новый ID? Сохранения, где он лежит под старым ID, его больше не найдут.",
+                    "Выдать", "Отмена"))
+            {
+                ItemIdIndex.RegenerateId(item);
+                GUIUtility.ExitGUI();
             }
         }
     }

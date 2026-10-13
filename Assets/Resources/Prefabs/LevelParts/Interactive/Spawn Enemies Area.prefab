@@ -158,6 +158,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edacc9b36aba39b4bb5feed1959cfb70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelfDestruction
+--- !u!1 &2320940547554064588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7762706141536645037}
+  - component: {fileID: 6748525237067035427}
+  m_Layer: 6
+  m_Name: Executor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7762706141536645037
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2320940547554064588}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2508097905146027237}
+  m_Father: {fileID: 7840350066785753601}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6748525237067035427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2320940547554064588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 464850d8a524483098e54ce9713a25d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.EntitiesCombatExecutor
+  spawns:
+  - prefab: {fileID: 0}
+    SpawnTransform: {fileID: 2508097905146027237}
+    NeedKillToComplete: 0
 --- !u!1 &3264388596076851369
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5425398666275443952}
   m_Layer: 6
-  m_Name: Targets
+  m_Name: Effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -235,6 +284,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.SpawnEntityEffect
   prefab: {fileID: 0}
+--- !u!1 &4966834381477433164
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2508097905146027237}
+  - component: {fileID: 3713670863697698923}
+  m_Layer: 6
+  m_Name: Target (0)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2508097905146027237
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4966834381477433164}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7762706141536645037}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3713670863697698923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4966834381477433164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f5824c612b643669b3364fbc07608b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.SpawnEntityEffect
+  prefab: {fileID: 0}
 --- !u!1 &5877487407430005226
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,8 +345,9 @@ GameObject:
   - component: {fileID: 5947406123470694086}
   - component: {fileID: 291358447390153180}
   - component: {fileID: 2208630765820750090}
-  - component: {fileID: 1005627346370064262}
   - component: {fileID: 3980834468791032702}
+  - component: {fileID: 4512058684321715555}
+  - component: {fileID: 1765785014299678001}
   m_Layer: 6
   m_Name: Spawn Enemies Area
   m_TagString: Untagged
@@ -275,6 +370,7 @@ Transform:
   m_Children:
   - {fileID: 296291158232429999}
   - {fileID: 5425398666275443952}
+  - {fileID: 7762706141536645037}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &6668812081841661467
@@ -311,7 +407,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggerCollider: {fileID: 6668812081841661467}
-  cachedRigidbody: {fileID: 8016685324157890910}
   _warningLineWidth: 0.1
   _warningFloorOffset: 0.02
   _warningFadeInDuration: 0.12
@@ -417,7 +512,7 @@ MonoBehaviour:
   trigger: {fileID: 291358447390153180}
   conditions: []
   preExecuteEffects: []
-  executor: {fileID: 1005627346370064262}
+  executor: {fileID: 1765785014299678001}
   duringExecuteEffects: []
   successEffects:
   - {fileID: 5027186734508884816}
@@ -428,19 +523,6 @@ MonoBehaviour:
   alignInteractor: 0
   disableInteractorCollisionDuringPlay: 0
   affectsInteractorState: 0
---- !u!114 &1005627346370064262
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5877487407430005226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
-  willComplete: 1
 --- !u!114 &3980834468791032702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,7 +535,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 
+  uniqueId: 5f7ab072-eee5-4aa6-962e-8b74d22094e1
+--- !u!114 &4512058684321715555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5877487407430005226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78bb3074f54d4b2894940dc91880d853, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.ActivatorProgress
+  entity: {fileID: 5947406123470694086}
+  comp: {fileID: 2208630765820750090}
+--- !u!114 &1765785014299678001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5877487407430005226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
+  willComplete: 1
 --- !u!1001 &8793123939986191607
 PrefabInstance:
   m_ObjectHideFlags: 0

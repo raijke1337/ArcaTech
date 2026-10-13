@@ -35,6 +35,7 @@ GameObject:
   - component: {fileID: 8528722862445907844}
   - component: {fileID: 305671713140248637}
   - component: {fileID: 5125304463136380564}
+  - component: {fileID: -7164475639072393987}
   m_Layer: 6
   m_Name: BaseEnemyPrefab
   m_TagString: Untagged
@@ -132,7 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec862707ea0443e2b69cf0e77a4076e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EntityID
-  uniqueId: 3deddf5f-c2c8-4a09-970c-f51786e8204a
+  uniqueId: 
 --- !u!114 &493588014704688078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,6 +278,7 @@ MonoBehaviour:
     ItemPositions:
       _serializedList: []
   defaultItemsDrawStrat: {fileID: 0}
+  handPlaces: 
 --- !u!114 &2696047799457324286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -345,9 +347,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
-  m_Graph: {fileID: 0}
+  m_Graph: {fileID: 5059491024574770053, guid: 4d822d3f69c29a047bab76545e01449b, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 5078712839912292439
+  - rid: 6727530276711825715
   m_OriginalGraph: {fileID: 0}
   m_IsInitialised: 0
   m_IsStarted: 0
@@ -363,6 +366,15 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 1748869539384168759}
+    - rid: 6727530276711825715
+      type: {class: 'BlackboardVariable`1[[Arcatech.Units.NPCBehaviorWrapper, Assembly-CSharp]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 13074850347369168945
+          m_Value1: 11077795117009414171
+        Name: Wrapper
+        m_Value: {fileID: -1964986680528136209}
 --- !u!195 &8856116984022894583
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -371,7 +383,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1748869539384168759}
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
+  m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
@@ -453,7 +465,7 @@ MonoBehaviour:
   effectsReceiver: {fileID: -2281744422382432745}
   animator: {fileID: 0}
   data: {fileID: 0}
-  CombatGroup: 
+  combatGroup: undefined
 --- !u!114 &8943116983315701113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -526,6 +538,19 @@ MonoBehaviour:
   triggerOnce: 1
   cooldown: 0
   description: {fileID: 0}
+--- !u!114 &-7164475639072393987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748869539384168759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e089015100d21e74787fa7bd243757e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.EnemyProgress
+  entity: {fileID: 493588014704688078}
 --- !u!1001 &6875618518237365287
 PrefabInstance:
   m_ObjectHideFlags: 0

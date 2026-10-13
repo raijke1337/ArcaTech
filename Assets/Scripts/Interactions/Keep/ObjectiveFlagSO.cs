@@ -13,7 +13,10 @@ namespace Arcatech.SaveSystem
         [System.NonSerialized] private bool _value;
         public bool IsSet => _value;
 
-        public void Set() => _value = true;
-        public void Reset() => _value = false;
+        public event System.Action Changed;
+
+        public void Set()   { if (_value)  return; _value = true;  Changed?.Invoke(); }
+        public void Reset() { if (!_value) return; _value = false; Changed?.Invoke(); }
+        
     }
 }

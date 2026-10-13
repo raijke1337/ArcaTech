@@ -12,6 +12,9 @@
 // Прозрачность (ArcaOcclusion.hlsl) учитывается во всех пассах; вырез перед
 // Теилс - везде, кроме теней (тень не должна зависеть от камеры).
 // DepthNormals нужен SSAO: без него на ARCA-объектах были артефакты.
+//
+// #define ARCA_LANTERN_SHADOW_SKIP (+ _ArcaNoLanternShadow в CBUFFER) - материал
+// умеет не отбрасывать тень от фонаря Теилс (см. ArcaGlobals.hlsl).
 // ===========================================================================
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
@@ -54,6 +57,18 @@ ArcaPassVaryings ArcaShadowVert(ArcaPassAttributes input)
         positionCS.z = min(positionCS.z, UNITY_NEAR_CLIP_VALUE);
     #else
         positionCS.z = max(positionCS.z, UNITY_NEAR_CLIP_VALUE);
+    #endif
+
+    // Не отбрасывать тень от фонаря Теилс (материалы с _ArcaNoLanternShadow).
+    // Во время отрисовки теней точечного света _LightPosition = позиция этой
+    // лампы: если это фонарь, вершины уводятся за пределы экрана тени и
+    // треугольник отбрасывается ещё до растеризации.
+    #if defined(_CASTING_PUNCTUAL_LIGHT_SHADOW) && defined(ARCA_LANTERN_SHADOW_SKIP)
+        if (_ArcaNoLanternShadow > 0.5 && _ArcaLanternPosition.w > 0.5 &&
+            distance(_LightPosition, _ArcaLanternPosition.xyz) < 0.05)
+        {
+            positionCS = float4(2.0, 2.0, 2.0, 1.0);
+        }
     #endif
 
     output.positionCS = positionCS;

@@ -1,4 +1,4 @@
-using Arcatech.Managers;
+﻿using Arcatech.Managers;
 using Arcatech.Scenes;
 using TMPro;
 using UnityEngine;
@@ -41,7 +41,7 @@ namespace Arcatech.UI
         }
         public void ClickedEventCall()
         {
-           // GameManager.Instance.RequestLoadSceneFromContainer(_data);
+            GameManager.Instance.StartLevel(_data);
         }
 
     }

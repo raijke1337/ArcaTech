@@ -1,4 +1,4 @@
-// Place in Editor folder
+﻿// Place in Editor folder
 // File: ItemDatabaseWindow.cs
 
 using System.Collections.Generic;
@@ -44,7 +44,12 @@ public class ItemDatabaseWindow : EditorWindow
         All,
         BasicItems,
         Equipment,
-        Usables
+        Usables,
+        Parts,
+        CostumeBlueprints,
+        GalleryBlueprints,
+        LevelOnly,
+        DuplicateIds
     }
     
     private enum SortMode
@@ -124,6 +129,7 @@ public class ItemDatabaseWindow : EditorWindow
     
     private void RefreshItemList()
     {
+        ItemIdIndex.Invalidate();
         allItems.Clear();
         
         // Find all ItemSO assets in the project
@@ -157,6 +163,21 @@ public class ItemDatabaseWindow : EditorWindow
                 break;
             case ItemTypeFilter.Usables:
                 items = items.Where(i => i is UsablesSO);
+                break;
+            case ItemTypeFilter.Parts:
+                items = items.Where(i => !(i is EquipSO) && i.Category == ItemCategory.Part);
+                break;
+            case ItemTypeFilter.CostumeBlueprints:
+                items = items.Where(i => !(i is EquipSO) && i.Category == ItemCategory.CostumeBlueprint);
+                break;
+            case ItemTypeFilter.GalleryBlueprints:
+                items = items.Where(i => !(i is EquipSO) && i.Category == ItemCategory.GalleryBlueprint);
+                break;
+            case ItemTypeFilter.LevelOnly:
+                items = items.Where(i => !(i is EquipSO) && i.Category == ItemCategory.LevelOnly);
+                break;
+            case ItemTypeFilter.DuplicateIds:
+                items = items.Where(ItemIdIndex.HasDuplicates);
                 break;
         }
         
@@ -248,7 +269,7 @@ public class ItemDatabaseWindow : EditorWindow
         // Type filter
         EditorGUILayout.LabelField("Filter:", GUILayout.Width(40));
         EditorGUI.BeginChangeCheck();
-        typeFilter = (ItemTypeFilter)EditorGUILayout.EnumPopup(typeFilter, EditorStyles.toolbarPopup, GUILayout.Width(100));
+        typeFilter = (ItemTypeFilter)EditorGUILayout.EnumPopup(typeFilter, EditorStyles.toolbarPopup, GUILayout.Width(130));
         if (EditorGUI.EndChangeCheck())
         {
             ApplyFiltersAndSort();
@@ -466,12 +487,24 @@ public class ItemDatabaseWindow : EditorWindow
 
         // Tag background
         Rect tagBgRect = new Rect(
-            contentRect.x + (contentRect.width - 60) / 2,
+            contentRect.x + (contentRect.width - 72) / 2,
             yOffset,
-            60, 14
+            72, 14
         );
         EditorGUI.DrawRect(tagBgRect, new Color(typeColor.r, typeColor.g, typeColor.b, 0.8f));
         GUI.Label(tagRect, typeTag, typeTagStyle);
+
+        // Duplicate ID warning
+        if (ItemIdIndex.HasDuplicates(item))
+        {
+            Rect dupRect = new Rect(cardRect.x + 6, cardRect.y + 6, 34, 16);
+            EditorGUI.DrawRect(dupRect, new Color(0.85f, 0.2f, 0.25f, 0.9f));
+            GUI.Label(dupRect, new GUIContent("ID!", "Этот ID есть у другого ассета"), new GUIStyle(EditorStyles.miniBoldLabel)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white }
+            });
+        }
 
         // Draw stack count badge if > 1
         if (item.MaxStack > 1)
@@ -505,15 +538,16 @@ public class ItemDatabaseWindow : EditorWindow
     {
         if (item is UsablesSO) return new Color(0.4f, 0.8f, 0.4f);
         if (item is EquipSO) return new Color(0.4f, 0.6f, 0.9f);
-        return new Color(0.9f, 0.7f, 0.3f);
+        return item.Category switch
+        {
+            ItemCategory.Part => new Color(0.9f, 0.7f, 0.3f),
+            ItemCategory.CostumeBlueprint => new Color(0.85f, 0.4f, 0.75f),
+            ItemCategory.GalleryBlueprint => new Color(0.65f, 0.45f, 0.9f),
+            _ => new Color(0.55f, 0.58f, 0.65f)
+        };
     }
     
-    private string GetTypeTag(ItemSO item)
-    {
-        if (item is UsablesSO) return "Usable";
-        if (item is EquipSO) return "Equip";
-        return "Item";
-    }
+    private string GetTypeTag(ItemSO item) => ItemIdIndex.CategoryLabel(item);
     
     private void DrawStatusBar()
     {
@@ -526,6 +560,17 @@ public class ItemDatabaseWindow : EditorWindow
             countText += $" (of {allItems.Count} total)";
         }
         EditorGUILayout.LabelField(countText, EditorStyles.miniLabel);
+
+        int duplicateCount = ItemIdIndex.CountItemsWithDuplicateIds();
+        if (duplicateCount > 0)
+        {
+            var warn = new GUIStyle(EditorStyles.miniBoldLabel) { normal = { textColor = new Color(0.95f, 0.35f, 0.35f) } };
+            if (GUILayout.Button($"Дубликаты ID: {duplicateCount}", warn))
+            {
+                typeFilter = ItemTypeFilter.DuplicateIds;
+                ApplyFiltersAndSort();
+            }
+        }
         
         GUILayout.FlexibleSpace();
         
@@ -626,6 +671,8 @@ public class ItemDatabaseWindow : EditorWindow
         RefreshItemList();
         
         ItemSO newItem = AssetDatabase.LoadAssetAtPath<ItemSO>(newPath);
+        // Копия получает свой ID, иначе сохранения не отличат её от оригинала.
+        ItemIdIndex.RegenerateId(newItem);
         selectedItem = newItem;
         Selection.activeObject = newItem;
         EditorGUIUtility.PingObject(newItem);

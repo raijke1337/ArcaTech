@@ -25,6 +25,9 @@ namespace Arcatech.Rendering
         public static readonly int CutoutRayDir     = Shader.PropertyToID("_ArcaCutoutRayDir");
         public static readonly int CutoutParams     = Shader.PropertyToID("_ArcaCutoutParams");
 
+        // Фонарь Теилс
+        public static readonly int LanternPosition  = Shader.PropertyToID("_ArcaLanternPosition");
+
         // Материал
         public static readonly int FadeAmount       = Shader.PropertyToID("_FadeAmount");
     }

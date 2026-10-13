@@ -78,7 +78,12 @@ namespace Arcatech.Interactions
         {
             if (State == InteractionState.Idle) return;
 
-            if (State is InteractionState.Success or InteractionState.Failure or InteractionState.Cancelled)
+            // Вызов может прийти при выгрузке сцены / откате к чекпоинту, когда интерактор уже
+            // уничтожен или выключен: корутину на нём запустить нельзя.
+            if (this == null) return;
+
+            bool terminal = State is InteractionState.Success or InteractionState.Failure or InteractionState.Cancelled;
+            if (terminal && isActiveAndEnabled)
             {
                 StartCoroutine(ResetIdleNextFrame());
             }

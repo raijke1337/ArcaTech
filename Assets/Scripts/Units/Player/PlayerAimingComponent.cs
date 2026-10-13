@@ -34,6 +34,7 @@ namespace Arcatech.Units.Control
 
         private TargetSelector _targetSelector;
         private PlayerInputGateway _inputGateway;
+        private IMove _mover;
         private Camera _camera;
         private Plane _groundPlane;
 
@@ -54,6 +55,7 @@ namespace Arcatech.Units.Control
             _targetSelector = GetComponent<TargetSelector>();
             _groundPlane = new Plane(Vector3.up, 0f);
             _camera = Camera.main;
+            _mover = GetComponent<IMove>();
 
             // Важно: компонент, реализующий IAim, может быть на дочернем объекте.
             _aimInterfaces.AddRange(GetComponentsInChildren<IAim>(true));
@@ -105,7 +107,35 @@ namespace Arcatech.Units.Control
                     CurrentTarget.EffectSpawn.position - transform.position);
 
                 ApplyAimDirection();
+                return;
             }
+
+            FollowMovementWhenAimStickIdle();
+        }
+
+        /// <summary>
+        /// Геймпад, свободный прицел: пока правый стик отпущен, а персонаж движется,
+        /// запоминаем направление движения как направление взгляда.
+        /// Итог - после остановки персонаж смотрит туда, куда смотрел последним:
+        /// на последний ввод прицела, если стик держали до конца движения,
+        /// иначе - по направлению движения.
+        /// </summary>
+        private void FollowMovementWhenAimStickIdle()
+        {
+            if (_inputGateway == null || !_inputGateway.IsGamepad || _mover == null)
+                return;
+
+            // Стик прицела удерживается - его направление приоритетнее.
+            float deadZoneSqr = gamepadAimDeadZone * gamepadAimDeadZone;
+            if (_inputGateway.AimInput.sqrMagnitude >= deadZoneSqr)
+                return;
+
+            Vector3 moveDirection = GetPlanarDirection(_mover.MovementVector);
+            if (moveDirection == Vector3.zero)
+                return;
+
+            _desiredLookDirection = moveDirection;
+            ApplyAimDirection();
         }
 
         private void OnAimChanged(Vector2 input)
