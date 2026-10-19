@@ -34,7 +34,7 @@ public partial class CustomNavigateToPointAction : Action
 
         _nav.speed = _wrapper.CurrentMoveSpeed;         // старт с актуальной скорости
         _nav.stoppingDistance = StoppingDistance.Value;
-        _nav.isStopped = false;
+        _wrapper.BehaviorHold = false;              // снимает удержание графом; CanMove машины состояний учитывается
         _nav.SetDestination(Destination.Value);
         return Status.Running;
     }

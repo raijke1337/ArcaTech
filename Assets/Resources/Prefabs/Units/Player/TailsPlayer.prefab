@@ -294,7 +294,7 @@ GameObject:
   - component: {fileID: 6781747816026390099}
   - component: {fileID: 3107538716206129910}
   - component: {fileID: 7583641227977036609}
-  - component: {fileID: 2602505934636855958}
+  - component: {fileID: 2274108327599100839}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -978,25 +978,37 @@ MonoBehaviour:
   radius: 7
   visionLight: {fileID: 8921552075354218533}
   lightRangeMultiplier: 1.2
---- !u!114 &2602505934636855958
+--- !u!114 &2274108327599100839
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6934539185133570580}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98b9141766ee0ea4a95548a831f88f26, type: 3}
+  m_Script: {fileID: 11500000, guid: 24f46cebe32368a46bb5c27602bed4f3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Rendering.ArcaShadowLayerSync
-  ignoreGameObjectLayer: 1
-  sourceLayers:
-    serializedVersion: 2
-    m_Bits: 64
-  renderingLayer:
-    serializedVersion: 0
-    m_Bits: 2
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Units.Combat.CombatCoordinator
+  settings:
+    MeleeTokens: 2
+    HeavyTokens: 1
+    RangedTokens: 2
+    GrabTokens: 1
+    GrantInterval: {x: 0.3, y: 0.6}
+    AggressionThreshold: 1
+    ProximityWeight: 0.5
+    MaxTokenHold: 5
+    GrabDecisionDelay: 0.3
+    RecoveryGrace: 1.5
+    InnerRadius: 1.6
+    OuterRadius: 3.2
+    SlotSpacing: 1.4
+    SlotHysteresisDeg: 30
+    NavSampleRadius: 1
+    SlotsUpdateInterval: 0.15
+  owner: {fileID: 3413998453285093005}
+  drawGizmos: 1
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,7 +16,11 @@ namespace Arcatech.Units
         [SerializeField, Self] BaseGameEntityComponent gameEntity;
         [SerializeField, Child] Animator animator;
         public BaseGameEntityComponent GetMainEntity => gameEntity;
-
+        public StateMachineContext Context => context;
+        public UnitState CurrentUnitState => _currentState;
+        public Animator Animator => animator;
+        public int PendingPerformersCount => _pendingPerformers.Count;
+        public IReadOnlyList<IStateAugmentor> ActiveAugmentors => _activeAugmentors;
         [Space, Header("States")] 
         [SerializeField] SerializedUnitState defaultState;
 

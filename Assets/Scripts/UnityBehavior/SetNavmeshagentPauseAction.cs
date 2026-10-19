@@ -1,4 +1,5 @@
 using System;
+using Arcatech.Units;
 using Unity.Behavior;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
@@ -15,10 +16,20 @@ public partial class SetNavmeshagentPauseAction : Action
 
     private float timePassed;
     private NavMeshAgent _agent;
+    private NPCBehaviorWrapper _wrapper;
     protected override Status OnStart()
     {
         timePassed = 0;
         _agent = Agent.Value.GetComponent<NavMeshAgent>();
+
+        // у врагов пауза идёт через wrapper: машина состояний (CanMove) её не перезапишет,
+        // а если агент сейчас не на навмеше, wrapper применит её, когда вернётся
+        if (_wrapper == null) Agent.Value.TryGetComponent(out _wrapper);
+        if (_wrapper != null)
+        {
+            _wrapper.BehaviorHold = Value.Value;
+            return Status.Success;
+        }
         return Status.Running;
     }
 

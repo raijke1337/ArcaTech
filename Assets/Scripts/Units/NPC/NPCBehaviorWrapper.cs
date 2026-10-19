@@ -1,6 +1,7 @@
 using System;
 using Arcatech.SaveSystem;
 using Arcatech.Stats;
+using Arcatech.Units.Combat;
 using Arcatech.Units.Control;
 using Arcatech.Usables.Effects;
 using KBCore.Refs;
@@ -34,11 +35,13 @@ namespace Arcatech.Units
         
         private IModifierAggregator _mods;
         private ImpulseApplier _impulse;
+        private CombatParticipant _participant;
         
         private bool _paused;
         private float _speedMultiplier = 1f;
         private bool _canMove;
         private bool _canMoveAssigned;
+        private bool _behaviorHold;
 
         #region BLACKBOARD actions
 
@@ -51,6 +54,9 @@ namespace Arcatech.Units
             // он не создавался, и первый же ApplyImpulse падал с NullReferenceException.
             if (!TryGetComponent(out _impulse)) _impulse = gameObject.AddComponent<ImpulseApplier>();
             _impulse.MotionEnded += OnExternalMotionEnded;
+
+            // участник оркестратора боя (токены атаки, агрессия, слоты)
+            if (!TryGetComponent(out _participant)) _participant = gameObject.AddComponent<CombatParticipant>();
 
             behavior.GetVariable("CombatState", out var combatState);
             _combateventChannel = combatState.ObjectValue as EnterCombatEventChannel;
@@ -76,13 +82,60 @@ namespace Arcatech.Units
         /// <summary>Толчок закончился: возвращаем агенту «намерение» (двигаться / стоять).</summary>
         private void OnExternalMotionEnded(ImpulseApplier _)
         {
-            if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
-            agent.isStopped = _paused || (_canMoveAssigned && !_canMove);
+            ApplyStopState(ignoreImpulse: true);
+        }
+
+        /// <summary>
+        /// Граф держит позицию (нода Set navmeshagent pause). В отличие от CanMove, который
+        /// машина состояний выставляет при каждой смене состояния, держится, пока граф сам не снимет.
+        /// Сбрасывается при смене состояния боя и при смерти/воскрешении.
+        /// </summary>
+        public bool BehaviorHold
+        {
+            get => _behaviorHold;
+            set
+            {
+                _behaviorHold = value;
+                ApplyStopState();
+            }
+        }
+
+        /// <summary>
+        /// Единственное место, где считается agent.isStopped:
+        /// пауза игры, удержание графом, запрет движения от машины состояний.
+        /// </summary>
+        private void ApplyStopState(bool ignoreImpulse = false)
+        {
+            if (!ignoreImpulse && ImpulseActive) return; // во время импульса агентом рулит ImpulseApplier, вернёт в OnExternalMotionEnded
+            if (!AgentActive) return;
+            agent.isStopped = _paused || _behaviorHold || (_canMoveAssigned && !_canMove);
         }
 
         private void OnCombatStateChanged(bool state, string group)
         {
-            if (group == CombatGroup) _inCombat = state;
+            if (group != CombatGroup) return;
+            bool changed = _inCombat != state;
+            _inCombat = state;
+            if (!changed) return;
+            // ветку атаки могли прервать посреди паузы: не тащим удержание в другое поведение
+            _behaviorHold = false;
+            ApplyStopState();
+            CombatStateChanged?.Invoke(state);
+        }
+
+        /// <summary>Враг в бою (по событию своей боевой группы).</summary>
+        public bool InCombat => _inCombat;
+
+        /// <summary>Смена состояния боя этого врага.</summary>
+        public event Action<bool> CombatStateChanged;
+
+        /// <summary>Сменить боевую группу (призванные берут группу призывателя).</summary>
+        public void SetCombatGroup(string group) => combatGroup = group;
+
+        /// <summary>Отправить своей боевой группе событие «вступили в бой».</summary>
+        public void ForceEnterCombat()
+        {
+            if (_combateventChannel != null) _combateventChannel.SendEventMessage(true, combatGroup);
         }
         public NavMeshAgent Nav => agent;
         public float CurrentMoveSpeed  => _inCombat? 
@@ -128,6 +181,17 @@ namespace Arcatech.Units
             }
         }
 
+#if UNITY_EDITOR
+        private Quaternion _debugLastRotation;
+        private EntityStateMachineComponent _debugStateMachine;
+
+        /// <summary>
+        /// Show Debugs на BaseGameEntity: пишет в консоль, если юнит поворачивается, пока граф держит позицию.
+        /// Повороты от ноды Rotate towards тоже попадут в лог — это ожидаемо.
+        /// </summary>
+
+#endif
+
         #region ipausable
         public bool Paused
         {
@@ -135,7 +199,7 @@ namespace Arcatech.Units
             set
             {
                 _paused = value;
-                if (agent.enabled && agent.isOnNavMesh) agent.isStopped = _paused;
+                ApplyStopState();
 
                 if (!behavior) return;
                 behavior.enabled = !_paused;
@@ -146,7 +210,9 @@ namespace Arcatech.Units
         
         public void SetKilled(IKillerComponent component, bool value)
         {
-            if (agent.isOnNavMesh) agent.isStopped = value;
+            _behaviorHold = false;
+            if (value) { if (AgentActive) agent.isStopped = true; }
+            else ApplyStopState();
             if (!behavior) return;
             if (value) behavior.End();
             else behavior.Restart();
@@ -164,9 +230,7 @@ namespace Arcatech.Units
             {
                 _canMove = value;                 // намерение запоминаем ВСЕГДА
                 _canMoveAssigned = true;
-                if (ImpulseActive) return;        // во время импульса агентом рулит ImpulseApplier (вернёт isStopped в OnExternalMotionEnded)
-                if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
-                agent.isStopped = !value;
+                ApplyStopState();                 // удержание графом (BehaviorHold) не снимается сменой состояния
             }
         }
 
@@ -232,9 +296,10 @@ namespace Arcatech.Units
         public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
             BaseGameEntityComponent source)
         {
-            if (source.GetEntitySide == Side.PlayerSide && statDelta < 0)
+            if (source != null && source.GetEntitySide == Side.PlayerSide && statDelta < 0)
             {
-                _combateventChannel.SendEventMessage(true,combatGroup);
+                if (_combateventChannel != null) _combateventChannel.SendEventMessage(true,combatGroup);
+                if (_participant != null) _participant.OnDamagedByPlayer();
             }
         }
 

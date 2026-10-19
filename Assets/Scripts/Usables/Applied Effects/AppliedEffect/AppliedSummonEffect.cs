@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Arcatech.Units.Combat;
+using UnityEngine;
 
 namespace Arcatech.Usables.Effects
 {
@@ -10,6 +11,12 @@ namespace Arcatech.Usables.Effects
         [Tooltip("Spawn offsets relative to the target, paired by index with prefabs. " +
                  "Missing entries default to Vector3.zero.")]
         public Vector3[] offsets;
+
+        [Header("Combat")]
+        [Tooltip("Агрессия призванных на спавне. 1 = полная шкала: сразу претендуют на токен атаки. " +
+                 "Призванные также берут боевую группу призывателя и сразу вступают в бой.")]
+        [Range(0f, CombatParticipant.MaxAggression)]
+        public float spawnAggression = 1.2f;
     }
 
     /// <summary>
@@ -23,11 +30,13 @@ namespace Arcatech.Usables.Effects
     {
         private readonly BaseGameEntityComponent[] _prefabs;
         private readonly Vector3[] _offsets;
+        private readonly float _spawnAggression;
 
         public SummonResult(AppliedSummonEffect cfg): base(cfg)
         {
             _prefabs = cfg.prefabs ?? System.Array.Empty<BaseGameEntityComponent>();
             _offsets = cfg.offsets ?? System.Array.Empty<Vector3>();
+            _spawnAggression = cfg.spawnAggression;
         }
 
         public override void Apply(EffectContext ctx)
@@ -45,7 +54,9 @@ namespace Arcatech.Usables.Effects
                 Vector3 pos = origin.position + origin.TransformDirection(offset);
                 Quaternion rot = origin.rotation;
 
-                GameObject.Instantiate(_prefabs[i], pos, rot);
+                var spawned = GameObject.Instantiate(_prefabs[i], pos, rot);
+                if (spawned.TryGetComponent(out CombatParticipant participant))
+                    participant.OnSummoned(_spawnAggression, ctx.Source);
             }
         }
         public override bool Validate(EffectContext ctx) => true;

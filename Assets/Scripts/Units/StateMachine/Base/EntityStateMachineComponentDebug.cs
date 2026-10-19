@@ -18,11 +18,7 @@ namespace Arcatech.Units
         
         
 #if UNITY_EDITOR
-        public StateMachineContext Context => context;
-        public UnitState CurrentUnitState => _currentState;
-        public Animator Animator => animator;
-        public int PendingPerformersCount => _pendingPerformers.Count;
-        public IReadOnlyList<IStateAugmentor> ActiveAugmentors => _activeAugmentors;
+
 
         [Serializable]
         public struct CandidateInfo

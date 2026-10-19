@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.RuntimeBlackboardAsset
-  VersionTimestamp: 639201612024396283
+  VersionTimestamp: 639277694943709460
   AssetID:
     m_Value0: 8374599978084465484
     m_Value1: 4862074349698470347
@@ -20,11 +20,14 @@ MonoBehaviour:
     m_Variables:
     - rid: 4741284594657788164
     - rid: 5078712843443110869
+    - rid: 6727530496094634309
   m_SharedBlackboardVariableGuids:
   - m_Value0: 14683880180574262744
     m_Value1: 17899709198601377123
   - m_Value0: 15914685069626257532
     m_Value1: 16391587594617731550
+  - m_Value0: 10956920884599291428
+    m_Value1: 17199403768777364597
   references:
     version: 2
     RefIds:
@@ -46,6 +49,15 @@ MonoBehaviour:
           m_Value1: 16391587594617731550
         Name: PlayerAlive
         m_Value: 0
+    - rid: 6727530496094634309
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 10956920884599291428
+          m_Value1: 17199403768777364597
+        Name: PlayerKnockdown
+        m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64,7 +76,8 @@ MonoBehaviour:
   m_Variables:
   - rid: 4741284594657788163
   - rid: 5078712843443110868
-  m_VersionTimestamp: 639201612024396283
+  - rid: 6727530496094634308
+  m_VersionTimestamp: 639277694943709460
   m_CommandBuffer:
     m_Commands: []
   m_RuntimeBlackboardAsset: {fileID: -5588179668135849856}
@@ -90,6 +103,17 @@ MonoBehaviour:
           m_Value0: 15914685069626257532
           m_Value1: 16391587594617731550
         Name: PlayerAlive
+        IsExposed: 1
+        m_IsShared: 1
+        m_Value: 0
+    - rid: 6727530496094634308
+      type: {class: 'TypedVariableModel`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 10956920884599291428
+          m_Value1: 17199403768777364597
+        Name: PlayerKnockdown
         IsExposed: 1
         m_IsShared: 1
         m_Value: 0
