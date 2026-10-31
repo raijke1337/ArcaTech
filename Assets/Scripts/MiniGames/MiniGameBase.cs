@@ -1,12 +1,15 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Arcatech.Interactions;
 using Arcatech.Texts;
+using Arcatech.UI;
 using Arcatech.Units.Control;
 using KBCore.Refs;
 using SpankyBoy.JuiceUI.Free;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace Arcatech.MiniGames
 {
@@ -29,6 +32,57 @@ namespace Arcatech.MiniGames
         [SerializeField] Description description;
         
         public Description Description => description;
+
+        [Header("Button glyphs")]
+        [Tooltip("Иконки кнопок. Пусто - в Image остаются спрайты, заданные в префабе.")]
+        [SerializeField] private InputGlyphSet glyphs;
+
+        private readonly List<(Image image, MiniGameButton button)> _glyphImages = new();
+        private PlayerInputGateway _glyphGateway;
+
+        /// <summary>
+        /// Привязывает Image к кнопке миниигры: иконка берётся под текущее устройство
+        /// и сама меняется при его смене. Вызывать из OnGameStarted.
+        /// </summary>
+        protected void BindGlyph(Image image, MiniGameButton button)
+        {
+            if (image == null) return;
+            _glyphImages.Add((image, button));
+            ApplyGlyph(image, button);
+        }
+
+        private void ApplyGlyph(Image image, MiniGameButton button)
+        {
+            PlayerInputGateway gateway = PlayerInputGateway.Instance;
+            if (gateway == null || image == null) return;
+
+            if (InputPromptFormatter.TryGetActionSprite($"Minigame/{button}", gateway.Actions,
+                    gateway.ActiveDeviceKind, gateway.LastUsedDevice, glyphs, out Sprite sprite))
+            {
+                image.sprite = sprite;
+            }
+        }
+
+        private void RefreshGlyphs(InputDeviceKind kind, InputDevice device)
+        {
+            foreach (var (image, button) in _glyphImages) ApplyGlyph(image, button);
+        }
+
+        private void SubscribeGlyphs()
+        {
+            UnsubscribeGlyphs();
+            _glyphImages.Clear();
+            _glyphGateway = PlayerInputGateway.Instance;
+            if (_glyphGateway != null) _glyphGateway.ActiveDeviceChanged += RefreshGlyphs;
+        }
+
+        private void UnsubscribeGlyphs()
+        {
+            if (_glyphGateway != null) _glyphGateway.ActiveDeviceChanged -= RefreshGlyphs;
+            _glyphGateway = null;
+        }
+
+        private void OnDestroy() => UnsubscribeGlyphs();
         
         /// <summary>
         /// Запускает миниигру. Перед запуском всегда сбрасывает её состояние.
@@ -39,6 +93,7 @@ namespace Arcatech.MiniGames
             _isRunning = true;
             _isFinishing = false;
             ResetGame();
+            SubscribeGlyphs();
             PlayerInputGateway.Instance?.EnableMinigameInput(this);
             OnGameStarted();
         }
@@ -76,16 +131,23 @@ namespace Arcatech.MiniGames
             _isRunning = false;
             _isFinishing = true;
             OnGameEnded();
+            UnsubscribeGlyphs();
             onGameCompleteResult?.Invoke(result);
             PlayerInputGateway.Instance?.EnableGameplayInput();
         }
 
         protected abstract void HandleButtonPress(MiniGameButton button, InputAction.CallbackContext context);
 
-        public void OnButtonN(InputAction.CallbackContext context) => HandleButtonPress(MiniGameButton.ButtonN, context);
-        public void OnButtonE(InputAction.CallbackContext context) => HandleButtonPress(MiniGameButton.ButtonE,context);
-        public void OnButtonW(InputAction.CallbackContext context) => HandleButtonPress(MiniGameButton.ButtonW,context);
-        public void OnButtonS(InputAction.CallbackContext context) => HandleButtonPress(MiniGameButton.ButtonS,context);
+        public void OnButtonN(InputAction.CallbackContext context) => Press(MiniGameButton.ButtonN, context);
+        public void OnButtonE(InputAction.CallbackContext context) => Press(MiniGameButton.ButtonE, context);
+        public void OnButtonW(InputAction.CallbackContext context) => Press(MiniGameButton.ButtonW, context);
+        public void OnButtonS(InputAction.CallbackContext context) => Press(MiniGameButton.ButtonS, context);
+
+        private void Press(MiniGameButton button, InputAction.CallbackContext context)
+        {
+            PlayerInputGateway.Instance?.NotifyDeviceUsed(context);
+            HandleButtonPress(button, context);
+        }
     }
     
 }

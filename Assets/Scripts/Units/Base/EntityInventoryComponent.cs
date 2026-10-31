@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Items;
+using Arcatech.Managers;
 using Arcatech.SaveSystem;
 using com.cyborgAssets.inspectorButtonPro;
 using KBCore.Refs;
@@ -49,9 +50,30 @@ namespace Arcatech.Units
 
             if (useSaveSystem)
             {
+                // до подписки на RecordToProgress: костюм из Мастерской - не «найденная на уровне» экипировка
+                ApplySavedCostume();
                 _model.ModelUpdatedEvent += RecordToProgress;
                 RecordSnapshot();
             }
+        }
+
+        /// <summary>Костюм, выбранный в Мастерской, надевается поверх стартовой экипировки.
+        /// При загрузке с чекпоинта не трогаем: там уже записан костюм, с которым игрок шёл.</summary>
+        private void ApplySavedCostume()
+        {
+            if (LevelProgressController.Instance.ResumedFromCheckpoint) return;
+
+            var id = SaveManager.Instance.MetaProgress.equippedCostumeID;
+            if (string.IsNullOrEmpty(id)) return;
+
+            if (!DataManager.Instance.TryGetItemConfig(id, out var config) || config is not EquipSO)
+            {
+                Debug.LogWarning($"Saved costume '{id}' not found or is not an EquipSO.", this);
+                return;
+            }
+
+            var item = DataManager.Instance.MakeItem(config, baseGameEntity);
+            if (item != null) PickUpItem(item);
         }
 
         private void RecordToProgress(InventoryChangeNotification notification)
@@ -119,9 +141,22 @@ namespace Arcatech.Units
             }
         }
 
-        private void HandleViewChange()
+        /// <summary>Вьюха (меню, UI) просит изменить инвентарь.
+        /// Equip - надеть экипировку, PickUp - положить предмет. Остальное пока не поддерживается.</summary>
+        private void HandleViewChange(InventoryChangeType type, Item item, int amount)
         {
-            // implement if needed: change of inventory in some menu
+            if (item == null) return;
+
+            switch (type)
+            {
+                case InventoryChangeType.Equip when item is Equipment:
+                case InventoryChangeType.PickUp:
+                    PickUpItem(item, Mathf.Max(1, amount));
+                    break;
+                default:
+                    Debug.LogWarning($"{name}: view request '{type}' is not supported yet.", this);
+                    break;
+            }
         }
 
         #endregion

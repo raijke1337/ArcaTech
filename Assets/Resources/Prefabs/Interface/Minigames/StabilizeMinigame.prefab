@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 8560637750551177125}
   - component: {fileID: 5904206627228022653}
   - component: {fileID: 6002887674882433079}
+  - component: {fileID: 7521682164370090061}
+  - component: {fileID: 578330613706493920}
   m_Layer: 5
   m_Name: StabilizeMinigame
   m_TagString: Untagged
@@ -61,19 +63,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c03189b3cbe41c8b5b816aac44cd4ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.MiniGames.OverloadStabilizerMinigame
+  Animator: {fileID: 578330613706493920}
+  ShowInGadget: 1
   onGameCompleteResult:
     m_PersistentCalls:
       m_Calls: []
   description: {fileID: 11400000, guid: 0d30fa13512d61442b3a3a72bf253c02, type: 2}
+  glyphs: {fileID: 11400000, guid: fe90f81c697d83248884f7070abdaf1f, type: 2}
   markerSlider: {fileID: 678432088006466265}
   safeZoneRect: {fileID: 3244711866899200000}
   markerImage: {fileID: 8102606605162130454}
+  buttonImage: {fileID: 0}
   progressSlider: {fileID: 1977574797206677127}
   baseSpeed: 1.5
   holdSlowFactor: 0.2
   safeZoneWidth: 0.15
   fillRate: 0.5
   drainRate: 1
+  buttonToActivate: 3
   timeExpires: 1
   timeLimit: 15
   timerText: {fileID: 3081889910892700191}
@@ -81,6 +88,48 @@ MonoBehaviour:
   allowedFailures: 3
   attemptsText: {fileID: 3792299219099200705}
   reduceMotion: 0
+--- !u!225 &7521682164370090061
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1252700101084589163}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &578330613706493920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1252700101084589163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4291d51050243604fb0f84754374569c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpankyBoy.JuiceUI.Free.PanelAnimator
+  inAnimation: 0
+  outAnimation: 0
+  inDirection: 3
+  outDirection: 2
+  inDuration: 0.5
+  outDuration: 0.4
+  inDelay: 0
+  outDelay: 0
+  inEase: 6
+  outEase: 5
+  playInOnEnable: 1
+  disableOnOutComplete: 1
+  resetStateAfterOut: 1
+  inSound: {fileID: 0}
+  outSound: {fileID: 0}
+  customAudioSource: {fileID: 0}
+  volume: 1
+  canvasGroup: {fileID: 7521682164370090061}
 --- !u!1 &1495089462321138263
 GameObject:
   m_ObjectHideFlags: 0

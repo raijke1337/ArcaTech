@@ -32,6 +32,9 @@ namespace Arcatech.MiniGames
             [Tooltip("Image компонента кольца для подсветки результата")]
             public Image ringImage;
 
+            [Tooltip("Image с иконкой кнопки остановки этого кольца (подставляется под текущее устройство)")]
+            public Image keyImage;
+
             [HideInInspector] public bool isStopped;
             [HideInInspector] public float currentAngle;
         }
@@ -76,6 +79,7 @@ namespace Arcatech.MiniGames
             foreach (var ring in ringSettings)
             {
                 rings[ring.stopKey] = ring;
+                BindGlyph(ring.keyImage, ring.stopKey);
             }
             // Инициализация колец
             foreach (var ring in rings.Values)

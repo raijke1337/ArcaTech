@@ -23,6 +23,11 @@ namespace Arcatech.SaveSystem
         /// С ней Теилс выходит на уровень. Пусто - берётся пресет игрока по умолчанию.</summary>
         public List<string> equippedLoadout = new();
 
+        /// <summary>ID костюма (EquipSO), выбранного в Мастерской. Пусто - костюм не выбирался,
+        /// остаётся костюм из пресета. EntityInventoryComponent (use save system) надевает его
+        /// поверх стартовой экипировки - и в главном меню, и на старте уровня.</summary>
+        public string equippedCostumeID;
+
         // Чертёж: найден на уровне -> разблокирован в Мастерской за детали.
         public HashSet<string> foundCostumeBlueprints = new();
         public HashSet<string> unlockedCostumeBlueprints = new();

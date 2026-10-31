@@ -74,6 +74,7 @@ namespace Arcatech.MiniGames
                 attemptsText.text = allowedFailures.ToString();
             }
             
+            BindGlyph(buttonImage, ActivateButton);
             UpdateWaves();
         }
 

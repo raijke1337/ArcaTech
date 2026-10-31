@@ -83,8 +83,7 @@ namespace Arcatech.MiniGames
             TargeterRing.color = SetColorAlpha(GameInterfaceManager.Instance.ColorReference.ArcaCyan, 0f);
             TargetRing.color = SetColorAlpha(GameInterfaceManager.Instance.ColorReference.TechnoBlue, 1f);
 
-            // NYI
-            // ButtonImage = GameInterfaceManager.Instance.GetButtonImage(buttonToPress);
+            BindGlyph(ButtonImage, buttonToPress);
 
             _targeterFadeTween = TargeterRing
                 .DOFade(1f, targeterFadeInDuration)

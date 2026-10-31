@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Arcatech.Units.Control;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Arcatech.UI
@@ -40,6 +41,33 @@ namespace Arcatech.UI
                 if (action == null) return match.Value;
                 return DescribeAction(action, kind, device, glyphs) ?? match.Value;
             });
+        }
+
+        /// <summary>Спрайт кнопки действия для обычного UI Image (не для текста).
+        /// actionPath - например "Minigame/ButtonN". false - иконки нет, оставьте запасной спрайт.</summary>
+        public static bool TryGetActionSprite(string actionPath, InputActionAsset actions, InputDeviceKind kind,
+            InputDevice device, InputGlyphSet glyphs, out Sprite sprite)
+        {
+            sprite = null;
+            if (glyphs == null || string.IsNullOrEmpty(actionPath)) return false;
+
+            if (actions == null)
+            {
+                _fallbackControls ??= new PlayerControls();
+                actions = _fallbackControls.asset;
+            }
+
+            InputAction action = actions.FindAction(actionPath);
+            if (action == null) return false;
+
+            string group = kind == InputDeviceKind.Gamepad ? GamepadGroup : KeyboardMouseGroup;
+            foreach (InputBinding binding in action.bindings)
+            {
+                if (binding.isComposite || binding.isPartOfComposite || !InGroup(binding, group)) continue;
+                return glyphs.TryGetUISprite(GetFamily(kind, device), StripDevice(binding.effectivePath), out sprite);
+            }
+
+            return false;
         }
 
         private static string DescribeAction(InputAction action, InputDeviceKind kind, InputDevice device,

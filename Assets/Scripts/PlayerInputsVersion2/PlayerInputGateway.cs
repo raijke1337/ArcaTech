@@ -236,6 +236,11 @@ namespace Arcatech.Units.Control
                 CameraRotateRightPressed.Invoke();
         }
 
+        /// <summary>Для карты Minigame: её колбэки живут не здесь, поэтому мини-игра сообщает
+        /// о нажатии сама, и иконки кнопок переключаются на устройство, которым играют.</summary>
+        public void NotifyDeviceUsed(InputAction.CallbackContext context) =>
+            TrackDevice(context, context.started || context.performed);
+
         private void TrackDevice(InputAction.CallbackContext context, bool meaningful)
         {
             if (!meaningful) return;

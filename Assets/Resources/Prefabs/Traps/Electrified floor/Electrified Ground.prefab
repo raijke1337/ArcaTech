@@ -213,6 +213,10 @@ MonoBehaviour:
   failureEffects: []
   cancelEffects: []
   destroyAfterSuccess: 0
+  interactorAlignTransform: {fileID: 0}
+  alignInteractor: 0
+  disableInteractorCollisionDuringPlay: 1
+  affectsInteractorState: 1
 --- !u!114 &334788727252922764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,6 +249,7 @@ MonoBehaviour:
   triggerOnce: 0
   cooldown: 0.2
   affectedSide: 1
+  onTriggerEffects: []
 --- !u!114 &7644162158406529892
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,10 +263,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Triggers.TriggerTrackerComponent
   triggerCollider: {fileID: 7685712385351580225}
-  cachedRigidbody: {fileID: 3632460172869535138}
-  _hitVisualizationDuration: 2
-  _hitSphereRadius: 0.1
-  _lineLength: 0.5
   _warningLineWidth: 0.1
   _warningFloorOffset: 0.02
   _warningFadeInDuration: 0.12
@@ -283,6 +284,7 @@ MonoBehaviour:
     - Key: 3
       Value:
       - {fileID: 11400000, guid: 8436551d6e967fb42b62a7c025bb37ff, type: 2}
+  targetUser: 1
 --- !u!1 &2640871187409913966
 GameObject:
   m_ObjectHideFlags: 0

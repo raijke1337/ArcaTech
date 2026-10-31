@@ -117,7 +117,6 @@ namespace Arcatech.Stats
         public bool Invulnerable { get; set; }
         public string KilledBy => $"Stats Kill Condition (source: {_lastHarmSource?.name ?? "unknown"})";
 
-        public event UnityAction ViewChangedInventory;
 
         #endregion
 
@@ -233,6 +232,8 @@ namespace Arcatech.Stats
         #endregion
 
         #region Inventory (IUnitInventoryView)
+
+        public event UnityAction<InventoryChangeType, Item, int> ViewChangedInventory;
 
         public void RefreshView(InventoryChangeNotification notification)
         {

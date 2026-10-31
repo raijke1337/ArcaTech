@@ -150,6 +150,20 @@ namespace Arcatech.UI
             return false;
         }
 
+        /// <summary>То же, что TryGetSprite, но возвращает Sprite для обычного UI Image
+        /// (миниигры и т.п.), а не имя для тега &lt;sprite&gt; в тексте.</summary>
+        public bool TryGetUISprite(InputGlyphFamily family, string controlPath, out Sprite sprite)
+        {
+            sprite = null;
+            if (!TryGetSprite(family, controlPath, out string name)) return false;
+
+            int index = spriteAsset.GetSpriteIndexFromName(name);
+            if (index < 0) return false;
+
+            sprite = (spriteAsset.spriteCharacterTable[index].glyph as TMP_SpriteGlyph)?.sprite;
+            return sprite != null;
+        }
+
         private bool HasSprite(string name) =>
             !string.IsNullOrEmpty(name) && spriteAsset.GetSpriteIndexFromName(name) >= 0;
 

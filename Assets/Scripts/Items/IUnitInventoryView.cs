@@ -4,7 +4,9 @@ namespace Arcatech.Items
 {
     public interface IUnitInventoryView
     {
-        public event UnityAction ViewChangedInventory;
+        /// <summary>Вьюха просит изменить инвентарь (меню, UI): тип изменения, предмет, количество.
+        /// Обрабатывает EntityInventoryComponent. Рендереры (как drawer) событие не вызывают.</summary>
+        public event UnityAction<InventoryChangeType, Item, int> ViewChangedInventory;
         void RefreshView (InventoryChangeNotification notification);
     }
 

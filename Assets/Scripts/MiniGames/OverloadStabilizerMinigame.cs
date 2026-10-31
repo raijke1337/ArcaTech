@@ -13,6 +13,7 @@ namespace Arcatech.MiniGames
         public Slider markerSlider; // Ползунок маркера
         public RectTransform safeZoneRect; // Зеленая зона
         public Image markerImage; // Визуальный образ маркера
+        public Image buttonImage; // Иконка кнопки (необязательно, подставляется под текущее устройство)
         public Slider progressSlider;
 
         [Header("Settings")]
@@ -51,6 +52,7 @@ namespace Arcatech.MiniGames
             progressSlider.value = 0;
             if (markerSlider != null) markerSlider.value = 0.5f;
 
+            BindGlyph(buttonImage, buttonToActivate);
             UpdateUI();
         }
 

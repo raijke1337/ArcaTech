@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
+  - _ARCAOCCLUDER_ON
   - _USEOUTLINE_ON
   - _USESHADOWS_ON
   m_LightmapFlags: 4
@@ -30,7 +31,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 25b9f1acc6f838d4e85b8d6a90ab7ffe, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -44,6 +45,9 @@ Material:
     m_Ints: []
     m_Floats:
     - _AdaptiveThickness: 0.3
+    - _AddLightStep: 0.3
+    - _AmbientInfluence: 0.5
+    - _ArcaOccluder: 1
     - _BumpScale: 1
     - _Cull: 2
     - _DitherScale: 1
@@ -57,15 +61,18 @@ Material:
     - _MainLightIntensity: 1
     - _OutlineTextureStrength: 0
     - _OutlineWidth: 0.0001
+    - _OutlineWidthPx: 1
     - _QueueOffset: 0
     - _RimBoost: 1.5
     - _RimIntensity: 0.8
     - _RimPower: 3
+    - _RimThreshold: 0.6
     - _ScanlineContrast: 0.6
     - _ScanlineFreq: 30
     - _ScanlineSpeed: 1.5
     - _SrcBlend: 5
     - _StepOffset: 0
+    - _StepSmooth: 0.02
     - _StepSoftness: 0.01
     - _StepThreshold: 0.5
     - _Surface: 1

@@ -23,10 +23,7 @@ namespace Arcatech.UI
         [SerializeField] protected EquipmentNotificationWindow equipsNotification;
         [SerializeField,Self] PanelAnimator panelAnimator;
         [Space, SerializeField, Range(0,200)] private int bigDamageThreshold = 25;
-        /// <summary>
-        /// not called in this component
-        /// </summary>
-        public event UnityAction ViewChangedInventory;
+
         BaseGameEntityComponent _player;
         private EntityStatsComponent _st;
         UsablesCasterComponent _usablesCasterComponent;
@@ -142,6 +139,8 @@ namespace Arcatech.UI
         }
         
         #region interface
+
+        public event UnityAction<InventoryChangeType, Item, int> ViewChangedInventory;
 
         public void RefreshView(InventoryChangeNotification not)
         {

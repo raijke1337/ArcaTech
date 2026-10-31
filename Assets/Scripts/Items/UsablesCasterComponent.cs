@@ -20,7 +20,6 @@ namespace Arcatech.Items
         , IDrawItemsStrategyProvider, IStateMachineNotificationReceiver
     {
 
-        public event UnityAction ViewChangedInventory;
 
         [SerializeField,Self] EntityInventoryComponent entityInventory;
         [SerializeField, Self] private EntityStateMachineComponent stateUnit;
@@ -40,6 +39,9 @@ namespace Arcatech.Items
             _stats = GetComponent<EntityStatsComponent>();
             _weaponHeat = WeaponHeatComponent.Find(this);
         }
+
+        public event UnityAction<InventoryChangeType, Item, int> ViewChangedInventory;
+
         public void RefreshView(InventoryChangeNotification notification)
         {
             if (notification.ChangeType == InventoryChangeType.PickUp ||

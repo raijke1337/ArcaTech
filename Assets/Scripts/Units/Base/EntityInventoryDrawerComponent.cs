@@ -53,7 +53,7 @@ namespace Arcatech.Units
         #region model view
         
         private UnitInventoryModel inventoryModel;
-        public event UnityAction ViewChangedInventory;
+        public event UnityAction<InventoryChangeType, Item, int> ViewChangedInventory;
 
         public void RefreshView(InventoryChangeNotification notification)
         {

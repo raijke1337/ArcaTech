@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 7556142809477502016}
   - component: {fileID: 7148742804314150164}
   - component: {fileID: 2269298898921104425}
+  - component: {fileID: 7079924469599969370}
+  - component: {fileID: 8175066234751746784}
   m_Layer: 5
   m_Name: SyncMinigame
   m_TagString: Untagged
@@ -63,13 +65,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84dc66a4f2e41f8b479bde3248517d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.MiniGames.RhythmSyncMinigame
+  Animator: {fileID: 8175066234751746784}
+  ShowInGadget: 1
   onGameCompleteResult:
     m_PersistentCalls:
       m_Calls: []
   description: {fileID: 11400000, guid: a6bfc226725da944ea8f65cff593f451, type: 2}
+  glyphs: {fileID: 11400000, guid: fe90f81c697d83248884f7070abdaf1f, type: 2}
   progressSlider: {fileID: 133423121160459112}
   targetWave: {fileID: 5737576891246010420}
   playerWave: {fileID: 1067173650569159659}
+  buttonImage: {fileID: 0}
+  ActivateButton: 3
   targetFrequency: 1.2
   playerFrequencyBase: 1.5
   syncTolerance: 0.2
@@ -83,6 +90,48 @@ MonoBehaviour:
   allowedFailures: 3
   attemptsText: {fileID: 4312407800255809511}
   reduceMotion: 0
+--- !u!225 &7079924469599969370
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 238016740861719299}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &8175066234751746784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 238016740861719299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4291d51050243604fb0f84754374569c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpankyBoy.JuiceUI.Free.PanelAnimator
+  inAnimation: 0
+  outAnimation: 0
+  inDirection: 3
+  outDirection: 2
+  inDuration: 0.5
+  outDuration: 0.4
+  inDelay: 0
+  outDelay: 0
+  inEase: 6
+  outEase: 5
+  playInOnEnable: 1
+  disableOnOutComplete: 1
+  resetStateAfterOut: 1
+  inSound: {fileID: 0}
+  outSound: {fileID: 0}
+  customAudioSource: {fileID: 0}
+  volume: 1
+  canvasGroup: {fileID: 7079924469599969370}
 --- !u!1 &763907867500970774
 GameObject:
   m_ObjectHideFlags: 0
