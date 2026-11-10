@@ -9,6 +9,10 @@ namespace Arcatech.Units.Control
 
         /// <summary>Рывок/додж. Добавляется к текущей скорости. NPC не покидает навмеш (упирается в край).</summary>
         Dash,
+        
+        /// <summary>Непрерывный снос (конвейер). Скорость задаёт систему отсчёта, в которой юнит двигается сам.
+        /// Не импульс: нужно слать каждый тик, Duration = сколько держать после последнего запроса.</summary>
+        Conveyor,
     }
 
     /// <summary>
@@ -27,13 +31,16 @@ namespace Arcatech.Units.Control
 
         /// <summary>Можно ли выбросить NPC за край навмеша (в пропасть). Игрока не касается.</summary>
         public readonly bool CanLeaveNavMesh;
-
-        private MotionRequest(Vector3 velocity, float duration, MotionKind kind, bool canLeaveNavMesh)
+        /// <summary>Только для Conveyor: сохранять ли скорость ленты в воздухе после схода/прыжка.</summary>
+        public readonly bool ImpartOnExit;
+        private MotionRequest(Vector3 velocity, float duration, MotionKind kind,
+            bool canLeaveNavMesh, bool impartOnExit = false)
         {
             Velocity = velocity;
             Duration = duration;
             Kind = kind;
             CanLeaveNavMesh = canLeaveNavMesh;
+            ImpartOnExit = impartOnExit;
         }
 
         public static MotionRequest Knockback(Vector3 velocity, float duration = 0f, bool canLeaveNavMesh = true)
@@ -41,5 +48,8 @@ namespace Arcatech.Units.Control
 
         public static MotionRequest Dash(Vector3 velocity, float duration = 0f)
             => new MotionRequest(velocity, duration, MotionKind.Dash, false);
+        
+        public static MotionRequest Conveyor(Vector3 velocity, float holdTime = 0.1f, bool impartOnExit = true)
+            => new MotionRequest(velocity, holdTime, MotionKind.Conveyor, false, impartOnExit);
     }
 }

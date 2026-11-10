@@ -5,6 +5,9 @@ namespace Arcatech.Units.Control
     public interface IMove
     {
         public bool CanMove { get; set; }
+        /// <summary>
+        /// desired vector from inputs
+        /// </summary>
         public Vector3 MovementVector { get; set; }
         public float ActualMovementVelocity { get; }
         public bool IsGrounded { get; }

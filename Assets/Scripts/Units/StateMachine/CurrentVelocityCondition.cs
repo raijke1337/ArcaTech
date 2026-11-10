@@ -15,7 +15,6 @@ namespace Arcatech.Units
             var mover = ctx.Owner.GetComponentInChildren<IMove>();
             if (mover == null) return false;
             var velocity = mover.ActualMovementVelocity;
-
             return thresholdSatisfied ? velocity > velocityThreshold : velocity < velocityThreshold;
         }
     }
