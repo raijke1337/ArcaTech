@@ -221,6 +221,8 @@ MonoBehaviour:
     verticalAxisValue: 45
   rotationDuration: 0.35
   clockwiseDirectionIsPositive: 1
+  defaultFieldOfView: 0
+  zoomEase: 6
   enableDebugLogs: 0
 --- !u!1 &1203173804408967626
 GameObject:
@@ -422,12 +424,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 110b6cef58ed4f928ae9a3c68c0f5405, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Cameras.CameraTransparencyCaster
+  mode: 0
   wallMask:
     serializedVersion: 2
     m_Bits: 8
   sphereRadius: 0.5
   fadeSpeed: 8
   targetFadeAmount: 0.85
+  cutoutRadius: 4
+  cutoutSoftness: 1
+  cutoutMinHeight: 0.4
+  cutoutDepthMargin: 0.3
+  cutoutAlwaysOn: 0
 --- !u!1 &1318236538680424649
 GameObject:
   m_ObjectHideFlags: 0
