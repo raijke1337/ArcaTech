@@ -11,8 +11,7 @@ namespace Arcatech.Units
 
         public override bool CanTransition(StateMachineContext ctx)
         {
-            if (ctx?.Owner == null) return false;
-            var mover = ctx.Owner.GetComponent<IMove>();
+            var mover = ctx?.RootMover;
             if (mover == null) return false;
             return mover.IsGrounded == requireGrounded;
         }

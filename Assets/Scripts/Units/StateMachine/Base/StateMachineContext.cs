@@ -21,6 +21,9 @@ namespace Arcatech.Units
         [CanBeNull] public EntityStatsComponent Stats;
 
         [CanBeNull] public IMove[] Movers;
+        [CanBeNull] public IMove RootMover;
+
+        public IMove PrimaryMover => Movers != null && Movers.Length > 0 ? Movers[0] : null;
 
         [CanBeNull] public IAim[] Aimers;
 

@@ -159,7 +159,12 @@ namespace Arcatech.Units
                    normalized >= _normalizedActionSchedule[_nextActionIndex].Time)
             {
                 var actions = _normalizedActionSchedule[_nextActionIndex].Actions;
-                if (actions == null || actions.Length == 0 || context == null) return;
+                if (context == null) return;
+                if (actions == null || actions.Length == 0)
+                {
+                    _nextActionIndex++;
+                    continue;
+                }
 
                 var owner = context.Owner;
                 var pos = context.Spawn.position;

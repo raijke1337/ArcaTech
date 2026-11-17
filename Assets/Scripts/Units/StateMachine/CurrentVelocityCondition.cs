@@ -12,7 +12,7 @@ namespace Arcatech.Units
 
         public override bool CanTransition(StateMachineContext ctx)
         {
-            var mover = ctx.Owner.GetComponentInChildren<IMove>();
+            var mover = ctx?.PrimaryMover;
             if (mover == null) return false;
             var velocity = mover.ActualMovementVelocity;
             return thresholdSatisfied ? velocity > velocityThreshold : velocity < velocityThreshold;

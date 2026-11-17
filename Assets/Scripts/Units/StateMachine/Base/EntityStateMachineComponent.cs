@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Arcatech.Interactions;
 using Arcatech.Stats;
 using Arcatech.Units.Control;
@@ -98,6 +97,7 @@ namespace Arcatech.Units
             context.Owner = gameEntity;
             context.Aimers = GetComponentsInChildren<IAim>();
             context.Movers = GetComponentsInChildren<IMove>();
+            context.RootMover = gameEntity.GetComponent<IMove>();
             context.Invulnerables = GetComponentsInChildren<IInvulnerability>();
             context.Stats = GetComponentInChildren<EntityStatsComponent>();
             context.Interactor = GetComponentInChildren<IInteractor>();
@@ -471,16 +471,31 @@ namespace Arcatech.Units
         {
             wasLocal = false;
             RefreshCandidates();
-            if (_candidates.Count == 0) return null;
+            StateTransition bestTransition = null;
+            int bestPriority = int.MinValue;
+            bool bestIsLocal = false;
 
-            var best = _candidates
-                .OrderByDescending(c => c.tr.TransitionPriority)
-                .ThenByDescending(c => c.local ? 0 : 1) // globals win ties
-                .FirstOrDefault();
+            for (int i = 0; i < _candidates.Count; i++)
+            {
+                var candidate = _candidates[i];
+                int priority = candidate.tr.TransitionPriority;
 
-            if (best.tr == null) return null;
-            wasLocal = best.local;
-            return best.tr;
+                // Higher priority wins; global transitions win ties, matching the
+                // previous OrderBy/ThenBy ordering while preserving list order otherwise.
+                if (bestTransition != null &&
+                    (priority < bestPriority ||
+                     (priority == bestPriority && (candidate.local || !bestIsLocal))))
+                {
+                    continue;
+                }
+
+                bestTransition = candidate.tr;
+                bestPriority = priority;
+                bestIsLocal = candidate.local;
+            }
+
+            wasLocal = bestTransition != null && bestIsLocal;
+            return bestTransition;
         }
 
         // ---------------------------------------------------------------------
