@@ -27,17 +27,36 @@ namespace Arcatech
         {
             Tween tween;
 
-            if (target.TryGetComponent(out Rigidbody rb))
+            if (isRelative)
             {
-                tween = rb.DOMove(targetPosition, duration, snapping);
+                if (target.TryGetComponent(out Rigidbody rb))
+                {
+                    // Rigidbody tweens use world coordinates, so rotate the local
+                    // offset by the parent before applying it as a world-space delta.
+                    Vector3 worldOffset = target.parent
+                        ? target.parent.TransformVector(targetPosition)
+                        : targetPosition;
+                    tween = rb.DOMove(worldOffset, duration, snapping).SetRelative();
+                }
+                else
+                {
+                    // Relative movement is defined in the target's parent space.
+                    tween = target.DOLocalMove(targetPosition, duration, snapping).SetRelative();
+                }
             }
             else
             {
-                tween = target.DOMove(targetPosition, duration, snapping);
+                if (target.TryGetComponent(out Rigidbody rb))
+                {
+                    tween = rb.DOMove(targetPosition, duration, snapping);
+                }
+                else
+                {
+                    tween = target.DOMove(targetPosition, duration, snapping);
+                }
             }
 
-            tween.SetRelative(isRelative)
-                .SetDelay(delay)
+            tween.SetDelay(delay)
                 .SetLoops(loops, loopType)
                 .SetAutoKill(false) // НЕ убивать автоматически
                 .SetUpdate(UpdateType.Normal, true); // Работать даже если Time.timeScale = 0

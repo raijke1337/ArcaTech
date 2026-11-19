@@ -88,7 +88,7 @@ namespace Arcatech.Interactions
 
             if (source is MovementTweenPreset movePreset)
             {
-                var end = ResolveMovementEnd(movePreset, start);
+                var end = ResolveMovementEnd(movePreset, start, target);
                 pts.Add(end);
                 return pts;
             }
@@ -109,7 +109,7 @@ namespace Arcatech.Interactions
                         var movement = TryExtractMovementPreset(step.Action);
                         if (movement == null) continue;
 
-                        var next = ResolveMovementEnd(movement, curr);
+                        var next = ResolveMovementEnd(movement, curr, target);
                         if ((next - curr).sqrMagnitude > 0.000001f)
                         {
                             pts.Add(next);
@@ -134,7 +134,7 @@ namespace Arcatech.Interactions
                         var movement = TryExtractMovementPreset(step.Action);
                         if (movement == null) continue;
 
-                        var next = ResolveMovementEnd(movement, curr);
+                        var next = ResolveMovementEnd(movement, curr, target);
                         if ((next - curr).sqrMagnitude > 0.000001f)
                         {
                             pts.Add(next);
@@ -150,9 +150,41 @@ namespace Arcatech.Interactions
             return pts;
         }
 
-        static Vector3 ResolveMovementEnd(MovementTweenPreset preset, Vector3 startWorld)
+        static Vector3 ResolveMovementEnd(MovementTweenPreset preset, Vector3 startWorld, Transform target)
         {
-            Vector3 end = preset.isRelative ? startWorld + preset.targetPosition : preset.targetPosition;
+            Vector3 end;
+            if (preset.isRelative)
+            {
+                bool hasRigidbody = target.TryGetComponent(out Rigidbody _);
+                if (hasRigidbody)
+                {
+                    Vector3 worldOffset = target.parent
+                        ? target.parent.TransformVector(preset.targetPosition)
+                        : preset.targetPosition;
+                    end = startWorld + worldOffset;
+                }
+                else
+                {
+                    Vector3 localStart = target.parent
+                        ? target.parent.InverseTransformPoint(startWorld)
+                        : startWorld;
+                    Vector3 localEnd = localStart + preset.targetPosition;
+                    if (preset.snapping)
+                    {
+                        localEnd = new Vector3(
+                            Mathf.Round(localEnd.x),
+                            Mathf.Round(localEnd.y),
+                            Mathf.Round(localEnd.z));
+                    }
+
+                    end = target.parent ? target.parent.TransformPoint(localEnd) : localEnd;
+                    return end;
+                }
+            }
+            else
+            {
+                end = preset.targetPosition;
+            }
 
             if (preset.snapping)
             {

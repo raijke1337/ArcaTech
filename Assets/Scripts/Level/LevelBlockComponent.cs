@@ -1,164 +1,183 @@
-using System;
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Arcatech.Cameras;
+using Arcatech.SaveSystem;
 using Arcatech.Triggers;
-using com.cyborgAssets.inspectorButtonPro;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Arcatech.Levels
 {
-    public class LevelBlockComponent : MonoBehaviour, ITriggerNotificationReceiver
+    public class LevelBlockComponent : MonoBehaviour, ITriggerNotificationReceiver, ISavedProgressItem
     {
         [Header("References")]
-        private List<Renderer> _renderers = new(); 
-        private List<Light> _lights = new();
-
         [SerializeField] private Transform boundsParent;
-        [SerializeField, ReadOnlyText] private string boundsCount = "ERROR!";
-        [SerializeField, ReadOnlyText] private string renderersCount = "0"; 
-        [SerializeField, ReadOnlyText] private string lightsCount = "0"; 
-        [Header("Settings")]
-        [SerializeField] private int floor = 0; // 0 = базовый этаж, +1 выше, -1 ниже
+        [SerializeField] private Material fogMaterial;
+        [SerializeField, Min(0.01f)] private float fogFadeDuration = 0.2f;
         [SerializeField] private CamerasController.CameraViewType roomView;
 
-        
-        public int Floor => floor;
-        private Material[] _originalMaterials;
-        private RoomState _currentState = RoomState.Hidden;
-        private bool _initialized = false; // теперь реально используется
-
+        [Header("Room")]
+        [SerializeField] private List<TriggerTrackerComponent> roomTriggers = new();
         [SerializeField] private List<LevelBlockComponent> neighbors = new();
+
         public IReadOnlyList<LevelBlockComponent> Neighbors => neighbors;
-
-        public RoomState CurrentState => _currentState;
-
-        [SerializeField] private List<TriggerTrackerComponent> roomTriggers = new(); // инициализировано!
-        private readonly HashSet<object> _entitiesInside = new();
-
         public UnityAction<LevelBlockComponent, bool> RoomHasPlayerEvent = delegate { };
 
-        private void OnValidate()
-        {
-            AutoCollect();
-        }
+        private readonly HashSet<object> _entitiesInside = new();
+        private readonly List<GameObject> _fogVolumes = new();
+        private bool _explored;
+        private ProgressItemState _savedState;
+        private bool _fadeOutStarted;
+        private float _fadeOutTime;
+        private static readonly int FadeAmountId = Shader.PropertyToID("_FadeAmount");
+        private MaterialPropertyBlock _fogProperties;
+
+        private static Mesh _inwardCubeMesh;
 
         private void OnEnable()
         {
-            _originalMaterials = new Material[_renderers.Count];
-            for (int i = 0; i < _renderers.Count; i++)
+            _fogProperties ??= new MaterialPropertyBlock();
+            LevelProgressController.Instance.Register(this);
+
+            if (boundsParent == null)
             {
-                if (_renderers[i] != null)
-                    _originalMaterials[i] = _renderers[i].sharedMaterial;
+                Debug.LogWarning($"{nameof(LevelBlockComponent)} on {name} has no bounds parent.", this);
+                return;
             }
 
-            roomTriggers = boundsParent.GetComponentsInChildren<TriggerTrackerComponent>().ToList();
-            boundsCount = roomTriggers.Count.ToString();
-            foreach (var t in roomTriggers)
+            if (fogMaterial == null)
+                fogMaterial = Resources.Load<Material>("Material/ARCA_FogOfWar");
+
+            roomTriggers = boundsParent.GetComponentsInChildren<TriggerTrackerComponent>(true).ToList();
+            foreach (var trigger in roomTriggers)
             {
-                t.RegisterReceiver(this);
-                t.Active = true;
+                trigger.RegisterReceiver(this);
+                trigger.Active = true;
+
+                if (trigger.TryGetComponent(out BoxCollider boxCollider))
+                    CreateFogVolume(boxCollider);
+                else
+                    Debug.LogWarning($"Fog of war supports BoxCollider bounds only. Unsupported bounds: {trigger.name}.", trigger);
+            }
+        }
+
+        private void Start()
+        {
+            foreach (var trigger in roomTriggers)
+                trigger.AreaCast(this);
+        }
+
+        private void Update()
+        {
+            if (!_fadeOutStarted) return;
+
+            _fadeOutTime += Time.deltaTime;
+            var fade = Mathf.Clamp01(_fadeOutTime / fogFadeDuration);
+            foreach (var volume in _fogVolumes)
+            {
+                if (volume == null || !volume.activeSelf) continue;
+                var renderer = volume.GetComponent<MeshRenderer>();
+                if (renderer == null) continue;
+                renderer.GetPropertyBlock(_fogProperties);
+                _fogProperties.SetFloat(FadeAmountId, fade);
+                renderer.SetPropertyBlock(_fogProperties);
+            }
+
+            if (fade >= 1f)
+            {
+                _fadeOutStarted = false;
+                foreach (var volume in _fogVolumes)
+                    if (volume != null)
+                        volume.SetActive(false);
             }
         }
 
         private void OnDisable()
         {
-            if (roomTriggers == null || roomTriggers.Count == 0) return;
-            foreach (var t in roomTriggers) t.UnregisterReceiver(this);
+            LevelProgressController.TryGetInstance()?.Unregister(this);
+
+            foreach (var trigger in roomTriggers)
+                if (trigger != null)
+                    trigger.UnregisterReceiver(this);
+
+            foreach (var volume in _fogVolumes)
+                if (volume != null)
+                    Destroy(volume);
+            _fogVolumes.Clear();
         }
 
-        private void Start()
+        private void CreateFogVolume(BoxCollider bounds)
         {
-            // to prevent race condition
-            if (roomTriggers == null || roomTriggers.Count == 0) return;
-            foreach (var t in roomTriggers) t.AreaCast(this);
-        }
-
-        public void SetState(RoomState newState,Material material)
-        {
-            // ключевой фикс: первый вызов всегда должен применяться,
-            // даже если newState совпадает с дефолтным _currentState
-            if (_initialized && _currentState == newState) return;
-
-            _initialized = true;
-            _currentState = newState;
-
-            switch (newState)
+            if (fogMaterial == null)
             {
-                case RoomState.Hidden:
-                    // Полностью выключаем рендеринг и свет
-                    foreach (var r in _renderers)
-                    {
-                        if (r != null)
-                        {
-                            r.enabled = true;
-                            r.sharedMaterial = material;
-                        }
-                    }
-                    foreach (var l in _lights)
-                        if (l != null)
-                            l.enabled = false;
-                    break;
+                Debug.LogWarning("Fog material was not assigned and Resources/Material/ARCA_FogOfWar was not found.", this);
+                return;
+            }
 
-                case RoomState.Inactive:
-                    // Показываем голограмму/скан
-                    foreach (var r in _renderers)
-                    {
-                        if (r != null)
-                        {
-                            r.enabled = true;
-                            r.sharedMaterial = material;
-                        }
-                    }
+            var volume = new GameObject($"Fog of War ({bounds.name})");
+            volume.transform.SetParent(bounds.transform, false);
+            volume.transform.localPosition = bounds.center;
+            volume.transform.localRotation = Quaternion.identity;
+            volume.transform.localScale = bounds.size;
 
-                    foreach (var l in _lights)
-                        if (l != null)
-                            l.enabled = false;
-                    break;
+            var filter = volume.AddComponent<MeshFilter>();
+            filter.sharedMesh = InwardCubeMesh;
 
-                case RoomState.Active:
-                case RoomState.Explored:
-                    // Возвращаем оригинальные материалы
-                    for (int i = 0; i < _renderers.Count; i++)
-                    {
-                        if (_renderers[i] != null && _originalMaterials[i] != null)
-                        {
-                            _renderers[i].enabled = true;
-                            _renderers[i].sharedMaterial = _originalMaterials[i];
-                        }
-                    }
+            var renderer = volume.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = fogMaterial;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
 
-                    foreach (var l in _lights)
-                        if (l != null)
-                            l.enabled = true;
-                    break;
+            _fogVolumes.Add(volume);
+            // renderer.GetPropertyBlock(_fogProperties); 
+            // _fogProperties.SetFloat(FadeAmountId, 0f);
+            // renderer.SetPropertyBlock(_fogProperties);
+            if (_explored)
+                volume.SetActive(false);
+        }
+
+        private static Mesh InwardCubeMesh
+        {
+            get
+            {
+                if (_inwardCubeMesh != null)
+                    return _inwardCubeMesh;
+
+                var temporary = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                _inwardCubeMesh = Instantiate(temporary.GetComponent<MeshFilter>().sharedMesh);
+                Destroy(temporary);
+
+                // var triangles = _inwardCubeMesh.triangles;
+                // for (var i = 0; i < triangles.Length; i += 3)
+                //     (triangles[i + 1], triangles[i + 2]) = (triangles[i + 2], triangles[i + 1]);
+                // _inwardCubeMesh.triangles = triangles;
+                //
+                // var normals = _inwardCubeMesh.normals;
+                // for (var i = 0; i < normals.Length; i++)
+                //     normals[i] = -normals[i];
+                // _inwardCubeMesh.normals = normals;
+                // _inwardCubeMesh.name = "Fog of War Inward Cube";
+                 return _inwardCubeMesh;
             }
         }
 
-#if UNITY_EDITOR
-         void AutoCollect()
-        {
-            _renderers.Clear();
-            _lights.Clear();
-            _renderers.AddRange(GetComponentsInChildren<Renderer>(true));
-            _lights.AddRange(GetComponentsInChildren<Light>(true));
-            Debug.Log($"{name} Collected {_renderers.Count} renderers and {_lights.Count} lights");
-            renderersCount = _renderers.Count.ToString();
-            lightsCount = _lights.Count.ToString();
-            if (!boundsParent) return;
-            boundsCount = "OK";
-        }
-#endif
         public void TriggerEntered(TriggerHitInfo triggerHitInfo)
         {
-            if (!triggerHitInfo.TryGetEntityTarget(out var e) || !e.CompareTag("Player")) return;
+            if (!triggerHitInfo.TryGetEntityTarget(out var entity) || !entity.CompareTag("Player"))
+                return;
 
-            // Add() возвращает false, если сущность уже была в множестве —
-            // дублирующий Enter (например, от AreaCast + реальной физики
-            // на старте, или от нескольких триггеров одной комнаты) просто игнорируется.
-            if (_entitiesInside.Add(e) && _entitiesInside.Count == 1)
+            if (_entitiesInside.Add(entity) && _entitiesInside.Count == 1)
             {
+                if (!_explored)
+                {
+                    _explored = true;
+                    _fadeOutStarted = _fogVolumes.Count > 0;
+                    _fadeOutTime = 0f;
+                    if (!_fadeOutStarted) ApplyExploredState();
+                    _savedState = ProgressItemState.Completed;
+                    LevelProgressController.Instance.SavedItemAnnounce(this);
+                }
+
                 RoomHasPlayerEvent.Invoke(this, true);
                 CamerasController.Instance.SetView(roomView);
             }
@@ -166,14 +185,49 @@ namespace Arcatech.Levels
 
         public void TriggerExited(TriggerHitInfo triggerExitInfo)
         {
-            if (!triggerExitInfo.TryGetEntityTarget(out var e) || !e.CompareTag("Player")) return;
+            if (!triggerExitInfo.TryGetEntityTarget(out var entity) || !entity.CompareTag("Player"))
+                return;
 
-            // Remove() возвращает false, если сущности не было в множестве —
-            // лишний/повторный Exit тоже безопасно игнорируется.
-            if (_entitiesInside.Remove(e) && _entitiesInside.Count == 0)
-            {
+            if (_entitiesInside.Remove(entity) && _entitiesInside.Count == 0)
                 RoomHasPlayerEvent.Invoke(this, false);
-            }
         }
+        [SerializeField, HideInInspector] private string savedItemID;
+        public string SavedItemID => string.IsNullOrWhiteSpace(savedItemID) ? name : savedItemID;
+        public string Name => name;
+        public ProgressItemKind Kind => ProgressItemKind.Room;
+        public ProgressItemState ReadItemState => _savedState;
+        public void ApplySaveState(ProgressItemState state, ILevelProgressContext ctx)
+        {
+            _savedState = state;
+            if (state == ProgressItemState.Completed)
+                ApplyExploredState();
+            else
+                ApplyUnexploredState();
+        }
+
+        private void ApplyExploredState()
+        {
+            _explored = true;
+            _fadeOutStarted = false;
+            foreach (var volume in _fogVolumes)
+                if (volume != null)
+                    volume.SetActive(false);
+        }
+
+        private void ApplyUnexploredState()
+        {
+            _explored = false;
+            foreach (var volume in _fogVolumes)
+                if (volume != null)
+                    volume.SetActive(true);
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (string.IsNullOrWhiteSpace(savedItemID))
+                savedItemID = System.Guid.NewGuid().ToString("N");
+        }
+#endif
     }
 }

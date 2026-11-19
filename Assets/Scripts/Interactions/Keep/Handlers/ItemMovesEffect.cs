@@ -9,10 +9,7 @@ namespace Arcatech.Interactions
     public partial class ItemMovesEffect : InteractionEffect, IPausableComponent
     {
         [SerializeField] private Transform moveTargetOverride;
-        
-        // TODO: this whole part is now in "Item moves with Tween".
-        // remove duplication
-        
+
         [SerializeField] bool runFromEnable = false;
         [SerializeField] SerializedDOTweener tween;
         Tween cached;
@@ -55,19 +52,11 @@ namespace Arcatech.Interactions
         public override void Play(InteractionContext ctx)
         {
             if (ctx.State != InteractionState.Success) return;
-        //    Debug.Log($"Playing {tween} on {moveTargetOverride.name}");
             if (!runFromEnable) 
                 cached.Play();
             toggled = true;
         }
 
-        // public override void OnLoadLevelState(ProgressItemState stateToLoad)
-        // {
-        //     if (stateToLoad != ProgressItemState.Completed) return;
-        //     toggled = true;
-        //     cached ??= tween.GetTween(transform).Pause();
-        //     cached.Play();
-        // }
     }
 
 }

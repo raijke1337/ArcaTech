@@ -217,6 +217,13 @@ namespace Arcatech.SaveSystem
             EnsureInitialized(item is Component c ? c.gameObject.scene : default);
             if (!_isGameLevel) return;
 
+            if (_trackedItems.TryGetValue(item.SavedItemID, out var existing) && !ReferenceEquals(existing, item))
+            {
+                Debug.LogError($"Duplicate progress item ID '{item.SavedItemID}' on '{existing.Name}' and '{item.Name}'. " +
+                               "Each room and saved object must have a unique ID.", item as UnityEngine.Object);
+                return;
+            }
+
             _trackedItems[item.SavedItemID] = item;
             _knownItems.TryAdd(item.SavedItemID, item.Kind);
 
