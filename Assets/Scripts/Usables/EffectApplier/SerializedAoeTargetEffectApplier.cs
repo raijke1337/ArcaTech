@@ -43,6 +43,7 @@ namespace Arcatech.Usables
             int count = Physics.OverlapSphereNonAlloc(hit.Position, _radius, _hits, _collisionMask);
             if (count == 0) return;
             hit.TryGetEntityTarget(out var initTarget);
+            HashSet<BaseGameEntityComponent> destructiblesHit = null;
 
             // буфер переиспользуется: за пределами count лежат коллайдеры с прошлых срабатываний
             for (int i = 0; i < count; i++)
@@ -53,13 +54,11 @@ namespace Arcatech.Usables
 
                 if (unit == user && !_affectUser) continue;
                 if (unit == initTarget && !_affectInitialTarget) continue;
+                if (unit.TryGetComponent<DestructibleComponent>(out var destructible) && destructible.isActiveAndEnabled &&
+                    !(destructiblesHit ??= new HashSet<BaseGameEntityComponent>()).Add(unit)) continue;
                 
                 Debug.Log($"Applying {effects.Count} effects to {unit.GetName}, triggered by hit on {hit.TargetCollider}");
-                foreach (var effect in effects)
-                {
-                    effect.ProduceResult(user, unit, unit.transform.position, unit.transform.rotation);
-                }
-                PlayApplicationParticles(unit.EffectSpawn.position);
+                ApplyToTarget(user, unit, hit, effects, applyAtHitPosition: false);
             }
         }
     }

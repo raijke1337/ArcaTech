@@ -30,5 +30,10 @@ namespace Arcatech.Rendering
 
         // Материал
         public static readonly int FadeAmount       = Shader.PropertyToID("_FadeAmount");
+        public static readonly int DamageFlashStrength = Shader.PropertyToID("_DamageFlashStrength");
+        public static readonly int DamageFlashColor    = Shader.PropertyToID("_DamageFlashColor");
+        public static readonly int DamageFlashDetail   = Shader.PropertyToID("_DamageFlashDetail");
+        public static readonly int DamageFlashHalftone = Shader.PropertyToID("_DamageFlashHalftone");
+        public static readonly int DamageFlashEmission = Shader.PropertyToID("_DamageFlashEmission");
     }
 }

@@ -16,6 +16,7 @@
         Enemy,
         Collectible,
         Secret, // плейсхолдер: триггер секретной зоны, пока не используется
-        Room
+        Room,
+        Destructible
     }
 }

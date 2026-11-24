@@ -9,21 +9,23 @@ namespace Arcatech.Items
 {
     public class LightControlEffect : InteractionEffect
     {
-        [SerializeField] private Color startColor;
+        [SerializeField] private Light targetLight;
         [SerializeField] private SerializedDictionary<InteractionState, Color> colors;
-        private Light light;
 
         private void Awake()
         {
-            light = GetComponentInChildren<Light>();
-            light.color =  startColor;
+            targetLight = GetComponentInChildren<Light>();
+            if (targetLight == null)
+            {
+                targetLight = gameObject.AddComponent<Light>();
+            }
         }
 
         public override void Play(InteractionContext ctx)
         {
             if (colors.TryGetValue(ctx.State, out  var color))
             {
-                light.color = color;
+                targetLight.color = color;
             }
         }
     }

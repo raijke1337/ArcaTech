@@ -28,6 +28,30 @@ namespace Arcatech.Usables
     
         public abstract void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects,
             Vector3 origin);
+
+        protected void ApplyToTarget(BaseGameEntityComponent user, BaseGameEntityComponent target,
+            TriggerHitInfo hit, List<ActionResult> effects, bool applyAtHitPosition)
+        {
+            target.TryGetComponent<DestructibleComponent>(out var destructible);
+            float? previousDamage = destructible != null ? destructible.BeginHit() : null;
+            float damage = 0f;
+            try
+            {
+                foreach (var effect in effects)
+                {
+                    var place = applyAtHitPosition ? hit.Position : target.transform.position;
+                    var rotation = applyAtHitPosition ? Quaternion.identity : target.transform.rotation;
+                    effect.ProduceResult(user, target, place, rotation);
+                }
+            }
+            finally
+            {
+                if (destructible != null) damage = destructible.EndHit(previousDamage);
+            }
+
+            PlayApplicationParticles(applyAtHitPosition ? hit.Position : target.EffectSpawn.position);
+            if (destructible != null) destructible.CompleteHit(damage, hit);
+        }
     
         protected void PlayApplicationParticles(Vector3 position)
         {

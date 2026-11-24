@@ -46,6 +46,13 @@ Shader "ARCA/CharacterToon"
         _RimThreshold ("Rim Threshold", Range(0.0, 1.0)) = 0.55
         _RimPower ("Rim Power", Range(0.5, 8.0)) = 3.0
 
+        [Header(Damage Flash)]
+        _DamageFlashStrength ("Flash Strength", Range(0, 1)) = 0
+        _DamageFlashColor ("Flash Color", Color) = (1, 0.3215686, 0.4078431, 1)
+        _DamageFlashDetail ("Texture and MatCap Detail", Range(0, 1)) = 0.75
+        _DamageFlashHalftone ("Shadow Halftone", Range(0, 1)) = 0.4
+        _DamageFlashEmission ("Flash Emission", Range(0, 3)) = 0.45
+
         [Header(Metal)]
         [Toggle(_METAL)] _Metal ("Металл (matcap + блик)", Float) = 0
         [Toggle(_SPECULAR)] _Specular ("Блик (без matcap)", Float) = 0
@@ -94,6 +101,11 @@ Shader "ARCA/CharacterToon"
             float4 _RimColor;
             float  _RimThreshold;
             float  _RimPower;
+            float  _DamageFlashStrength;
+            float4 _DamageFlashColor;
+            float  _DamageFlashDetail;
+            float  _DamageFlashHalftone;
+            float  _DamageFlashEmission;
             float4 _ArcaSpecColor;
             float  _SpecSize;
             float  _MatCapStrength;
@@ -228,9 +240,26 @@ Shader "ARCA/CharacterToon"
                 s.normalWS   = normalWS;
                 s.positionCS = input.positionCS;
 
+                half flash = saturate(_DamageFlashStrength);
+                if (flash > 0.0h)
+                {
+                    // Keep the value contrast from the texture and MatCap inside the red fill.
+                    half value = sqrt(saturate(dot(albedo, half3(0.299h, 0.587h, 0.114h))));
+                    half detail = lerp(1.0h, lerp(0.35h, 1.0h, value), _DamageFlashDetail);
+                    half3 damageTint = _DamageFlashColor.rgb * detail;
+                    s.albedo = lerp(albedo, damageTint, flash);
+                    tp.shadowColor = lerp(tp.shadowColor, half3(0.58h, 0.42h, 0.52h), flash);
+                    tp.lightColorInfluence *= 1.0h - flash;
+                    tp.halftoneStrength = _DamageFlashHalftone * flash;
+                    tp.specColor = lerp(tp.specColor, tp.specColor * _DamageFlashColor.rgb, flash);
+                    emission = lerp(emission, damageTint * _DamageFlashEmission, flash);
+                }
+
                 #if defined(_UNSHADED)
                     // Шейдинг выключен: ни света, ни теней, ни ambient - чистая заливка.
                     half3 color = albedo * _UnshadedBrightness;
+                    if (flash > 0.0h)
+                        color = lerp(color, ArcaToonLighting(s, tp), flash);
                 #else
                     half3 color = ArcaToonLighting(s, tp);
                 #endif

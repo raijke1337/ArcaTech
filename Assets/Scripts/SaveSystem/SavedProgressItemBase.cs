@@ -11,14 +11,21 @@ namespace Arcatech.SaveSystem
     public abstract class SavedProgressItemBase : ValidatedMonoBehaviour, ISavedProgressItem
     {
         [SerializeField, Self] private BaseGameEntityComponent entity;
-        protected BaseGameEntityComponent Entity => entity;
+        protected BaseGameEntityComponent Entity
+        {
+            get
+            {
+                if (entity == null) entity = GetComponent<BaseGameEntityComponent>();
+                return entity;
+            }
+        }
 
-        public string SavedItemID => entity.GetID;
-        public string Name => entity.GetName;
+        public string SavedItemID => Entity.GetID;
+        public string Name => Entity.GetName;
         public abstract ProgressItemKind Kind { get; }
 
         /// <summary>Объект создан во время игры - его состояние не сохраняется.</summary>
-        public bool IsTracked => entity != null && entity.TryGetComponent(out EntityID id) && !id.IsRuntimeSpawned;
+        public bool IsTracked => Entity != null && Entity.TryGetComponent(out EntityID id) && !id.IsRuntimeSpawned;
 
         private ProgressItemState _state;
         public ProgressItemState ReadItemState => _state;

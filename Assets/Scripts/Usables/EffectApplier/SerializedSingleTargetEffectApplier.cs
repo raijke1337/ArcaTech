@@ -25,13 +25,7 @@ namespace Arcatech.Usables
         public override void ApplyEffects(BaseGameEntityComponent user, TriggerHitInfo hit, List<ActionResult> effects, Vector3 origin)
         {
             if (hit.TryGetEntityTarget(out BaseGameEntityComponent component))
-            {
-                foreach (var e in effects)
-                {
-                    e.ProduceResult(user, component, hit.Position, Quaternion.identity);
-                }
-                PlayApplicationParticles(hit.Position);
-            }
+                ApplyToTarget(user, component, hit, effects, applyAtHitPosition: true);
         }
     }
 }
