@@ -115,10 +115,10 @@ GameObject:
   - component: {fileID: 9048639676855387528}
   - component: {fileID: 5887240669043196477}
   - component: {fileID: 6836967032417363760}
-  - component: {fileID: 3446776554277959066}
   - component: {fileID: 4855648754566446162}
   - component: {fileID: 1602066192044985990}
   - component: {fileID: 7788467925517885437}
+  - component: {fileID: 635946370188804762}
   m_Layer: 6
   m_Name: Console
   m_TagString: Untagged
@@ -238,7 +238,7 @@ MonoBehaviour:
   conditions: []
   preExecuteEffects:
   - {fileID: 6836967032417363760}
-  executor: {fileID: 3446776554277959066}
+  executor: {fileID: 635946370188804762}
   duringExecuteEffects:
   - {fileID: 6836967032417363760}
   successEffects:
@@ -296,19 +296,6 @@ MonoBehaviour:
     - Key: 5
       Value: {fileID: 0}
   blockUntilTextCompletes: 0
---- !u!114 &3446776554277959066
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8429546161288232691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8996a063f0e4091b6ff9dcc3bcadec6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InstantExecutor
-  willComplete: 1
 --- !u!114 &4855648754566446162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -323,7 +310,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.EntityMouseOverGlowComponent
   entity: {fileID: 3164810939006390305}
   outlineMaterial: {fileID: 0}
-  outlineColor: {r: 0, g: 1, b: 1, a: 1}
   outlineWidth: 0.02
   useGlow: 1
   glowIntensity: 2
@@ -368,14 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119ef3ebc21a48d29b7ae41857b4379c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractionStatesInjectorComponent
-  ownerEntity: {fileID: 0}
-  activeArea: {fileID: 2262326607726006872}
-  stateTransitions:
-    _serializedList:
-    - Key: 3
-      Value: {fileID: 11400000, guid: 1d88dd4e9998f25438b50c1fdd962226, type: 2}
-    - Key: 4
-      Value: {fileID: 11400000, guid: 7130243591e58444dbefd6992373d4ba, type: 2}
+  profile: {fileID: 11400000, guid: b5fcdd501f93cac4c924be07612267c1, type: 2}
   StateAnimationExited:
     m_PersistentCalls:
       m_Calls: []
@@ -393,6 +372,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.SaveSystem.ActivatorProgress
   entity: {fileID: 3164810939006390305}
   comp: {fileID: 9048639676855387528}
+--- !u!114 &635946370188804762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8429546161288232691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16a3a605a9a14f7a89a03eae179ce6dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CompleteAnimationStateExecutor
 --- !u!1001 &2089790560931088335
 PrefabInstance:
   m_ObjectHideFlags: 0

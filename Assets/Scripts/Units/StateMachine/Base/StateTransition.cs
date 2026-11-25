@@ -13,6 +13,7 @@ namespace Arcatech.Units
         public float ExitNormalizedTime { get; }
         private SerializedStateTransitionCondition[] Conditions { get; }
         public bool CanOverrideMinimumStateTime { get; }
+        internal bool IsEnabled { get; set; } = true;
       //  public bool IsCommandTransition { get; }
 
         public StateTransition(UnitState nextState,
@@ -40,6 +41,7 @@ namespace Arcatech.Units
 
         public bool CanTransition(StateMachineContext ctx)
         {
+            if (!IsEnabled) return false;
             if (Conditions == null || Conditions.Length == 0) return true;
             foreach (var c in Conditions)
                 if (c != null && !c.CanTransition(ctx))

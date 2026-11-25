@@ -1,4 +1,3 @@
-﻿using System.Collections.Generic;
 using Arcatech.Items;
 using KBCore.Refs;
 using UnityEngine;
@@ -16,9 +15,7 @@ namespace Arcatech.Units.Control
         [SerializeField, Self] private EntityInventoryDrawerComponent drawer;
         [SerializeField] private StanceSlotMap slotMap;
 
-        private AnimatorOverrideController _aoc;
-        private readonly List<KeyValuePair<AnimationClip, AnimationClip>> _overrides = new();
-        private readonly Dictionary<AnimationClip, int> _indexByClip = new();
+        private AnimatorClipOverrides _overrides;
         private WeaponStanceSO _current;
         private bool _initialized;
 
@@ -59,35 +56,8 @@ namespace Arcatech.Units.Control
                 return;
             }
 
-            RuntimeAnimatorController source = animator.runtimeAnimatorController;
-            if (source == null)
-            {
-                Debug.LogWarning($"[{name}] у аниматора нет контроллера.", this);
-                return;
-            }
-
-            // Override-контроллер нельзя вкладывать в другой override-контроллер.
-            if (source is AnimatorOverrideController existing) source = existing.runtimeAnimatorController;
-
-            // Свой экземпляр на каждого юнита: общий ассет не трогаем.
-            _aoc = new AnimatorOverrideController(source) { name = source.name + " (stances)" };
-            animator.runtimeAnimatorController = _aoc;
-
-            _aoc.GetOverrides(_overrides);
-            for (int i = 0; i < _overrides.Count; i++)
-                _indexByClip[_overrides[i].Key] = i;
-
-            foreach (var entry in slotMap.Entries)
-            {
-                if (entry.baseClip != null && !_indexByClip.ContainsKey(entry.baseClip))
-                {
-                    Debug.LogWarning(
-                        $"[{name}] слот {entry.slot}: клипа '{entry.baseClip.name}' нет в контроллере '{source.name}'. " +
-                        "Проверьте StanceSlotMap.", this);
-                }
-            }
-
-            _initialized = true;
+            _overrides = AnimatorClipOverrides.For(animator);
+            _initialized = _overrides != null;
         }
 
         /// <summary>
@@ -99,23 +69,13 @@ namespace Arcatech.Units.Control
             if (!_initialized || stance == _current) return;
             _current = stance;
 
-            // Сбрасываем всё к оригиналам, затем применяем слоты стойки.
-            for (int i = 0; i < _overrides.Count; i++)
-                _overrides[i] = new KeyValuePair<AnimationClip, AnimationClip>(_overrides[i].Key, null);
-
-            if (stance != null)
+            foreach (var entry in slotMap.Entries)
             {
-                foreach (var entry in slotMap.Entries)
-                {
-                    if (entry.baseClip == null) continue;
-                    if (!stance.TryGetClip(entry.slot, out AnimationClip replacement)) continue;
-                    if (!_indexByClip.TryGetValue(entry.baseClip, out int index)) continue;
-
-                    _overrides[index] = new KeyValuePair<AnimationClip, AnimationClip>(entry.baseClip, replacement);
-                }
+                AnimationClip replacement = null;
+                if (stance != null) stance.TryGetClip(entry.slot, out replacement);
+                _overrides.SetClip(entry.baseClip, replacement);
             }
-
-            _aoc.ApplyOverrides(_overrides);   // одним пакетом
+            _overrides.Apply();
         }
     }
 }

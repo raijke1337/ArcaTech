@@ -1,6 +1,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Arcatech.Managers;
 using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -17,7 +18,8 @@ namespace Arcatech.Interactions
 
         [Header("Outline Settings")]
     [SerializeField] private Material outlineMaterial;
-    [SerializeField] private Color outlineColor = Color.cyan;
+
+        private Color outlineColor;
     [Range(0.001f, 0.1f)] [SerializeField] private float outlineWidth = 0.02f;
     [SerializeField] private bool useGlow = true;
     [Range(0f, 5f)] [SerializeField] private float glowIntensity = 2f;
@@ -48,6 +50,7 @@ namespace Arcatech.Interactions
     
     void Start()
     {
+        outlineColor = GameInterfaceManager.Instance.ColorReference.ArcaCyan;
         SetupOutlineSystem();
     }
     

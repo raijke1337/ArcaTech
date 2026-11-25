@@ -13,6 +13,8 @@ namespace Arcatech.Interactions
         void UnregisterInteractive(InteractableComponent interactive);
         BaseGameEntityComponent Entity { get; }
         InteractionState State { get; }
+        InteractionState? AnimationState { get; }
         void ResetToIdle();
+        public bool HasValidTarget { get; }
     }
 }

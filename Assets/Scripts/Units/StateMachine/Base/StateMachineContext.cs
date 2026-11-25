@@ -16,6 +16,7 @@ namespace Arcatech.Units
 
         public Transform Spawn;
         public UnitState CurrentState;
+        public UnitState DefaultState { get; internal set; }
         public BaseGameEntityComponent Owner;
 
         [CanBeNull] public EntityStatsComponent Stats;

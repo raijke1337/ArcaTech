@@ -4,23 +4,15 @@ using Arcatech.Interactions;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(InteractionStatesInjectorComponent))]
+[RequireComponent(typeof(InteractionAnimationsSwitcherComponent))]
 public class CompleteAnimationStateExecutor : InteractionExecutor
 {
-    private InteractionStatesInjectorComponent comp;
+    private InteractionAnimationsSwitcherComponent comp;
     private UnityAction<InteractionState> action;
-    [SerializeField, ReadOnlyText] private string waitForCompletionStateName;
-
-    private void OnValidate()
-    {
-        GetComponent<InteractionStatesInjectorComponent>()
-            .TryGetTransitionByInteractionState(InteractionState.InProgress, out var transition);
-        waitForCompletionStateName = transition.nextState.animatorStateName;
-    }
 
     private void Awake()
     {
-        comp = GetComponent<InteractionStatesInjectorComponent>();
+        comp = GetComponent<InteractionAnimationsSwitcherComponent>();
     }
 
     
@@ -44,6 +36,12 @@ public class CompleteAnimationStateExecutor : InteractionExecutor
 
     public override void Execute(InteractionContext ctx, UnityAction<InteractionState> onComplete)
     {
+        if (comp.isActiveAndEnabled && comp.Profile != null && comp.Profile.SkipsAnimation(InteractionState.InProgress))
+        {
+            action = null;
+            onComplete?.Invoke(InteractionState.Success);
+            return;
+        }
         action = onComplete;
     }
 

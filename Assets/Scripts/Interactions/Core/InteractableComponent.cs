@@ -25,6 +25,10 @@ namespace Arcatech.Interactions
         [SerializeField] private List<InteractionCondition> conditions;
         [SerializeField] private List<InteractionEffect> preExecuteEffects;
         [SerializeField] private InteractionExecutor executor;
+        internal InteractionAnimationsSwitcherComponent AnimationSwitcher =>
+            executor != null && executor.TryGetComponent(out InteractionAnimationsSwitcherComponent switcher)
+                ? switcher
+                : GetComponent<InteractionAnimationsSwitcherComponent>();
         [SerializeField] private List<InteractionEffect> duringExecuteEffects;
 
         [Header("Post Effects")] [SerializeField]
@@ -52,6 +56,8 @@ namespace Arcatech.Interactions
         public bool IsAvailable => !_isExecuting && _listening && executor != null;
 
         [SerializeField] private bool affectsInteractorState = true;
+
+        internal event Action<InteractableComponent> Disabled;
         
         private void OnDisable()
         {
@@ -59,6 +65,7 @@ namespace Arcatech.Interactions
                 CancelInteraction();
             else
                 RestoreInteractorCollision();
+            Disabled?.Invoke(this);
         }
 
         private void Start()
@@ -77,6 +84,8 @@ namespace Arcatech.Interactions
             StopAllCoroutines();
             _isExecuting = true;
 
+            if (affectsInteractorState && ctx.Interactor is InteractionComponent interactor)
+                interactor.BeginInteraction(this);
             StartCoroutine(RunPipeline(ctx));
         }
 

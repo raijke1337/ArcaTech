@@ -92,6 +92,7 @@ namespace Arcatech.Units
             };
 
             _defaultState = defaultState.Build();
+            context.DefaultState = _defaultState;
             _currentState = _defaultState;
             context.CurrentState = _currentState;
             context.Owner = gameEntity;
@@ -394,6 +395,8 @@ namespace Arcatech.Units
             {
                 context.ClearCommand();
             }
+            // Use должен успеть запустить предмет, пока Starting ещё является текущим состоянием.
+            if (_currentState.SkipAnimation) TryFallbackToDefault();
         }
         void ProduceTransitionResults(StateTransition tr)
         {

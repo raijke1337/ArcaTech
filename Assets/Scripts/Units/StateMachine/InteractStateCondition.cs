@@ -8,6 +8,8 @@ namespace Arcatech.Units
     public class InteractStateCondition : SerializedStateTransitionCondition
     {
         public InteractionState requiredState = InteractionState.InProgress;
+        [Header("Need to be in range of a valid interaction target.")]
+        public bool requireValidInteractionTarget = true;
         [Header ("'OR' condition, overwrites the one above")]
         public InteractionState[] requiredStates = Array.Empty<InteractionState>();
         public override bool CanTransition(StateMachineContext ctx)
@@ -23,6 +25,7 @@ namespace Arcatech.Units
                 return false;
             }
 
+            if (requireValidInteractionTarget && !ctx.Interactor.HasValidTarget) return false;
             return current == requiredState;
         }
     }

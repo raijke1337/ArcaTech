@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using Arcatech.Managers;
 using Arcatech.Rendering;
 using Arcatech.Usables.Effects;
+using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace Arcatech.Stats
 {
-    [DisallowMultipleComponent]
-    public class DamageFeedbackComponent : MonoBehaviour, IStatReceiver
+    [DisallowMultipleComponent][RequireComponent(typeof(BaseGameEntityComponent))]
+    public class DamageFeedbackComponent : ValidatedMonoBehaviour, IStatReceiver, IDamageDrawer
     {
-        private const float HitstopDuration = 0.3f;
+        [SerializeField, Self] private BaseGameEntityComponent entity;
+        [SerializeField ]private float HitstopDuration = 0.3f;
 
         [Header("Hitstop")]
         [SerializeField] private bool playHitstop = true;
@@ -22,7 +24,11 @@ namespace Arcatech.Stats
         private Material damageFlashMaterial;
         [SerializeField, Tooltip("Leave empty to use the mesh and skinned mesh renderers on this object and its children.")]
         private Renderer[] flashRenderers;
-
+[Header("Floating numbers")]
+        [SerializeField] bool drawDamageNumbers = true;
+        [SerializeField] private bool drawHealingNumbers = true;
+        
+        
         private readonly Dictionary<Renderer, Material[]> _originalMaterials = new();
         private readonly Dictionary<Material, Material> _flashMaterials = new();
         private readonly List<Material> _materialSlots = new();
@@ -171,6 +177,27 @@ namespace Arcatech.Stats
             _flashMaterials.Clear();
             _activeFlashMaterial = null;
             _flashRoutine = null;
+        }
+        
+        public void DrawResourceChange(float amount, bool isDamage, float? durationOverride, 
+            ResourceStatType type)
+        {
+            if (entity == null || entity.EffectSpawn == null || type != ResourceStatType.Health ) return;
+
+            if (drawDamageNumbers != isDamage) return; 
+            
+            if (GameInterfaceManager.Instance == null)
+            {
+                Debug.LogWarning("DamageDrawerComponent: GameInterfaceManager.Instance not available.");
+                return;
+            }
+
+            GameInterfaceManager.Instance.ShowFloatingNumber(
+                amount,
+                entity.EffectSpawn.position,
+                isDamage,
+                durationOverride
+            );
         }
     }
 }

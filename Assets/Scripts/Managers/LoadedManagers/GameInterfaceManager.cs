@@ -524,7 +524,7 @@ namespace Arcatech.Managers
         public void ShowFloatingNumber(float amount, Vector3 worldPosition, bool isDamage,
             float? durationOverride = null)
         {
-            if (amount <= 0f) return;
+           // if (amount <= 0f) return;
 
             EnsureFloatingTextSetup();
             if (uiCanvas == null || floatingTextsParent == null || damageTextPrefab == null) return;
@@ -569,9 +569,5 @@ namespace Arcatech.Managers
 
         #endregion
 
-        public Sprite GetButtonImage(MiniGameButton buttonToPress)
-        {
-            throw new NotImplementedException();
-        }
     }
-}
+}

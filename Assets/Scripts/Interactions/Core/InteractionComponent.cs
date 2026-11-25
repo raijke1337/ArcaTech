@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Arcatech.Items;
 using Arcatech.Units;
 using Arcatech.Units.Control;
+using AYellowpaper.SerializedCollections;
 using KBCore.Refs;
 using UnityEngine;
-
-
 
 namespace Arcatech.Interactions
 {
@@ -24,27 +22,115 @@ namespace Arcatech.Interactions
         public event Action<InteractionState> StateChanged;
 
         //--- State Machine bridge ---
-       [SerializeField] private SerializedStateTransition dummyActivate;
-       private StateTransition _activate;
+        [SerializeField] private SerializedDictionary<InteractionState, SerializedStateTransition> animatedStates;
+        [SerializeField, Tooltip("Исходные Motion-клипы generic-состояний в базовом Animator Controller.")]
+        private SerializedDictionary<InteractionState, AnimationClip> baseClips = new();
+
+        private readonly Dictionary<InteractionState, StateTransition> stateTransitions = new();
+        private Animator animator;
+        private InteractionAnimationProfileSO activeProfile;
+        private InteractionAnimationProfileSO appliedProfile;
+        private InteractionAnimationsSwitcherComponent enteredSwitcher;
+        private InteractionState? enteredState;
+        public InteractionState? AnimationState => enteredState;
 
         public void Attach(IStateAugmentorReceiver machine)
         {
-            if (!dummyActivate) return;
-            _activate ??= dummyActivate.Build();
-            if (_activate != null) machine.AddTransition(_activate);
+            animator = machine.Context.Animator;
+            if (animatedStates == null)
+            {
+                Debug.LogError($"Interaction component not set up! {name}");
+                return;
+            }
+            foreach (var pair in animatedStates)
+            {
+                if (pair.Value == null || pair.Value.nextState == null) continue;
+                if (!stateTransitions.TryGetValue(pair.Key, out var transition))
+                {
+                    transition = pair.Value.Build();
+                    stateTransitions.Add(pair.Key, transition);
+                }
+                machine.AddTransition(transition);
+            }
+            RefreshAnimationProfile();
         }
         
         public void Detach(IStateAugmentorReceiver machine)
         {
-            if (_activate != null) machine.RemoveTransition(_activate);
+            foreach (var pair in stateTransitions)
+            {
+                machine.RemoveTransition(pair.Value);
+            }
+            ApplyProfile(null);
+            animator = null;
+            enteredSwitcher = null;
+            enteredState = null;
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)
         {
+            foreach (var pair in stateTransitions)
+            {
+                if (pair.Value.NextState != state) continue;
+                var target = _active ?? _target;
+                enteredSwitcher = target != null ? target.AnimationSwitcher : null;
+                enteredState = pair.Key;
+                // Длительное действие (например, мини-игра) может оставаться в этой
+                // фазе после мгновенного выхода из её анимационного состояния.
+                if (state.SkipAnimation) pair.Value.IsEnabled = false;
+                break;
+            }
         }
 
         public void OnStateExited(UnitState state, StateMachineContext context)
         {
+            if (!enteredState.HasValue) return;
+            var exited = enteredState.Value;
+            var switcher = enteredSwitcher;
+            enteredSwitcher = null;
+            enteredState = null;
+            if (switcher != null) switcher.StateAnimationExited?.Invoke(exited);
+            RefreshAnimationProfile();
+        }
+
+        internal void BeginInteraction(InteractableComponent target)
+        {
+            if (_active == target) return;
+            _active = target;
+            activeProfile = ProfileOf(target);
+            RefreshAnimationProfile();
+        }
+
+        private static InteractionAnimationProfileSO ProfileOf(InteractableComponent target)
+        {
+            var switcher = target != null ? target.AnimationSwitcher : null;
+            return switcher != null && switcher.isActiveAndEnabled ? switcher.Profile : null;
+        }
+
+        private void RefreshAnimationProfile()
+        {
+            // Терминальный клип может играть дольше, чем логический статус Success/Failure/Cancelled.
+            if (enteredState is not (InteractionState.Success or InteractionState.Failure or InteractionState.Cancelled))
+                ApplyProfile(_active is null ? ProfileOf(_target) : activeProfile);
+        }
+
+        private void ApplyProfile(InteractionAnimationProfileSO profile)
+        {
+            if (stateTransitions.Count == 0 || appliedProfile == profile) return;
+            appliedProfile = profile;
+            foreach (var pair in stateTransitions)
+            {
+                bool skip = profile != null && profile.SkipsAnimation(pair.Key);
+                pair.Value.NextState.SkipAnimation = skip;
+                // Пустая поза рядом с предметом вообще не требует выхода из обычного Idle.
+                pair.Value.IsEnabled = !skip || pair.Key != InteractionState.Idle;
+            }
+            if (baseClips.Count == 0) return;
+            var clipOverrides = AnimatorClipOverrides.For(animator);
+            if (clipOverrides == null) return;
+            foreach (var pair in baseClips)
+                clipOverrides.SetClip(pair.Value, profile != null ? profile.GetClip(pair.Key) : null);
+            clipOverrides.Apply();
         }
 
         // --- State core ---
@@ -56,6 +142,8 @@ namespace Arcatech.Interactions
             private set
             {
                 if (_state == value) return;
+                if (_state != InteractionState.Idle && stateTransitions.TryGetValue(_state, out var previous))
+                    previous.IsEnabled = true;
                 _state = value;
                 if (entity.ShowingDebugs) Debug.Log($"[{entity.GetName}] Interaction State = {value}");
                 StateChanged?.Invoke(value);
@@ -89,8 +177,7 @@ namespace Arcatech.Interactions
             }
             else
             {
-                _active = null; // ← и здесь тоже
-                State = InteractionState.Idle;
+                FinishInteraction();
             }
         }
 
@@ -103,9 +190,16 @@ namespace Arcatech.Interactions
                 InteractionState.Failure or 
                 InteractionState.Cancelled)
             {
-                _active = null;  // ← очищаем завершённое взаимодействие
-                State = InteractionState.Idle;
+                FinishInteraction();
             }
+        }
+
+        private void FinishInteraction()
+        {
+            _active = null;
+            activeProfile = null;
+            RefreshTarget();
+            State = InteractionState.Idle;
         }
 
         // --- Commands ---
@@ -113,7 +207,7 @@ namespace Arcatech.Interactions
         {
             info = "Interaction";
             if (command.Type == UnitActionType.Use)
-                return State == InteractionState.Idle;
+                return State == InteractionState.Idle && _target != null && _target.IsAvailable;
             return true;
         }
 
@@ -126,6 +220,14 @@ namespace Arcatech.Interactions
         public void DoUnitCommand(UnitCommand command, bool wasSuccessful)
         {
             if (command.Type != UnitActionType.Use || !wasSuccessful) return;
+
+            // Машина может принять более приоритетный переход (например, получение урона)
+            // в кадре команды Use. В этом случае предмет запускать ещё рано.
+            if (stateTransitions.ContainsKey(InteractionState.Starting) && enteredState != InteractionState.Starting)
+            {
+                if (State == InteractionState.Starting && _active == null) State = InteractionState.Idle;
+                return;
+            }
 
             // Ветка 1: отмена текущего активного взаимодействия
             if (_active != null && _active == _target)
@@ -143,7 +245,7 @@ namespace Arcatech.Interactions
                     Interactor = this,
                     State = InteractionState.Starting,
                 };
-                _active = _target;
+                BeginInteraction(_target);
                 _target.StartInteraction(ctx);
                 return;
             }
@@ -158,48 +260,41 @@ namespace Arcatech.Interactions
         // --- Trigger zone logic ---
         public void RegisterInteractive(InteractableComponent interactable)
         {
-            if (interactable == null) return;
-            if (!_inRange.Contains(interactable))
-                _inRange.Add(interactable);
+            if (interactable == null || !interactable.isActiveAndEnabled || _inRange.Contains(interactable)) return;
+            _inRange.Add(interactable);
+            interactable.Disabled += UnregisterInteractive;
             RefreshTarget();
         }
 
         public void UnregisterInteractive(InteractableComponent interactable)
         {
             if (interactable == null) return;
-            _inRange.Remove(interactable);
+            if (_inRange.Remove(interactable))
+                interactable.Disabled -= UnregisterInteractive;
 
-            if (_target == interactable)
-            {
-                _target = null;
-                if (_active == interactable)
-                {
-                    // Отменяем только если объект ещё выполняет взаимодействие.
-                    // Если он уже финишировал (IsAvailable == true), просто отпускаем ссылку.
-                    if (interactable != null && !interactable.IsAvailable)
-                    {
-                        interactable.CancelInteraction();
-                    }
-                    _active = null;
-                }
-            }
-
+            if (_active == interactable && !interactable.IsAvailable)
+                interactable.CancelInteraction();
             RefreshTarget();
         }
 
         private void RefreshTarget()
         {
-            _inRange.RemoveAll(x => x == null || !x.gameObject.activeInHierarchy);
-            if (_inRange.Count == 0)
-            {
-                _target = null;
-                return;
-            }
-
-            // Можно добавить сортировку по дистанции/углу
-            _target = _inRange[0];
+            _inRange.RemoveAll(x => x == null);
+            _target = _inRange.Count > 0 ? _inRange[0] : null;
+            RefreshAnimationProfile();
         }
 
         public BaseGameEntityComponent Entity => entity;
+
+        private void OnDestroy()
+        {
+            foreach (var target in _inRange)
+                if (target != null) target.Disabled -= UnregisterInteractive;
+        }
+
+        /// <summary>
+        /// for idle interact state transition. Like "thinking" near a console.
+        /// </summary>
+        public bool HasValidTarget => (_target != null && _target.isActiveAndEnabled) || _active is not null;
     }
 }

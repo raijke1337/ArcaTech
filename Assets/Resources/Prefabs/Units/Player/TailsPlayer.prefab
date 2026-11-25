@@ -273,7 +273,6 @@ GameObject:
   - component: {fileID: 8074146902712792649}
   - component: {fileID: 8341150968193856820}
   - component: {fileID: 2594953831469317237}
-  - component: {fileID: 3116274449414851423}
   - component: {fileID: 6627545496501446189}
   - component: {fileID: 4056496551489463538}
   - component: {fileID: 1089328251400730155}
@@ -295,6 +294,7 @@ GameObject:
   - component: {fileID: 3107538716206129910}
   - component: {fileID: 7583641227977036609}
   - component: {fileID: 2274108327599100839}
+  - component: {fileID: 6692396335245690018}
   m_Layer: 6
   m_Name: TailsPlayer
   m_TagString: Player
@@ -638,21 +638,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Interactions.InteractionComponent
   entity: {fileID: 3413998453285093005}
-  dummyActivate: {fileID: 11400000, guid: 23ad2f0d77f5707439abc451134d0db6, type: 2}
+  animatedStates:
+    _serializedList:
+    - Key: 0
+      Value: {fileID: 11400000, guid: 0489c9b999cb1b94093f0bfccc05e49b, type: 2}
+    - Key: 1
+      Value: {fileID: 11400000, guid: e0d2eb96c9294f5448fcc3fc5b27a4fb, type: 2}
+    - Key: 2
+      Value: {fileID: 11400000, guid: bd57fe969073c464a9d77f5b87ff21b6, type: 2}
+    - Key: 3
+      Value: {fileID: 11400000, guid: b2d1ca2e42f24814e870de4b9e0ad3e2, type: 2}
+    - Key: 4
+      Value: {fileID: 11400000, guid: eeec97e131ffc28458407530986c3588, type: 2}
+    - Key: 5
+      Value: {fileID: 11400000, guid: 6a571aa25c5d1394fb96b24f311bd74c, type: 2}
+  baseClips:
+    _serializedList:
+    - Key: 0
+      Value: {fileID: 8993902097722301239, guid: bdc6359629907994888f2993a154e501, type: 3}
+    - Key: 1
+      Value: {fileID: 8993902097722301239, guid: 8f663e671bdb1524cb99c089811f4ace, type: 3}
+    - Key: 2
+      Value: {fileID: 8993902097722301239, guid: f078abc0ac960394587f71a2f53039c3, type: 3}
+    - Key: 3
+      Value: {fileID: 8993902097722301239, guid: dcb84950f43b31741bc729781c253273, type: 3}
+    - Key: 4
+      Value: {fileID: 7400000, guid: 90aea7fa61ac90d48a24221bd57a4460, type: 3}
+    - Key: 5
+      Value: {fileID: 7400000, guid: a5ac979c4bb4da046955cf527da03b7b, type: 3}
   _state: 0
---- !u!114 &3116274449414851423
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6934539185133570580}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6a9024c18004c448809c70c6a6ed80e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.DamageDrawerComponent
-  entity: {fileID: 3413998453285093005}
 --- !u!114 &6627545496501446189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1010,6 +1024,26 @@ MonoBehaviour:
     SlotsUpdateInterval: 0.15
   owner: {fileID: 3413998453285093005}
   drawGizmos: 1
+--- !u!114 &6692396335245690018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934539185133570580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86bfabcd908b4f72a920b64c1c949f70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Arcatech.Stats.DamageFeedbackComponent
+  entity: {fileID: 3413998453285093005}
+  HitstopDuration: 0.3
+  playHitstop: 0
+  playDamageFlash: 1
+  damageFlashMaterial: {fileID: 2100000, guid: 2a8074d468d04d438bb93fb9bc87e518, type: 2}
+  flashRenderers: []
+  drawDamageNumbers: 0
+  drawHealingNumbers: 0
 --- !u!1 &8185351829652871479
 GameObject:
   m_ObjectHideFlags: 0
@@ -2038,7 +2072,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4795474619174377237}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ddcfb6939ea49c58497211f681b9cc1, type: 3}
   m_Name: 

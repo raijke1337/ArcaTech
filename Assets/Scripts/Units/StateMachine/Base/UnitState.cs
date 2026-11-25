@@ -10,6 +10,7 @@ namespace Arcatech.Units
     {
         public override string ToString() => StateName;
         public string StateName { get; }
+        internal bool SkipAnimation { get; set; }
         private readonly StopwatchTimer _stateTimer;
         public bool AllowsAiming { get; }
         public bool AllowsMovement { get; }
@@ -122,7 +123,7 @@ namespace Arcatech.Units
             foreach (var invulnerable in context.Invulnerables)
                 invulnerable.Invulnerable = Invulnerable;
 
-            if (animator != null && _animatorHash != 0)
+            if (!SkipAnimation && animator != null && _animatorHash != 0)
             {
                 if (!animator.HasState(_animatorLayer, _animatorHash))
                 {
@@ -147,6 +148,8 @@ namespace Arcatech.Units
                     context.Spawn.position,
                     context.Spawn.rotation);
             }
+            // У мгновенного состояния может не быть ни одного Update до выхода.
+            if (SkipAnimation) UpdateState(context, animator, 0f);
         }
 
         public void UpdateState(StateMachineContext context, Animator animator,float delta)
@@ -198,6 +201,7 @@ namespace Arcatech.Units
         /// </summary>
         public bool HasCompleted(StateMachineContext context)
         {
+            if (SkipAnimation) return true;
             if (_animatorHash == 0) return false;
             if (context.Animator == null) return false;
 
@@ -256,6 +260,11 @@ namespace Arcatech.Units
         
         private bool TryGetAnimatorProgress(Animator animator, out float normalized)
         {
+            if (SkipAnimation)
+            {
+                normalized = 1f;
+                return true;
+            }
             normalized = 0f;
             if (animator == null) return false;
 
