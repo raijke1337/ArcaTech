@@ -1,0 +1,143 @@
+<figure id="storage-plan" aria-labelledby="storage-plan-title">
+  <style>
+    #storage-plan {
+      margin: 0;
+      container-type: inline-size;
+      --edge: color-mix(in srgb, var(--foreground) 52%, var(--background));
+      --floor: color-mix(in srgb, var(--foreground) 9%, var(--background));
+      --grid: color-mix(in srgb, var(--foreground) 15%, var(--background));
+      --route: var(--viz-series-1, var(--blue));
+      --return: var(--viz-series-2, var(--green));
+      --hazard: var(--viz-series-3, var(--orange));
+      --secret: var(--viz-series-4, var(--purple));
+    }
+    #storage-plan header, #storage-plan figcaption {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: calc(var(--font-size-base) * .5) var(--font-size-base);
+    }
+    #storage-plan svg { display: block; width: 100%; height: auto; }
+    #storage-plan svg text {
+      fill: var(--foreground);
+      font-size: 17px;
+      font-weight: 500;
+      paint-order: stroke;
+      stroke: var(--background);
+      stroke-width: 3px;
+      stroke-linejoin: round;
+    }
+    #storage-plan svg .secondary { fill: var(--muted-foreground); font-weight: 400; }
+    #storage-plan figcaption { padding-top: calc(var(--font-size-base) * .5); }
+    #storage-plan .legend-item { display: inline-flex; align-items: center; gap: .45em; }
+    #storage-plan .swatch { display: inline-block; width: 1.3em; height: 0; border-top: 2px solid; }
+    #storage-plan .swatch.route { color: var(--route); }
+    #storage-plan .swatch.return { color: var(--return); }
+    #storage-plan .swatch.fire { color: var(--hazard); border-top-width: 5px; }
+    #storage-plan .swatch.reset { color: var(--hazard); border-top-style: dashed; }
+    #storage-plan .swatch.secret { color: var(--secret); border-top-style: dotted; }
+    @container (max-width: 520px) {
+      #storage-plan svg text { font-size: 23px; }
+    }
+    @container (max-width: 380px) {
+      #storage-plan svg text { font-size: 25px; }
+    }
+  </style>
+  <header>
+    <h2 id="storage-plan-title">Склад деталей</h2>
+    <span class="text-small text-muted">Вариант расстановки · вид сверху</span>
+  </header>
+  <svg viewBox="0 0 700 464" role="img" aria-labelledby="storage-map-title storage-map-desc">
+    <title id="storage-map-title">План склада с маршрутом через контейнеры</title>
+    <desc id="storage-map-desc">Из хаба Флуфа входит на сухую площадку и подбирает батарею Т0 до зоны огня. От края площадки можно бросить ключ в турель. Два прыжка через электризованную воду ведут через контейнер с укрытием на дальний балкон к предохранителю. После подбора срабатывает чекпоинт. В хаб можно вернуться по непрерывному балкону вдоль стен. Падение в воду возвращает на сухую площадку у входа. После подачи питания дверь в стартовый зал выбрасывает ящик деталей и открывает короткий путь.</desc>
+    <defs>
+      <pattern id="storage-water" width="29" height="25" patternUnits="userSpaceOnUse">
+        <path d="M2 13q3-3 6 0t6 0t6 0" fill="none" stroke="var(--hazard)" stroke-opacity=".3" stroke-width="1.2"/>
+      </pattern>
+      <pattern id="storage-deck" width="12" height="12" patternUnits="userSpaceOnUse">
+        <path d="M12 0H0V12" fill="none" stroke="var(--grid)" stroke-width="1"/>
+      </pattern>
+      <path id="storage-lanes" d="M104 246H231V340H104Z M268 236H364V293H268Z M425 236H547V109H603V350H547V270H425Z M104 350H603V382H104Z M104 340H145V350H104Z"/>
+      <marker id="storage-main-tip" markerWidth="10" markerHeight="12" markerUnits="userSpaceOnUse" refX="8" refY="6" orient="auto">
+        <path d="m1 1 7 5-7 5" fill="none" stroke="var(--route)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <marker id="storage-return-tip" markerWidth="10" markerHeight="12" markerUnits="userSpaceOnUse" refX="8" refY="6" orient="auto">
+        <path d="m1 1 7 5-7 5" fill="none" stroke="var(--return)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <marker id="storage-reset-tip" markerWidth="10" markerHeight="12" markerUnits="userSpaceOnUse" refX="8" refY="6" orient="auto">
+        <path d="m1 1 7 5-7 5" fill="none" stroke="var(--hazard)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <marker id="storage-secret-tip" markerWidth="10" markerHeight="12" markerUnits="userSpaceOnUse" refX="8" refY="6" orient="auto">
+        <path d="m1 1 7 5-7 5" fill="none" stroke="var(--secret)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <rect x="104" y="94" width="514" height="288" fill="color-mix(in srgb, var(--hazard) 6%, var(--background))"/>
+    <rect x="104" y="94" width="514" height="288" fill="url(#storage-water)"/>
+    <use href="#storage-lanes" fill="var(--floor)" stroke="var(--edge)" stroke-width="1.5"/>
+    <use href="#storage-lanes" fill="url(#storage-deck)"/>
+    <path d="M104 277V94H618V291M618 324V382H104V338" fill="none" stroke="var(--edge)" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M104 270V277M104 338V345M618 283V291M618 324V332" fill="none" stroke="var(--foreground)" stroke-width="3" stroke-linecap="round"/>
+
+    <path d="M442 144 224 256Q290 296 432 292Z" fill="var(--hazard)" opacity=".14"/>
+    <path d="M442 144 224 256M442 144 432 292" fill="none" stroke="var(--hazard)" stroke-opacity=".55" stroke-width="1.5"/>
+    <rect x="290" y="236" width="56" height="17" rx="2" fill="var(--background)" stroke="var(--edge)" stroke-width="2"/>
+    <path d="M300 241V248M309 241V248M318 241V248M327 241V248M336 241V248" stroke="var(--edge)" stroke-width="1.3"/>
+    <rect x="410" y="104" width="62" height="46" rx="2" fill="var(--floor)" stroke="var(--edge)" stroke-width="1.5"/>
+    <circle cx="442" cy="129" r="11" fill="var(--background)" stroke="var(--hazard)" stroke-width="2"/>
+    <path d="m440 129-13 9m8-10-9 6" fill="none" stroke="var(--hazard)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M218 249Q300 168 424 134" fill="none" stroke="var(--muted-foreground)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>
+    <circle cx="218" cy="249" r="4" fill="var(--background)" stroke="var(--muted-foreground)" stroke-width="1.5"/>
+
+    <path d="M47 300H158Q176 300 176 282V264H279M278 264H439M438 264H530Q565 264 565 225V152"
+      fill="none" stroke="var(--route)" stroke-width="3" stroke-linecap="round" marker-end="url(#storage-main-tip)"/>
+    <path d="M231 264H266M366 264H423"
+      fill="none" stroke="var(--background)" stroke-width="4.5"/>
+    <path d="M231 264H266M366 264H423"
+      fill="none" stroke="var(--route)" stroke-width="3" stroke-dasharray="5 4"/>
+    <path d="M586 177V363H137Q120 363 120 346V323H44"
+      fill="none" stroke="var(--return)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#storage-return-tip)"/>
+    <path d="m581 260 5 7 5-7m-201 98-7 5 7 5m-142-10-7 5 7 5"
+      fill="none" stroke="var(--return)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M268 303C253 329 201 328 147 314" fill="none" stroke="var(--hazard)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#storage-reset-tip)"/>
+    <circle cx="139" cy="313" r="5.5" fill="var(--background)" stroke="var(--hazard)" stroke-width="2"/>
+    <path d="M587 308H673" fill="none" stroke="var(--secret)" stroke-width="2.5" stroke-dasharray="2 5" stroke-linecap="round" marker-end="url(#storage-secret-tip)"/>
+    <path d="M618 292V324" stroke="var(--secret)" stroke-width="3" stroke-dasharray="5 4"/>
+
+    <g fill="var(--background)" stroke="var(--route)" stroke-width="2" stroke-linejoin="round">
+      <path d="M171 253H181V269H171Z M174 250H178V253"/>
+      <path d="M555 123H576V139H555Z M559 127V135M565 127V135M571 127V135"/>
+    </g>
+    <g fill="var(--background)" stroke="var(--return)" stroke-width="2">
+      <path d="m586 172 7-7-7-7-7 7Z"/><circle cx="586" cy="165" r="1.4" fill="var(--return)" stroke="none"/>
+    </g>
+    <g fill="var(--background)" stroke="var(--secret)" stroke-width="2" stroke-linejoin="round">
+      <rect x="627" y="286" width="18" height="15" rx="1.5"/>
+      <path d="M627 291H645M633 286V301M640 286V301" fill="none" stroke-width="1"/>
+    </g>
+
+    <g fill="none" stroke="var(--edge)" stroke-width="1.1">
+      <path d="M218 66V108M411 66 436 101M567 67V117M172 226V244M318 226V232M580 171 560 187H532M559 395 619 317"/>
+    </g>
+    <g>
+      <text x="218" y="55" text-anchor="middle">Электризованная вода</text>
+      <text x="411" y="55" text-anchor="middle">Турель</text>
+      <text x="575" y="55" text-anchor="middle">Предохранитель</text>
+      <text x="175" y="216" text-anchor="middle">Батарея Т0</text>
+      <text x="318" y="216" text-anchor="middle">Укрытие</text>
+      <text x="265" y="153" text-anchor="middle" class="secondary">Бросок ключа</text>
+      <text x="532" y="208" text-anchor="end" class="secondary">Чекпоинт</text>
+      <text x="47" y="284" text-anchor="middle">Хаб</text>
+      <text x="636" y="270" text-anchor="middle" class="secondary">Детали</text>
+      <text x="544" y="414" text-anchor="middle">Дверь в стартовый зал</text>
+      <text x="544" y="448" text-anchor="middle" class="secondary">После подачи питания</text>
+    </g>
+  </svg>
+  <figcaption class="text-small">
+    <span class="legend-item"><span class="swatch route" aria-hidden="true"></span>Путь к предохранителю</span>
+    <span class="legend-item"><span class="swatch return" aria-hidden="true"></span>Обратный балкон</span>
+    <span class="legend-item"><span class="swatch fire" aria-hidden="true"></span>Обстрел</span>
+    <span class="legend-item"><span class="swatch reset" aria-hidden="true"></span>Возврат при падении</span>
+    <span class="legend-item"><span class="swatch secret" aria-hidden="true"></span>Секретный выход</span>
+  </figcaption>
+</figure>

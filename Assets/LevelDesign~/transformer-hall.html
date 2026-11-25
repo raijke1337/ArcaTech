@@ -1,0 +1,158 @@
+<figure id="transformer-plan" aria-labelledby="transformer-plan-title">
+  <style>
+    #transformer-plan {
+      margin: 0;
+      container-type: inline-size;
+      --edge: color-mix(in srgb, var(--foreground) 52%, var(--background));
+      --floor: color-mix(in srgb, var(--foreground) 6%, var(--background));
+      --grid: color-mix(in srgb, var(--foreground) 12%, var(--background));
+      --pad: color-mix(in srgb, var(--foreground) 10%, var(--background));
+      --metal: color-mix(in srgb, var(--foreground) 16%, var(--background));
+      --route: var(--viz-series-1, var(--blue));
+      --upper: var(--viz-series-2, var(--green));
+      --arc: var(--viz-series-3, var(--orange));
+      --secret: var(--viz-series-4, var(--purple));
+    }
+    #transformer-plan header, #transformer-plan figcaption {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: calc(var(--font-size-base) * .5) var(--font-size-base);
+    }
+    #transformer-plan svg { display: block; width: 100%; height: auto; }
+    #transformer-plan svg text {
+      fill: var(--foreground);
+      font-size: 17px;
+      font-weight: 500;
+      paint-order: stroke;
+      stroke: var(--background);
+      stroke-width: 3px;
+      stroke-linejoin: round;
+    }
+    #transformer-plan svg text.secondary { fill: var(--muted-foreground); font-weight: 400; }
+    #transformer-plan figcaption { padding-top: calc(var(--font-size-base) * .5); }
+    #transformer-plan .legend-item { display: inline-flex; align-items: center; gap: .45em; }
+    #transformer-plan .swatch { display: inline-block; width: 1.3em; height: 0; border-top: 2px solid; }
+    #transformer-plan .swatch.direct { color: var(--route); }
+    #transformer-plan .swatch.upper { color: var(--upper); border-top-style: dashed; }
+    #transformer-plan .swatch.secret { color: var(--secret); border-top-style: dotted; }
+    #transformer-plan .swatch.return { color: var(--arc); border-top-style: dashed; }
+    @container (max-width: 520px) {
+      #transformer-plan svg text { font-size: 23px; }
+      #transformer-plan svg text.secondary { font-size: 22px; }
+    }
+    @container (max-width: 380px) {
+      #transformer-plan svg text, #transformer-plan svg text.secondary { font-size: 25px; }
+    }
+  </style>
+  <header>
+    <h2 id="transformer-plan-title">Трансформаторный зал</h2>
+    <span class="text-small text-muted">Вид сверху · без масштаба</span>
+  </header>
+  <svg viewBox="0 0 700 474" role="img" aria-labelledby="xfmr-map-title xfmr-map-desc">
+    <title id="xfmr-map-title">План Г-образного Трансформаторного зала</title>
+    <desc id="xfmr-map-desc">Из Реакторного зала Флуфа попадает в сухой тамбур, перепрыгивает дугу А и выходит на площадку с укрытием и крис-дроном. Дальше можно пробежать через дугу Б или подняться на верхний настил и перепрыгнуть разрыв. С настила доступна ниша с деталями. Пути сходятся перед чекпоинтом лифта. Дуга А возвращает во входной тамбур, дуга Б — за укрытие на площадке у поворота.</desc>
+    <defs>
+      <pattern id="xfmr-grid" width="22" height="22" patternUnits="userSpaceOnUse">
+        <path d="M22 0H0V22" stroke="var(--grid)" stroke-width="1" fill="none"/>
+      </pattern>
+      <pattern id="xfmr-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <path d="M0 0V7" stroke="var(--arc)" stroke-opacity=".25" stroke-width="2"/>
+      </pattern>
+      <marker id="xfmr-direct" markerWidth="10" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto" refX="8" refY="6">
+        <path d="M1 1 8 6 1 11" fill="none" stroke="var(--route)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <marker id="xfmr-upper" markerWidth="10" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto" refX="8" refY="6">
+        <path d="M1 1 8 6 1 11" fill="none" stroke="var(--upper)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <marker id="xfmr-secret" markerWidth="9" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto" refX="7" refY="5">
+        <path d="M1 1 7 5 1 9" fill="none" stroke="var(--secret)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <marker id="xfmr-return" markerWidth="10" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto" refX="8" refY="6">
+        <path d="M1 1 8 6 1 11" fill="none" stroke="var(--arc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <g id="xfmr-cabinet">
+        <rect width="48" height="30" rx="2" fill="var(--metal)" stroke="var(--edge)" stroke-width="1.5"/>
+        <path d="M8 6V24M14 6V24M20 6V24M26 6V24M32 6V24M38 6V24" fill="none" stroke="var(--edge)" stroke-width="1.5"/>
+      </g>
+    </defs>
+
+    <path d="M110 409V79H633V253H291V409Z" fill="var(--floor)"/>
+    <path d="M110 409V79H633V253H291V409Z" fill="url(#xfmr-grid)"/>
+    <path d="M110 409V79H633V195M633 235V253H291V409H227M181 409H110"
+      fill="none" stroke="var(--edge)" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M172 409H181M227 409H236M633 185V195M633 235V245"
+      fill="none" stroke="var(--foreground)" stroke-width="3" stroke-linecap="round"/>
+
+    <path d="M126 99H269V207L287 234V246H126Z M127 336H275V396H127Z M555 176H621V242H555Z"
+      fill="var(--pad)" stroke="var(--grid)" stroke-width="1.2"/>
+    <path d="M264 192 283 153H354V112H267L237 177Z M447 112H570L597 165 569 177 547 149H447Z"
+      fill="color-mix(in srgb, var(--upper) 13%, var(--background))" stroke="var(--edge)" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M246 171 271 181M251 161 276 171M256 151 281 161"
+      fill="none" stroke="var(--edge)" stroke-width="1.4"/>
+    <path d="M477 110V86H532V111" fill="var(--floor)" stroke="var(--edge)" stroke-width="1.5"/>
+    <rect x="495" y="92" width="20" height="15" rx="1.5" fill="var(--background)" stroke="var(--secret)" stroke-width="2"/>
+    <path d="M496 97H514M501 92V107M509 92V107" fill="none" stroke="var(--secret)" stroke-width="1"/>
+
+    <rect x="128" y="280" width="151" height="29" fill="url(#xfmr-hatch)"/>
+    <rect x="414" y="181" width="29" height="69" fill="url(#xfmr-hatch)"/>
+    <use href="#xfmr-cabinet" x="225" y="249"/>
+    <use href="#xfmr-cabinet" x="331" y="160"/>
+    <path d="M257 278V286M378 176H404L424 193" fill="none" stroke="var(--edge)" stroke-width="1.5"/>
+
+    <path d="M204 438V238Q204 216 227 216H663"
+      fill="none" stroke="var(--route)" stroke-width="3" stroke-linecap="round" marker-end="url(#xfmr-direct)"/>
+    <path d="m199 324 5-7 5 7m-10-66 5-7 5 7m94-47 7 5-7 5m208-10 7 5-7 5"
+      fill="none" stroke="var(--route)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M231 216 284 132H348 M348 132H453 M453 132H545L582 210"
+      fill="none" stroke="var(--upper)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+      stroke-dasharray="9 5" marker-end="url(#xfmr-upper)"/>
+    <path d="M480 132 503 112 M522 107 545 132"
+      fill="none" stroke="var(--secret)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 5" marker-end="url(#xfmr-secret)"/>
+
+    <g fill="none" stroke="var(--arc)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M125 295h12l10-7 11 14 11-14 11 14 11-14 11 14 11-14 11 14 11-14 11 14 11-14 11 7h12"/>
+      <path d="M428 181v10l-6 7 12 8-12 8 12 8-12 8 6 8v10"/>
+      <path d="M122 289V301M281 289V301M422 180H434M422 249H434" stroke-width="4"/>
+    </g>
+    <path d="M149 309C126 331 130 353 150 359 M412 233Q364 244 314 239L261 239"
+      fill="none" stroke="var(--arc)" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4" marker-end="url(#xfmr-return)"/>
+    <g fill="var(--background)" stroke="var(--arc)" stroke-width="2">
+      <circle cx="159" cy="360" r="6"/><circle cx="253" cy="239" r="6"/>
+    </g>
+
+    <g fill="var(--metal)" stroke="var(--edge)" stroke-width="1.5">
+      <rect x="196" y="192" width="35" height="9" rx="2"/>
+      <path d="m162 157 10 7-10 7-10-7Z"/>
+      <path d="M161 164h2M151 160h-7m29 0h7" fill="none" stroke-linecap="round"/>
+    </g>
+    <g fill="var(--background)" stroke="var(--route)" stroke-width="2">
+      <path d="m603 198 7-7-7-7-7 7Z"/><circle cx="603" cy="191" r="1.4" fill="var(--route)" stroke="none"/>
+    </g>
+
+    <g fill="none" stroke="var(--edge)" stroke-width="1.1">
+      <path d="M108 295H89M194 196H106L90 177H63 M320 65V112 M526 65L505 86 M602 201V277"/>
+    </g>
+    <g>
+      <text x="320" y="56" text-anchor="middle">Верхний настил</text>
+      <text x="526" y="56" text-anchor="middle">Ниша с деталями</text>
+      <text x="400" y="111" text-anchor="middle" class="secondary">Прыжок</text>
+      <text x="192" y="102" text-anchor="middle">Сухая</text>
+      <text x="192" y="136" text-anchor="middle">площадка</text>
+      <text x="181" y="170" class="secondary">Крис-дрон</text>
+      <text x="7" y="171" class="secondary">Укрытие</text>
+      <text x="82" y="301" text-anchor="end">Дуга А</text>
+      <text x="429" y="173" text-anchor="middle">Дуга Б</text>
+      <text x="204" y="390" text-anchor="middle">Тамбур</text>
+      <text x="204" y="461" text-anchor="middle" class="secondary">Из реакторного зала</text>
+      <text x="602" y="299" text-anchor="middle">Тамбур лифта</text>
+      <text x="602" y="334" text-anchor="middle" class="secondary">Чекпоинт</text>
+    </g>
+  </svg>
+  <figcaption class="text-small">
+    <span class="legend-item"><span class="swatch direct" aria-hidden="true"></span>Нижний маршрут</span>
+    <span class="legend-item"><span class="swatch upper" aria-hidden="true"></span>Верхний обход</span>
+    <span class="legend-item"><span class="swatch secret" aria-hidden="true"></span>Путь к секрету</span>
+    <span class="legend-item"><span class="swatch return" aria-hidden="true"></span>Возврат после разряда</span>
+  </figcaption>
+</figure>
