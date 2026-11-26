@@ -16,6 +16,10 @@ namespace Arcatech.Stats
     [RequireComponent(typeof(EntityStatsComponent),typeof(EntityStateMachineComponent))]
     public class StatsStateAugmentorComponent : ValidatedMonoBehaviour, IStateAugmentor, IKillerComponent,IStatUpdatesViewer
     {
+        private static readonly int DamageDirectionHash = Animator.StringToHash("DamageDirection");
+        private static readonly int DamageMagnitudeHash = Animator.StringToHash("DamageMagnitude");
+        private const float MediumDamageFraction = 0.1f;
+        private const float HeavyDamageFraction = 0.25f;
         
         [SerializeField, Self]
         private EntityStatsComponent stats;
@@ -23,6 +27,7 @@ namespace Arcatech.Stats
         [SerializeField] private SerializedStateTransition toKilledState;
         [SerializeField] private SerializedStateTransition toKnockDown;
         [SerializeField] private SerializedStateTransition toDamageInterrupt;
+        [SerializeField] private bool setDamageAnimationParameters;
 
         [SerializeField] private SerializedActionResult onDeathPlaceholder;
         
@@ -33,6 +38,8 @@ namespace Arcatech.Stats
         private UnitState _killState;
         private UnitState _knockDownStartState;
         private UnitState _damageInterruptState;
+        private float _queuedDamageDirection;
+        private float _queuedDamageMagnitude;
 
         
         private StateMachineContext _stateMachineCtx;
@@ -82,8 +89,8 @@ namespace Arcatech.Stats
                 _damageInterruptState = _toDamageInterrupt.NextState;
                 machine.AddTransition(_toDamageInterrupt);
             }
-            stats.RegisterStatsViewer(this);
             _stateMachineCtx = machine.Context;
+            stats.RegisterStatsViewer(this);
         }
 
         public void Detach(IStateAugmentorReceiver machine)
@@ -91,6 +98,8 @@ namespace Arcatech.Stats
             if (usesKilled) machine.RemoveTransition(_toKilled);
             if (usesKnockDown) machine.RemoveTransition(_toKnockDown);
             if (usesDamageInterrupt) machine.RemoveTransition(_toDamageInterrupt);
+            stats.UnregisterStatsViewer(this);
+            _stateMachineCtx = null;
         }
 
         public void OnStateEntered(UnitState state, StateMachineContext context)
@@ -117,7 +126,13 @@ namespace Arcatech.Stats
 
             if (usesDamageInterrupt && state == _damageInterruptState)
             {
-                _stateMachineCtx.InterruptQueued = false;
+                if (setDamageAnimationParameters && context.Animator != null)
+                {
+                    context.Animator.SetFloat(DamageDirectionHash, _queuedDamageDirection);
+                    context.Animator.SetFloat(DamageMagnitudeHash, _queuedDamageMagnitude);
+                }
+
+                context.InterruptQueued = false;
             }
         }
 
@@ -131,11 +146,6 @@ namespace Arcatech.Stats
                     k.SetKilled(this,true);
                 }
             }
-            // if (state == _damage)
-            // {
-            //     context.Animator.SetFloat(dmgFrontHash,0);
-            //     context.Animator.SetFloat(dmgRightHash,0);
-            // }
         }
 
         public string KilledBy => $"Transition to Killed State Condition Satisfied";
@@ -144,12 +154,28 @@ namespace Arcatech.Stats
         public void HandleStatsUpdate(ResourceStatType stat, float statCurrent, float statMax, float statDelta, EntityStatsComponent.ExpendType changeType,
             BaseGameEntityComponent source)
         {
-            if (stat == ResourceStatType.Health &&
+            if (_stateMachineCtx != null && stat == ResourceStatType.Health &&
                 statDelta < 0f &&
                 changeType == EntityStatsComponent.ExpendType.ActionResult &&
                 source != stateMachine.GetMainEntity)
             {
-                // damage was taken
+                if (setDamageAnimationParameters)
+                {
+                    // Keep the active reaction's blend values until the next interrupt starts.
+                    var facing = stateMachine.GetMainEntity.transform;
+                    _queuedDamageDirection = 1f;
+                    if (source != null)
+                    {
+                        Vector3 toSource = Vector3.ProjectOnPlane(source.transform.position - facing.position, Vector3.up);
+                        if (Vector3.Dot(facing.forward, toSource) < 0f)
+                            _queuedDamageDirection = -1f;
+                    }
+
+                    float damageFraction = -statDelta / statMax;
+                    _queuedDamageMagnitude = damageFraction >= HeavyDamageFraction ? 3f :
+                        damageFraction >= MediumDamageFraction ? 2f : 1f;
+                }
+
                 _stateMachineCtx.InterruptQueued = true;
             }
         }

@@ -2,6 +2,7 @@
 // File: ItemIdIndex.cs
 
 using System.Collections.Generic;
+using Arcatech;
 using Arcatech.Items;
 using UnityEditor;
 
@@ -19,6 +20,7 @@ public static class ItemIdIndex
     static ItemIdIndex()
     {
         EditorApplication.projectChanged += Invalidate;
+        Undo.undoRedoPerformed += Invalidate;
     }
 
     public static void Invalidate() => _byId = null;
@@ -68,11 +70,7 @@ public static class ItemIdIndex
     public static void RegenerateId(ItemSO item)
     {
         if (item == null) return;
-        Undo.RecordObject(item, "Regenerate Item ID");
-        item.ID = System.Guid.NewGuid().ToString();
-        EditorUtility.SetDirty(item);
-        AssetDatabase.SaveAssetIfDirty(item);
-        Invalidate();
+        ScriptableObjectIdTools.RegenerateIds(new[] { item }, "Regenerate Item ID");
     }
 
     /// <summary>Подпись категории для карточек и инспектора.</summary>

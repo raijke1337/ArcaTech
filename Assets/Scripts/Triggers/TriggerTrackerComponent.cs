@@ -64,7 +64,7 @@ namespace Arcatech.Triggers
             }
         }
 
-        public void AreaCast(ITriggerNotificationReceiver receiver)
+        public void AreaCast(ITriggerNotificationReceiver receiver = null)
         {
             if (triggerCollider is not BoxCollider boxCollider)
             {
@@ -322,13 +322,19 @@ namespace Arcatech.Triggers
             _attackWarningLine.SetPosition(2, new Vector3(center.x + halfX, floorY, center.z + halfZ));
             _attackWarningLine.SetPosition(3, new Vector3(center.x - halfX, floorY, center.z + halfZ));
         }
-        private void ShowAttackWarning()
+        public void ShowAttackWarning(bool immediate = false)
         {
             EnsureAttackWarningVisual();
             UpdateAttackWarningTransform();
             _attackWarningObject.SetActive(true);
 
             _attackWarningTween?.Kill();
+            if (immediate)
+            {
+                SetWarningAlpha(1f);
+                return;
+            }
+
             _attackWarningTween = DOTween.To(
                     () => _warningAlpha,
                     SetWarningAlpha,
@@ -339,11 +345,18 @@ namespace Arcatech.Triggers
                 .SetLink(gameObject);
         }
 
-        private void HideAttackWarning()
+        public void HideAttackWarning(bool immediate = false)
         {
             if (_attackWarningObject == null || !_attackWarningObject.activeSelf) return;
 
             _attackWarningTween?.Kill();
+            if (immediate)
+            {
+                SetWarningAlpha(0f);
+                _attackWarningObject.SetActive(false);
+                return;
+            }
+
             _attackWarningTween = DOTween.To(
                     () => _warningAlpha,
                     SetWarningAlpha,

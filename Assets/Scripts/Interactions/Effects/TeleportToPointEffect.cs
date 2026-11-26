@@ -19,7 +19,7 @@ namespace Arcatech.Interactions
             if (point != null)
             {
                 Gizmos.color = Color.blue;
-                Gizmos.DrawSphere(point.position, 1f);
+                Gizmos.DrawSphere(point.position, .3f);
             }
         }
     }

@@ -34,15 +34,5 @@ namespace Arcatech
             EventBus<PauseToggleEvent>.Deregister(_eventBinding);
         }
 
-        public void Pause(float time) => StartCoroutine(TimedPause(time));
-
-        private IEnumerator TimedPause(float time)
-        {
-            OnApplicationPause(true);
-            Debug.Log("Pause");
-            yield return new WaitForSeconds(time);
-            Debug.Log("unPause");
-            OnApplicationPause(false);
-        }
     }
 }

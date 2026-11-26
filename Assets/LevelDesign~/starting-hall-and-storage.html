@@ -1,0 +1,134 @@
+<figure id="arca-paired-plan" aria-labelledby="arca-pair-title">
+  <style>
+    #arca-paired-plan {
+      margin: 0; container-type: inline-size;
+      --edge: color-mix(in srgb,var(--foreground) 54%,var(--background));
+      --floor: color-mix(in srgb,var(--foreground) 6%,var(--background));
+      --metal: color-mix(in srgb,var(--foreground) 13%,var(--background));
+      --grid: color-mix(in srgb,var(--foreground) 11%,var(--background));
+      --main: var(--viz-series-1,var(--blue)); --back: var(--viz-series-2,var(--orange));
+      --danger: var(--viz-series-3,var(--green)); --secret: var(--viz-series-4,var(--purple));
+    }
+    #arca-paired-plan header, #arca-paired-plan figcaption {display:flex; align-items:baseline; flex-wrap:wrap; gap:.4em 1em}
+    #arca-paired-plan svg {display:block;width:100%;height:auto;margin:.65em 0}
+    #arca-paired-plan svg text {font:14px system-ui,sans-serif;fill:var(--foreground);paint-order:stroke;stroke:var(--background);stroke-width:3;stroke-linejoin:round}
+    #arca-paired-plan svg .room {font-weight:650;font-size:19px}
+    #arca-paired-plan .wall, #arca-paired-plan .leader {fill:none;stroke:var(--edge)}
+    #arca-paired-plan .wall {stroke-width:2.4}
+    #arca-paired-plan .deck {fill:var(--metal);stroke:var(--edge);stroke-width:1.3}
+    #arca-paired-plan .route,#arca-paired-plan .ret,#arca-paired-plan .spur,#arca-paired-plan .reset {fill:none;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+    #arca-paired-plan .route {stroke:var(--main)}
+    #arca-paired-plan .ret {stroke:var(--back);stroke-dasharray:8 4}
+    #arca-paired-plan .spur {stroke:var(--secret);stroke-dasharray:1 5}
+    #arca-paired-plan .reset {stroke:var(--danger);stroke-width:2;stroke-dasharray:4 4}
+    #arca-paired-plan figcaption span {display:inline-flex;align-items:center;gap:.4em}
+    #arca-paired-plan figcaption i {width:1.6em;border-top:3px solid var(--main)}
+    #arca-paired-plan i.jump {border-top-style:dashed}
+    #arca-paired-plan i.back {border-top:dashed 3px var(--back)}
+    #arca-paired-plan i.secret {border-top:dotted 3px var(--secret)}
+    #arca-paired-plan i.fire {height:.65em;background:color-mix(in srgb,var(--danger) 22%,var(--background));border:1px solid var(--danger)}
+    #arca-paired-plan i.reset-key {border-top:dashed 2px var(--danger)}
+    #arca-paired-plan .codes,#arca-paired-plan .compact-key {display:none}
+    @container(max-width:575px) {
+      #arca-paired-plan .full {display:none}
+      #arca-paired-plan .codes {display:block}
+      #arca-paired-plan .codes text {font-size:26px;font-weight:600}
+      #arca-paired-plan svg .room {font-size:26px}
+      #arca-paired-plan .compact-key {display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:.3em 1em;margin:.75em 0}
+    }
+  </style>
+  <header><h2 id="arca-pair-title">Стартовый зал и Склад деталей</h2><span class="text-small text-muted">Вид сверху · без масштаба</span></header>
+  <svg viewBox="0 0 700 536" role="img" aria-labelledby="pair-title pair-desc">
+    <title id="pair-title">План двух залов с общей длинной стеной</title>
+    <desc id="pair-desc">Верхний зал начинается у пролома. Ящики ведут к прыжку на балкон и решётке в техшахту. Спрыгнув на уступ, можно найти детали за обломком стены. В нижний зал входят из хаба. Батарея Т0 лежит до первого прыжка под огнём турели. За контейнером с укрытием находится сухая площадка с предохранителем и чекпоинтом. Обратный балкон ведёт в хаб. После включения питания дверь в общей стене можно активировать со склада. Она взрывается, выбрасывает ящик деталей и открывает проход в стартовый зал.</desc>
+    <defs>
+      <pattern id="pair-grid" width="17" height="17" patternUnits="userSpaceOnUse"><path d="M17 0H0V17" fill="none" stroke="var(--grid)" stroke-width=".65"/></pattern>
+      <pattern id="pair-water" width="28" height="19" patternUnits="userSpaceOnUse"><path d="M3 10q3-3 6 0t6 0" fill="none" stroke="var(--danger)" opacity=".35"/></pattern>
+      <marker id="pair-tip" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="m2 1 6 4-6 4" fill="none" stroke="var(--main)" stroke-width="2"/></marker>
+      <marker id="pair-ret-tip" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="m2 1 6 4-6 4" fill="none" stroke="var(--back)" stroke-width="2"/></marker>
+      <marker id="pair-s-tip" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="m2 1 6 4-6 4" fill="none" stroke="var(--secret)" stroke-width="2"/></marker>
+      <g id="pair-loot" fill="var(--background)" stroke="currentColor"><rect x="-10" y="-7" width="20" height="14" rx="1" stroke-width="1.7"/><path d="M-10-2H10M-4-7V7M4-7V7" fill="none"/></g>
+    </defs>
+    <rect x="24" y="18" width="652" height="468" fill="var(--floor)"/>
+    <rect x="24" y="18" width="652" height="468" fill="url(#pair-grid)"/>
+    <text class="room" x="40" y="48">Стартовый зал</text>
+    <!-- The crates form a continuous ascent. The sole gap leads to the balcony. -->
+    <path class="deck" d="M186 109h66v45h-66z M252 102h55v52h-55z M307 94h62v60h-62z M369 88h49v66h-49z M466 80h210v80H466z"/>
+    <path class="leader" d="M193 115h52m15-7h40m14-8h48m14-6h34M473 88h193"/>
+    <path class="deck" d="M308 177h95v42h-95z"/>
+    <path class="wall" d="m328 184 13 6 9-2 12 9"/>
+    <path class="route" d="M8 133h147q14 0 27-4l36-9h195"/>
+    <path class="route" d="M413 120q25-20 55 0" stroke-dasharray="5 5"/>
+    <path class="route" d="M468 120h222" marker-end="url(#pair-tip)"/>
+    <path class="spur" d="M316 124q0 30 9 39l44 36" marker-end="url(#pair-s-tip)"/>
+    <use href="#pair-loot" x="129" y="120" color="var(--main)"/>
+    <use href="#pair-loot" x="383" y="201" color="var(--secret)"/>
+    <path d="M672 106v28m4-28v28m4-28v28m-9-21h10m-10 7h10m-10 7h10" fill="none" stroke="var(--edge)" stroke-width="1.6"/>
+    <g class="full">
+      <text x="38" y="158">Пролом</text><text x="98" y="97">Детали</text>
+      <text x="218" y="79">Подъём по ящикам</text><text x="501" y="106">Балкон</text>
+      <text x="660" y="64" text-anchor="end">Решётка в техшахту</text>
+      <path class="leader" d="M650 68l22 34M299 201h23"/>
+      <text x="288" y="197" text-anchor="end">Секретный уступ</text>
+      <text x="288" y="216" text-anchor="end">Детали за обломком стены</text>
+    </g>
+    <!-- A single doorway in the common wall aligns with a dry warehouse balcony. -->
+    <text class="room" x="40" y="279">Склад деталей</text>
+    <rect x="24" y="303" width="652" height="145" fill="url(#pair-water)"/>
+    <path class="deck" d="M24 345h169v86H24z M253 352h105v54H253z M419 352h135v-49h-65v-57h42v30h141v172H554v-57H419z M24 448h648v38H24z M24 431h48v17H24z"/>
+    <path class="deck" d="M374 300h51v30h-51z"/>
+    <path d="m398 317-195 45q64 34 178 31z" fill="var(--danger)" opacity=".2"/>
+    <path d="m203 362 195-45-17 76" stroke="var(--danger)" fill="none" stroke-width="1.1"/>
+    <circle cx="399" cy="315" r="7" fill="var(--background)" stroke="var(--danger)" stroke-width="2"/>
+    <path d="m398 316-11 6" stroke="var(--danger)" stroke-width="3"/>
+    <rect class="deck" x="277" y="350" width="56" height="13" rx="1"/>
+    <path class="leader" d="M286 352v8m8-8v8m8-8v8m8-8v8m8-8v8"/>
+    <path class="route" d="M8 385H89q14 0 22-8l8-7h72 M253 370h105 M419 370h168q15 0 15-15v-24" marker-end="url(#pair-tip)"/>
+    <path class="route" d="M192 370h61m105 0h61" stroke-dasharray="5 5"/>
+    <path class="ret" d="M636 344v121H50q-9 0-9-10v-43H8" marker-end="url(#pair-ret-tip)"/>
+    <path class="reset" d="M230 413q-20 23-70 0l-19-8"/>
+    <circle cx="137" cy="404" r="4.5" fill="var(--background)" stroke="var(--danger)" stroke-width="2"/>
+    <path class="spur" d="M609 302H512V215" marker-end="url(#pair-s-tip)"/>
+    <path d="M490 246h41" stroke="var(--secret)" stroke-width="3" stroke-dasharray="5 4"/>
+    <use href="#pair-loot" x="533" y="226" color="var(--secret)"/>
+    <g fill="var(--background)" stroke="var(--main)" stroke-width="2">
+      <path d="M115 355h12v16h-12z M119 352h4v3"/>
+      <path d="M592 309h21v16h-21z M597 312v10m5-10v10m5-10v10"/>
+    </g>
+    <path d="m636 321 7 7-7 7-7-7z" stroke="var(--back)" stroke-width="2" fill="var(--background)"/>
+    <path class="wall" d="M24 118V18h652v87m0 30v351H24v-62m0-50V147M24 246h465m43 0h144"/>
+    <g class="full">
+      <text x="660" y="190" text-anchor="end">Дверь в стартовый зал</text>
+      <text x="660" y="209" text-anchor="end">После подачи питания</text>
+      <text x="40" y="328">Батарея Т0</text><path class="leader" d="m112 331 8 17"/>
+      <text x="42" y="376">Хаб</text>
+      <text x="242" y="333">Укрытие</text><path class="leader" d="m293 336 10 11"/>
+      <text x="377" y="292">Турель</text>
+      <text x="661" y="269" text-anchor="end">Предохранитель</text>
+      <text x="663" y="357" text-anchor="end">Чекпоинт</text>
+      <text x="358" y="434" text-anchor="middle">Электризованная вода</text>
+      <text x="360" y="511" text-anchor="middle">Обратный балкон в хаб</text>
+    </g>
+    <g class="codes" text-anchor="middle">
+      <text x="47" y="166">1</text><text x="129" y="100">2</text><text x="294" y="85">3</text>
+      <text x="635" y="103">4</text><text x="379" y="180">5</text><text x="562" y="234">6</text>
+      <text x="48" y="373">7</text><text x="120" y="347">8</text><text x="305" y="342">9</text>
+      <text x="399" y="291">10</text><text x="600" y="300">11</text><text x="642" y="367">12</text>
+      <text x="370" y="437">13</text><text x="357" y="514">14</text>
+    </g>
+  </svg>
+  <div class="compact-key text-small">
+    <span>1 · Вход через пролом</span><span>2 · Ящик с деталями</span>
+    <span>3 · Подъём по ящикам</span><span>4 · Балкон и решётка в шахту</span>
+    <span>5 · Уступ с деталями</span><span>6 · Дверь после подачи питания</span>
+    <span>7 · Вход из хаба</span><span>8 · Батарея Т0</span>
+    <span>9 · Укрытие</span><span>10 · Турель</span>
+    <span>11 · Предохранитель</span><span>12 · Чекпоинт</span>
+    <span>13 · Вода под током</span><span>14 · Обратный балкон</span>
+  </div>
+  <figcaption class="text-small">
+    <span><i></i>Основной путь</span><span><i class="jump"></i>Прыжок</span>
+    <span><i class="back"></i>Возврат в хаб</span><span><i class="secret"></i>Путь к секрету</span>
+    <span><i class="fire"></i>Сектор обстрела</span><span><i class="reset-key"></i>Возврат при падении</span>
+  </figcaption>
+</figure>
